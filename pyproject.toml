@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "funstruct"
+version = "0.1.0"
+description = "fun & functional structures"
+authors = ["Andrew Stefanich <andrewstefanich@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+keywords = ["functional", "immutable", "fp"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+returns = "^0.23.0"
+pytest-parametrization = "^2022.2.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+debugpy = "^1.8.2"
+black = "^24.4.2"
+pre-commit = "^3.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
