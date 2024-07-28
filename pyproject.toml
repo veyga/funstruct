@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "funstruct"
-version = "0.1.0"
+version = "0.1.1"
 description = "fun & functional structures"
 authors = ["Andrew Stefanich <andrewstefanich@gmail.com>"]
 license = "MIT"

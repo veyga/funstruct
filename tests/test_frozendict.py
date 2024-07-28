@@ -1,5 +1,5 @@
 import pytest
-from funstruct import frozendict
+from funstruct.frozendict import frozendict
 from returns.maybe import Some, Nothing
 from parametrization import Parametrization as P
 

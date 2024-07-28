@@ -1,6 +1,6 @@
 import pytest
 from parametrization import Parametrization as P
-from funstruct import CList, Cons, Nil
+from funstruct.cons import CList, Cons, Nil
 
 
 @pytest.fixture
