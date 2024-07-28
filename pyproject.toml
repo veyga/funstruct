@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "funstruct"
+version = "0.1.2"
+description = "fun & functional structures"
+authors = ["Andrew Stefanich <andrewstefanich@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/veyga/funstruct"
+repository = "https://github.com/veyga/funstruct"
+keywords = ["functional", "immutable", "fp", "data structures", "cons"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+returns = "^0.23.0"
+pytest-parametrization = "^2022.2.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+debugpy = "^1.8.2"
+black = "^24.4.2"
+pre-commit = "^3.7.1"
+sphinx = "^7.4.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
