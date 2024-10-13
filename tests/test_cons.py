@@ -1,6 +1,7 @@
 import pytest
 from parametrization import Parametrization as P
 from funstruct.cons import CList, Cons, Nil
+from funstruct.tailrec import tco, tail_call
 
 
 @pytest.fixture
@@ -535,3 +536,26 @@ def test_flatten(input, expected):
 def test_flat_map(original, expected):
     triple = lambda n: CList.from_iterable([n * 3, n * 3])
     assert original.flat_map(triple) == expected
+
+
+def _build_range(n: int):
+    @tco
+    def inner(remaining: int, acc: CList[int]):
+        if remaining == 0:
+            return acc
+        return tail_call(inner)(remaining - 1, remaining << acc)
+
+    return inner(n, Nil())
+
+
+def test_prepend_tailrec_ok():
+    n = 5
+    built = _build_range(n)
+    assert len(built) == n
+
+
+def test_prepend_tailrec_bad():
+    with pytest.raises(RecursionError):
+        n = 2000
+        built = _build_range(n)
+        assert len(built) == n

@@ -399,7 +399,7 @@ class Nil(CList):
         Returns:
             A string representing the empty list.
         """
-        return "Nil()"
+        return "Nil"
 
     def append(self, other: _CList) -> _CList:
         """Append another list to the empty list.
@@ -513,10 +513,7 @@ class Cons[A](CList[A]):
         Returns:
             A string representing the list, showing the head and tail.
         """
-        match self.tail:
-            case Nil():
-                return f"Cons({self.head})"
-        return f"Cons({self.head}, {self.tail})"
+        return f"{self.head} << {self.tail}"
 
     def append(self, other: _CList) -> _CList:
         """Append another list to the end of this non-empty list.
