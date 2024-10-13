@@ -1,19 +1,20 @@
 from copy import deepcopy
-from returns.maybe import Maybe, Some, Nothing
 from typing import Optional
+
+from returns.maybe import Maybe, Nothing, Some
 
 
 class frozendict[K, V]:
-    """
-    An immutable wrapper around a mutable dict.
+    """An immutable wrapper around a mutable dict.
 
-    This class provides an immutable dictionary-like object. Once created, the dictionary cannot be modified.
-    It supports standard dictionary operations and some additional methods for immutability and safe usage.
+    This class provides an immutable dictionary-like object.
+    Once created, the dictionary cannot be modified.
+    It supports standard dictionary operations and some additional
+    methods for immutability and safe usage.
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Initializes a frozendict instance with the given arguments.
+        """Initializes a frozendict instance with the given arguments.
 
         Args:
             *args: Positional arguments passed to the dictionary constructor.
@@ -23,8 +24,7 @@ class frozendict[K, V]:
         self._hash = None
 
     def __getitem__(self, key: K) -> V:
-        """
-        Retrieves the value associated with the given key.
+        """Retrieves the value associated with the given key.
 
         Args:
             key: The key to look up in the dictionary.
@@ -38,8 +38,8 @@ class frozendict[K, V]:
         return self._dict[key]
 
     def get(self, key: K) -> Optional[V]:
-        """
-        Retrieves the value associated with the given key, or None if the key is not found.
+        """Retrieves the value associated with the given key,
+        or None if the key is not found.
 
         Args:
             key: The key to look up in the dictionary.
@@ -53,14 +53,14 @@ class frozendict[K, V]:
         return None
 
     def get_maybe(self, key: K) -> Maybe[V]:
-        """
-        Retrieves the value associated with the given key as a Maybe type.
+        """Retrieves the value associated with the given key as a Maybe type.
 
         Args:
             key: The key to look up in the dictionary.
 
         Returns:
-            A Maybe instance containing the value if the key is found, or Nothing if the key is not found.
+            A Maybe instance containing the value if the key is found,
+            or Nothing if the key is not found.
         """
         item = self._dict.get(key)
         if item is not None:
@@ -68,14 +68,15 @@ class frozendict[K, V]:
         return Nothing
 
     def __eq__(self, other) -> bool:
-        """
-        Checks if the current frozendict is equal to another dictionary or frozendict.
+        """Checks if the current frozendict is equal to another
+        dictionary or frozendict.
 
         Args:
             other: The object to compare with the current frozendict.
 
         Returns:
-            True if the other object is equal to the current frozendict, False otherwise.
+            True if the other object is equal to the current frozendict,
+            False otherwise.
         """
         match other:
             case frozendict():
@@ -86,8 +87,7 @@ class frozendict[K, V]:
                 return False
 
     def __contains__(self, key) -> bool:
-        """
-        Checks if the dictionary contains the given key.
+        """Checks if the dictionary contains the given key.
 
         Args:
             key: The key to check for in the dictionary.
@@ -98,8 +98,7 @@ class frozendict[K, V]:
         return key in self._dict
 
     def __len__(self) -> int:
-        """
-        Returns the number of items in the dictionary.
+        """Returns the number of items in the dictionary.
 
         Returns:
             The number of key-value pairs in the dictionary.
@@ -107,8 +106,7 @@ class frozendict[K, V]:
         return len(self._dict)
 
     def keys(self):
-        """
-        Returns an iterator over the dictionary's keys.
+        """Returns an iterator over the dictionary's keys.
 
         Returns:
             An iterator over the keys of the dictionary.
@@ -116,8 +114,7 @@ class frozendict[K, V]:
         return self._dict.keys()
 
     def values(self):
-        """
-        Returns an iterator over the dictionary's values.
+        """Returns an iterator over the dictionary's values.
 
         Returns:
             An iterator over the values of the dictionary.
@@ -125,8 +122,7 @@ class frozendict[K, V]:
         return self._dict.values()
 
     def items(self):
-        """
-        Returns an iterator over the dictionary's key-value pairs.
+        """Returns an iterator over the dictionary's key-value pairs.
 
         Returns:
             An iterator over the key-value pairs of the dictionary.
@@ -134,8 +130,7 @@ class frozendict[K, V]:
         return self._dict.items()
 
     def __iter__(self):
-        """
-        Returns an iterator over the dictionary's keys.
+        """Returns an iterator over the dictionary's keys.
 
         Returns:
             An iterator over the keys of the dictionary.
@@ -143,8 +138,7 @@ class frozendict[K, V]:
         return iter(self._dict)
 
     def __repr__(self) -> str:
-        """
-        Returns a string representation of the frozendict instance.
+        """Returns a string representation of the frozendict instance.
 
         Returns:
             A string representation of the frozendict.
@@ -152,8 +146,7 @@ class frozendict[K, V]:
         return f"frozendict({self._dict})"
 
     def __str__(self) -> str:
-        """
-        Returns a string representation of the frozendict instance.
+        """Returns a string representation of the frozendict instance.
 
         Returns:
             A string representation of the frozendict.
@@ -161,8 +154,7 @@ class frozendict[K, V]:
         return f"frozendict({self._dict})"
 
     def __hash__(self) -> int:
-        """
-        Returns the hash value of the frozendict.
+        """Returns the hash value of the frozendict.
 
         The hash is computed based on the key-value pairs in the dictionary.
         This method ensures that the hash value is consistent for the lifetime
@@ -179,11 +171,11 @@ class frozendict[K, V]:
         return self._hash
 
     def put(self, k: K, v: V) -> "frozendict":
-        """
-        Returns a new frozendict with an updated value for the given key.
+        """Returns a new frozendict with an updated value for the given key.
 
-        This method creates a new frozendict instance with the same contents as the current instance, but with
-        the value for the specified key updated.
+        This method creates a new frozendict instance with the same
+        contents as the current instance, but with the value for
+        the specified key updated.
 
         Args:
             k: The key to update.
@@ -197,8 +189,7 @@ class frozendict[K, V]:
         return frozendict(new_dict)
 
     def combine(self, other) -> "frozendict":
-        """
-        Combines the current frozendict with another frozendict.
+        """Combines the current frozendict with another frozendict.
 
         This method returns a new frozendict that contains all key-value pairs
         from both frozendicts. If there are duplicate keys,
@@ -215,8 +206,7 @@ class frozendict[K, V]:
 
     @property
     def raw(self) -> dict:
-        """
-        Gets the underlying dictionary in its raw form.
+        """Gets the underlying dictionary in its raw form.
 
         Returns:
             The underlying dictionary.
@@ -225,8 +215,7 @@ class frozendict[K, V]:
 
     @classmethod
     def fromkeys(cls, *args, **kwargs) -> "frozendict":
-        """
-        Creates a new frozendict with keys from the given iterable
+        """Creates a new frozendict with keys from the given iterable
         and values set to a specified value.
 
         Args:
@@ -240,8 +229,7 @@ class frozendict[K, V]:
 
     @staticmethod
     def new() -> "frozendict":
-        """
-        Creates a new, empty frozendict.
+        """Creates a new, empty frozendict.
 
         Returns:
             A new, empty frozendict.
@@ -250,8 +238,7 @@ class frozendict[K, V]:
 
     @staticmethod
     def combine_dicts(fd1, fd2) -> "frozendict":
-        """
-        Combines two frozendicts into a new frozendict.
+        """Combines two frozendicts into a new frozendict.
 
         This method returns a new frozendict that contains all key-value pairs
         from both frozendicts. If there are duplicate keys,

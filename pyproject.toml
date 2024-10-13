@@ -18,14 +18,38 @@ pytest-parametrization = "^2022.2.1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
 debugpy = "^1.8.2"
-black = "^24.4.2"
 pre-commit = "^3.7.1"
 sphinx = "^7.4.7"
 ruff = "^0.6.9"
 mypy = "^1.11.2"
 
 [tool.ruff]
-lint.ignore = ["E731"] # allow assignment of lambdas to a symbol
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "N",  # PEP8 naming convetions
+    "D"  # pydocstyle
+]
+ignore = [
+    "E731", # allow assignment of lambdas to a symbol
+    "N801", # class CapWords convention
+    "D415", # docstring - first line should end with period
+    "D205", # docstring - 1 blank line between summary and description
+]
+exclude = [
+  "tests/*.py",
+  "docs/*.py",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [build-system]
 requires = ["poetry-core"]

@@ -47,7 +47,7 @@ def test_get__falsey_returns_item():
 
 
 def test_get__missing_returns_none(empty_fd):
-    assert empty_fd.get("x") == None
+    assert empty_fd.get("x") is None
 
 
 def test_get_maybe__found_returns_some(fd_parity1):

@@ -12,8 +12,8 @@ class _tail_call(object):
 
 
 class tco(object):
-    """
-    Marks a function as tail_call optimized
+    """Marks a function as tail_call optimized
+
     [see tail_call]
     """
 
@@ -28,14 +28,13 @@ class tco(object):
 
 
 def tail_call(f):
-    """
-    Calls a f
-    Allows a function as tail recursive call.
-    This allows recursive functions to not blow the call stack.
-    Use in conjunction with @tco
-    (use with caution)
-    Example:
+    """Call a tail recursive function.
 
+    This allows recursive functions to not blow the call stack.
+    Use in conjunction with @tco.
+    (use with caution).
+
+    Example:
     def sum_up_to(n: int):
         @tco
         def inner(remaining: int, acc: int):
