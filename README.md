@@ -1,6 +1,6 @@
 # funstruct
 
-Some of my fav lil data structures. Heavily inspired by Scala.
+Some of my fav lil data structures.
 
 These are not meant to be highly performant.
 
@@ -11,11 +11,10 @@ Like all functional stuctures, they play very well with recursive algos.
 ### Commands
 This repo utilizes [just](https://github.com/casey/just), which defines a set of common commands.
 Simply type `just` to see a list of available commands.
-These commands are for testing, debugging, managing things, etc.
+These commands are for testing, debugging, etc.
 
 ### Formatting/Linting
 This repo utilizes [ruff](https://github.com/astral-sh/ruff). 
-Setup: 
+Initial Setup: 
 - `just installhooks`
 Formatting and linting will occur on commit.
-If you want to run ruff outside of a commit: `just format` or `just lint`
