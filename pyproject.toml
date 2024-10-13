@@ -21,6 +21,10 @@ debugpy = "^1.8.2"
 black = "^24.4.2"
 pre-commit = "^3.7.1"
 sphinx = "^7.4.7"
+ruff = "^0.6.9"
+
+[tool.ruff]
+lint.ignore = ["E731"] # allow assignment of lambdas to a symbol
 
 [build-system]
 requires = ["poetry-core"]
