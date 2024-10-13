@@ -1,8 +1,6 @@
 from copy import deepcopy
 from typing import Optional
 
-from returns.maybe import Maybe, Nothing, Some
-
 
 class frozendict[K, V]:
     """An immutable wrapper around a mutable dict.
@@ -51,21 +49,6 @@ class frozendict[K, V]:
         if item is not None:
             return item
         return None
-
-    def get_maybe(self, key: K) -> Maybe[V]:
-        """Retrieves the value associated with the given key as a Maybe type.
-
-        Args:
-            key: The key to look up in the dictionary.
-
-        Returns:
-            A Maybe instance containing the value if the key is found,
-            or Nothing if the key is not found.
-        """
-        item = self._dict.get(key)
-        if item is not None:
-            return Some(item)
-        return Nothing
 
     def __eq__(self, other) -> bool:
         """Checks if the current frozendict is equal to another

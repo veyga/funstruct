@@ -2,12 +2,20 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.2
     hooks:
-      - id: ruff-format # Run the formatter.
-        args: ["--config", "pyproject.toml"]
-      - id: ruff # Run the linter.
-        args: ["--config", "pyproject.toml", "--fix"]
+      - id: ruff-format  # Run the formatter.
+        args:
+          - --config
+          - pyproject.toml
+      - id: ruff  # Run the linter.
+        args:
+          - --config
+          - pyproject.toml
+          - --fix
   # - repo: https://github.com/pre-commit/mirrors-mypy
   #   rev: v1.11.2
   #   hooks:
   #     - id: mypy
-  #       args: ["--config-file=mypy.ini"]
+  #       args:
+  #         - --config-file=pyproject.toml
+  #         - --enable-incomplete-feature=NewGenericSyntax  # py3.12 generics
+  #       files: ^_funstruct/  # this isn't being picked up in the pyproject.toml?

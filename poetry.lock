@@ -616,24 +616,6 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
-name = "returns"
-version = "0.23.0"
-description = "Make your functions return something meaningful, typed, and safe!"
-optional = false
-python-versions = "<4.0,>=3.9"
-files = [
-    {file = "returns-0.23.0-py3-none-any.whl", hash = "sha256:278aa6168072b24574ad14be32f7123d1b835928473dd40bc506f47c8b25859a"},
-    {file = "returns-0.23.0.tar.gz", hash = "sha256:27594c28e5fc338e052d27ddf77fe1da82db4472f6d59901e7e9165be35a5256"},
-]
-
-[package.dependencies]
-typing-extensions = ">=4.0,<5.0"
-
-[package.extras]
-check-laws = ["hypothesis (>=6.98,<7.0)", "pytest (>=8.0,<9.0)"]
-compatible-mypy = ["mypy (>=1.10,<1.11)"]
-
-[[package]]
 name = "ruff"
 version = "0.6.9"
 description = "An extremely fast Python linter and code formatter, written in Rust."
@@ -861,4 +843,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "025a147cb0ced3ea58f0b2d3b18c51de5028c44c8bc5231e5831277bc5ea638e"
+content-hash = "e6b57c019b8f6249a2585f7680efe69fb6920e47ee9277f938fb6979ff6136ed"

@@ -4,7 +4,7 @@ from typing import Callable, Iterable, Tuple, TypeVar
 
 A = TypeVar("A")
 
-type _CList = "CList[A]"
+type _CList[A] = "CList[A]"
 
 
 class CList[A](ABC):
@@ -256,6 +256,8 @@ class CList[A](ABC):
                     return right
                 case Cons(h, t):
                     return Cons(h, concat(t, right))
+                case _:
+                    return Nil()
 
         def flatten(lst: "CList[CList[A]]") -> "CList[A]":
             match lst:
@@ -267,6 +269,8 @@ class CList[A](ABC):
                             return concat(flatten(h), flatten(t))
                         case _:
                             return Cons(h, flatten(t))
+                case _:
+                    return Nil()
 
         return flatten(lst)
 

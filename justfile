@@ -18,6 +18,10 @@ dscript FILE:
 format:
   poetry run ruff format
 
+# install the pre-commit hooks
+installhooks:
+  poetry run pre-commit install
+
 # lint the repo
 lint:
   poetry run ruff check
@@ -37,3 +41,7 @@ test TEST:
 # run an individual test with -k flag
 ktest ARG:
   pytest -k {{ARG}}
+
+# run typechecker
+tc:
+  poetry run mypy --enable-incomplete-feature=NewGenericSyntax # py3.12 generics

@@ -11,12 +11,11 @@ keywords = ["functional", "immutable", "fp", "data structures", "cons"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-returns = "^0.23.0"
-pytest-parametrization = "^2022.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
+pytest-parametrization = "^2022.2.1"
 debugpy = "^1.8.2"
 pre-commit = "^3.7.1"
 sphinx = "^7.4.7"
@@ -50,6 +49,12 @@ exclude = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.mypy]
+python_version = "3.12"
+files = [
+  "_funstruct/",
+]
 
 [build-system]
 requires = ["poetry-core"]
