@@ -535,13 +535,3 @@ def test_flatten(input, expected):
 def test_flat_map(original, expected):
     triple = lambda n: CList.from_iterable([n * 3, n * 3])
     assert original.flat_map(triple) == expected
-
-
-@pytest.mark.skip
-def test_prepend_tailrec():
-    n = 10000  # recursion limit
-    lst = Nil()
-    while n > 0:
-        lst = n << lst
-        n -= 1
-    assert len(lst)
