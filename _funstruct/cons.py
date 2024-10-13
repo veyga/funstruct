@@ -182,7 +182,7 @@ class CList[A](ABC):
         Returns:
             A new list with all nested lists flattened into a single list.
         """
-        return CList.flatten_(self)
+        return CList.flatten_(self)  # type: ignore
 
     def flat_map[B](self, f: Callable[[A], "CList[B]"]) -> "CList[B]":
         """Apply a function to each element of the list,
