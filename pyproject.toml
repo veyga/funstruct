@@ -11,16 +11,50 @@ keywords = ["functional", "immutable", "fp", "data structures", "cons"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-returns = "^0.23.0"
-pytest-parametrization = "^2022.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
+pytest-parametrization = "^2022.2.1"
 debugpy = "^1.8.2"
-black = "^24.4.2"
 pre-commit = "^3.7.1"
 sphinx = "^7.4.7"
+ruff = "^0.6.9"
+mypy = "^1.11.2"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "N",  # PEP8 naming convetions
+    "D"  # pydocstyle
+]
+ignore = [
+    "E731", # allow assignment of lambdas to a symbol
+    "N801", # class CapWords convention
+    "D415", # docstring - first line should end with period
+    "D205", # docstring - 1 blank line between summary and description
+]
+exclude = [
+  "tests/*.py",
+  "docs/*.py",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.12"
+files = [
+  "_funstruct/",
+]
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,6 +1,5 @@
 import pytest
 from funstruct.frozendict import frozendict
-from returns.maybe import Some, Nothing
 from parametrization import Parametrization as P
 
 
@@ -47,19 +46,7 @@ def test_get__falsey_returns_item():
 
 
 def test_get__missing_returns_none(empty_fd):
-    assert empty_fd.get("x") == None
-
-
-def test_get_maybe__found_returns_some(fd_parity1):
-    assert fd_parity1.get_maybe("x") == Some(1)
-
-
-def test_get_maybe__found_falsey_returns_some():
-    assert frozendict({"x": 0}).get_maybe("x") == Some(0)
-
-
-def test_get_maybe__missing_returns_nothing(empty_fd):
-    assert empty_fd.get_maybe("x") == Nothing
+    assert empty_fd.get("x") is None
 
 
 def test_fd_cannot_set_new_key(fd_parity1):

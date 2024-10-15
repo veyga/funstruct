@@ -1,6 +1,21 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 24.3.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.2
     hooks:
-      - id: black
-        language_version: python3.12
+      - id: ruff-format  # Run the formatter.
+        args:
+          - --config
+          - pyproject.toml
+      - id: ruff  # Run the linter.
+        args:
+          - --config
+          - pyproject.toml
+          - --fix
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        args:
+          - --config-file=pyproject.toml
+          - --enable-incomplete-feature=NewGenericSyntax  # py3.12 generics
+        files: ^_funstruct/  # this isn't being picked up in the pyproject.toml?
