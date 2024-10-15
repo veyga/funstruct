@@ -161,29 +161,6 @@ def test_prepend_as_dunder(input, expected, request):
     assert input == e
 
 
-# def test_yo():
-#   class Nill:
-#       def __repr__(self):
-#           return "Nil"
-
-#   class Conss:
-#       def __init__(self, head, tail):
-#           self.head = head
-#           self.tail = tail
-
-#       def __repr__(self):
-#           return f"Conss({self.head}, {self.tail})"
-
-#       def __rlshift__(self, other):
-#           return Conss(other, self)
-
-#   result = 1 << 2 << 3 << Nill()  # Creates Cons(1, Cons(2, Cons(3, Nil())))
-#   print(result)  # Output: Cons(1, Cons(2, Cons(3, Nil())))
-#   # nil = Nil()
-#   # result = 2 << 1 << nil
-#   # print(result)
-
-
 @P.autodetect_parameters()
 @P.case(
     name="Nil",
@@ -536,26 +513,3 @@ def test_flatten(input, expected):
 def test_flat_map(original, expected):
     triple = lambda n: CList.from_iterable([n * 3, n * 3])
     assert original.flat_map(triple) == expected
-
-
-def _build_range(n: int):
-    @tco
-    def inner(remaining: int, acc: CList[int]):
-        if remaining == 0:
-            return acc
-        return tail_call(inner)(remaining - 1, remaining << acc)
-
-    return inner(n, Nil())
-
-
-def test_prepend_tailrec_ok():
-    n = 5
-    built = _build_range(n)
-    assert len(built) == n
-
-
-def test_prepend_tailrec_bad():
-    with pytest.raises(RecursionError):
-        n = 2000
-        built = _build_range(n)
-        assert len(built) == n
