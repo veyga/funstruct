@@ -8,6 +8,10 @@ They are useful for smaller datasets and for personal scripts.
 
 Like all functional stuctures, they play very well with recursive algos.
 
+### Install
+Install like any PyPI package:</br>
+`pip install funstruct`, `poetry add funstruct`, ...
+
 ### Commands
 This repo utilizes [just](https://github.com/casey/just), which defines a set of common commands.
 Simply type `just` to see a list of available commands.
