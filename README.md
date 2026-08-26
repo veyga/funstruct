@@ -25,3 +25,12 @@ This repo utilizes [ruff](https://github.com/astral-sh/ruff). Initial Setup:
 - `just installhooks` Formatting and linting will occur on commit.
 
 # mise trust && mise install
+
+###
+
+```python
+from funstruct import tailrec
+from funstruct.collections import Cons, FrozenDict
+from funstruct.monad import State, StateT, ReaderT
+from funstruct.applicative import Validated, Valid, Invalid, map_n
+```

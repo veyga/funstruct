@@ -1,3 +1,3 @@
-"""A state monad transformer"""
+"""A state monad transformer."""
 
-from _funstruct.state import *  # noqa F403
+from _funstruct.state_t import *  # noqa: F403
