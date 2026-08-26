@@ -1,3 +1,3 @@
 """Utilities for tail calls"""
 
-from _funstruct.tailrec import *  # noqa F403
+from _funstruct._tailrec import *  # noqa F403

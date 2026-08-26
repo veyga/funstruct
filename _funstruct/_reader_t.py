@@ -64,8 +64,8 @@ class ReaderT(Generic[_Ctx, _M, _A]):
 
     def bind(
         self,
-        f: Callable[[_A], "ReaderT[_Ctx, _M, _B]"],
-    ) -> "ReaderT[_Ctx, _M, _B]":
+        f: Callable[[_A], ReaderT[_Ctx, _M, _B]],
+    ) -> ReaderT[_Ctx, _M, _B]:
         """FlatMap: compose via M's bind, threading ctx."""
 
         def inner(ctx):
@@ -73,7 +73,7 @@ class ReaderT(Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def map(self, f: Callable[[_A], _B]) -> "ReaderT[_Ctx, _M, _B]":
+    def map(self, f: Callable[[_A], _B]) -> ReaderT[_Ctx, _M, _B]:
         """Transform value via M's map."""
 
         def inner(ctx):
@@ -81,7 +81,7 @@ class ReaderT(Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def lash(self, f: Callable) -> "ReaderT[_Ctx, _M, _A]":
+    def lash(self, f: Callable) -> ReaderT[_Ctx, _M, _A]:
         """Recover from failure via M's lash."""
 
         def inner(ctx):
@@ -89,9 +89,7 @@ class ReaderT(Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def product(
-        self, other: "ReaderT[_Ctx, _M, _B]"
-    ) -> "ReaderT[_Ctx, _M, _B]":
+    def product(self, other: ReaderT[_Ctx, _M, _B]) -> ReaderT[_Ctx, _M, _B]:
         """Applicative product: delegates to M's product."""
 
         def inner(ctx):
@@ -101,18 +99,18 @@ class ReaderT(Generic[_Ctx, _M, _A]):
 
     def then(
         self,
-        next_step: "ReaderT[_Ctx, _M, _B]",
-    ) -> "ReaderT[_Ctx, _M, _B]":
+        next_step: ReaderT[_Ctx, _M, _B],
+    ) -> ReaderT[_Ctx, _M, _B]:
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_step)
 
     @classmethod
-    def pure(cls, value, monad: type) -> "ReaderT":
+    def pure(cls, value, monad: type) -> ReaderT:
         """Lift a raw value into ReaderT via monad.from_value."""
         return cls(lambda _: monad.from_value(value))
 
     @classmethod
-    def lift(cls, m) -> "ReaderT":
+    def lift(cls, m) -> ReaderT:
         """Lift an existing M[A] into ReaderT (ignoring context).
 
         Haskell: ``lift :: m a -> ReaderT r m a``
@@ -121,3 +119,8 @@ class ReaderT(Generic[_Ctx, _M, _A]):
 
     def __repr__(self) -> str:
         return f"ReaderT({self._run})"
+
+
+__all__ = [
+    "ReaderT",
+]

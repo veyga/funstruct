@@ -160,3 +160,8 @@ class StateT(Generic[_F, _A]):
 
     def __repr__(self) -> str:
         return f"StateT({self._run})"
+
+
+__all__ = [
+    "StateT",
+]

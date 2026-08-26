@@ -1,7 +1,7 @@
 import pytest
 from parametrization import Parametrization as P
-from funstruct.cons import CList, Cons, Nil
-from funstruct.tailrec import tco, tail_call
+
+from funstruct.collections.cons import CList, Cons, Nil
 
 
 @pytest.fixture

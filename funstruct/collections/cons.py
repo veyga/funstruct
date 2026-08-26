@@ -1,3 +1,3 @@
 """A singly linked list"""
 
-from _funstruct.cons import *  # noqa F403
+from _funstruct._cons import *  # noqa F403

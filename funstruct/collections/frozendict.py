@@ -1,3 +1,3 @@
 """An immutable map"""
 
-from _funstruct.frozendict import *  # noqa F403
+from _funstruct._frozendict import *  # noqa F403

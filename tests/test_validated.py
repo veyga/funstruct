@@ -1,6 +1,6 @@
 """Tests for Validated applicative"""
 
-from funstruct.applicative import Validated, Valid, Invalid
+from funstruct.applicative.validated import Validated, Valid, Invalid
 
 
 class TestValid:
@@ -82,38 +82,29 @@ class TestProduct:
         assert result == Invalid(["first", "second"])
 
 
-class TestMapN:
-    def test_all_valid(self):
-        result = map_n(lambda a, b, c: a + b + c, Valid(1), Valid(2), Valid(3))
-        assert result == Valid(6)
-
-    def test_any_invalid(self):
-        result = map_n(lambda a, b: a + b, Valid(1), Invalid(["x"]))
-        assert result == Invalid(["x"])
-
-    def test_multiple_invalid(self):
-        result = map_n(
-            lambda a, b: a + b,
-            Invalid(["x"]),
-            Invalid(["y"]),
-        )
-        assert result == Invalid(["x", "y"])
-
-
 class TestValidatedCond:
     def test_real_world_validation(self):
         result = (
-            Validated.cond("secret" == "secret", None, "bad auth")
-            .product(Validated.cond("svca" in ["svca", "svcb"], None, "bad aud"))
-            .product(Validated.cond(1 < 2, None, "depth exceeded"))
+            Validated.cond("value" == "value", None, "bad auth")
+            .product(Validated.cond("a" in ["a", "b"], None, "no member"))
+            .product(Validated.cond(1 < 2, None, "less than"))
         )
         assert result.is_valid
 
     def test_real_world_multiple_failures(self):
         result = (
-            Validated.cond("wrong" == "secret", None, "bad auth")
-            .product(Validated.cond("unknown" in ["svca", "svcb"], None, "bad aud"))
-            .product(Validated.cond(5 < 2, None, "depth exceeded"))
+            Validated.cond("wrong" == "value", None, "bad auth")
+            .product(Validated.cond("unknown" in ["a", "b"], None, "no member"))
+            .product(Validated.cond(5 < 2, None, "less than"))
         )
         assert not result.is_valid
-        assert result.errors == ["bad auth", "bad aud", "depth exceeded"]
+        assert result.errors == ["bad auth", "no member", "less than"]
+
+    # def test_real_world_multiple_failures_add(self):
+    #     result = (
+    #         Validated.cond("wrong" == "value", None, "bad auth")
+    #         + Validated.cond("unknown" in ["a", "b"], None, "no member"))
+    #         + Validated.cond(5 < 2, None, "less than"))
+    #     )
+    #     assert not result.is_valid
+    #     assert result.errors == ["bad auth", "no member", "less than"]

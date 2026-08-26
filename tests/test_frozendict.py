@@ -1,6 +1,7 @@
 import pytest
-from funstruct.frozendict import frozendict
 from parametrization import Parametrization as P
+
+from funstruct.collections.frozendict import frozendict
 
 
 @pytest.fixture
