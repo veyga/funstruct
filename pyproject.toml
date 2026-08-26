@@ -1,61 +1,47 @@
-[tool.poetry]
+[project]
 name = "funstruct"
-version = "0.1.2"
-description = "fun & functional structures"
-authors = ["Andrew Stefanich <andrewstefanich@gmail.com>"]
-license = "MIT"
+version = "0.2.0"
+description = "Fun & functional structures for Python"
+authors = [{name = "Andrew Stefanich", email = "andrewstefanich@gmail.com"}]
+license = {text = "MIT"}
 readme = "README.md"
-homepage = "https://github.com/veyga/funstruct"
-repository = "https://github.com/veyga/funstruct"
+requires-python = ">=3.10"
 keywords = ["functional", "immutable", "fp", "data structures", "cons"]
+dependencies = []
 
-[tool.poetry.dependencies]
-python = "^3.12"
+[project.urls]
+Homepage = "https://github.com/veyga/funstruct"
+Repository = "https://github.com/veyga/funstruct"
 
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.2"
-pytest-parametrization = "^2022.2.1"
-debugpy = "^1.8.2"
-pre-commit = "^3.7.1"
-sphinx = "^7.4.7"
-ruff = "^0.6.9"
-mypy = "^1.11.2"
+[tool.hatch.build.targets.wheel]
+packages = ["funstruct"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-parametrization>=2022.2.1",
+    "ruff>=0.8.0",
+    "debugpy>=1.8.0",
+    "ty>=0.0.74",
+    "tox>=4.60.1",
+    "tox-uv>=1.36.0",
+]
+docs = [
+    "mike>=2.2.0",
+    "mkdocs>=1.6,<2.0",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+]
 
 [tool.ruff]
 line-length = 88
 
 [tool.ruff.lint]
-select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "N",  # PEP8 naming convetions
-    "D"  # pydocstyle
-]
+select = ["E", "F", "I", "UP"]
 ignore = [
-    "E731", # allow assignment of lambdas to a symbol
-    "N801", # class CapWords convention
-    "D415", # docstring - first line should end with period
-    "D205", # docstring - 1 blank line between summary and description
+    "E731",
 ]
-exclude = [
-  "tests/*.py",
-  "docs/*.py",
-]
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
-[tool.mypy]
-python_version = "3.12"
-files = [
-  "_funstruct/",
-]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

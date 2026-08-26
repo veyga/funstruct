@@ -1,0 +1,39 @@
+site_name: funstruct
+site_description: Fun & functional structures for Python
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep-purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep-purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+nav:
+  - Home: index.md
+  - Modules:
+      - State: modules/state.md
+      - StateT: modules/state_t.md
+      - ReaderT: modules/reader_t.md
+      - Validated: modules/validated.md
+      - Cons: modules/cons.md
+      - FrozenDict: modules/frozendict.md
+      - TailRec: modules/tailrec.md
+  - API Reference:
+      - funstruct: api/index.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            members_order: source

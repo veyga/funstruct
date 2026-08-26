@@ -1,47 +1,29 @@
-# List all available commands
 _default:
   just --list
 
-# debug an individual test under tests/
-dtest TEST:
-  python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest tests/{{TEST}}
+# install project
+install:
+  uv sync
 
-# debug an individual test with -k flag
-dktest ARG:
-  python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest -k {{ARG}}
+# lint (--fix)
+lint *args:
+  uv run ruff check {{args}}
 
-# debug a script
-dscript FILE:
-  python -m debugpy --listen 0.0.0.0:5680 --wait-for-client {{FILE}}
-
-# format the repo
+# format code
 format:
-  poetry run ruff format
+  uv run ruff format
 
-# install the pre-commit hooks
-installhooks:
-  poetry run pre-commit install
+# Serve docs locally at http://127.0.0.1:8000
+docs:
+  uv run mkdocs serve
 
-# lint the repo
-lint:
-  poetry run ruff check
+# docs-build:
+#   uv run mkdocs build
 
-# lint the repo (+ auto-fix)
-lintfix:
-  poetry run ruff check --fix
+# run pytest
+test *args:
+  uv run pytest {{args}}
 
-# Run all test suites
-tests:
-  pytest
-
-# run an individual test under tests/
-test TEST:
-  pytest tests/{{TEST}}
-
-# run an individual test with -k flag
-ktest ARG:
-  pytest -k {{ARG}}
-
-# run typechecker
-tc:
-  poetry run mypy --enable-incomplete-feature=NewGenericSyntax # py3.12 generics
+# debug a pytest
+dtest *args:
+  PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest {{args}}
