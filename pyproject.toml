@@ -7,7 +7,10 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["functional", "immutable", "fp", "data structures", "cons"]
-dependencies = []
+constants = [
+    "returns>=0.26.0,<0.27.0; python_version<'3.11'",
+    "returns>=0.29.0; python_version>='3.11'",
+]
 
 [project.urls]
 Homepage = "https://github.com/veyga/funstruct"
@@ -43,5 +46,5 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
 ignore = [
-    "E731",
+    "E731", # Do not assign a `lambda` expression, use a `def`
 ]

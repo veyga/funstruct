@@ -1,6 +1,10 @@
 version = 1
 revision = 3
-requires-python = ">=3.12"
+requires-python = ">=3.10"
+resolution-markers = [
+    "python_full_version >= '3.11'",
+    "python_full_version < '3.11'",
+]
 
 [[package]]
 name = "babel"
@@ -48,6 +52,38 @@ version = "3.5.1"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1.tar.gz", hash = "sha256:6117b84ea48435e5356dc737f5121485c30920ba43375fa7b434fd753df0eac3" }
 wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d1ee1e296209fdce05b81b663250eefa02213a2da7b41bf26f7829b8ba3545aa" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e9fbdce1e47394b09bc9f26ab117dfc8d6491977a11d86f592bb42c779db2fda" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:00668ebb0609751758682eb0b5857e7c35b9f00e84dfdef062e103244ec94d45" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:ba2f37ee79e6338845261a3c5b1784e5d1acdff2c0785b284f1b633033d136ab" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:ce854f5f478050ade5a238731c4ca985a7d3b3cb53ff600a9b5c3b689b5f0a7a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:96eefc178f8636b9c760c5829345307fd81cfae9ab1e80997dbddeb0f54ee9a3" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:366ec70f5547c640d3ce1985722490f23faf4eb5216a7eeba78277490e78dacb" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:950f23cb393f85543777b0433f082cddd25b51ab398eac7971146495679efe5f" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-musllinux_1_2_armv7l.whl", hash = "sha256:c1dcc36dcb96abc02236e182d17e0f71430152a6c2c7447421da2d2dc144edea" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-musllinux_1_2_ppc64le.whl", hash = "sha256:07ffd07412fc5d5e84cd8952acf9ff7e4ed7a708e69d1bada19d8ba91711353f" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-musllinux_1_2_riscv64.whl", hash = "sha256:f5542f9b941279d82d41eb0aa9f98eba36fe4df5c7086c651df7944935b37182" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-musllinux_1_2_s390x.whl", hash = "sha256:a545775cfe815855ea32d7c27731d79da358ef2055b4a25830231b1622dd18aa" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:494b70049a4d69aec6e8137c13af4cf8db8c9f9820a1392ac293b0dd2987a818" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-win32.whl", hash = "sha256:94fbf1c0c6cc0d3d5e50f9a9313a8cdca90dd696d34b381cd1704f8c9e939f20" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-win_amd64.whl", hash = "sha256:be47f99644b208bff7766314013f9acf57b056b04191d570d68ad14022cf5b1d" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp310-cp310-win_arm64.whl", hash = "sha256:a6d095662e73e74f0a49988e0593373e243e3a52e27bfeea0a859e88acf4a0f5" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:eda059b6bc8bc0812d626fd91a7ce01bf583df0a61296eff390fd94141a34e30" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:aa2bb0b37202dca27175591f761108b5d34096ade1191ffe4808bdf6b1571488" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:0b2b1b3fa5670c127b246df1d0c059defd41f689a868a3b9d79df9b1cac42d22" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:6e5e4d73d588ca5ed09df1b7dcd1b203d1df3c542e3f50d126c947d432b10731" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:b54e7e13267d49ffbfe68e25b3cbd774dab38fa37238f71265e91b36146eb21c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c7b742bf31c88566b4bb6335a7f393bb322e580b6bb98df7bd0c25e6e3519ce8" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:6ba32c4d2abf1d2fe7cf27d280f4cca5664233b0f885549c7761719eb977f486" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:0722590aabf9dc6a6c0343d523c05458fa2b5047dbe6302fd526bb570600753f" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-musllinux_1_2_armv7l.whl", hash = "sha256:aa1099b956fb795e686d073568f6dc002a0bb89765ea6d5b055dd7d9bf1b116c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-musllinux_1_2_ppc64le.whl", hash = "sha256:bd6c173f04743d483881bffa1478d5a4624475b8cd1d2194956a75548e191c18" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-musllinux_1_2_riscv64.whl", hash = "sha256:f298e218441525d3794428b4c8b8fb8662c6d3ea79925d4807ee6b9a96a3bca5" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-musllinux_1_2_s390x.whl", hash = "sha256:6e2912d4babbc65196ac13c2f53468dc57fb8b9c25ef913e8c59ddf7c6dc0e1b" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:3d27167433c0d5f18dc850f07d0b3816221984fecdc405d6c157a6f0b8f8e9e6" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-win32.whl", hash = "sha256:ac00177c4831ffa650f8609e4bdddd5fe09c03b1c0c47acece7e6ea20421598b" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-win_amd64.whl", hash = "sha256:f9b1e28d0e8dbfa858abdba91d6b547beaf2df1a59bec6da6faae7b96a4991a9" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp311-cp311-win_arm64.whl", hash = "sha256:ae31a1a1db2ee6cc2942fccaf695c934bc7f3db9f2133a3fef1f367cf1a4ab10" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:5b6d1386bf0096d26d3a863dc0a487a5b4eb9aa93cf5ba69683d29dde6b9d60f" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:4582c27e8c889d64811987b5967fbd3ae0c823fe1fd933b543d55ac20bb475fa" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/charset-normalizer/3.5.1/charset_normalizer-3.5.1-cp312-cp312-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:1d1c7a53a6c2103925cdd6d7229f8c567379f211c869793df679f2e9f738c369" },
@@ -200,6 +236,14 @@ version = "1.8.21"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21.tar.gz", hash = "sha256:a3c53278e84c94e11bd87c53970ec391d1a67396c8b22609fcac576520e611a6" }
 wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp310-cp310-macosx_15_0_x86_64.whl", hash = "sha256:8eeab7b5462f683452c57c0126aaa5ec4e974ddb705f39ba87dff8818c8e08f9" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp310-cp310-manylinux_2_34_x86_64.whl", hash = "sha256:0fddfdc130ac6d8bfc0415b0409822fa901c8f310e5c945ac5653a0352532344" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp310-cp310-win32.whl", hash = "sha256:72b5d676c4cbfac3bac5bb01c138a4656e843f93f03ce2a5f4e394ad49fbee73" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp310-cp310-win_amd64.whl", hash = "sha256:a7fe47fd23da57b9e0bec3f4a8ee65a2dc55782455ed7f2141d75ab5d2eaeef5" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp311-cp311-macosx_15_0_universal2.whl", hash = "sha256:da456226c7b4c69e35dbe35dcee6623d912000a77816db7856a41af1c72a0264" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:f68b891688e61bdc08b8d364d919ff0051e0b94657b39dcd027bc3173edb7cdc" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp311-cp311-win32.whl", hash = "sha256:f843a8b08c2edeaf9b1582eed4f25441af21a297c22ff16bf76a662557aa9c9e" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp311-cp311-win_amd64.whl", hash = "sha256:84c564d8cc701d41843b29a92814c1f1bef6798724ca9d675c284ad9f6a547d7" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp312-cp312-macosx_15_0_universal2.whl", hash = "sha256:9f96713896f39c3dff0ee841f47320c3f2983d33c341e009361bb0ebc79adc4e" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:c193d474f0a211191f2b4449d2d06157c689013035bd952f3b617e0ef422b176" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp312-cp312-win32.whl", hash = "sha256:4743373c1cac7f9e74a1b9915bf1dbe0e900eca657ffb170ae07ac8363205ae9" },
@@ -225,6 +269,18 @@ wheels = [
 ]
 
 [[package]]
+name = "exceptiongroup"
+version = "1.3.1"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/exceptiongroup/1.3.1/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/exceptiongroup/1.3.1/exceptiongroup-1.3.1-py3-none-any.whl", hash = "sha256:a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598" },
+]
+
+[[package]]
 name = "filelock"
 version = "3.32.4"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -237,6 +293,10 @@ wheels = [
 name = "funstruct"
 version = "0.2.0"
 source = { editable = "." }
+dependencies = [
+    { name = "returns", version = "0.26.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "returns", version = "0.29.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version >= '3.11'" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -256,6 +316,7 @@ docs = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "returns", specifier = ">=0.26.0" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -340,6 +401,28 @@ version = "3.0.3"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3.tar.gz", hash = "sha256:722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698" }
 wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:2f981d352f04553a7171b8e44369f2af4055f888dfb147d55e42d29e29e74559" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e1c1493fb6e50ab01d20a22826e57520f1284df32f2d8601fdd90b6304601419" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:1ba88449deb3de88bd40044603fafffb7bc2b055d626a330323a9ed736661695" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f42d0984e947b8adf7dd6dde396e720934d12c506ce84eea8476409563607591" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:c0c0b3ade1c0b13b936d7970b1d37a57acde9199dc2aecc4c336773e1d86049c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:0303439a41979d9e74d18ff5e2dd8c43ed6c6001fd40e5bf2e43f7bd9bbc523f" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-musllinux_1_2_riscv64.whl", hash = "sha256:d2ee202e79d8ed691ceebae8e0486bd9a2cd4794cec4824e1c99b6f5009502f6" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:177b5253b2834fe3678cb4a5f0059808258584c559193998be2601324fdeafb1" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-win32.whl", hash = "sha256:2a15a08b17dd94c53a1da0438822d70ebcd13f8c3a95abe3a9ef9f11a94830aa" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-win_amd64.whl", hash = "sha256:c4ffb7ebf07cfe8931028e3e4c85f0357459a3f9f9490886198848f4fa002ec8" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp310-cp310-win_arm64.whl", hash = "sha256:e2103a929dfa2fcaf9bb4e7c091983a49c9ac3b19c9061b6d5427dd7d14d81a1" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:1cc7ea17a6824959616c525620e387f6dd30fec8cb44f649e31712db02123dad" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:4bd4cd07944443f5a265608cc6aab442e4f74dff8088b0dfc8238647b8f6ae9a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:6b5420a1d9450023228968e7e6a9ce57f65d148ab56d2313fcd589eee96a7a50" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:0bf2a864d67e76e5c9a34dc26ec616a66b9888e25e7b9460e1c76d3293bd9dbf" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:bc51efed119bc9cfdf792cdeaa4d67e8f6fcccab66ed4bfdd6bde3e59bfcbb2f" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:068f375c472b3e7acbe2d5318dea141359e6900156b5b2ba06a30b169086b91a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-musllinux_1_2_riscv64.whl", hash = "sha256:7be7b61bb172e1ed687f1754f8e7484f1c8019780f6f6b0786e76bb01c2ae115" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:f9e130248f4462aaa8e2552d547f36ddadbeaa573879158d721bbd33dfe4743a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-win32.whl", hash = "sha256:0db14f5dafddbb6d9208827849fad01f1a2609380add406671a26386cdf15a19" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-win_amd64.whl", hash = "sha256:de8a88e63464af587c950061a5e6a67d3632e36df62b986892331d4620a35c01" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp311-cp311-win_arm64.whl", hash = "sha256:3b562dd9e9ea93f13d53989d23a7e775fdfd1066c33494ff43f5418bc8c58a5c" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:d53197da72cc091b024dd97249dfc7794d6a56530370992a5e1a08983ad9230e" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:1872df69a4de6aead3491198eaf13810b565bdbeec3ae2dc8780f14458ec73ce" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/markupsafe/3.0.3/markupsafe-3.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:3a7e8ae81ae39e62a41ec302f972ba6ae23a5c5396c8e60113e9066ef893da0d" },
@@ -536,6 +619,7 @@ dependencies = [
     { name = "griffelib" },
     { name = "mkdocs-autorefs" },
     { name = "mkdocstrings" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/mkdocstrings-python/2.0.7/mkdocstrings_python-2.0.7.tar.gz", hash = "sha256:8c49faf66d243072d7590a1b5dea028d9d7425fac191f54f096123a4a9c1a783" }
 wheels = [
@@ -624,6 +708,7 @@ version = "1.11.0"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 dependencies = [
     { name = "packaging" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyproject-api/1.11.0/pyproject_api-1.11.0.tar.gz", hash = "sha256:b8807d85a293e6c9f133e6575946fed45f1d42b22d58c780b33aa2421a799549" }
 wheels = [
@@ -636,10 +721,12 @@ version = "9.1.1"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
     { name = "pygments" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pytest/9.1.1/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313" }
 wheels = [
@@ -686,6 +773,24 @@ version = "6.0.3"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3.tar.gz", hash = "sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f" }
 wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-macosx_10_13_x86_64.whl", hash = "sha256:214ed4befebe12df36bcc8bc2b64b396ca31be9304b8f59e25c11cf94a4c033b" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:02ea2dfa234451bbb8772601d7b8e426c2bfa197136796224e50e35a78777956" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b30236e45cf30d2b8e7b3e85881719e98507abed1011bf463a8fa23e9c3e98a8" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:66291b10affd76d76f54fad28e22e51719ef9ba22b29e1d7d03d6777a9174198" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9c7708761fccb9397fe64bbc0395abcae8c4bf7b0eac081e12b809bf47700d0b" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:418cf3f2111bc80e0933b2cd8cd04f286338bb88bdc7bc8e6dd775ebde60b5e0" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:5e0b74767e5f8c593e8c9b5912019159ed0533c70051e9cce3e8b6aa699fcd69" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-win32.whl", hash = "sha256:28c8d926f98f432f88adc23edf2e6d4921ac26fb084b028c733d01868d19007e" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp310-cp310-win_amd64.whl", hash = "sha256:bdb2c67c6c1390b63c6ff89f210c8fd09d9a1217a465701eac7316313c915e4c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-macosx_10_13_x86_64.whl", hash = "sha256:44edc647873928551a01e7a563d7452ccdebee747728c1080d881d68af7b997e" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:652cb6edd41e718550aad172851962662ff2681490a8a711af6a4d288dd96824" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:10892704fc220243f5305762e276552a0395f7beb4dbf9b14ec8fd43b57f126c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:850774a7879607d3a6f50d36d04f00ee69e7fc816450e5f7e58d7f17f1ae5c00" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b8bb0864c5a28024fac8a632c443c87c5aa6f215c0b126c449ae1a150412f31d" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:1d37d57ad971609cf3c53ba6a7e365e40660e3be0e5175fa9f2365a379d6095a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:37503bfbfc9d2c40b344d06b2199cf0e96e97957ab1c1b546fd4f87e53e5d3e4" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-win32.whl", hash = "sha256:8098f252adfa6c80ab48096053f512f2321f0b998f98150cea9bd23d83e1467b" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp311-cp311-win_amd64.whl", hash = "sha256:9f3bfb4965eb874431221a3ff3fdcddc7e74e3b07799e0e84ca4a0f867d449bf" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:7f047e29dcae44602496db43be01ad42fc6f1cc0d8cd6c83d342306c32270196" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:fc09d0aa354569bc501d4e787133afc08552722d3ab34836a80547331bb5d4a0" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:9149cad251584d5fb4981be1ecde53a1ca46c891a79788c0df828d2f166bda28" },
@@ -754,6 +859,36 @@ wheels = [
 ]
 
 [[package]]
+name = "returns"
+version = "0.26.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+resolution-markers = [
+    "python_full_version < '3.11'",
+]
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.26.0/returns-0.26.0.tar.gz", hash = "sha256:180320e0f6e9ea9845330ccfc020f542330f05b7250941d9b9b7c00203fcc3da" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.26.0/returns-0.26.0-py3-none-any.whl", hash = "sha256:7cae94c730d6c56ffd9d0f583f7a2c0b32cfe17d141837150c8e6cff3eb30d71" },
+]
+
+[[package]]
+name = "returns"
+version = "0.29.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+resolution-markers = [
+    "python_full_version >= '3.11'",
+]
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.29.0/returns-0.29.0.tar.gz", hash = "sha256:fd9831594403229595dc705fee632a9be24a497df10aa3b9b72405d75d54e8ad" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.29.0/returns-0.29.0-py3-none-any.whl", hash = "sha256:db43c06d228f84b3d93c0418313c37c5ee4ecdb7a0f10326c24444f9baaf074c" },
+]
+
+[[package]]
 name = "ruff"
 version = "0.16.4"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -788,6 +923,60 @@ wheels = [
 ]
 
 [[package]]
+name = "tomli"
+version = "2.4.1"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1.tar.gz", hash = "sha256:7c7e1a961a0b2f2472c1ac5b69affa0ae1132c39adcb67aba98568702b9cc23f" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:f8f0fc26ec2cc2b965b7a3b87cd19c5c6b8c5e5f436b984e85f486d652285c30" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:4ab97e64ccda8756376892c53a72bd1f964e519c77236368527f758fbc36a53a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:96481a5786729fd470164b47cdb3e0e58062a496f455ee41b4403be77cb5a076" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5a881ab208c0baf688221f8cecc5401bd291d67e38a1ac884d6736cbcd8247e9" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:47149d5bd38761ac8be13a84864bf0b7b70bc051806bc3669ab1cbc56216b23c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:ec9bfaf3ad2df51ace80688143a6a4ebc09a248f6ff781a9945e51937008fcbc" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-win32.whl", hash = "sha256:ff2983983d34813c1aeb0fa89091e76c3a22889ee83ab27c5eeb45100560c049" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-win_amd64.whl", hash = "sha256:5ee18d9ebdb417e384b58fe414e8d6af9f4e7a0ae761519fb50f721de398dd4e" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp311-cp311-win_arm64.whl", hash = "sha256:c2541745709bad0264b7d4705ad453b76ccd191e64aa6f0fc66b69a293a45ece" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:c742f741d58a28940ce01d58f0ab2ea3ced8b12402f162f4d534dfe18ba1cd6a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:7f86fd587c4ed9dd76f318225e7d9b29cfc5a9d43de44e5754db8d1128487085" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ff18e6a727ee0ab0388507b89d1bc6a22b138d1e2fa56d1ad494586d61d2eae9" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:136443dbd7e1dee43c68ac2694fde36b2849865fa258d39bf822c10e8068eac5" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:5e262d41726bc187e69af7825504c933b6794dc3fbd5945e41a79bb14c31f585" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:5cb41aa38891e073ee49d55fbc7839cfdb2bc0e600add13874d048c94aadddd1" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-win32.whl", hash = "sha256:da25dc3563bff5965356133435b757a795a17b17d01dbc0f42fb32447ddfd917" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-win_amd64.whl", hash = "sha256:52c8ef851d9a240f11a88c003eacb03c31fc1c9c4ec64a99a0f922b93874fda9" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp312-cp312-win_arm64.whl", hash = "sha256:f758f1b9299d059cc3f6546ae2af89670cb1c4d48ea29c3cacc4fe7de3058257" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:36d2bd2ad5fb9eaddba5226aa02c8ec3fa4f192631e347b3ed28186d43be6b54" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:eb0dc4e38e6a1fd579e5d50369aa2e10acfc9cace504579b2faabb478e76941a" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:c7f2c7f2b9ca6bdeef8f0fa897f8e05085923eb091721675170254cbc5b02897" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f3c6818a1a86dd6dca7ddcaaf76947d5ba31aecc28cb1b67009a5877c9a64f3f" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:d312ef37c91508b0ab2cee7da26ec0b3ed2f03ce12bd87a588d771ae15dcf82d" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:51529d40e3ca50046d7606fa99ce3956a617f9b36380da3b7f0dd3dd28e68cb5" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-win32.whl", hash = "sha256:2190f2e9dd7508d2a90ded5ed369255980a1bcdd58e52f7fe24b8162bf9fedbd" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-win_amd64.whl", hash = "sha256:8d65a2fbf9d2f8352685bc1364177ee3923d6baf5e7f43ea4959d7d8bc326a36" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp313-cp313-win_arm64.whl", hash = "sha256:4b605484e43cdc43f0954ddae319fb75f04cc10dd80d830540060ee7cd0243cd" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:fd0409a3653af6c147209d267a0e4243f0ae46b011aa978b1080359fddc9b6cf" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:a120733b01c45e9a0c34aeef92bf0cf1d56cfe81ed9d47d562f9ed591a9828ac" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:559db847dc486944896521f68d8190be1c9e719fced785720d2216fe7022b662" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:01f520d4f53ef97964a240a035ec2a869fe1a37dde002b57ebc4417a27ccd853" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:7f94b27a62cfad8496c8d2513e1a222dd446f095fca8987fceef261225538a15" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:ede3e6487c5ef5d28634ba3f31f989030ad6af71edfb0055cbbd14189ff240ba" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-win32.whl", hash = "sha256:3d48a93ee1c9b79c04bb38772ee1b64dcf18ff43085896ea460ca8dec96f35f6" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-win_amd64.whl", hash = "sha256:88dceee75c2c63af144e456745e10101eb67361050196b0b6af5d717254dddf7" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314-win_arm64.whl", hash = "sha256:b8c198f8c1805dc42708689ed6864951fd2494f924149d3e4bce7710f8eb5232" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:d4d8fe59808a54658fcc0160ecfb1b30f9089906c50b23bcb4c69eddc19ec2b4" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:7008df2e7655c495dd12d2a4ad038ff878d4ca4b81fccaf82b714e07eae4402c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:1d8591993e228b0c930c4bb0db464bdad97b3289fb981255d6c9a41aedc84b2d" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:734e20b57ba95624ecf1841e72b53f6e186355e216e5412de414e3c51e5e3c41" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:8a650c2dbafa08d42e51ba0b62740dae4ecb9338eefa093aa5c78ceb546fcd5c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:504aa796fe0569bb43171066009ead363de03675276d2d121ac1a4572397870f" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-win32.whl", hash = "sha256:b1d22e6e9387bf4739fbe23bfa80e93f6b0373a7f1b96c6227c32bef95a4d7a8" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-win_amd64.whl", hash = "sha256:2c1c351919aca02858f740c6d33adea0c5deea37f9ecca1cc1ef9e884a619d26" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-win_arm64.whl", hash = "sha256:eab21f45c7f66c13f2a9e0e1535309cee140182a9cdae1e041d02e47291e8396" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-py3-none-any.whl", hash = "sha256:0d85819802132122da43cb86656f8d1f8c6587d54ae7dcaf30e90533028b49fe" },
+]
+
+[[package]]
 name = "tomli-w"
 version = "1.2.0"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -809,6 +998,7 @@ dependencies = [
     { name = "pluggy" },
     { name = "pyproject-api" },
     { name = "python-discovery" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "tomli-w" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "virtualenv" },
@@ -836,6 +1026,7 @@ version = "1.36.0"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 dependencies = [
     { name = "packaging" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "tox" },
 ]
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tox-uv-bare/1.36.0/tox_uv_bare-1.36.0.tar.gz", hash = "sha256:d9b0a2fd0f74fa65d9597108f8a0ef7abb08651c9196a998a6073b781b45cfd0" }
@@ -930,6 +1121,7 @@ dependencies = [
     { name = "filelock" },
     { name = "platformdirs" },
     { name = "python-discovery" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/virtualenv/21.7.5/virtualenv-21.7.5.tar.gz", hash = "sha256:a73c4246fba3c8901ff9717399f466e00eeca5a3834981f1a6ebb4f1e94de2f8" }
 wheels = [
@@ -942,12 +1134,20 @@ version = "6.0.0"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0.tar.gz", hash = "sha256:9ddf7c82fda3ae8e24decda1338ede66e1c99883db93711d8fb941eaa2d8c282" }
 wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d1cdb490583ebd691c012b3d6dae011000fe42edb7a82ece80965b42abd61f26" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:bc64ab3bdb6a04d69d4023b29422170b74681784ffb9463ed4870cf2f3e66112" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:c897ac1b55c5a1461e16dae288d22bb2e412ba9807df8397a635d88f671d36c3" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:6eb11feb5a0d452ee41f824e271ca311a09e250441c262ca2fd7ebcf2461a06c" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:ef810fbf7b781a5a593894e4f439773830bdecb885e6880d957d5b9382a960d2" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:afd0fe1b2270917c5e23c2a65ce50c2a4abb63daafb0d419fde368e272a76b7c" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:bdd4e6f14b8b18c334febb9c4425a878a2ac20efd1e0b231978e7b150f92a948" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:c7c15dda13c4eb00d6fb6fc508b3c0ed88b9d5d374056b239c4ad1611125c860" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:6f10cb2d5902447c7d0da897e2c6768bca89174d0c6e1e30abec5421af97a5b0" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:490ab2ef84f11129844c23fb14ecf30ef3d8a6abafd3754a6f75ca1e6654136c" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:76aae96b00ae814b181bb25b1b98076d5fc84e8a53cd8885a318b42b6d3a5134" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:a175f755fc2279e0b7312c0035d52e27211a5bc39719dd529625b1930917345b" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-pp310-pypy310_pp73-macosx_10_15_x86_64.whl", hash = "sha256:c7ac31a19f4545dd92fc25d200694098f42c9a8e391bc00bdd362c5736dbf881" },
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:9513f27a1a582d9808cf21a07dae516f0fab1cf2d7683a742c498b93eedabb11" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:7607498efa04a3542ae3e05e64da8202e58159aa1fa4acddf7678d34a35d4f13" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-py3-none-manylinux2014_armv7l.whl", hash = "sha256:9041567ee8953024c83343288ccc458fd0a2d811d6a0fd68c4c22609e3490379" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/watchdog/6.0.0/watchdog-6.0.0-py3-none-manylinux2014_i686.whl", hash = "sha256:82dc3e3143c7e38ec49d61af98d6558288c415eac98486a5c581726e0737c00e" },
