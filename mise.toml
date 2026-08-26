@@ -4,3 +4,6 @@ uv = "latest"
 ruff = "latest"
 just = "latest"
 ty = "latest"
+
+[hooks.postinstall]
+run = "pre-commit install && just install"

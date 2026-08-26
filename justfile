@@ -13,12 +13,13 @@ lint *args:
 format:
   uv run ruff format
 
+# run ty check
+check:
+  uv run ty check _funstruct/
+
 # Serve docs locally at http://127.0.0.1:8000
 docs:
-  uv run mkdocs serve
-
-# docs-build:
-#   uv run mkdocs build
+  uv run --group docs mkdocs serve
 
 # run pytest
 test *args:
@@ -27,3 +28,10 @@ test *args:
 # debug a pytest
 dtest *args:
   PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest {{args}}
+
+# Run tox (all versions, or specify: mise tox -e py312)
+tox *args:
+  uv run tox
+
+# docs-build:
+#   uv run mkdocs build

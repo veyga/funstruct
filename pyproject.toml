@@ -7,7 +7,7 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["functional", "immutable", "fp", "data structures", "cons"]
-constants = [
+dependencies = [
     "returns>=0.26.0,<0.27.0; python_version<'3.11'",
     "returns>=0.29.0; python_version>='3.11'",
 ]

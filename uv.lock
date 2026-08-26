@@ -316,7 +316,10 @@ docs = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "returns", specifier = ">=0.26.0" }]
+requires-dist = [
+    { name = "returns", marker = "python_full_version < '3.11'", specifier = ">=0.26.0,<0.27.0" },
+    { name = "returns", marker = "python_full_version >= '3.11'", specifier = ">=0.29.0" },
+]
 
 [package.metadata.requires-dev]
 dev = [
