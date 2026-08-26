@@ -1,6 +1,6 @@
-"""Tests for Validated (applicative error accumulation)."""
+"""Tests for Validated applicative"""
 
-from jf_commons.functional import Invalid, Valid, Validated, map_n
+from funstruct.applicative import Validated, Valid, Invalid
 
 
 class TestValid:
@@ -40,9 +40,7 @@ class TestInvalid:
         assert result == Invalid(["a"])
 
     def test_left_map(self):
-        result = Invalid(["a", "b"]).left_map(
-            lambda errs: [e.upper() for e in errs]
-        )
+        result = Invalid(["a", "b"]).left_map(lambda errs: [e.upper() for e in errs])
         assert result == Invalid(["A", "B"])
 
     def test_to_result(self):
@@ -67,19 +65,11 @@ class TestValidatedConstructors:
 
 class TestProduct:
     def test_chain_multiple_valid(self):
-        result = (
-            Valid(None)
-            .product(Valid(None))
-            .product(Valid(None))
-        )
+        result = Valid(None).product(Valid(None)).product(Valid(None))
         assert result.is_valid
 
     def test_chain_accumulates_all_errors(self):
-        result = (
-            Invalid(["a"])
-            .product(Invalid(["b"]))
-            .product(Invalid(["c"]))
-        )
+        result = Invalid(["a"]).product(Invalid(["b"])).product(Invalid(["c"]))
         assert result == Invalid(["a", "b", "c"])
 
     def test_mixed_accumulates_errors_only(self):

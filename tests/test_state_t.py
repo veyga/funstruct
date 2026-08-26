@@ -3,7 +3,7 @@
 from parametrization import Parametrization as P
 from returns.result import Failure, Result, Success
 
-from jf_commons.functional import StateT
+from funstruct.monad import StateT
 
 
 class TestRun:

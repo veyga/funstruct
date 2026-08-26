@@ -2,7 +2,7 @@
 
 from parametrization import Parametrization as P
 
-from jf_commons.functional import State
+from funstruct.monad import State
 
 
 class TestRun:

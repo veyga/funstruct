@@ -2,7 +2,7 @@
 
 from returns.result import Failure, Result, Success
 
-from jf_commons.functional import ReaderT, StateT
+from funstruct.monad import ReaderT, StateT
 
 
 class TestRun:
