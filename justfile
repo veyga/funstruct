@@ -1,10 +1,6 @@
 _default:
   just --list
 
-# install project
-install:
-  uv sync
-
 # lint (--fix)
 lint *args:
   uv run ruff check {{args}}

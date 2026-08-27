@@ -291,7 +291,7 @@ wheels = [
 
 [[package]]
 name = "funstruct"
-version = "0.2.0"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "returns", version = "0.26.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version < '3.11'" },

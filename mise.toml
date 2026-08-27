@@ -6,4 +6,4 @@ just = "latest"
 ty = "latest"
 
 [hooks.postinstall]
-run = "pre-commit install && just install"
+run = "pre-commit install && uv sync"

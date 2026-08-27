@@ -22,45 +22,57 @@ Example::
 
 from __future__ import annotations
 
+from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, TypeVar
+
+from _funstruct._functor import Applicative
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 _E = TypeVar("_E")
 
 
-class Validated:
-    """Namespace for constructors (mirrors Cats' Validated companion)."""
+class Validated(Applicative):
+    """Base class for Valid/Invalid — provides constructors and supports + operator."""
+
+    @abstractmethod
+    def product(self, other: Validated) -> Validated: ...
+
+    @property
+    @abstractmethod
+    def is_valid(self) -> bool: ...
+
+    @abstractmethod
+    def fold(self, on_invalid: Callable, on_valid: Callable):
+        """Eliminate the Validated — apply on_invalid or on_valid."""
+        ...
 
     @staticmethod
-    def valid(value: _A) -> Valid[_A]:
+    def valid(value: _A) -> Validated:
         """Lift a value into Valid."""
         return Valid(value)
 
     @staticmethod
-    def invalid(error: _E) -> Invalid[_E]:
+    def invalid(error: _E) -> Validated:
         """Lift a single error into Invalid."""
         return Invalid([error])
 
     @staticmethod
-    def invalid_nel(errors: list[_E]) -> Invalid[_E]:
+    def invalid_nel(errors: list[_E]) -> Validated:
         """Lift a list of errors into Invalid."""
         return Invalid(errors)
 
     @staticmethod
-    def cond(test: bool, value: _A, error: _E) -> Valid[_A] | Invalid[_E]:
-        """Conditional — Valid(value) if test, else Invalid([error]).
-
-        Scala: ``Validated.cond(test, value, error)``
-        """
+    def cond(test: bool, value: _A, error: _E) -> Validated:
+        """Conditional — Valid(value) if test, else Invalid([error])."""
         if test:
             return Valid(value)
         return Invalid([error])
 
     @staticmethod
-    def cond_nel(test: bool, value: _A, errors: list[_E]) -> Valid[_A] | Invalid[_E]:
+    def cond_nel(test: bool, value: _A, errors: list[_E]) -> Validated:
         """Conditional with error list."""
         if test:
             return Valid(value)
@@ -68,7 +80,7 @@ class Validated:
 
 
 @dataclass(frozen=True)
-class Valid(Generic[_A]):
+class Valid(Validated, Generic[_A]):
     """Success case."""
 
     value: _A
@@ -77,27 +89,25 @@ class Valid(Generic[_A]):
     def is_valid(self) -> bool:
         return True
 
-    @property
-    def errors(self) -> list:
-        return []
+    def fold(self, on_invalid: Callable, on_valid: Callable):
+        """Eliminate — applies on_valid to the value."""
+        return on_valid(self.value)
 
     def map(self, f: Callable[[_A], _B]) -> Valid[_B]:
         """Transform the success value."""
         return Valid(f(self.value))
 
-    def product(self, other: Valid | Invalid) -> Valid | Invalid:
+    def product(self, other: Validated) -> Validated:
         """Combine with another Validated (applicative).
 
         Accumulates errors from both sides.
         On success, tuples the values.
-
-        Scala: ``v1.product(v2)``
         """
         match other:
             case Valid(val):
                 return Valid((self.value, val))
-            case Invalid(errs):
-                return Invalid(errs)
+            case _:
+                return other
 
     def to_result(self):
         """Convert to returns.result.Success."""
@@ -107,10 +117,13 @@ class Valid(Generic[_A]):
 
 
 @dataclass(frozen=True)
-class Invalid(Generic[_E]):
-    """Failure case — accumulated errors."""
+class Invalid(Validated, Generic[_E]):
+    """Failure case — accumulated errors.
 
-    errors: list[_E]
+    `errors` can be any Semigroup (supports +): list, str, tuple, or custom.
+    """
+
+    errors: _E
 
     @property
     def is_valid(self) -> bool:
@@ -120,20 +133,17 @@ class Invalid(Generic[_E]):
         """No-op on Invalid."""
         return self
 
-    def left_map(self, f: Callable[[list[_E]], list]) -> Invalid:
-        """Transform the errors."""
-        return Invalid(f(self.errors))
+    def fold(self, on_invalid: Callable, on_valid: Callable):
+        """Eliminate — applies on_invalid to the errors."""
+        return on_invalid(self.errors)
 
-    def product(self, other: Valid | Invalid) -> Invalid:
-        """Combine — accumulates errors from both sides.
-
-        Scala: ``v1.product(v2)``
-        """
+    def product(self, other: Validated) -> Validated:
+        """Combine — accumulates errors from both sides."""
         match other:
-            case Valid(_):
-                return self
             case Invalid(errs):
                 return Invalid(self.errors + errs)
+            case _:
+                return self
 
     def to_result(self):
         """Convert to returns.result.Failure."""

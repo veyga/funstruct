@@ -1,6 +1,6 @@
 """Tests for Validated applicative"""
 
-from funstruct.applicative.validated import Validated, Valid, Invalid
+from funstruct.applicative.validated import Invalid, Valid, Validated
 
 
 class TestValid:
@@ -39,9 +39,12 @@ class TestInvalid:
         result = Invalid(["a"]).product(Valid(1))
         assert result == Invalid(["a"])
 
-    def test_left_map(self):
-        result = Invalid(["a", "b"]).left_map(lambda errs: [e.upper() for e in errs])
-        assert result == Invalid(["A", "B"])
+    def test_fold(self):
+        result = Invalid(["a", "b"]).fold(
+            on_invalid=lambda errs: [e.upper() for e in errs],
+            on_valid=lambda _: [],
+        )
+        assert result == ["A", "B"]
 
     def test_to_result(self):
         from returns.result import Failure
@@ -98,13 +101,62 @@ class TestValidatedCond:
             .product(Validated.cond(5 < 2, None, "less than"))
         )
         assert not result.is_valid
-        assert result.errors == ["bad auth", "no member", "less than"]
+        assert result.fold(lambda errs: errs, lambda _: []) == [
+            "bad auth",
+            "no member",
+            "less than",
+        ]
 
-    # def test_real_world_multiple_failures_add(self):
-    #     result = (
-    #         Validated.cond("wrong" == "value", None, "bad auth")
-    #         + Validated.cond("unknown" in ["a", "b"], None, "no member"))
-    #         + Validated.cond(5 < 2, None, "less than"))
-    #     )
-    #     assert not result.is_valid
-    #     assert result.errors == ["bad auth", "no member", "less than"]
+    def test_real_world_multiple_failures_add(self):
+        result = (
+            Validated.cond("wrong" == "value", None, "bad auth")
+            + Validated.cond("unknown" in ["a", "b"], None, "no member")
+            + Validated.cond(5 < 2, None, "less than")
+        )
+        assert not result.is_valid
+        assert result.fold(lambda errs: errs, lambda _: []) == [
+            "bad auth",
+            "no member",
+            "less than",
+        ]
+
+
+class TestAddOperator:
+    def test_valid_plus_valid(self):
+        result = Valid(1) + Valid(2)
+        assert result == Valid((1, 2))
+
+    def test_valid_plus_invalid(self):
+        result = Valid(1) + Invalid(["err"])
+        assert result == Invalid(["err"])
+
+    def test_invalid_plus_valid(self):
+        result = Invalid(["err"]) + Valid(1)
+        assert result == Invalid(["err"])
+
+    def test_invalid_plus_invalid_accumulates(self):
+        result = Invalid(["a"]) + Invalid(["b"])
+        assert result == Invalid(["a", "b"])
+
+    def test_chain_three_valids(self):
+        result = Valid(1) + Valid(2) + Valid(3)
+        assert result.is_valid
+
+    def test_chain_accumulates_all_errors(self):
+        result = Invalid(["a"]) + Invalid(["b"]) + Invalid(["c"])
+        assert result == Invalid(["a", "b", "c"])
+
+    def test_cond_chain_with_add(self):
+        result = Validated.cond(True, None, "x") + Validated.cond(True, None, "y")
+        assert result.is_valid
+
+    def test_cond_chain_failures_with_add(self):
+        result = Validated.cond(False, None, "first") + Validated.cond(
+            False, None, "second"
+        )
+        assert result.fold(lambda errs: errs, lambda _: []) == ["first", "second"]
+
+    def test_add_is_same_as_product(self):
+        a = Valid(1)
+        b = Invalid(["err"])
+        assert (a + b) == a.product(b)
