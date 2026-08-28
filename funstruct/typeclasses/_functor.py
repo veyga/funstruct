@@ -22,7 +22,7 @@ class Functor(ABC, Generic[_A]):
     """
 
     @abstractmethod
-    def map(self, f: Callable[[_A], _B]) -> "Functor[_B]": ...
+    def map(self, f: Callable[[_A], _B]) -> Functor[_B]: ...
 
 
 __all__ = [

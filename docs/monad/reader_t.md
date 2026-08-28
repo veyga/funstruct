@@ -1,3 +1,3 @@
 ## API Reference
 
-::: funstruct.monad.reader_t.ReaderT
+::: funstruct.monadtransformer.reader_t.ReaderT

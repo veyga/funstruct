@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-
-from funstruct.typeclasses import Monoid
 from funstruct.collections.cons import CList, Nil
+from funstruct.typeclasses import Monoid
 
 IntAddition = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
 IntMultiplication = Monoid(typ=int, combine=lambda a, b: a * b, empty=1)

@@ -25,15 +25,15 @@ class Monad(Applicative[_A]):
     """
 
     @abstractmethod
-    def bind(self, f: Callable[[_A], "Monad[_B]"]) -> "Monad[_B]": ...
+    def bind(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]: ...
 
     @classmethod
     @abstractmethod
-    def do(cls, gen_fn: Callable) -> "Monad[_A]":
+    def do(cls, gen_fn: Callable) -> Monad[_A]:
         """Do-notation via generators. Flattens nested binds."""
         ...
 
-    def ap(self, other: "Monad[_B]") -> "Monad[tuple[_A, _B]]":
+    def ap(self, other: Monad[_B]) -> Monad[tuple[_A, _B]]:
         """Default ap derived from bind + map.
 
         Every Monad is an Applicative, and ap can always be derived from
@@ -43,7 +43,7 @@ class Monad(Applicative[_A]):
         """
         return self.bind(lambda a: other.map(lambda b: (a, b)))
 
-    def map2(self, other: "Monad[_B]", f: Callable) -> "Monad":
+    def map2(self, other: Monad[_B], f: Callable) -> Monad:
         """Combine two monadic values with a function.
 
         map2(fa, fb, f) = fa.bind(a => fb.map(b => f(a, b)))
@@ -52,11 +52,11 @@ class Monad(Applicative[_A]):
         """
         return self.bind(lambda a: other.map(lambda b: f(a, b)))
 
-    def flat_map(self, f: Callable[[_A], "Monad[_B]"]) -> "Monad[_B]":
+    def flat_map(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
         """Alias for bind."""
         return self.bind(f)
 
-    def __rshift__(self, f: Callable[[_A], "Monad[_B]"]) -> "Monad[_B]":
+    def __rshift__(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
         """Alias for bind."""
         return self.bind(f)
 

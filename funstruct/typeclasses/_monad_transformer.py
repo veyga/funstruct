@@ -25,8 +25,8 @@ class MonadTransformer(Monad, Generic[_F, _A]):
     monad and provide lift/and_then" without capturing the full mathematical concept.
 
     Type parameters:
-        _F: The inner monad type. Must support .bind(), .map(), .from_value().
-            Python cannot enforce this constraint at the type level — duck-typed at runtime.
+        _F: The inner monad type. Must support .bind(), .map(),
+            .from_value(). Duck-typed at runtime.
         _A: The value type produced by the transformer.
 
     Each transformer implements its own do and and_then.
@@ -34,7 +34,7 @@ class MonadTransformer(Monad, Generic[_F, _A]):
 
     @classmethod
     @abstractmethod
-    def lift(cls, inner: _F) -> "MonadTransformer[_F, _A]":
+    def lift(cls, inner: _F) -> MonadTransformer[_F, _A]:
         """Lift an inner monad value into the transformer.
 
         This is the defining operation of a monad transformer —
@@ -43,7 +43,7 @@ class MonadTransformer(Monad, Generic[_F, _A]):
         ...
 
     @abstractmethod
-    def and_then(self, other) -> "MonadTransformer[_F, _A]":
+    def and_then(self, other) -> MonadTransformer[_F, _A]:
         """Kleisli composition: output of self becomes input of other."""
         ...
 

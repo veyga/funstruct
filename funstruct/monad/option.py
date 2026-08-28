@@ -30,7 +30,8 @@ Examples:
 
     >>> Option.traverse(CList.from_iterable([1, 2, 3]), lambda x: Some(x * 10))
     Some(Cons(10, Cons(20, Cons(30, Nil()))))
-    >>> Option.traverse(CList.from_iterable([1, 0, 3]), lambda x: Some(x) if x != 0 else Nothing())
+    >>> safe = lambda x: Some(x) if x != 0 else Nothing()
+    >>> Option.traverse(CList.from_iterable([1, 0, 3]), safe)
     Nothing()
 """
 

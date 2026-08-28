@@ -1,10 +1,10 @@
-"""Immutable persistent/structurally shared dictionary backed by a Hash Array Mapped Trie (HAMT).
+"""Immutable persistent dictionary backed by a HAMT.
 
-NOT insertion-ordered.
+NOT insertion-ordered. Iteration order depends on key hash distribution.
 
 Performance characteristics:
-    - get:    O(log32 n) — effectively O(1) for practical sizes (max 7 levels for 2^35 entries)
-    - put:    O(log32 n) — path-copied, old version unchanged (structural sharing)
+    - get:    O(log32 n) — effectively O(1) for practical sizes
+    - put:    O(log32 n) — path-copied, structural sharing
     - delete: O(log32 n) — same path-copy semantics
     - iter:   O(n)
     - eq:     O(n)
@@ -12,7 +12,7 @@ Performance characteristics:
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator, KeysView, ValuesView, ItemsView
+from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 from typing import Generic, TypeVar
 
 K = TypeVar("K")
@@ -163,9 +163,7 @@ class _Branch:
             return _Branch(self._empty, self._bitmap, new_children)
         else:
             new_child = _Leaf(key, value)
-            new_children = (
-                self._children[:pos] + (new_child,) + self._children[pos:]
-            )
+            new_children = self._children[:pos] + (new_child,) + self._children[pos:]
             return _Branch(self._empty, self._bitmap | bit, new_children)
 
     def remove(self, key, hash_val, shift):
@@ -184,9 +182,7 @@ class _Branch:
             if len(new_children) == 1 and isinstance(new_children[0], _Leaf):
                 return new_children[0]
             return _Branch(self._empty, new_bitmap, new_children)
-        new_children = (
-            self._children[:pos] + (new_child,) + self._children[pos + 1 :]
-        )
+        new_children = self._children[:pos] + (new_child,) + self._children[pos + 1 :]
         return _Branch(self._empty, self._bitmap, new_children)
 
     def items_iter(self):

@@ -31,14 +31,14 @@ class Applicative(Functor[_A]):
 
     @classmethod
     @abstractmethod
-    def pure(cls, value: _A, *args, **kwargs) -> "Applicative[_A]":
+    def pure(cls, value: _A, *args, **kwargs) -> Applicative[_A]:
         """Lift a value into the context."""
         ...
 
     @abstractmethod
-    def ap(self, other: "Applicative[_B]") -> "Applicative[tuple[_A, _B]]": ...
+    def ap(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]: ...
 
-    def __add__(self, other: "Applicative[_B]") -> "Applicative[tuple[_A, _B]]":
+    def __add__(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
         """Alias for ap."""
         return self.ap(other)
 

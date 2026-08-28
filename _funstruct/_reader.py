@@ -13,8 +13,8 @@ Example::
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Generator, Generic, TypeVar
+from collections.abc import Callable, Generator
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
 
@@ -51,9 +51,7 @@ class Reader(Monad, Generic[_Ctx, _A]):
         return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
 
     @classmethod
-    def do(
-        cls, gen_fn: Callable[[], Generator[Reader, object, _R]]
-    ) -> "Reader[_Ctx, _R]":
+    def do(cls, gen_fn: Callable[[], Generator[Reader, object, _R]]) -> Reader:
         """Do-notation via generators. Flattens nested binds.
 
         Each `yield` extracts the value from a Reader (all share the same ctx).

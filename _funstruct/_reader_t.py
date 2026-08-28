@@ -1,33 +1,21 @@
-"""
-Generic ReaderT monad transformer.
+"""Generic ReaderT monad transformer.
 
 ``ReaderT[M, Ctx, A]`` wraps ``Ctx -> M[A]`` where M is any monad
 with ``.bind()``, ``.map()``, and optionally ``.lash()``.
 
 Delegates all composition to the inner monad M — one implementation
-works for any M (StateT, Result, FutureResult, etc.).
+works for any M (Option, StateT, Result, etc.).
 
 Haskell: ``ReaderT r m a``
 Scala cats:   ``Kleisli[F, Ctx, A]``
 
-Example with Result::
+Example with Option::
 
-    >>> from returns.result import Result
-    >>> from funstruct.monad import ReaderT
-    >>> step = ReaderT(lambda ctx: Result.from_value(ctx + 1))
+    >>> from _funstruct._option import Option, Some, Nothing
+    >>> from _funstruct._reader_t import ReaderT
+    >>> step = ReaderT(lambda ctx: Some(ctx + 1))
     >>> step.run(5)
-    <Success: 6>
-
-Example with StateT::
-
-    >>> from returns.result import Result
-    >>> from funstruct.monad import StateT
-    >>> from funstruct.monad import ReaderT
-    >>> step = ReaderT(lambda ctx: StateT(
-    ...     lambda s: Result.from_value((s + ctx, s))
-    ... ))
-    >>> step.run(10).run(0)
-    <Success: (10, 0)>
+    Some(6)
 
 """
 
@@ -142,8 +130,6 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
     ) -> ReaderT[_Ctx, _M, _B]:
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_step)
-
-        return cls(_run)
 
     @classmethod
     def pure(cls, value, monad) -> ReaderT:

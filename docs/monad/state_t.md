@@ -24,4 +24,4 @@ result = divide_state(0).run(10)  # Failure("division by zero")
 
 ## API Reference
 
-::: funstruct.monad.state_t.StateT
+::: funstruct.monadtransformer.state_t.StateT

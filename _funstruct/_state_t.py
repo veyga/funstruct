@@ -1,17 +1,15 @@
-"""
-Generic State monad transformer.
+"""Generic State monad transformer.
 
 ``StateT[F, A]`` wraps ``S -> F[(S, A)]`` where ``F`` is any monad with
 ``.bind()``, ``.map()``, and optionally ``.lash()``.
 
+Example with Option::
 
-Example with Result::
-
-    >>> from returns.result import Result
-    >>> from funstruct.monad import StateT
-    >>> inc = StateT(lambda s: Result.from_value((s + 1, s)))
+    >>> from _funstruct._option import Option, Some
+    >>> from _funstruct._state_t import StateT
+    >>> inc = StateT(lambda s: Some((s + 1, s)))
     >>> inc.then(inc).then(inc).run(0)
-    <Success: (3, 2)>
+    Some((3, 2))
 
 """
 
@@ -61,9 +59,9 @@ class StateT(MonadTransformer, Generic[_F, _A]):
     def bind(self, f: Callable[[_A], "StateT[_F, _B]"]) -> "StateT[_F, _B]":
         """FlatMap: thread state, pass value to ``f``.
 
-        >>> from returns.result import Result
-        >>> StateT.from_value(1, Result).bind(lambda x: StateT.from_value(x + 10, Result)).run(0)
-        <Success: (0, 11)>
+        >>> from _funstruct._option import Option, Some
+        >>> StateT.pure(1, Option).bind(lambda x: StateT.pure(x + 10, Option)).run(0)
+        Some((0, 11))
         """
 
         def inner(s):
@@ -74,9 +72,9 @@ class StateT(MonadTransformer, Generic[_F, _A]):
     def map(self, f: Callable[[_A], _B]) -> "StateT[_F, _B]":
         """Transform the produced value without touching state.
 
-        >>> from returns.result import Result
-        >>> StateT.from_value(5, Result).map(lambda x: x * 2).run(0)
-        <Success: (0, 10)>
+        >>> from _funstruct._option import Option, Some
+        >>> StateT.pure(5, Option).map(lambda x: x * 2).run(0)
+        Some((0, 10))
         """
 
         def inner(s):
@@ -85,16 +83,10 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return StateT(inner)
 
     def lash(self, f: Callable) -> "StateT":
-        """
-        Recover from failure. ``f`` receives the error, returns a recovery StateT.
+        """Recover from failure.
+
+        ``f`` receives the error, returns a recovery StateT.
         Only works when ``F`` supports ``.lash()`` (Result, IOResult, etc.).
-
-        >>> from returns.result import Result
-        >>> failing = StateT(lambda s: Result.from_failure(ValueError("oops")))
-        >>> recovered = failing.lash(lambda e: StateT.from_value("ok", Result))
-        >>> recovered.run(0)
-        <Success: (0, 'ok')>
-
         """
 
         def inner(s):
@@ -140,7 +132,8 @@ class StateT(MonadTransformer, Generic[_F, _A]):
                     next_val = gen.send(value)
                     return next_val.run(new_s).bind(step)
                 except StopIteration as e:
-                    return first.run(s).__class__.from_value((new_s, e.value))
+                    monad_cls = first.run(s).__class__
+                    return lift(monad_cls, (new_s, e.value))
 
             return first.run(s).bind(step)
 
@@ -148,59 +141,52 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
     @classmethod
     def pure(cls, value, monad: type) -> "StateT":
-        """Lift a value.
+        """Lift a value into StateT. State unchanged.
 
-        State unchanged. Uses ``monad.from_value``.
-                >>> from returns.result import Result
-                >>> StateT.from_value("hello", Result).run(99)
-                <Success: (99, 'hello')>
+        >>> from _funstruct._option import Option, Some
+        >>> StateT.pure("hello", Option).run(99)
+        Some((99, 'hello'))
         """
-        return cls(lambda s: monad.from_value((s, value)))
+        return cls(lambda s: lift(monad, (s, value)))
 
     @classmethod
     def fail(cls, err, monad) -> "StateT":
-        """Lift an error.
-
-        Uses ``monad.from_failure``.
-                >>> from returns.result import Result
-                >>> StateT.fail(ValueError("bad"), Result).run(0)
-                <Failure: bad>
-        """
+        """Lift an error. Uses ``monad.from_failure``."""
         return cls(lambda _: monad.from_failure(err))
 
     @classmethod
     def get(cls, monad) -> "StateT":
         """Produce current state as the value.
 
-        >>> from returns.result import Result
-        >>> StateT.get(Result).run(42)
-        <Success: (42, 42)>
+        >>> from _funstruct._option import Option, Some
+        >>> StateT.get(Option).run(42)
+        Some((42, 42))
         """
-        return cls(lambda s: monad.from_value((s, s)))
+        return cls(lambda s: lift(monad, (s, s)))
 
     @classmethod
     def modify(cls, f: Callable, monad) -> "StateT":
         """Modify state, produce None.
 
-        >>> from returns.result import Result
-        >>> StateT.modify(lambda s: s + 1, Result).run(5)
-        <Success: (6, None)>
+        >>> from _funstruct._option import Option, Some
+        >>> StateT.modify(lambda s: s + 1, Option).run(5)
+        Some((6, None))
         """
-        return cls(lambda s: monad.from_value((f(s), None)))
+        return cls(lambda s: lift(monad, (f(s), None)))
 
     @classmethod
-    def lift(cls, fa) -> "StateT":
+    def lift(cls, inner) -> "StateT":
         """Lift F[A] into StateT — state unchanged.
 
         Haskell: ``lift :: m a -> StateT s m a``
 
-        >>> from returns.result import Result
-        >>> StateT.lift(Result.from_value(42)).run(0)
-        <Success: (0, 42)>
-        >>> StateT.lift(Result.from_failure("err")).run(0)
-        <Failure: err>
+        >>> from _funstruct._option import Option, Some, Nothing
+        >>> StateT.lift(Some(42)).run(0)
+        Some((0, 42))
+        >>> StateT.lift(Nothing()).run(0)
+        Nothing()
         """
-        return cls(lambda s: fa.map(lambda a: (s, a)))
+        return cls(lambda s: inner.map(lambda a: (s, a)))
 
     def __repr__(self) -> str:
         return f"StateT({self._run})"

@@ -11,8 +11,8 @@ ListWriter(value=99, output=[])
 """
 
 from _funstruct._writer import Writer
-from funstruct.typeclasses import Monoid
 from funstruct.collections.cons import CList, Nil
+from funstruct.typeclasses import Monoid
 
 
 class ListWriter(Writer):

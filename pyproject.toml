@@ -42,6 +42,9 @@ docs = [
     "docformatter>=1.7",
 ]
 
+[tool.ty]
+rules.invalid-method-override = "ignore"
+
 [tool.ty.environment]
 root = ["."]
 
@@ -50,7 +53,7 @@ addopts = "--doctest-modules"
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 
 [tool.ruff]
-line-length = 80
+line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]

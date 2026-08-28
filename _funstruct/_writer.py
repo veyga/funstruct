@@ -83,7 +83,8 @@ class Writer(Monad, Generic[_W, _A]):
                 return False
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(value={repr(self.value)}, output={repr(self.output)})"
+        cls = self.__class__.__name__
+        return f"{cls}(value={repr(self.value)}, output={repr(self.output)})"
 
     __match_args__ = ("value", "output")
 
