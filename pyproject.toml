@@ -61,10 +61,6 @@ ignore = [
     "E731", # Do not assign a `lambda` expression, use a `def`
 ]
 
-[tool.ruff.lint.per-file-ignores]
-# CList can't be imported at top level (circular); quoted forward ref is valid
-"_funstruct/_option.py" = ["F821", "UP037"]
-
 
 [tool.docformatter]
 wrap-summaries = 80
