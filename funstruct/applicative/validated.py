@@ -1,4 +1,8 @@
-"""Validated: applicative error-accumulating functor.
+"""
+yoooo
+Validated: applicative error-accumulating functor.
+
+```python
 
 >>> from funstruct.applicative.validated import Validated, Valid, Invalid
 >>> Validated.cond(True, 42, "err")
@@ -9,6 +13,8 @@ Invalid(errors=Cons('err', Nil()))
 Valid(value=(1, 2))
 >>> Invalid("a:") + Invalid("b")
 Invalid(errors='a:b')
+
+```
 """
 
 from _funstruct._validated import *  # noqa F403
