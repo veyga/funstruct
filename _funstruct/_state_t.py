@@ -19,10 +19,8 @@ from typing import Generic, TypeVar
 from funstruct.typeclasses._monad_transformer import MonadTransformer
 
 
-def lift(monad_cls, value):
-    """Lift a value into a monad — uses from_value if available, else pure."""
-    if hasattr(monad_cls, "from_value"):
-        return monad_cls.from_value(value)
+def _pure(monad_cls, value):
+    """Lift a plain value into a monad via pure."""
     return monad_cls.pure(value)
 
 
@@ -86,13 +84,11 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         """Recover from failure.
 
         ``f`` receives the error, returns a recovery StateT.
-        Only works when ``F`` supports ``.or_else()`` or ``.lash()``.
+        Only works when ``F`` supports ``.or_else()``.
         """
 
         def inner(s):
-            m = self._run(s)
-            recover = getattr(m, "or_else", None) or m.lash
-            return recover(lambda err: f(err).run(s))
+            return self._run(s).or_else(lambda err: f(err).run(s))
 
         return StateT(inner)
 
@@ -135,7 +131,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
                     return next_val.run(new_s).bind(step)
                 except StopIteration as e:
                     monad_cls = first.run(s).__class__
-                    return lift(monad_cls, (new_s, e.value))
+                    return _pure(monad_cls, (new_s, e.value))
 
             return first.run(s).bind(step)
 
@@ -149,12 +145,12 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         >>> StateT.pure("hello", Option).run(99)
         Some((99, 'hello'))
         """
-        return cls(lambda s: lift(monad, (s, value)))
+        return cls(lambda s: _pure(monad, (s, value)))
 
     @classmethod
     def fail(cls, err, monad) -> "StateT":
-        """Lift an error. Uses ``monad.from_failure``."""
-        return cls(lambda _: monad.from_failure(err))
+        """Lift an error. Uses ``monad.from_error``."""
+        return cls(lambda _: monad.from_error(err))
 
     @classmethod
     def get(cls, monad) -> "StateT":
@@ -164,7 +160,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         >>> StateT.get(Option).run(42)
         Some((42, 42))
         """
-        return cls(lambda s: lift(monad, (s, s)))
+        return cls(lambda s: _pure(monad, (s, s)))
 
     @classmethod
     def modify(cls, f: Callable, monad) -> "StateT":
@@ -174,7 +170,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         >>> StateT.modify(lambda s: s + 1, Option).run(5)
         Some((6, None))
         """
-        return cls(lambda s: lift(monad, (f(s), None)))
+        return cls(lambda s: _pure(monad, (f(s), None)))
 
     @classmethod
     def lift(cls, inner) -> "StateT":

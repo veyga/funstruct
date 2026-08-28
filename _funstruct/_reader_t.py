@@ -27,10 +27,8 @@ from typing import Generic, TypeVar
 from funstruct.typeclasses._monad_transformer import MonadTransformer
 
 
-def lift(monad_cls, value):
-    """Lift a value into a monad — uses from_value if available, else pure."""
-    if hasattr(monad_cls, "from_value"):
-        return monad_cls.from_value(value)
+def _pure(monad_cls, value):
+    """Lift a value into a monad via pure."""
     return monad_cls.pure(value)
 
 
@@ -80,12 +78,10 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         return ReaderT(inner)
 
     def or_else(self, f: Callable) -> ReaderT[_Ctx, _M, _A]:
-        """Recover from failure via inner monad's or_else/lash."""
+        """Recover from failure via inner monad's or_else."""
 
         def inner(ctx):
-            m = self._run(ctx)
-            recover = getattr(m, "or_else", None) or m.lash
-            return recover(lambda err: f(err).run(ctx))
+            return self._run(ctx).or_else(lambda err: f(err).run(ctx))
 
         return ReaderT(inner)
 
@@ -120,7 +116,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
                     next_val = gen.send(value)
                     return next_val._run(ctx).bind(step)
                 except StopIteration as e:
-                    return lift(monadic_val._run(ctx).__class__, e.value)
+                    return _pure(monadic_val._run(ctx).__class__, e.value)
 
             return monadic_val._run(ctx).bind(step)
 
@@ -135,12 +131,12 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
     @classmethod
     def pure(cls, value, monad) -> ReaderT:
-        """Lift a raw value into ReaderT via monad.from_value."""
-        return cls(lambda _: lift(monad, value))
+        """Lift a plain value into ReaderT via monad.pure."""
+        return cls(lambda _: _pure(monad, value))
 
     @classmethod
     def lift(cls, m) -> ReaderT:
-        """Lift an existing M[A] into ReaderT (ignoring context).
+        """Lift M[A] into ReaderT (ignoring context).
 
         Haskell: ``lift :: m a -> ReaderT r m a``
         """

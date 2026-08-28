@@ -37,11 +37,6 @@ class Either(Monad, Generic[E, A]):
         return Right(value)
 
     @classmethod
-    def from_value(cls, value: A) -> Either[E, A]:
-        """Alias for pure — lifts a value into Right."""
-        return Right(value)
-
-    @classmethod
     def from_error(cls, error: E) -> Either[E, A]:
         """Lift an error into Left."""
         return Left(error)
@@ -209,32 +204,8 @@ class Left(Either[E, A]):
         return f"Left({repr(self.error)})"
 
 
-def Try(f: Callable) -> Callable[..., Either[Exception, A]]:
-    """Decorator: wraps a function so exceptions become Left.
-
-    >>> @Try
-    ... def divide(a, b):
-    ...     return a / b
-    >>> divide(10, 2)
-    Right(5.0)
-    >>> divide(10, 0)  # doctest: +ELLIPSIS
-    Left(ZeroDivisionError(...))
-    """
-    from functools import wraps
-
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        try:
-            return Right(f(*args, **kwargs))
-        except Exception as e:
-            return Left(e)
-
-    return wrapper
-
-
 __all__ = [
     "Either",
     "Right",
     "Left",
-    "Try",
 ]

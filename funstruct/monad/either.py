@@ -3,7 +3,7 @@
 Either[E, A] = Right(a) | Left(e). Right-biased.
 
 Examples:
-    >>> from funstruct.monad.either import Either, Right, Left, Try
+    >>> from funstruct.monad.either import Either, Right, Left
     >>> Right(10).map(lambda x: x + 1)
     Right(11)
     >>> Left("err").map(lambda x: x + 1)
@@ -19,16 +19,6 @@ Examples:
     Right('default')
     >>> Right(10).or_else(lambda e: Right("default"))
     Right(10)
-
-    @Try decorator — catch exceptions into Left:
-
-    >>> @Try
-    ... def safe_div(a, b):
-    ...     return a / b
-    >>> safe_div(10, 2)
-    Right(5.0)
-    >>> safe_div(10, 0)  # doctest: +ELLIPSIS
-    Left(ZeroDivisionError(...))
 
     do-notation:
 

@@ -357,8 +357,6 @@ dev = [
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-parametrization" },
-    { name = "returns", version = "0.26.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "returns", version = "0.29.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "ruff" },
     { name = "ty" },
 ]
@@ -381,8 +379,6 @@ dev = [
     { name = "pre-commit", specifier = ">=4.6.2" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-parametrization", specifier = ">=2022.2.1" },
-    { name = "returns", marker = "python_full_version < '3.11'", specifier = ">=0.26.0,<0.27.0" },
-    { name = "returns", marker = "python_full_version >= '3.11'", specifier = ">=0.29.0" },
     { name = "ruff", specifier = ">=0.8.0" },
     { name = "ty", specifier = ">=0.0.74" },
 ]
@@ -1058,37 +1054,6 @@ dependencies = [
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/requests/2.34.2/requests-2.34.2.tar.gz", hash = "sha256:f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/requests/2.34.2/requests-2.34.2-py3-none-any.whl", hash = "sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0" },
-]
-
-[[package]]
-name = "returns"
-version = "0.26.0"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-resolution-markers = [
-    "python_full_version < '3.11'",
-]
-dependencies = [
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.26.0/returns-0.26.0.tar.gz", hash = "sha256:180320e0f6e9ea9845330ccfc020f542330f05b7250941d9b9b7c00203fcc3da" }
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.26.0/returns-0.26.0-py3-none-any.whl", hash = "sha256:7cae94c730d6c56ffd9d0f583f7a2c0b32cfe17d141837150c8e6cff3eb30d71" },
-]
-
-[[package]]
-name = "returns"
-version = "0.29.0"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-resolution-markers = [
-    "python_full_version >= '3.15'",
-    "python_full_version >= '3.11' and python_full_version < '3.15'",
-]
-dependencies = [
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.29.0/returns-0.29.0.tar.gz", hash = "sha256:fd9831594403229595dc705fee632a9be24a497df10aa3b9b72405d75d54e8ad" }
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/returns/0.29.0/returns-0.29.0-py3-none-any.whl", hash = "sha256:db43c06d228f84b3d93c0418313c37c5ee4ecdb7a0f10326c24444f9baaf074c" },
 ]
 
 [[package]]

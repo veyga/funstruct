@@ -11,7 +11,7 @@ from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
 
-_F = TypeVar("_F")  # The inner monad (must support .bind/.map/.from_value)
+_F = TypeVar("_F")  # The inner monad (must support .bind/.map/.pure)
 _A = TypeVar("_A")  # The value type
 
 
@@ -26,7 +26,7 @@ class MonadTransformer(Monad, Generic[_F, _A]):
 
     Type parameters:
         _F: The inner monad type. Must support .bind(), .map(),
-            .from_value(). Duck-typed at runtime.
+            .pure(). Duck-typed at runtime.
         _A: The value type produced by the transformer.
 
     Each transformer implements its own do and and_then.
