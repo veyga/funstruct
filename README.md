@@ -2,8 +2,6 @@
 
 A small, helpful collection of functional utilities.
 
-These are not meant to be highly performant, but are useful for smaller datasets.
-
 ## Install
 
 ```bash
