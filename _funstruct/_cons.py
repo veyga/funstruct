@@ -14,8 +14,20 @@ B = TypeVar("B")
 class CList(Monad, Generic[A]):
     """A Lisp/ML/Scala style singly linked list (cons list).
 
-    Provides an interface for working with a singly linked list, including methods for
-    traversal, transformation, and manipulation of list elements.
+    Performance characteristics:
+        - prepend (<<):  O(1) — just creates a new head node
+        - head/tail:     O(1) — direct field access
+        - append (+):    O(n) — must traverse to the end
+        - length:        O(n) — traverses entire list
+        - drop(k):       O(k) — follows k tail pointers
+        - take(k):       O(k) — copies k nodes
+        - map/filter:    O(n) — traverses and rebuilds
+        - bind/flatMap:  O(n*m) — maps then flattens
+        - reversed:      O(n) — builds new list via fold
+        - index access:  O(n) — no random access (use Python list for that)
+
+    This is a persistent, immutable, singly-linked structure. Prepend is cheap;
+    append is expensive. Best for recursive algorithms and stack-like access patterns.
     """
 
     @abstractmethod

@@ -10,7 +10,7 @@ bind: chain computations that share context, any can fail.
 and_then: pipe output forward as the next context (Kleisli composition).
 
 Examples:
-    >>> from funstruct.monad.reader_t import ReaderT
+    >>> from funstruct.monadtransformer import ReaderT
     >>> from returns.result import Result, Success, Failure
 
     bind — shared context, with failure:

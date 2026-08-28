@@ -1,7 +1,7 @@
 """StateT — state monad transformer over any monad.
 
 Examples:
-    >>> from funstruct.monad.state_t import StateT
+    >>> from funstruct.monadtransformer import StateT
     >>> from returns.result import Result
     >>> inc = StateT(lambda s: Result.from_value((s + 1, s)))
     >>> inc.run(0)
