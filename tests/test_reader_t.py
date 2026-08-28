@@ -3,7 +3,11 @@
 from returns.result import Failure, Result, Success
 
 from funstruct.monad import ReaderT, StateT
-from tests.laws import assert_applicative_laws, assert_functor_laws, assert_monad_laws
+from tests.laws import (
+    assert_applicative_laws,
+    assert_functor_laws,
+    assert_monad_laws,
+)
 
 
 def _reader_t_eq(a, b):
@@ -73,7 +77,9 @@ class TestLash:
 
     def test_lash_skips_on_success(self):
         ok = ReaderT(lambda ctx: Result.from_value("ok"))
-        result = ok.lash(lambda err: ReaderT(lambda ctx: Result.from_value("nope")))
+        result = ok.lash(
+            lambda err: ReaderT(lambda ctx: Result.from_value("nope"))
+        )
         assert result.run(0) == Success("ok")
 
     def test_lash_receives_context(self):
@@ -130,7 +136,9 @@ class TestWithStateT:
     """ReaderT wrapping StateT — the full stack."""
 
     def test_threads_context_and_state(self):
-        step = ReaderT(lambda ctx: StateT(lambda s: Result.from_value((s + ctx, s))))
+        step = ReaderT(
+            lambda ctx: StateT(lambda s: Result.from_value((s + ctx, s)))
+        )
         assert step.run(10).run(0) == Success((10, 0))
 
     def test_lift_state_t(self):
@@ -147,7 +155,9 @@ class TestWithStateT:
     def test_lash_with_state_t(self):
         failing = ReaderT.lift(StateT(lambda s: Failure(ValueError("expired"))))
         recover = ReaderT(
-            lambda ctx: StateT(lambda s: Result.from_value((s, f"recovered-{ctx}")))
+            lambda ctx: StateT(
+                lambda s: Result.from_value((s, f"recovered-{ctx}"))
+            )
         )
         pipeline = failing.lash(lambda err: recover)
         assert pipeline.run("myctx").run(0) == Success((0, "recovered-myctx"))

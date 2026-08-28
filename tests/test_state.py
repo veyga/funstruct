@@ -3,7 +3,11 @@
 from parametrization import Parametrization as P
 
 from funstruct.monad import State
-from tests.laws import assert_applicative_laws, assert_functor_laws, assert_monad_laws
+from tests.laws import (
+    assert_applicative_laws,
+    assert_functor_laws,
+    assert_monad_laws,
+)
 
 
 def _state_eq(a, b):

@@ -4,7 +4,11 @@ from parametrization import Parametrization as P
 from returns.result import Failure, Result, Success
 
 from funstruct.monad import StateT
-from tests.laws import assert_applicative_laws, assert_functor_laws, assert_monad_laws
+from tests.laws import (
+    assert_applicative_laws,
+    assert_functor_laws,
+    assert_monad_laws,
+)
 
 
 def _state_t_eq(a, b):
@@ -51,7 +55,9 @@ class TestRun:
 
 class TestPure:
     def test_pure_does_not_modify_state(self):
-        assert StateT.pure(99, Result).run("unchanged") == Success(("unchanged", 99))
+        assert StateT.pure(99, Result).run("unchanged") == Success(
+            ("unchanged", 99)
+        )
 
     def test_pure_wraps_value(self):
         assert StateT.pure("hello", Result).run(0) == Success((0, "hello"))
@@ -63,7 +69,9 @@ class TestFail:
         assert result == Failure("oops")
 
     def test_fail_short_circuits_chain(self):
-        pipeline = StateT.fail("stop", Result).then(StateT.pure("never", Result))
+        pipeline = StateT.fail("stop", Result).then(
+            StateT.pure("never", Result)
+        )
         assert pipeline.run(0) == Failure("stop")
 
 
@@ -73,7 +81,9 @@ class TestMap:
     @P.case(name="1", value="hi", f=str.upper, expected="HI")
     @P.case(name="2", value=[1, 2], f=len, expected=2)
     def test_map_transforms_value(self, value, f, expected):
-        assert StateT.pure(value, Result).map(f).run(0) == Success((0, expected))
+        assert StateT.pure(value, Result).map(f).run(0) == Success(
+            (0, expected)
+        )
 
     def test_map_does_not_modify_state(self):
         s = StateT(lambda st: Result.from_value((st + 1, 5)))
@@ -91,7 +101,9 @@ class TestBind:
         assert inc.bind(lambda _: inc).run(0) == Success((2, 1))
 
     def test_bind_passes_value(self):
-        result = StateT.pure(5, Result).bind(lambda x: StateT.pure(x + 10, Result))
+        result = StateT.pure(5, Result).bind(
+            lambda x: StateT.pure(x + 10, Result)
+        )
         assert result.run(0) == Success((0, 15))
 
     def test_bind_short_circuits_on_failure(self):
@@ -170,7 +182,9 @@ class TestLash:
 
 class TestThen:
     def test_then_discards_value(self):
-        result = StateT.pure("discarded", Result).then(StateT.pure("kept", Result))
+        result = StateT.pure("discarded", Result).then(
+            StateT.pure("kept", Result)
+        )
         assert result.run(0) == Success((0, "kept"))
 
     def test_then_threads_state(self):
@@ -191,7 +205,9 @@ class TestGet:
 
 class TestModify:
     def test_modify_transforms_state(self):
-        assert StateT.modify(lambda s: s * 2, Result).run(5) == Success((10, None))
+        assert StateT.modify(lambda s: s * 2, Result).run(5) == Success(
+            (10, None)
+        )
 
 
 class TestLaws:

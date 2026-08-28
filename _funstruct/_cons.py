@@ -194,7 +194,9 @@ class CList(Monad, Generic[A]):
         Returns:
             A new list containing only the elements that satisfy `f`.
         """
-        return self.fold_right(Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc)
+        return self.fold_right(
+            Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc
+        )
 
     def flatten(self) -> CList:
         """Flatten a list of lists into a single list.
