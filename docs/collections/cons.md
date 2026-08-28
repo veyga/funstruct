@@ -88,4 +88,8 @@ Cons(3, Cons(1, Cons(2, Nil()))).sorted(lambda a, b: a - b)
 
 ## API Reference
 
-::: \_funstruct.\_cons.CList ::: \_funstruct.\_cons.Cons ::: \_funstruct.\_cons.Nil
+::: _funstruct._cons.CList
+
+::: _funstruct._cons.Cons
+
+::: _funstruct._cons.Nil

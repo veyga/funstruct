@@ -17,4 +17,4 @@ new_state, result = pipeline.run(0)
 
 ## API Reference
 
-::: \_funstruct.\_state.State
+::: _funstruct._state.State

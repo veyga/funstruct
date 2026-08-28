@@ -21,4 +21,4 @@ sum_up_to(10000)  # no stack overflow
 
 ## API Reference
 
-::: \_funstruct.\_tailrec
+::: _funstruct._tailrec

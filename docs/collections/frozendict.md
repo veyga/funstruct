@@ -18,4 +18,4 @@ fd2 = fd.set("c", 3)  # frozendict({"a": 1, "b": 2, "c": 3})
 
 ## API Reference
 
-::: \_funstruct.\_frozendict.frozendict
+::: _funstruct._frozendict.frozendict

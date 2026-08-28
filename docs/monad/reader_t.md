@@ -16,4 +16,4 @@ result = fetch_url({"base_url": "https://api.example.com"})
 
 ## API Reference
 
-::: \_funstruct.\_reader_t.ReaderT
+::: _funstruct._reader_t.ReaderT
