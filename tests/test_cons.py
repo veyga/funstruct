@@ -791,3 +791,71 @@ class TestTruthiness:
 
     def test_nil_is_falsy(self):
         assert bool(Nil()) is False
+
+
+class TestSorted:
+    def test_sorted_empty(self):
+        assert Nil().sorted(lambda a, b: a - b) == Nil()
+
+    def test_sorted_single(self):
+        assert Cons(1, Nil()).sorted(lambda a, b: a - b) == Cons(1, Nil())
+
+    def test_sorted_multiple(self):
+        lst = CList.from_iterable([3, 1, 4, 1, 5, 2])
+        result = lst.sorted(lambda a, b: a - b)
+        assert result == CList.from_iterable([1, 1, 2, 3, 4, 5])
+
+    def test_sorted_already_sorted(self):
+        lst = CList.from_iterable([1, 2, 3])
+        assert lst.sorted(lambda a, b: a - b) == lst
+
+    def test_sorted_reverse(self):
+        lst = CList.from_iterable([3, 2, 1])
+        result = lst.sorted(lambda a, b: a - b)
+        assert result == CList.from_iterable([1, 2, 3])
+
+
+class TestFlatten:
+    def test_flatten_nested(self):
+        nested = Cons(Cons(1, Cons(2, Nil())), Cons(Cons(3, Nil()), Nil()))
+        result = CList.flatten_(nested)
+        assert result == CList.from_iterable([1, 2, 3])
+
+    def test_flatten_empty(self):
+        assert CList.flatten_(Nil()) == Nil()
+
+    def test_flatten_single(self):
+        nested = Cons(Cons(1, Nil()), Nil())
+        result = CList.flatten_(nested)
+        assert result == Cons(1, Nil())
+
+
+class TestDoNotation:
+    def test_do_basic(self):
+        @CList.do
+        def pairs():
+            x = yield CList.from_iterable([1, 2])
+            y = yield CList.from_iterable([10, 20])
+            return x + y
+
+        assert pairs == CList.from_iterable([11, 21, 12, 22])
+
+    def test_do_single_yield(self):
+        @CList.do
+        def single():
+            x = yield CList.from_iterable([1, 2, 3])
+            return x * 10
+
+        assert single == CList.from_iterable([10, 20, 30])
+
+
+class TestStaticConstructors:
+    def test_cons_static(self):
+        assert CList.cons(42) == Cons(42, Nil())
+
+    def test_empty_static(self):
+        assert CList.empty() == Nil()
+
+    def test_length(self):
+        assert CList.from_iterable([1, 2, 3]).length() == 3
+        assert Nil().length() == 0

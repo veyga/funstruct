@@ -405,12 +405,17 @@ class CList(Monad, Generic[A]):
         """
         return self.fold_right(0, lambda _, acc: acc + 1)
 
-    def __iter__(self) -> Iterator[A]:
-        """Iterate over the elements of the list.
+    def to_list(self) -> list[A]:
+        """Convert to a Python list.
 
-        Yields:
-            Each element of the list.
+        >>> Cons(1, Cons(2, Cons(3, Nil()))).to_list()
+        [1, 2, 3]
+        >>> Nil().to_list()
+        []
         """
+        return list(self)
+
+    def __iter__(self) -> Iterator[A]:
         current = self
         while isinstance(current, Cons):
             yield current.head
