@@ -203,7 +203,7 @@ class frozendict(Generic[K, V]):
         return self._dict
 
     @classmethod
-    def fromkeys(cls, *args: K, **kwargs: V) -> frozendict:
+    def fromkeys(cls, *args, **kwargs) -> frozendict:
         """Creates a new frozendict with keys from the given iterable
         and values set to a specified value.
 

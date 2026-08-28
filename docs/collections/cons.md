@@ -32,10 +32,10 @@ nums = Cons(1, Cons(2, Cons(3, Cons(4, Cons(5, Nil())))))
 
 # Pipeline: square → keep evens → duplicate each
 result = (
-    nums
-    .map(lambda x: x * x)                       # Cons(1, 4, 9, 16, 25)
-    .filter(lambda x: x % 2 == 0)               # Cons(4, 16)
-    >> (lambda x: Cons(x, Cons(-x, Nil())))      # Cons(4, -4, 16, -16)
+    nums.map(lambda x: x * x).filter(  # Cons(1, 4, 9, 16, 25)
+        lambda x: x % 2 == 0
+    )  # Cons(4, 16)
+    >> (lambda x: Cons(x, Cons(-x, Nil())))  # Cons(4, -4, 16, -16)
 )
 
 # Fold to sum
@@ -75,11 +75,11 @@ xs + Cons(4, Cons(5, Nil()))
 
 # Insert at position
 left, right = xs.split_at(2)  # (Cons(1, Cons(2, Nil)), Cons(3, Nil))
-left + (99 << right)          # Cons(1, Cons(2, Cons(99, Cons(3, Nil))))
+left + (99 << right)  # Cons(1, Cons(2, Cons(99, Cons(3, Nil))))
 
 # Take / Drop
-xs.take(2)   # Cons(1, Cons(2, Nil))
-xs.drop(2)   # Cons(3, Nil)
+xs.take(2)  # Cons(1, Cons(2, Nil))
+xs.drop(2)  # Cons(3, Nil)
 
 # Sorted (with comparator)
 Cons(3, Cons(1, Cons(2, Nil()))).sorted(lambda a, b: a - b)

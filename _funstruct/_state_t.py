@@ -4,8 +4,6 @@ Generic State monad transformer.
 ``StateT[F, A]`` wraps ``S -> F[(S, A)]`` where ``F`` is any monad with
 ``.bind()``, ``.map()``, and optionally ``.lash()``.
 
-Works with ``Result``, ``FutureResult``, ``Maybe``, or any container
-that implements those methods.
 
 Example with Result::
 

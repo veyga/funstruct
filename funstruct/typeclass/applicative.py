@@ -17,10 +17,9 @@ class Applicative(Functor):
     """Combine independent computations."""
 
     @classmethod
-    @abstractmethod
-    def pure(cls, value) -> Applicative:
+    def pure(cls, value, *args, **kwargs) -> Applicative:
         """Lift a value into the context."""
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def ap(self, other: Applicative) -> Applicative: ...

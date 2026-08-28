@@ -1,13 +1,8 @@
 """
 Pure State monad.
 
-``State[A]`` wraps ``S -> (S, A)`` — always succeeds, no error handling.
-For failable computations, use ``StateT``.
-
-Operators::
-
-    >>  bind (monadic flatMap)
-    +   ap (applicative, tuples values)
+``State[A]`` wraps ``S -> (S, A)``.
+For stateful computation over monadic types, use ``StateT``.
 
 Example::
 
