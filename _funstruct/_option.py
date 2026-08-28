@@ -10,12 +10,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
-
-if TYPE_CHECKING:
-    from _funstruct._cons import CList
 
 A = TypeVar("A")
 
@@ -43,7 +40,7 @@ class Option(Monad, Generic[A]):
         return Nothing() if value is None else Some(value)
 
     @classmethod
-    def sequence(cls, options: CList[Option[A]]) -> Option[CList[A]]:
+    def sequence(cls, options: "CList[Option[A]]") -> "Option[CList[A]]":
         """CList[Option[A]] → Option[CList[A]].
 
         Returns Some(clist) if all are Some, Nothing if any is Nothing.
@@ -67,7 +64,7 @@ class Option(Monad, Generic[A]):
         return _go(options, Nil())
 
     @classmethod
-    def traverse(cls, values: CList[A], f: Callable[[A], Option]) -> Option[CList]:
+    def traverse(cls, values: "CList[A]", f: Callable[[A], Option]) -> "Option[CList]":
         """CList[A] → (A → Option[B]) → Option[CList[B]].
 
         Applies f to each element, short-circuits on first Nothing.
