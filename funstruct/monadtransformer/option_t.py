@@ -41,4 +41,4 @@ Examples:
     Right(Some(42))
 """
 
-from _funstruct._option_t import *  # noqa: F403
+from _funstruct._option_t import OptionT as OptionT

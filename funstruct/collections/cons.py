@@ -11,4 +11,6 @@ Examples:
     Cons(1, Cons(1, Cons(2, Cons(2, Cons(3, Cons(3, Nil()))))))
 """
 
-from _funstruct._cons import *  # noqa F403
+from _funstruct._cons import CList as CList
+from _funstruct._cons import Cons as Cons
+from _funstruct._cons import Nil as Nil

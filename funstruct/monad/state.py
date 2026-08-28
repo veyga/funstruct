@@ -11,4 +11,4 @@ Examples:
     (99, 42)
 """
 
-from _funstruct._state import *  # noqa F403
+from _funstruct._state import State as State

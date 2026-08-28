@@ -51,4 +51,4 @@ Examples:
     Left('not a number: abc')
 """
 
-from _funstruct._reader_t import *  # noqa F403
+from _funstruct._reader_t import ReaderT as ReaderT

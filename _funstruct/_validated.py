@@ -88,6 +88,18 @@ class Valid(Validated, Generic[_A]):
             case _:
                 return other
 
+    def to_result(self):
+        """Convert to Ok(value)."""
+        from _funstruct._either import Right
+
+        return Right(self.value)
+
+    def to_result_or(self, exc_cls):
+        """Convert to Ok(value) — exc_cls unused on Valid."""
+        from _funstruct._either import Right
+
+        return Right(self.value)
+
 
 @dataclass(frozen=True)
 class Invalid(Validated, Generic[_E]):
@@ -120,6 +132,20 @@ class Invalid(Validated, Generic[_E]):
                 return Invalid(self.errors + errs)
             case _:
                 return self
+
+    def to_result(self):
+        """Convert to Err(errors)."""
+        from _funstruct._either import Left
+
+        return Left(self.errors)
+
+    def to_result_or(
+        self, exc_cls, combine=lambda errs: "; ".join(str(e) for e in errs)
+    ):
+        """Convert to Err(exc_cls(combined_errors))."""
+        from _funstruct._either import Left
+
+        return Left(exc_cls(combine(self.errors)))
 
 
 __all__ = [

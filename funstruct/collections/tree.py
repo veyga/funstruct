@@ -31,4 +31,6 @@ Examples:
     6
 """
 
-from _funstruct._tree import *  # noqa: F403
+from _funstruct._tree import Branch as Branch
+from _funstruct._tree import Leaf as Leaf
+from _funstruct._tree import Tree as Tree

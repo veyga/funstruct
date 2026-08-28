@@ -11,4 +11,5 @@ Examples:
     5050
 """
 
-from _funstruct._tailrec import *  # noqa F403
+from _funstruct._tailrec import tail_call as tail_call
+from _funstruct._tailrec import tco as tco

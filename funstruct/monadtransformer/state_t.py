@@ -12,4 +12,4 @@ Examples:
     Right((2, 1))
 """
 
-from _funstruct._state_t import *  # noqa F403
+from _funstruct._state_t import StateT as StateT

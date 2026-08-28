@@ -35,4 +35,6 @@ Examples:
     Nothing()
 """
 
-from _funstruct._option import *  # noqa F403
+from _funstruct._option import Nothing as Nothing
+from _funstruct._option import Option as Option
+from _funstruct._option import Some as Some

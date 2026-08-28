@@ -20,4 +20,4 @@ Examples:
     'http://prod.co:443/'
 """
 
-from _funstruct._reader import *  # noqa F403
+from _funstruct._reader import Reader as Reader

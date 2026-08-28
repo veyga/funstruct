@@ -102,6 +102,22 @@ class Either(Monad, Generic[E, A]):
         """
         return cls.sequence(values.map(f))
 
+    def to_option(self):
+        """Convert to Option — Right(v) → Some(v), Left(_) → Nothing.
+
+        >>> Right(1).to_option()
+        Some(1)
+        >>> Left("err").to_option()
+        Nothing()
+        """
+        from _funstruct._option import Nothing, Some
+
+        match self:
+            case Right(v):
+                return Some(v)
+            case _:
+                return Nothing()
+
     @property
     @abstractmethod
     def is_right(self) -> bool: ...

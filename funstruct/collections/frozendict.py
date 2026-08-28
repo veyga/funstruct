@@ -13,4 +13,4 @@ Examples:
     1
 """
 
-from _funstruct._frozendict import *  # noqa F403
+from _funstruct._frozendict import frozendict as frozendict

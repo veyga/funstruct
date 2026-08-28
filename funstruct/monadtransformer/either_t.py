@@ -42,4 +42,4 @@ Examples:
     Some(Right(99))
 """
 
-from _funstruct._either_t import *  # noqa: F403
+from _funstruct._either_t import EitherT as EitherT

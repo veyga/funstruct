@@ -85,6 +85,22 @@ class Option(Monad, Generic[A]):
         except StopIteration as e:
             return Some(e.value)
 
+    def to_result(self, error):
+        """Convert to Either — Some(v) → Right(v), Nothing → Left(error).
+
+        >>> Some(1).to_result("missing")
+        Right(1)
+        >>> Nothing().to_result("missing")
+        Left('missing')
+        """
+        from _funstruct._either import Left, Right
+
+        match self:
+            case Some(v):
+                return Right(v)
+            case _:
+                return Left(error)
+
     @property
     @abstractmethod
     def is_some(self) -> bool: ...

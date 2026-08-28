@@ -39,4 +39,4 @@ Examples:
     Left('err')
 """
 
-from _funstruct._writer_t import *  # noqa: F403
+from _funstruct._writer_t import WriterT as WriterT
