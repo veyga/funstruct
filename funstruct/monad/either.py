@@ -3,15 +3,13 @@
 Either[E, A] = Right(a) | Left(e). Right-biased.
 
 Examples:
-    >>> from funstruct.monad.either import Either, Right, Left, attempt
+    >>> from funstruct.monad.either import Either, Right, Left, Try
     >>> Right(10).map(lambda x: x + 1)
     Right(11)
     >>> Left("err").map(lambda x: x + 1)
     Left('err')
     >>> Right(10).bind(lambda x: Right(x * 2))
     Right(20)
-    >>> Right(10).bind(lambda x: Left("failed"))
-    Left('failed')
     >>> Left("err").bind(lambda x: Right(x * 2))
     Left('err')
 
@@ -22,6 +20,16 @@ Examples:
     >>> Right(10).or_else(lambda e: Right("default"))
     Right(10)
 
+    @Try decorator — catch exceptions into Left:
+
+    >>> @Try
+    ... def safe_div(a, b):
+    ...     return a / b
+    >>> safe_div(10, 2)
+    Right(5.0)
+    >>> safe_div(10, 0)  # doctest: +ELLIPSIS
+    Left(ZeroDivisionError(...))
+
     do-notation:
 
     >>> def pipeline():
@@ -30,22 +38,6 @@ Examples:
     ...     return x + y
     >>> Either.do(pipeline)
     Right(12)
-    >>> def failing():
-    ...     x = yield Right(1)
-    ...     y = yield Left("boom")
-    ...     return x + y
-    >>> Either.do(failing)
-    Left('boom')
-
-    @attempt decorator:
-
-    >>> @attempt
-    ... def safe_div(a, b):
-    ...     return a / b
-    >>> safe_div(10, 2)
-    Right(5.0)
-    >>> safe_div(10, 0)  # doctest: +ELLIPSIS
-    Left(ZeroDivisionError(...))
 """
 
 from _funstruct._either import *  # noqa: F403

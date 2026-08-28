@@ -47,20 +47,6 @@ class Either(Monad, Generic[E, A]):
         return Left(error)
 
     @classmethod
-    def attempt(cls, f: Callable[[], A]) -> Either[Exception, A]:
-        """Execute f, catching exceptions into Left.
-
-        >>> Either.attempt(lambda: 1 + 1)
-        Right(2)
-        >>> Either.attempt(lambda: 1 / 0)  # doctest: +ELLIPSIS
-        Left(ZeroDivisionError(...))
-        """
-        try:
-            return Right(f())
-        except Exception as e:
-            return Left(e)
-
-    @classmethod
     def do(cls, gen_fn: Callable) -> Either:
         """Do-notation. Short-circuits on Left.
 
@@ -223,10 +209,10 @@ class Left(Either[E, A]):
         return f"Left({repr(self.error)})"
 
 
-def attempt(f: Callable) -> Callable[..., Either[Exception, A]]:
+def Try(f: Callable) -> Callable[..., Either[Exception, A]]:
     """Decorator: wraps a function so exceptions become Left.
 
-    >>> @attempt
+    >>> @Try
     ... def divide(a, b):
     ...     return a / b
     >>> divide(10, 2)
@@ -250,5 +236,5 @@ __all__ = [
     "Either",
     "Right",
     "Left",
-    "attempt",
+    "Try",
 ]

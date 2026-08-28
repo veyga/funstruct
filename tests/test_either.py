@@ -1,4 +1,4 @@
-from funstruct.monad.either import Either, Right, Left, attempt
+from funstruct.monad.either import Either, Right, Left, Try
 from funstruct.collections.cons import Cons, Nil, CList
 from tests.laws import assert_functor_laws, assert_monad_laws
 
@@ -102,16 +102,16 @@ class TestDo:
         assert Either.do(pipeline) == Right(6)
 
 
-class TestAttempt:
+class TestTry:
     def test_success(self):
-        @attempt
+        @Try
         def divide(a, b):
             return a / b
 
         assert divide(10, 2) == Right(5.0)
 
     def test_failure(self):
-        @attempt
+        @Try
         def divide(a, b):
             return a / b
 
@@ -121,8 +121,12 @@ class TestAttempt:
             case Left(e):
                 assert type(e) is ZeroDivisionError
 
-    def test_class_method(self):
-        result = Either.attempt(lambda: int("abc"))
+    def test_try_value_error(self):
+        @Try
+        def parse(s):
+            return int(s)
+
+        result = parse("abc")
         assert result.is_left
         match result:
             case Left(e):

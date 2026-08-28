@@ -1,7 +1,7 @@
 """Generic ReaderT monad transformer.
 
 ``ReaderT[M, Ctx, A]`` wraps ``Ctx -> M[A]`` where M is any monad
-with ``.bind()``, ``.map()``, and optionally ``.lash()``.
+with ``.bind()``, ``.map()``, and optionally ``.or_else()``.
 
 Delegates all composition to the inner monad M — one implementation
 works for any M (Option, StateT, Result, etc.).
@@ -79,11 +79,13 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def lash(self, f: Callable) -> ReaderT[_Ctx, _M, _A]:
-        """Recover from failure via M's lash."""
+    def or_else(self, f: Callable) -> ReaderT[_Ctx, _M, _A]:
+        """Recover from failure via inner monad's or_else/lash."""
 
         def inner(ctx):
-            return self._run(ctx).lash(lambda err: f(err).run(ctx))
+            m = self._run(ctx)
+            recover = getattr(m, "or_else", None) or m.lash
+            return recover(lambda err: f(err).run(ctx))
 
         return ReaderT(inner)
 

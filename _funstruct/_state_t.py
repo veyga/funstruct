@@ -1,7 +1,7 @@
 """Generic State monad transformer.
 
 ``StateT[F, A]`` wraps ``S -> F[(S, A)]`` where ``F`` is any monad with
-``.bind()``, ``.map()``, and optionally ``.lash()``.
+``.bind()``, ``.map()``, and optionally ``.or_else()``.
 
 Example with Option::
 
@@ -37,7 +37,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
     """Generic state transformer: ``S -> F[(S, A)]``.
 
     ``F`` is the wrapping monad (Result, FutureResult, Maybe, etc.).
-    Composition uses duck-typed ``.bind()`` / ``.map()`` / ``.lash()``
+    Composition uses duck-typed ``.bind()`` / ``.map()`` / ``.or_else()``
     on whatever ``F`` returns — one implementation for all monads.
 
     Haskell: ``StateT m s a``
@@ -82,15 +82,17 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
         return StateT(inner)
 
-    def lash(self, f: Callable) -> "StateT":
+    def or_else(self, f: Callable) -> "StateT":
         """Recover from failure.
 
         ``f`` receives the error, returns a recovery StateT.
-        Only works when ``F`` supports ``.lash()`` (Result, IOResult, etc.).
+        Only works when ``F`` supports ``.or_else()`` or ``.lash()``.
         """
 
         def inner(s):
-            return self._run(s).lash(lambda err: f(err).run(s))
+            m = self._run(s)
+            recover = getattr(m, "or_else", None) or m.lash
+            return recover(lambda err: f(err).run(s))
 
         return StateT(inner)
 

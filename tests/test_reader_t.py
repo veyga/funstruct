@@ -71,23 +71,21 @@ class TestMap:
 
 
 class TestLash:
-    def test_lash_recovers_from_failure(self):
+    def test_or_else_recovers_from_failure(self):
         failing = ReaderT(lambda ctx: Result.from_failure("oops"))
-        recovered = failing.lash(
+        recovered = failing.or_else(
             lambda err: ReaderT(lambda ctx: Result.from_value("recovered"))
         )
         assert recovered.run(0) == Success("recovered")
 
-    def test_lash_skips_on_success(self):
+    def test_or_else_skips_on_success(self):
         ok = ReaderT(lambda ctx: Result.from_value("ok"))
-        result = ok.lash(
-            lambda err: ReaderT(lambda ctx: Result.from_value("nope"))
-        )
+        result = ok.or_else(lambda err: ReaderT(lambda ctx: Result.from_value("nope")))
         assert result.run(0) == Success("ok")
 
-    def test_lash_receives_context(self):
+    def test_or_else_receives_context(self):
         failing = ReaderT(lambda ctx: Result.from_failure("err"))
-        recovered = failing.lash(
+        recovered = failing.or_else(
             lambda err: ReaderT(lambda ctx: Result.from_value(f"{err}+{ctx}"))
         )
         assert recovered.run("ctx") == Success("err+ctx")
@@ -139,9 +137,7 @@ class TestWithStateT:
     """ReaderT wrapping StateT — the full stack."""
 
     def test_threads_context_and_state(self):
-        step = ReaderT(
-            lambda ctx: StateT(lambda s: Result.from_value((s + ctx, s)))
-        )
+        step = ReaderT(lambda ctx: StateT(lambda s: Result.from_value((s + ctx, s))))
         assert step.run(10).run(0) == Success((10, 0))
 
     def test_lift_state_t(self):
@@ -155,14 +151,12 @@ class TestWithStateT:
         pipeline = inc.then(inc).then(get)
         assert pipeline.run("ctx").run(0) == Success((2, 2))
 
-    def test_lash_with_state_t(self):
+    def test_or_else_with_state_t(self):
         failing = ReaderT.lift(StateT(lambda s: Failure(ValueError("expired"))))
         recover = ReaderT(
-            lambda ctx: StateT(
-                lambda s: Result.from_value((s, f"recovered-{ctx}"))
-            )
+            lambda ctx: StateT(lambda s: Result.from_value((s, f"recovered-{ctx}")))
         )
-        pipeline = failing.lash(lambda err: recover)
+        pipeline = failing.or_else(lambda err: recover)
         assert pipeline.run("myctx").run(0) == Success((0, "recovered-myctx"))
 
 
@@ -217,9 +211,9 @@ class TestDoNotation:
             email = yield get_email
             return {"name": name, "email": email}
 
-        assert build_profile.run(
+        assert build_profile.run({"name": "Alice", "email": "a@b.co"}) == Success(
             {"name": "Alice", "email": "a@b.co"}
-        ) == Success({"name": "Alice", "email": "a@b.co"})
+        )
         assert build_profile.run({"name": "Alice"}) == Failure("missing email")
         assert build_profile.run({"name": "", "email": "a@b.co"}) == Failure(
             "empty name"
@@ -262,15 +256,13 @@ class TestDoNotationEquivalentWithBind:
 
         build_profile = get_name.bind(
             lambda name: validate_name(name).bind(
-                lambda name: get_email.map(
-                    lambda email: {"name": name, "email": email}
-                )
+                lambda name: get_email.map(lambda email: {"name": name, "email": email})
             )
         )
 
-        assert build_profile.run(
+        assert build_profile.run({"name": "Alice", "email": "a@b.co"}) == Success(
             {"name": "Alice", "email": "a@b.co"}
-        ) == Success({"name": "Alice", "email": "a@b.co"})
+        )
         assert build_profile.run({"name": "Alice"}) == Failure("missing email")
         assert build_profile.run({"name": "", "email": "a@b.co"}) == Failure(
             "empty name"
@@ -298,33 +290,25 @@ class TestReaderTMonadAgnostic:
         from funstruct.monad.option import Option, Some, Nothing
 
         get_name = ReaderT(lambda cfg: Some(cfg.get("name")))
-        get_missing = ReaderT(
-            lambda cfg: Option.from_optional(cfg.get("email"))
-        )
+        get_missing = ReaderT(lambda cfg: Option.from_optional(cfg.get("email")))
 
         pipeline = get_name.bind(
             lambda name: get_missing.map(lambda email: f"{name} <{email}>")
         )
 
         assert pipeline.run({"name": "Alice"}) == Nothing()
-        assert pipeline.run({"name": "Alice", "email": "a@b"}) == Some(
-            "Alice <a@b>"
-        )
+        assert pipeline.run({"name": "Alice", "email": "a@b"}) == Some("Alice <a@b>")
 
     def test_with_cons_nondeterminism(self):
         """ReaderT over Cons: shared context, non-deterministic results."""
         from funstruct.collections.cons import CList, Cons, Nil
 
         get_names = ReaderT(lambda cfg: CList.from_iterable(cfg["names"]))
-        get_greetings = ReaderT(
-            lambda cfg: CList.from_iterable(cfg["greetings"])
-        )
+        get_greetings = ReaderT(lambda cfg: CList.from_iterable(cfg["greetings"]))
 
         pipeline = get_names.bind(
             lambda name: get_greetings.map(lambda greet: f"{greet} {name}")
         )
 
-        result = pipeline.run(
-            {"names": ["Alice", "Bob"], "greetings": ["Hi", "Hey"]}
-        )
+        result = pipeline.run({"names": ["Alice", "Bob"], "greetings": ["Hi", "Hey"]})
         assert result == ["Hi Alice", "Hey Alice", "Hi Bob", "Hey Bob"]

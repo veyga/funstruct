@@ -55,9 +55,7 @@ class TestRun:
 
 class TestPure:
     def test_pure_does_not_modify_state(self):
-        assert StateT.pure(99, Result).run("unchanged") == Success(
-            ("unchanged", 99)
-        )
+        assert StateT.pure(99, Result).run("unchanged") == Success(("unchanged", 99))
 
     def test_pure_wraps_value(self):
         assert StateT.pure("hello", Result).run(0) == Success((0, "hello"))
@@ -69,9 +67,7 @@ class TestFail:
         assert result == Failure("oops")
 
     def test_fail_short_circuits_chain(self):
-        pipeline = StateT.fail("stop", Result).then(
-            StateT.pure("never", Result)
-        )
+        pipeline = StateT.fail("stop", Result).then(StateT.pure("never", Result))
         assert pipeline.run(0) == Failure("stop")
 
 
@@ -81,9 +77,7 @@ class TestMap:
     @P.case(name="1", value="hi", f=str.upper, expected="HI")
     @P.case(name="2", value=[1, 2], f=len, expected=2)
     def test_map_transforms_value(self, value, f, expected):
-        assert StateT.pure(value, Result).map(f).run(0) == Success(
-            (0, expected)
-        )
+        assert StateT.pure(value, Result).map(f).run(0) == Success((0, expected))
 
     def test_map_does_not_modify_state(self):
         s = StateT(lambda st: Result.from_value((st + 1, 5)))
@@ -101,9 +95,7 @@ class TestBind:
         assert inc.bind(lambda _: inc).run(0) == Success((2, 1))
 
     def test_bind_passes_value(self):
-        result = StateT.pure(5, Result).bind(
-            lambda x: StateT.pure(x + 10, Result)
-        )
+        result = StateT.pure(5, Result).bind(lambda x: StateT.pure(x + 10, Result))
         assert result.run(0) == Success((0, 15))
 
     def test_bind_short_circuits_on_failure(self):
@@ -117,39 +109,39 @@ class TestBind:
         assert pipeline.run([]) == Success(([1, 2, 3], 3))
 
 
-class TestLash:
-    def test_lash_recovers_from_failure(self):
+class TestOrElse:
+    def test_or_else_recovers_from_failure(self):
         failing = StateT(lambda _: Result.from_failure("oops"))
-        recovered = failing.lash(lambda _: StateT.pure("recovered", Result))
+        recovered = failing.or_else(lambda _: StateT.pure("recovered", Result))
         assert recovered.run(0) == Success((0, "recovered"))
 
-    def test_lash_skips_on_success(self):
+    def test_or_else_skips_on_success(self):
         s = StateT.pure("ok", Result)
-        result = s.lash(lambda e: StateT.pure("should not happen", Result))
+        result = s.or_else(lambda e: StateT.pure("should not happen", Result))
         assert result.run(0) == Success((0, "ok"))
 
-    def test_lash_uses_state_before_lashed_computation(self):
-        """Lash reverts to the state at the start of the lashed computation."""
+    def test_or_else_uses_state_before_or_elseed_computation(self):
+        """Lash reverts to the state at the start of the or_elseed computation."""
         mutate_then_fail = StateT(lambda _: Result.from_failure("err"))
-        # lash wraps the whole .then(fail) — recovery gets the original state
+        # or_else wraps the whole .then(fail) — recovery gets the original state
         recovered = (
             StateT(lambda s: Result.from_value((s + 1, "a")))
             .then(mutate_then_fail)
-            .lash(lambda e: StateT.get(Result))
+            .or_else(lambda e: StateT.get(Result))
         )
         assert recovered.run(0) == Success((0, 0))
 
-    def test_lash_preserves_state_from_successful_prefix_with_separate_lash(
+    def test_or_else_preserves_state_from_successful_prefix_with_separate_or_else(
         self,
     ):
-        """To keep prior state, lash only the failing step."""
+        """To keep prior state, or_else only the failing step."""
         mutate = StateT(lambda s: Result.from_value((s + 1, "a")))
         failing = StateT(lambda s: Result.from_failure("err"))
-        # lash only wraps the failing step
-        recovered = mutate.then(failing.lash(lambda e: StateT.get(Result)))
+        # or_else only wraps the failing step
+        recovered = mutate.then(failing.or_else(lambda e: StateT.get(Result)))
         assert recovered.run(0) == Success((1, 1))
 
-    def test_lash_selective_recovery(self):
+    def test_or_else_selective_recovery(self):
         """Only recover from specific error types."""
 
         class Recoverable(Exception):
@@ -159,7 +151,7 @@ class TestLash:
             pass
 
         failing = StateT(lambda _: Result.from_failure(Recoverable()))
-        pipeline = failing.lash(
+        pipeline = failing.or_else(
             lambda err: (
                 StateT.pure("fixed", Result)
                 if isinstance(err, Recoverable)
@@ -169,7 +161,7 @@ class TestLash:
         assert pipeline.run(0) == Success((0, "fixed"))
 
         fatal = StateT(lambda _: Result.from_failure(Fatal()))
-        pipeline2 = fatal.lash(
+        pipeline2 = fatal.or_else(
             lambda err: (
                 StateT.pure("fixed", Result)
                 if isinstance(err, Recoverable)
@@ -182,9 +174,7 @@ class TestLash:
 
 class TestThen:
     def test_then_discards_value(self):
-        result = StateT.pure("discarded", Result).then(
-            StateT.pure("kept", Result)
-        )
+        result = StateT.pure("discarded", Result).then(StateT.pure("kept", Result))
         assert result.run(0) == Success((0, "kept"))
 
     def test_then_threads_state(self):
@@ -205,9 +195,7 @@ class TestGet:
 
 class TestModify:
     def test_modify_transforms_state(self):
-        assert StateT.modify(lambda s: s * 2, Result).run(5) == Success(
-            (10, None)
-        )
+        assert StateT.modify(lambda s: s * 2, Result).run(5) == Success((10, None))
 
 
 class TestLaws:
