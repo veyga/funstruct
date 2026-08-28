@@ -1,5 +1,7 @@
 """Immutable persistent/structurally shared dictionary backed by a Hash Array Mapped Trie (HAMT).
 
+NOT insertion-ordered.
+
 Performance characteristics:
     - get:    O(log32 n) — effectively O(1) for practical sizes (max 7 levels for 2^35 entries)
     - put:    O(log32 n) — path-copied, old version unchanged (structural sharing)

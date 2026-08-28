@@ -2,8 +2,27 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
-    "python_full_version >= '3.11'",
+    "python_full_version >= '3.15'",
+    "python_full_version >= '3.11' and python_full_version < '3.15'",
     "python_full_version < '3.11'",
+]
+
+[[package]]
+name = "argcomplete"
+version = "3.7.2"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/argcomplete/3.7.2/argcomplete-3.7.2.tar.gz", hash = "sha256:aad8b69a0b9969edb62db0d1752354c0d50717b10e0cbb00e2a958381b9fc6b9" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/argcomplete/3.7.2/argcomplete-3.7.2-py3-none-any.whl", hash = "sha256:6029205678bdd9c1c728a155f5f9ecf5812393f969eef58807641a2bc2aa5b19" },
+]
+
+[[package]]
+name = "attrs"
+version = "26.1.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/attrs/26.1.0/attrs-26.1.0.tar.gz", hash = "sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/attrs/26.1.0/attrs-26.1.0-py3-none-any.whl", hash = "sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309" },
 ]
 
 [[package]]
@@ -26,15 +45,6 @@ wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/backrefs/8.0/backrefs-8.0-py312-none-any.whl", hash = "sha256:87f0fae8c5f207fe9f4b2887efc71d42f4900ac78faa1af08d675ef303692dc5" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/backrefs/8.0/backrefs-8.0-py313-none-any.whl", hash = "sha256:601ce68ca12385dbda06ce264406b4c4210cf5b79fd0fd627592365c92f29a88" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/backrefs/8.0/backrefs-8.0-py314-none-any.whl", hash = "sha256:9ec96efa080938be92323e8e730e57718c9c88eb15ad70bbef4e1766df591408" },
-]
-
-[[package]]
-name = "cachetools"
-version = "7.1.7"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/cachetools/7.1.7/cachetools-7.1.7.tar.gz", hash = "sha256:a3e2a00b14d8f8a6b70c1dae7b4685e7ad3bc965c5b42124a2d6ce895da6cf50" }
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/cachetools/7.1.7/cachetools-7.1.7-py3-none-any.whl", hash = "sha256:ef98ef375ad188819ef2f9b3645e3987f4b8c5b7550e436ad998c2de78296df0" },
 ]
 
 [[package]]
@@ -240,6 +250,18 @@ wheels = [
 ]
 
 [[package]]
+name = "colorlog"
+version = "6.12.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/colorlog/6.12.0/colorlog-6.12.0.tar.gz", hash = "sha256:2a7924c1dadf18b22a0eb8b06d1c7b01d5341707ec1641eb6fcc4fde0c3e8e5f" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/colorlog/6.12.0/colorlog-6.12.0-py3-none-any.whl", hash = "sha256:30d392604e9110045a2c2aeefc27d7a017abbab63f3a8aee594eac0801df784e" },
+]
+
+[[package]]
 name = "debugpy"
 version = "1.8.21"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -266,6 +288,19 @@ wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp314-cp314-win32.whl", hash = "sha256:15d4963bd5ffa48f0da0947fd06757fa7621945048a14ad7705431566d3c0e7c" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-cp314-cp314-win_amd64.whl", hash = "sha256:fe0744a12353406de0ae8ccff0d0a4a666f00801a3db8fd04e7a5f761cd520e8" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/debugpy/1.8.21/debugpy-1.8.21-py2.py3-none-any.whl", hash = "sha256:b1e37d333663c8851516a47364ef473da127f9caebe4417e6df6f5825a7e9a92" },
+]
+
+[[package]]
+name = "dependency-groups"
+version = "1.3.2"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/dependency-groups/1.3.2/dependency_groups-1.3.2.tar.gz", hash = "sha256:c81831f43828dbc3987ee247eb198241a0152b8e7ceab10977cc3808eb388ac7" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/dependency-groups/1.3.2/dependency_groups-1.3.2-py3-none-any.whl", hash = "sha256:8c337f7b92445823b0d0ea507f611390c58dcd2112be00aebcd738a2ca7a1c64" },
 ]
 
 [[package]]
@@ -314,20 +349,17 @@ wheels = [
 name = "funstruct"
 version = "1.0.0"
 source = { editable = "." }
-dependencies = [
-    { name = "returns", version = "0.26.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "returns", version = "0.29.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version >= '3.11'" },
-]
 
 [package.dev-dependencies]
 dev = [
     { name = "debugpy" },
+    { name = "nox", extra = ["uv"] },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-parametrization" },
+    { name = "returns", version = "0.26.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "returns", version = "0.29.0", source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "ruff" },
-    { name = "tox" },
-    { name = "tox-uv" },
     { name = "ty" },
 ]
 docs = [
@@ -341,20 +373,17 @@ docs = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "returns", marker = "python_full_version < '3.11'", specifier = ">=0.26.0,<0.27.0" },
-    { name = "returns", marker = "python_full_version >= '3.11'", specifier = ">=0.29.0" },
-]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "debugpy", specifier = ">=1.8.0" },
+    { name = "nox", extras = ["uv"], specifier = ">=2026.8.17" },
     { name = "pre-commit", specifier = ">=4.6.2" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-parametrization", specifier = ">=2022.2.1" },
+    { name = "returns", marker = "python_full_version < '3.11'", specifier = ">=0.26.0,<0.27.0" },
+    { name = "returns", marker = "python_full_version >= '3.11'", specifier = ">=0.29.0" },
     { name = "ruff", specifier = ">=0.8.0" },
-    { name = "tox", specifier = ">=4.60.1" },
-    { name = "tox-uv", specifier = ">=1.36.0" },
     { name = "ty", specifier = ">=0.0.74" },
 ]
 docs = [
@@ -386,6 +415,15 @@ source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/si
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/griffelib/2.2.0/griffelib-2.2.0.tar.gz", hash = "sha256:e1bc36fe9cd21d4b6b659b456346755e4cfdc5676c0a5214083126ee12612b3c" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/griffelib/2.2.0/griffelib-2.2.0-py3-none-any.whl", hash = "sha256:d71c3bc2bbed9f958488634fe788b843a9f705d6d2838ca32cd6c25eeb64dfc4" },
+]
+
+[[package]]
+name = "humanize"
+version = "4.16.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/humanize/4.16.0/humanize-4.16.0.tar.gz", hash = "sha256:7dc2244a2f84a4bfb1d36c37bac80cd78e35cdc5c119206d87b018e1445f3a3f" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/humanize/4.16.0/humanize-4.16.0-py3-none-any.whl", hash = "sha256:353eb2f34c09d098b2880eee8bef21832eae6d174f48c5762fff7e5fcb74d01d" },
 ]
 
 [[package]]
@@ -762,6 +800,32 @@ wheels = [
 ]
 
 [[package]]
+name = "nox"
+version = "2026.8.17"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "argcomplete" },
+    { name = "attrs" },
+    { name = "colorlog" },
+    { name = "dependency-groups" },
+    { name = "humanize" },
+    { name = "packaging" },
+    { name = "platformdirs" },
+    { name = "python-discovery" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+    { name = "virtualenv" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/nox/2026.8.17/nox-2026.8.17.tar.gz", hash = "sha256:8d9c69c9b996a59db1eb2c6968deaebc2edbc55317d205981bbc4a37351d3f2e" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/nox/2026.8.17/nox-2026.8.17-py3-none-any.whl", hash = "sha256:a96a5286007cbc0d1eb1930e85738668f6722adba1ffaa48287296a96963086e" },
+]
+
+[package.optional-dependencies]
+uv = [
+    { name = "uv" },
+]
+
+[[package]]
 name = "packaging"
 version = "26.3"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -851,19 +915,6 @@ source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/si
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyparsing/3.3.2/pyparsing-3.3.2.tar.gz", hash = "sha256:c777f4d763f140633dcb6d8a3eda953bf7a214dc4eff598413c070bcdc117cbc" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyparsing/3.3.2/pyparsing-3.3.2-py3-none-any.whl", hash = "sha256:850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d" },
-]
-
-[[package]]
-name = "pyproject-api"
-version = "1.11.0"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-dependencies = [
-    { name = "packaging" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
-]
-sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyproject-api/1.11.0/pyproject_api-1.11.0.tar.gz", hash = "sha256:b8807d85a293e6c9f133e6575946fed45f1d42b22d58c780b33aa2421a799549" }
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pyproject-api/1.11.0/pyproject_api-1.11.0-py3-none-any.whl", hash = "sha256:860060c8832dce983b5eec6f41c4c43eb3ec06ff7332387a63acdf5ca27b68d8" },
 ]
 
 [[package]]
@@ -1029,7 +1080,8 @@ name = "returns"
 version = "0.29.0"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
 resolution-markers = [
-    "python_full_version >= '3.11'",
+    "python_full_version >= '3.15'",
+    "python_full_version >= '3.11' and python_full_version < '3.15'",
 ]
 dependencies = [
     { name = "typing-extensions" },
@@ -1125,64 +1177,6 @@ wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-win_amd64.whl", hash = "sha256:2c1c351919aca02858f740c6d33adea0c5deea37f9ecca1cc1ef9e884a619d26" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-cp314-cp314t-win_arm64.whl", hash = "sha256:eab21f45c7f66c13f2a9e0e1535309cee140182a9cdae1e041d02e47291e8396" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli/2.4.1/tomli-2.4.1-py3-none-any.whl", hash = "sha256:0d85819802132122da43cb86656f8d1f8c6587d54ae7dcaf30e90533028b49fe" },
-]
-
-[[package]]
-name = "tomli-w"
-version = "1.2.0"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli-w/1.2.0/tomli_w-1.2.0.tar.gz", hash = "sha256:2dd14fac5a47c27be9cd4c976af5a12d87fb1f0b4512f81d69cce3b35ae25021" }
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tomli-w/1.2.0/tomli_w-1.2.0-py3-none-any.whl", hash = "sha256:188306098d013b691fcadc011abd66727d3c414c571bb01b1a174ba8c983cf90" },
-]
-
-[[package]]
-name = "tox"
-version = "4.60.1"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-dependencies = [
-    { name = "cachetools" },
-    { name = "colorama" },
-    { name = "filelock" },
-    { name = "packaging" },
-    { name = "platformdirs" },
-    { name = "pluggy" },
-    { name = "pyproject-api" },
-    { name = "python-discovery" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
-    { name = "tomli-w" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
-    { name = "virtualenv" },
-]
-sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tox/4.60.1/tox-4.60.1.tar.gz", hash = "sha256:2611b77ebe06fa571ae2f4176eaf644115d08891befb9c7cb705cb038d5ab38e" }
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tox/4.60.1/tox-4.60.1-py3-none-any.whl", hash = "sha256:6f23a6417ad761b17c047e14b6e278968c09eb9b1fc00025269f82ec8327bc75" },
-]
-
-[[package]]
-name = "tox-uv"
-version = "1.36.0"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-dependencies = [
-    { name = "tox-uv-bare" },
-    { name = "uv" },
-]
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tox-uv/1.36.0/tox_uv-1.36.0-py3-none-any.whl", hash = "sha256:5f81b39be3fe4e14c6b9bb7ba637ed97d34efa6214efd5f525d95ee9559a99ac" },
-]
-
-[[package]]
-name = "tox-uv-bare"
-version = "1.36.0"
-source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
-dependencies = [
-    { name = "packaging" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
-    { name = "tox" },
-]
-sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tox-uv-bare/1.36.0/tox_uv_bare-1.36.0.tar.gz", hash = "sha256:d9b0a2fd0f74fa65d9597108f8a0ef7abb08651c9196a998a6073b781b45cfd0" }
-wheels = [
-    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/tox-uv-bare/1.36.0/tox_uv_bare-1.36.0-py3-none-any.whl", hash = "sha256:ba397dd0396df95a75744d4e42a50ee27207c0ffcf277b62ffba9c3de455a939" },
 ]
 
 [[package]]

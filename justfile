@@ -30,9 +30,9 @@ test *args:
 dtest *args:
   PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest {{args}}
 
-# Run tox (all versions, or specify: mise tox -e py312)
-tox *args:
-  uv run tox
+# Run nox (all sessions, or specify: just nox -s tests)
+nox *args:
+  uv run nox {{args}}
 
 # docs-build:
 #   uv run mkdocs build
