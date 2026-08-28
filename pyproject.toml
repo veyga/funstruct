@@ -61,6 +61,11 @@ ignore = [
     "E731", # Do not assign a `lambda` expression, use a `def`
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# CList is imported under TYPE_CHECKING (circular import avoidance)
+# but ruff F821 doesn't recognize TYPE_CHECKING-guarded imports
+"_funstruct/_option.py" = ["F821"]
+
 [tool.docformatter]
 wrap-summaries = 80
 wrap-descriptions = 80

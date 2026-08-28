@@ -13,6 +13,7 @@ Performance characteristics:
 from __future__ import annotations
 
 from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
+from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 K = TypeVar("K")
@@ -24,16 +25,14 @@ V = TypeVar("V")
 #   - 32 is the empirical sweet spot (Bagwell/Hickey): high enough branching
 #     to keep the tree shallow, small enough that path-copying on insert
 #     doesn't allocate too much per node. Fits well in CPU cache lines.
-#  this is a common strategy in HAMT implementations
 _BITS = 5
 _WIDTH = 1 << _BITS  # 32
 _MASK = _WIDTH - 1
 
 
+@dataclass(frozen=True, slots=True)
 class _Empty:
     """Sentinel for empty HAMT node."""
-
-    __slots__ = ()
 
     def get(self, key, hash_val, shift):
         return None
@@ -51,14 +50,12 @@ class _Empty:
         return 0
 
 
+@dataclass(frozen=True, slots=True)
 class _Leaf:
     """Single key-value entry."""
 
-    __slots__ = ("key", "value")
-
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
+    key: object
+    value: object
 
     def get(self, key, hash_val, shift):
         return self.value if self.key == key else None
@@ -85,14 +82,12 @@ class _Leaf:
         return 1
 
 
+@dataclass(frozen=True, slots=True)
 class _Collision:
     """Multiple entries with the same hash."""
 
-    __slots__ = ("hash_val", "entries")
-
-    def __init__(self, hash_val, entries):
-        self.hash_val = hash_val
-        self.entries = entries
+    hash_val: int
+    entries: tuple
 
     def get(self, key, hash_val, shift):
         for k, v in self.entries:
@@ -104,7 +99,10 @@ class _Collision:
         if hash_val != self.hash_val:
             node = _Branch(_EMPTY, 0, ())
             node = node.put(
-                self.entries[0][0], self.entries[0][1], self.hash_val, shift
+                self.entries[0][0],
+                self.entries[0][1],
+                self.hash_val,
+                shift,
             )
             for k, v in self.entries[1:]:
                 node = node.put(k, v, self.hash_val, shift)
@@ -131,15 +129,13 @@ class _Collision:
         return len(self.entries)
 
 
+@dataclass(frozen=True, slots=True)
 class _Branch:
     """Bitmap-indexed 32-way branch node."""
 
-    __slots__ = ("_empty", "_bitmap", "_children")
-
-    def __init__(self, empty, bitmap, children):
-        self._empty = empty
-        self._bitmap = bitmap
-        self._children = children
+    _empty: _Empty
+    _bitmap: int
+    _children: tuple
 
     def get(self, key, hash_val, shift):
         idx = (hash_val >> shift) & _MASK
@@ -179,9 +175,11 @@ class _Branch:
             if new_bitmap == 0:
                 return _EMPTY
             new_children = self._children[:pos] + self._children[pos + 1 :]
-            if len(new_children) == 1 and isinstance(new_children[0], _Leaf):
-                return new_children[0]
-            return _Branch(self._empty, new_bitmap, new_children)
+            match new_children:
+                case (_Leaf() as leaf,):
+                    return leaf
+                case _:
+                    return _Branch(self._empty, new_bitmap, new_children)
         new_children = self._children[:pos] + (new_child,) + self._children[pos + 1 :]
         return _Branch(self._empty, self._bitmap, new_children)
 
@@ -194,7 +192,7 @@ class _Branch:
 
 
 def _make_branch(k1, v1, h1, k2, v2, h2, shift):
-    """Create a branch that distinguishes two keys at the given shift level."""
+    """Create a branch that distinguishes two keys at the given shift."""
     idx1 = (h1 >> shift) & _MASK
     idx2 = (h2 >> shift) & _MASK
     if idx1 == idx2:
@@ -214,24 +212,31 @@ _EMPTY = _Empty()
 
 
 class frozendict(Generic[K, V]):
-    """An immutable, persistent dictionary backed by a HAMT"""
+    """An immutable, persistent dictionary backed by a HAMT."""
 
     __slots__ = ("__root", "__size", "__hash_cache")
 
     def __init__(self, *args, **kwargs) -> None:
-        if args and isinstance(args[0], frozendict):
-            object.__setattr__(self, "_frozendict__root", args[0].__root)
-            object.__setattr__(self, "_frozendict__size", args[0].__size)
-        else:
-            root = _EMPTY
-            size = 0
-            source = dict(*args, **kwargs)
-            for k, v in source.items():
-                root = root.put(k, v, hash(k), 0)
-                size += 1
-            object.__setattr__(self, "_frozendict__root", root)
-            object.__setattr__(self, "_frozendict__size", size)
+        match args:
+            case (frozendict() as other, *_):
+                object.__setattr__(self, "_frozendict__root", other.__root)
+                object.__setattr__(self, "_frozendict__size", other.__size)
+            case _:
+                root = _EMPTY
+                size = 0
+                source = dict(*args, **kwargs)
+                for k, v in source.items():
+                    root = root.put(k, v, hash(k), 0)
+                    size += 1
+                object.__setattr__(self, "_frozendict__root", root)
+                object.__setattr__(self, "_frozendict__size", size)
         object.__setattr__(self, "_frozendict__hash_cache", None)
+
+    def __setattr__(self, name, value):
+        raise AttributeError("frozendict is immutable")
+
+    def __delattr__(self, name):
+        raise AttributeError("frozendict is immutable")
 
     def __getitem__(self, key: K) -> V:
         result = self.__root.get(key, hash(key), 0)
