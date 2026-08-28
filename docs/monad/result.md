@@ -1,0 +1,3 @@
+# Result
+
+::: funstruct.monad.result

@@ -134,6 +134,10 @@ class Right(Either[E, A]):
             case _:
                 return other
 
+    def alt(self, f: Callable[[E], E]) -> Either[E, A]:
+        """No-op on Right — already succeeded."""
+        return self
+
     def or_else(self, f: Callable[[E], Either]) -> Either[E, A]:
         """No-op on Right — already succeeded."""
         return self
@@ -177,6 +181,14 @@ class Left(Either[E, A]):
 
     def ap(self, other: Either) -> Either:
         return self
+
+    def alt(self, f: Callable[[E], E]) -> Either[E, A]:
+        """Transform the error without recovering.
+
+        >>> Left("oops").alt(lambda e: e.upper())
+        Left('OOPS')
+        """
+        return Left(f(self.error))
 
     def or_else(self, f: Callable[[E], Either]) -> Either:
         """Handle error: f receives the error, returns a new Either.

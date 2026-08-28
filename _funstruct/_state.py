@@ -6,7 +6,7 @@ For stateful computation over monadic types, use ``StateT``.
 
 Example::
 
-    >>> from funstruct.monad import State
+    >>> from funstruct.monad.state import State
     >>> inc = State(lambda s: (s + 1, s))
     >>> inc.then(inc).then(inc).run(0)
     (3, 2)

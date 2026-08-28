@@ -11,7 +11,7 @@ and_then: pipe output forward as the next context (Kleisli composition).
 
 Examples:
     >>> from funstruct.monadtransformer import ReaderT
-    >>> from funstruct.monad import Either, Right, Left
+    >>> from funstruct.monad.either import Either, Right, Left
 
     bind — shared context, with failure:
 

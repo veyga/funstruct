@@ -6,7 +6,7 @@ by converting tail-recursive functions into iterative loops.
 ## Example
 
 ```python
-from funstruct.tailrec import tco, tail_call
+from funstruct.util.tailrec import tco, tail_call
 
 
 @tco
@@ -21,4 +21,4 @@ sum_up_to(10000)  # no stack overflow
 
 ## API Reference
 
-::: _funstruct._tailrec
+::: funstruct.util.tailrec

@@ -1,6 +1,7 @@
 """Tests for OptionT monad transformer."""
 
-from funstruct.monad import Either, Left, Nothing, Right, Some
+from funstruct.monad.either import Either, Left, Right
+from funstruct.monad.option import Nothing, Some
 from funstruct.monadtransformer.option_t import OptionT
 
 

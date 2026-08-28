@@ -1,3 +1,3 @@
 # Functor
 
-::: funstruct.typeclasses._functor
+::: funstruct.typeclasses.Functor

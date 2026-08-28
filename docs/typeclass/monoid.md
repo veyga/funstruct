@@ -1,3 +1,3 @@
 # Monoid
 
-::: funstruct.typeclasses._monoid
+::: funstruct.typeclasses.Monoid

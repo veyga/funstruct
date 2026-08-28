@@ -1,6 +1,11 @@
 """Result — Either with domain-oriented naming.
 
 Result[E, A] = Ok(a) | Err(e). Same type as Either, clearer names.
+AsyncResult[A] = Future[Exception, A]. Async counterpart of Result.
+
+Decorators:
+    @Try       : (args) -> Result[A]       = Either[Exception, A]
+    @TryAsync  : (args) -> AsyncResult[A]  = Future[Exception, A]
 
 Examples:
     >>> from funstruct.monad.result import Result, Ok, Err, Try

@@ -16,10 +16,10 @@ pip install funstruct || uv add funstruct
 Semigroup              Functor
     │                      │
  Monoid              Applicative
-                        │
-                       Monad
-                        |
-                      MonadTransformer
+                           │
+                         Monad
+                           │
+                    MonadTransformer
 ```
 
 #### Diagrams
@@ -106,10 +106,6 @@ trait Monoid[A] extends Semigroup[A] {
   def empty: A
 }
 
-trait Monoid[A] extends Semigroup[A] {
-  def empty: A
-}
-
 trait Functor[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]
 }
@@ -124,48 +120,60 @@ trait Monad[F[_]] extends Applicative[F] {
 }
 ```
 
+### Implementations
+
+| Typeclass        | Implementations                              |
+| ---------------- | -------------------------------------------- |
+| Functor          | Tree, frozendict, + all below                |
+| Applicative      | Validated, + all below                       |
+| Monad            | Option, Either, State, Reader, Writer, CList |
+| MonadTransformer | ReaderT, StateT, EitherT, OptionT, WriterT   |
+
+| Type                | What it models                              |
+| ------------------- | ------------------------------------------- |
+| `Option[A]`         | Value might not exist                       |
+| `Either[E, A]`      | Value or typed error                        |
+| `Result[A]` (alias) | `Either[Exception, A]` + `@Try` decorator   |
+| `State[S, A]`       | Stateful computation                        |
+| `Reader[Ctx, A]`    | Shared environment                          |
+| `Writer[W, A]`      | Accumulated output                          |
+| `Validated[E, A]`   | Error accumulation (applicative, not monad) |
+| `Future[E, A]`      | Lazy async + typed error                    |
+| `CList[A]`          | Persistent singly-linked list               |
+| `Tree[A]`           | Immutable binary tree (functor only)        |
+| `frozendict[K, V]`  | Persistent HAMT dictionary                  |
+
 ### Monad Transformers
 
-A monad transformer wraps one monad inside another, combining their effects.
+A transformer combines effects by wrapping one monad inside another.
 
 ```
-MonadTransformer[F, A]  — F is the inner monad, A is the value
+ReaderT[F, Ctx, A]  =  Ctx -> F[A]         (environment + F's effects)
+StateT[F, S, A]     =  S -> F[(S, A)]      (state + F's effects)
+EitherT[F, E, A]    =  F[Either[E, A]]     (errors + F's effects)
+OptionT[F, A]       =  F[Option[A]]        (absence + F's effects)
+WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
 ```
 
-**ReaderT** — shared environment + inner monad's effects (failure, state, etc.)
-
-```
-ReaderT[F, Ctx, A]  =  Ctx -> F[A]
-```
-
-**StateT** — threaded state + inner monad's effects
-
-```
-StateT[F, S, A]  =  S -> F[(S, A)]
-```
+**Why transformers?** Monads don't compose automatically. If you need
+config + errors + logging, you'd manually unwrap 3 nested layers at
+every step. Transformers flatten that into one `bind`:
 
 ```python
-class MonadTransformer(Monad, Generic[_F, _A]):
-    def and_then(self, other) -> MonadTransformer: ...  # Kleisli composition
-    def do(cls, gen_fn) -> MonadTransformer: ...  # do-notation
+# Without transformer — nested pattern matching at every step:
+result = fetch_user(id)          # Either[Err, Option[User]]
+match result:
+    case Left(e): ...            # handle error
+    case Right(Nothing()): ...   # handle absence
+    case Right(Some(user)): ...  # finally, the value
 
-
-class ReaderT(MonadTransformer[_F, _A]):
-    # bind: both steps share the same context
-    # and_then: output of one becomes context of next
-    ...
-
-
-class StateT(MonadTransformer[_F, _A]):
-    # bind: state threads through each step
-    # and_then: value from one becomes input of next
-    ...
+# With OptionT — one flat pipeline:
+pipeline = (
+    OptionT(fetch_user(id))
+    .bind(lambda user: OptionT(get_email(user)))
+    .map(lambda email: email.upper())
+)
 ```
-
-**Why transformers?** Plain `Reader` can only read from an environment.
-`ReaderT[Result, Ctx, A]` can read from an environment AND fail.
-`StateT[Result, S, A]` can thread state AND fail. You compose effects
-without writing a new monad for every combination.
 
 ### Laws
 

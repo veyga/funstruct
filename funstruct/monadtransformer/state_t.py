@@ -2,7 +2,7 @@
 
 Examples:
     >>> from funstruct.monadtransformer import StateT
-    >>> from funstruct.monad import Either, Right, Left
+    >>> from funstruct.monad.either import Either, Right, Left
     >>> inc = StateT(lambda s: Right((s + 1, s)))
     >>> inc.run(0)
     Right((1, 0))

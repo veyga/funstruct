@@ -27,12 +27,23 @@ nav:
   - applicative:
       - Validated: applicative/validated.md
   - monad:
+      - Either: monad/either.md
+      - Option: monad/option.md
+      - Result: monad/result.md
+      - Reader: monad/reader.md
+      - Writer: monad/writer.md
       - State: monad/state.md
-      - StateT: monad/state_t.md
+      - Future: monad/future.md
+  - monadtransformer:
       - ReaderT: monad/reader_t.md
+      - StateT: monad/state_t.md
+      - EitherT: monadtransformer/either_t.md
+      - OptionT: monadtransformer/option_t.md
+      - WriterT: monadtransformer/writer_t.md
   - collections:
       - Cons: collections/cons.md
       - frozendict: collections/frozendict.md
+      - Tree: collections/tree.md
   - util:
       - tailrec: util/tailrec.md
 

@@ -88,6 +88,19 @@ class Future(Generic[E, A]):
 
         return Future(_inner())
 
+    def alt(self, f: Callable[[E], E]) -> Future[E, A]:
+        """Transform the error without recovering. Keeps it as Left."""
+
+        async def _alt():
+            result = await self._coro
+            match result:
+                case Left(error):
+                    return Left(f(error))
+                case _:
+                    return result
+
+        return Future(_alt())
+
     def or_else(self, f: Callable[[E], Future[E, A]]) -> Future[E, A]:
         """Recover from error: f receives the error, returns a new Future."""
 

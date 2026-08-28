@@ -5,7 +5,7 @@ WriterT[F, W, A] wraps F[(A, W)].
 
 Examples:
     >>> from funstruct.monadtransformer.writer_t import WriterT
-    >>> from funstruct.monad import Either, Right, Left
+    >>> from funstruct.monad.either import Either, Right, Left
     >>> from funstruct.typeclasses import Monoid
 
     >>> list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])

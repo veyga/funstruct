@@ -1,3 +1,3 @@
 # Semigroup
 
-::: funstruct.typeclasses._semigroup
+::: funstruct.typeclasses.Semigroup

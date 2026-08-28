@@ -2,7 +2,7 @@
 
 from parametrization import Parametrization as P
 
-from funstruct.monad import State
+from funstruct.monad.state import State
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,

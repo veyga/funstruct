@@ -1,3 +1,3 @@
 # Monad
 
-::: funstruct.typeclasses._monad
+::: funstruct.typeclasses.Monad

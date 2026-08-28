@@ -4,7 +4,8 @@
 
 Examples:
     >>> from funstruct.monadtransformer.either_t import EitherT
-    >>> from funstruct.monad import Option, Some, Nothing, Right, Left
+    >>> from funstruct.monad.option import Option, Some, Nothing
+    >>> from funstruct.monad.either import Right, Left
 
     EitherT over Option — combines "might not exist" with "might fail":
 

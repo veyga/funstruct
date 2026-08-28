@@ -1,6 +1,7 @@
 """Tests for ReaderT monad transformer."""
 
-from funstruct.monad import Either, Left, ReaderT, Right, StateT
+from funstruct.monad.either import Either, Left, Right
+from funstruct.monadtransformer import ReaderT, StateT
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,

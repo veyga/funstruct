@@ -5,8 +5,8 @@ map transforms the value inside Some.
 
 Examples:
     >>> from funstruct.monadtransformer.option_t import OptionT
-    >>> from funstruct.monad import Either, Right, Left
-    >>> from funstruct.monad import Some, Nothing
+    >>> from funstruct.monad.either import Either, Right, Left
+    >>> from funstruct.monad.option import Some, Nothing
 
     Wrapping Either — a computation that can fail OR be absent:
 
