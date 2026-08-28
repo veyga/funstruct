@@ -47,6 +47,15 @@ wheels = [
 ]
 
 [[package]]
+name = "cfgv"
+version = "3.5.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/cfgv/3.5.0/cfgv-3.5.0.tar.gz", hash = "sha256:d5b1034354820651caa73ede66a6294d6e95c1b00acc5e9b098e917404669132" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/cfgv/3.5.0/cfgv-3.5.0-py2.py3-none-any.whl", hash = "sha256:a8dc6b26ad22ff227d2634a65cb388215ce6cc96bbcc5cfde7641ae87e8dacc0" },
+]
+
+[[package]]
 name = "charset-normalizer"
 version = "3.5.1"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -301,6 +310,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "debugpy" },
+    { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-parametrization" },
     { name = "ruff" },
@@ -324,6 +334,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "debugpy", specifier = ">=1.8.0" },
+    { name = "pre-commit", specifier = ">=4.6.2" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-parametrization", specifier = ">=2022.2.1" },
     { name = "ruff", specifier = ">=0.8.0" },
@@ -357,6 +368,15 @@ source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/si
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/griffelib/2.2.0/griffelib-2.2.0.tar.gz", hash = "sha256:e1bc36fe9cd21d4b6b659b456346755e4cfdc5676c0a5214083126ee12612b3c" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/griffelib/2.2.0/griffelib-2.2.0-py3-none-any.whl", hash = "sha256:d71c3bc2bbed9f958488634fe788b843a9f705d6d2838ca32cd6c25eeb64dfc4" },
+]
+
+[[package]]
+name = "identify"
+version = "2.6.19"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/identify/2.6.19/identify-2.6.19.tar.gz", hash = "sha256:6be5020c38fcb07da56c53733538a3081ea5aa70d36a156f83044bfbf9173842" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/identify/2.6.19/identify-2.6.19-py2.py3-none-any.whl", hash = "sha256:20e6a87f786f768c092a721ad107fc9df0eb89347be9396cadf3f4abbd1fb78a" },
 ]
 
 [[package]]
@@ -630,6 +650,15 @@ wheels = [
 ]
 
 [[package]]
+name = "nodeenv"
+version = "1.10.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/nodeenv/1.10.0/nodeenv-1.10.0.tar.gz", hash = "sha256:996c191ad80897d076bdfba80a41994c2b47c68e224c542b48feba42ba00f8bb" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/nodeenv/1.10.0/nodeenv-1.10.0-py2.py3-none-any.whl", hash = "sha256:5bb13e3eed2923615535339b3c620e76779af4cb4c6a90deccc9e36b274d3827" },
+]
+
+[[package]]
 name = "packaging"
 version = "26.3"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -672,6 +701,22 @@ source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/si
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pluggy/1.6.0/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pluggy/1.6.0/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746" },
+]
+
+[[package]]
+name = "pre-commit"
+version = "4.6.2"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "cfgv" },
+    { name = "identify" },
+    { name = "nodeenv" },
+    { name = "pyyaml" },
+    { name = "virtualenv" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pre-commit/4.6.2/pre_commit-4.6.2.tar.gz", hash = "sha256:8f5d7bfb021ecdbcd9d49d89847082dd24172ccde534390081a679ad046e2441" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pre-commit/4.6.2/pre_commit-4.6.2-py2.py3-none-any.whl", hash = "sha256:e2dde9a75d3bce11bd3831c26d134df00a2803c1d818be6a0383c3dcda25dc4e" },
 ]
 
 [[package]]

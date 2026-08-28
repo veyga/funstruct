@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterator, KeysView, ValuesView, ItemsView
 from copy import deepcopy
 from typing import Generic, TypeVar
 
