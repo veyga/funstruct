@@ -2,6 +2,46 @@ import pytest
 from parametrization import Parametrization as P
 
 from funstruct.collections.cons import CList, Cons, Nil
+from tests.laws import (
+    assert_applicative_laws,
+    assert_functor_laws,
+    assert_monad_laws,
+    assert_monoid_laws,
+    assert_semigroup_laws,
+)
+
+
+class TestCListLaws:
+    def test_semigroup(self):
+        assert_semigroup_laws(
+            Cons(1, Cons(2, Nil())),
+            Cons(3, Nil()),
+            Cons(4, Cons(5, Nil())),
+        )
+
+    def test_monoid(self):
+        assert_monoid_laws(Cons(1, Cons(2, Nil())), Nil())
+
+    def test_functor_cons(self):
+        assert_functor_laws(Cons(1, Cons(2, Cons(3, Nil()))))
+
+    def test_functor_nil(self):
+        assert_functor_laws(Nil())
+
+    def test_applicative(self):
+        assert_applicative_laws(
+            pure_fn=Cons.pure,
+            fa=Cons(1, Nil()),
+            fb=Cons(2, Nil()),
+        )
+
+    def test_monad(self):
+        assert_monad_laws(
+            pure_fn=Cons.pure,
+            m=Cons(1, Cons(2, Nil())),
+            f=lambda x: Cons(x, Cons(x + 1, Nil())),
+            g=lambda x: Cons(x * 10, Nil()),
+        )
 
 
 @pytest.fixture

@@ -2,9 +2,25 @@
 
 from parametrization import Parametrization as P
 
+from funstruct.collections.frozendict import frozendict
 from funstruct.applicative.validated import Invalid, Valid, Validated
 from funstruct.collections.cons import Cons, Nil
-from funstruct.collections.frozendict import frozendict
+from tests.laws import assert_functor_laws, assert_semigroup_laws
+
+
+class TestValidatedLaws:
+    def test_semigroup_invalid(self):
+        assert_semigroup_laws(
+            Invalid(Cons("a", Nil())),
+            Invalid(Cons("b", Nil())),
+            Invalid(Cons("c", Nil())),
+        )
+
+    def test_functor_valid(self):
+        assert_functor_laws(Valid(1))
+
+    def test_functor_invalid(self):
+        assert_functor_laws(Invalid(Cons("err", Nil())))
 
 
 class TestValid:

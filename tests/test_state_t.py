@@ -4,6 +4,34 @@ from parametrization import Parametrization as P
 from returns.result import Failure, Result, Success
 
 from funstruct.monad import StateT
+from tests.laws import assert_applicative_laws, assert_functor_laws, assert_monad_laws
+
+
+def _state_t_eq(a, b):
+    """Compare StateT values by running them with a test state."""
+    return a.run(0) == b.run(0) and a.run(99) == b.run(99)
+
+
+class TestStateTLaws:
+    def test_functor(self):
+        assert_functor_laws(StateT.pure(1, Result), eq=_state_t_eq)
+
+    def test_applicative(self):
+        assert_applicative_laws(
+            pure_fn=lambda v: StateT.pure(v, Result),
+            fa=StateT.pure(1, Result),
+            fb=StateT.pure(2, Result),
+            eq=_state_t_eq,
+        )
+
+    def test_monad(self):
+        assert_monad_laws(
+            pure_fn=lambda v: StateT.pure(v, Result),
+            m=StateT.pure(5, Result),
+            f=lambda x: StateT.pure(x + 1, Result),
+            g=lambda x: StateT.pure(x * 10, Result),
+            eq=_state_t_eq,
+        )
 
 
 class TestRun:

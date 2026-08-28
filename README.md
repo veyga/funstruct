@@ -103,3 +103,34 @@ trait Monad[F[_]] extends Applicative[F] {
   def bind(fa: F[A])(f: A => F[B]): F[B]
 }
 ```
+
+### Laws
+
+Every implementation must satisfy these mathematical laws:
+
+**Semigroup**
+
+- Associativity: `(a + b) + c == a + (b + c)`
+
+**Monoid**
+
+- Left identity: `empty + a == a`
+- Right identity: `a + empty == a`
+
+**Functor**
+
+- Identity: `fa.map(id) == fa`
+- Composition: `fa.map(f).map(g) == fa.map(g ∘ f)`
+
+**Applicative**
+
+- Identity: `pure(id).ap(v) == v`
+- Homomorphism: `pure(f).ap(pure(x)) == pure(f(x))`
+- Interchange: `u.ap(pure(y)) == pure(λf. f(y)).ap(u)`
+- Composition: `pure(∘).ap(u).ap(v).ap(w) == u.ap(v.ap(w))`
+
+**Monad**
+
+- Left identity: `pure(a).bind(f) == f(a)`
+- Right identity: `m.bind(pure) == m`
+- Associativity: `m.bind(f).bind(g) == m.bind(λx. f(x).bind(g))`

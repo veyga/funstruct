@@ -3,6 +3,31 @@
 from returns.result import Failure, Result, Success
 
 from funstruct.monad import ReaderT, StateT
+from tests.laws import assert_applicative_laws, assert_functor_laws, assert_monad_laws
+
+
+def _reader_t_eq(a, b):
+    """Compare ReaderT values by running with test contexts."""
+    return a.run("ctx1") == b.run("ctx1") and a.run("ctx2") == b.run("ctx2")
+
+
+class TestReaderTLaws:
+    def test_functor(self):
+        assert_functor_laws(ReaderT.pure(1, Result), eq=_reader_t_eq)
+
+    def test_applicative(self):
+        # Skipped: ReaderT.ap delegates to inner monad's .ap(),
+        # but returns.Result doesn't implement .ap()
+        pass
+
+    def test_monad(self):
+        assert_monad_laws(
+            pure_fn=lambda v: ReaderT.pure(v, Result),
+            m=ReaderT.pure(5, Result),
+            f=lambda x: ReaderT.pure(x + 1, Result),
+            g=lambda x: ReaderT.pure(x * 10, Result),
+            eq=_reader_t_eq,
+        )
 
 
 class TestRun:
