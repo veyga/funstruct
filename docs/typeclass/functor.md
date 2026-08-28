@@ -12,4 +12,4 @@ Valid(3).map(lambda x: x * 2)  # Valid(6)
 
 ## API Reference
 
-::: funstruct.typeclass.functor.Functor
+::: funstruct.typeclasses._functor.Functor

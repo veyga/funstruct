@@ -19,4 +19,4 @@ Cons(1, Cons(2, Nil)) >> (lambda x: Cons(x, Cons(x * 10, Nil)))
 
 ## API Reference
 
-::: funstruct.typeclass.monad.Monad
+::: funstruct.typeclasses._monad.Monad

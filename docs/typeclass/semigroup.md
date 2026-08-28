@@ -14,4 +14,4 @@ Built-in semigroups: `list`, `str`, `tuple`
 
 ## API Reference
 
-::: funstruct.typeclass.semigroup.Semigroup
+::: funstruct.typeclasses._semigroup.Semigroup

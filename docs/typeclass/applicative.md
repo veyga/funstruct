@@ -18,4 +18,4 @@ Valid(1) + Valid(2)  # Valid((1, 2))
 
 ## API Reference
 
-::: funstruct.typeclass.applicative.Applicative
+::: funstruct.typeclasses._applicative.Applicative

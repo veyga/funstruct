@@ -11,4 +11,4 @@ A [Semigroup](semigroup.md) with an identity element (`empty`).
 
 ## API Reference
 
-::: funstruct.typeclass.monoid.Monoid
+::: funstruct.typeclasses._monoid.Monoid
