@@ -32,11 +32,14 @@ class Option(Monad, Generic[A]):
         - pure:        O(1)
     """
 
-    def bind(self, f: Callable[[A], "Option[B]"]) -> "Option[B]":
-        raise NotImplementedError
+    # Type-narrowed signatures so type checkers see Option[B], not Monad[B].
+    # Implementations live in Some/Nothing below. @abstractmethod with ...
+    # means "must be implemented by subclasses" without raising anything.
+    @abstractmethod
+    def bind(self, f: Callable[[A], "Option[B]"]) -> "Option[B]": ...
 
-    def map(self, f: Callable[[A], B]) -> "Option[B]":
-        raise NotImplementedError
+    @abstractmethod
+    def map(self, f: Callable[[A], B]) -> "Option[B]": ...
 
     @classmethod
     def pure(cls, value: A) -> Option[A]:

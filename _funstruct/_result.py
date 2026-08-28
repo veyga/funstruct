@@ -5,6 +5,8 @@ AsyncResult[A] = Future[Exception, A] as a single-param generic.
 Try wraps sync functions, TryAsync wraps async functions.
 """
 
+from __future__ import annotations
+
 from collections.abc import Awaitable, Callable, Coroutine
 from functools import wraps
 from typing import Any, Generic, ParamSpec, TypeVar
@@ -28,7 +30,9 @@ class AsyncResult(Future[Exception, _A], Generic[_A]):
     pass
 
 
-def Try(f: Callable) -> Callable:
+def Try(
+    f: Callable[_P, _A],
+) -> Callable[_P, "Result[_A]"]:
     """Decorator: wraps a sync function so exceptions become Err.
 
     >>> @Try
@@ -41,7 +45,7 @@ def Try(f: Callable) -> Callable:
     """
 
     @wraps(f)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> Result[_A]:
         try:
             return Ok(f(*args, **kwargs))
         except Exception as e:
