@@ -364,19 +364,24 @@ class CList(Monad, Generic[A]):
         Returns:
             A new list containing the elements `xs`.
         """
-        return Cons(xs[0], CList.new(*xs[1:])) if xs else Nil()
+        from _funstruct._tailrec import tail_call, tco
+
+        @tco
+        def _go(items, idx, acc):
+            if idx < 0:
+                return acc
+            return tail_call(_go)(items, idx - 1, Cons(items[idx], acc))
+
+        return _go(xs, len(xs) - 1, Nil())
 
     @staticmethod
     def from_iterable(iterable: Iterable[A]) -> CList:
         """Create a new list from an iterable of elements.
-        Ex:
-        CList.from_iterable([1,2]) == Cons(1, Cons(2))
 
-        Args:
-            iterable: An iterable of elements.
-
-        Returns:
-            A new list containing the elements from the iterable.
+        >>> CList.from_iterable([1, 2, 3]).to_list()
+        [1, 2, 3]
+        >>> CList.from_iterable([]).to_list()
+        []
         """
         return CList.new(*iterable)
 
@@ -597,39 +602,26 @@ class Cons(CList[A]):
         return f"CList([{', '.join(_fmt(e) for e in self)}])"
 
     def append(self, other: CList) -> CList:
-        """Append another list to the end of this non-empty list.
-
-        Args:
-            other: The list to append.
-
-        Returns:
-            A new list with `other` appended to the end of this list.
-        """
-        return Cons(self.head, self.tail.append(other))
+        """Append another list to the end of this non-empty list."""
+        return self.reversed().fold_left(other, lambda acc, h: Cons(h, acc))
 
     def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        """Fold the non-empty list from right to left.
-
-        Args:
-            acc: The initial accumulator value.
-            f: A function to apply, taking an element and the current accumulator.
-
-        Returns:
-            The result of folding the list from right to left.
-        """
-        return f(self.head, self.tail.fold_right(acc, f))
+        """Fold from right to left. Stack-safe via reverse + fold_left."""
+        return self.reversed().fold_left(acc, lambda a, b: f(b, a))
 
     def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
-        """Fold the non-empty list from left to right.
+        """Fold from left to right. Tail-recursive via @tco."""
+        from _funstruct._tailrec import tail_call, tco
 
-        Args:
-            acc: The initial accumulator value.
-            f: A function to apply, taking the current accumulator and an element.
+        @tco
+        def _go(current, result):
+            match current:
+                case Nil():
+                    return result
+                case Cons(h, t):
+                    return tail_call(_go)(t, f(result, h))
 
-        Returns:
-            The result of folding the list from left to right.
-        """
-        return self.tail.fold_left(f(acc, self.head), f)
+        return _go(self, acc)
 
     def drop(self, n: int) -> CList:
         """Drop the first `n` elements from the non-empty list.

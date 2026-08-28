@@ -489,6 +489,7 @@ dev = [
     { name = "nox", extra = ["uv"] },
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "pytest-benchmark", extra = ["histogram"] },
     { name = "pytest-cov" },
     { name = "pytest-parametrization" },
     { name = "ruff" },
@@ -512,6 +513,7 @@ dev = [
     { name = "nox", extras = ["uv"], specifier = ">=2026.8.17" },
     { name = "pre-commit", specifier = ">=4.6.2" },
     { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-benchmark", extras = ["histogram"], specifier = ">=5.3.0" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "pytest-parametrization", specifier = ">=2022.2.1" },
     { name = "ruff", specifier = ">=0.8.0" },
@@ -573,6 +575,18 @@ source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/si
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/idna/3.19/idna-3.19.tar.gz", hash = "sha256:5e0811a4383b21dc5838069f801c4fb62113b7447663d2530d2bd6e77b49bf15" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/idna/3.19/idna-3.19-py3-none-any.whl", hash = "sha256:815e7be7a7806d54abb586dc943addc79e8b2ee16915059658cbeff4b1b43bf4" },
+]
+
+[[package]]
+name = "importlib-metadata"
+version = "9.0.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "zipp" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/importlib-metadata/9.0.0/importlib_metadata-9.0.0.tar.gz", hash = "sha256:a4f57ab599e6a2e3016d7595cfd72eb4661a5106e787a95bcc90c7105b831efc" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/importlib-metadata/9.0.0/importlib_metadata-9.0.0-py3-none-any.whl", hash = "sha256:2d21d1cc5a017bd0559e36150c21c830ab1dc304dedd1b7ea85d20f45ef3edd7" },
 ]
 
 [[package]]
@@ -1018,6 +1032,36 @@ wheels = [
 ]
 
 [[package]]
+name = "py-cpuinfo2"
+version = "10.1.1"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/py-cpuinfo2/10.1.1/py_cpuinfo2-10.1.1.tar.gz", hash = "sha256:7861133863663f16e06eca63b12904ef100b5760415e92372dac0162799a4771" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/py-cpuinfo2/10.1.1/py_cpuinfo2-10.1.1-py3-none-any.whl", hash = "sha256:adc53396bfb206e6498d078ec2ab407f85799ecd819584ac36a8f80a2d4d762d" },
+]
+
+[[package]]
+name = "pygal"
+version = "3.1.3"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "importlib-metadata" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pygal/3.1.3/pygal-3.1.3.tar.gz", hash = "sha256:dd119c14cdeb56beb85282e3e2687ece30561225d410a822e6bb68699aa6e7b1" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pygal/3.1.3/pygal-3.1.3-py3-none-any.whl", hash = "sha256:c0b9bc2d31df4094c9f65b0969b62571a47b28197aced081b1a9433c3a760f32" },
+]
+
+[[package]]
+name = "pygaljs"
+version = "1.0.2"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pygaljs/1.0.2/pygaljs-1.0.2.tar.gz", hash = "sha256:0b71ee32495dcba5fbb4a0476ddbba07658ad65f5675e4ad409baf154dec5111" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pygaljs/1.0.2/pygaljs-1.0.2-py2.py3-none-any.whl", hash = "sha256:d75e18cb21cc2cda40c45c3ee690771e5e3d4652bf57206f20137cf475c0dbe8" },
+]
+
+[[package]]
 name = "pygments"
 version = "2.21.0"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -1064,6 +1108,26 @@ dependencies = [
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pytest/9.1.1/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pytest/9.1.1/pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c" },
+]
+
+[[package]]
+name = "pytest-benchmark"
+version = "5.3.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "py-cpuinfo2" },
+    { name = "pytest" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pytest-benchmark/5.3.0/pytest_benchmark-5.3.0.tar.gz", hash = "sha256:358444d4e89be901ee2b6404fb043ac3d7684002ad7f3563cc153fca6339c965" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/pytest-benchmark/5.3.0/pytest_benchmark-5.3.0-py3-none-any.whl", hash = "sha256:920ab1dfcffa718d49aa15ba144c7e357bda59216a0dc308016cc1c7236f719d" },
+]
+
+[package.optional-dependencies]
+histogram = [
+    { name = "pygal" },
+    { name = "pygaljs" },
+    { name = "setuptools" },
 ]
 
 [[package]]
@@ -1228,6 +1292,15 @@ wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/ruff/0.16.4/ruff-0.16.4-py3-none-win32.whl", hash = "sha256:312769988007aaeb8e189b443ccdd03c0e6374489e053467be6d96518ebff76e" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/ruff/0.16.4/ruff-0.16.4-py3-none-win_amd64.whl", hash = "sha256:05d9d27a18c4bcbefada602480ec9e01e0bc949d432e0ced5df77edac195919c" },
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/ruff/0.16.4/ruff-0.16.4-py3-none-win_arm64.whl", hash = "sha256:a3a61621c9b6f6a89573e938a080e648f1695baa3f58570a3a707bc51ff65a21" },
+]
+
+[[package]]
+name = "setuptools"
+version = "84.0.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/setuptools/84.0.0/setuptools-84.0.0.tar.gz", hash = "sha256:f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/setuptools/84.0.0/setuptools-84.0.0-py3-none-any.whl", hash = "sha256:51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670" },
 ]
 
 [[package]]
@@ -1426,4 +1499,13 @@ source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/si
 sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/wcwidth/0.8.2/wcwidth-0.8.2.tar.gz", hash = "sha256:91fbef97204b96a3d4d421609b80340b760cf33e26da123ff243d76b1fda8dda" }
 wheels = [
     { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/wcwidth/0.8.2/wcwidth-0.8.2-py3-none-any.whl", hash = "sha256:d63947694a0539a1d51e01eda7caf800c291020e6cdd7e28ad7b14dd33ad4f85" },
+]
+
+[[package]]
+name = "zipp"
+version = "4.1.0"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/zipp/4.1.0/zipp-4.1.0.tar.gz", hash = "sha256:4cb57381f544315db7688e976e922a2b18cdb513d21cc194eb42232ba2a3e602" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/zipp/4.1.0/zipp-4.1.0-py3-none-any.whl", hash = "sha256:25ad4e16390cd314347dd8f1de67a2ac538ae658ed4ab9db16029c07c188e97f" },
 ]

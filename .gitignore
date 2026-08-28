@@ -133,3 +133,4 @@ pyrightconfig.json
 coc-settings.json
 .vimspector.json
 notes.txt
+.benchmarks/
