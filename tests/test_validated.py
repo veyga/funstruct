@@ -258,3 +258,55 @@ class TestTruthiness:
 
     def test_invalid_is_falsy(self):
         assert bool(Invalid(Cons("err", Nil()))) is False
+
+
+class TestToResult:
+    """to_result converts Validated to Either. Valid always → Right, Invalid always → Left.
+
+    The value's truthiness is irrelevant — Valid(0), Valid(None), Valid(False)
+    all produce Right. Validation status determines the case, not the value.
+    """
+
+    def test_valid_to_result(self):
+        from funstruct.monad.either import Right
+
+        assert Valid(42).to_result() == Right(42)
+
+    def test_valid_falsey_values_still_right(self):
+        from funstruct.monad.either import Right
+
+        assert Valid(0).to_result() == Right(0)
+        assert Valid(None).to_result() == Right(None)
+        assert Valid(False).to_result() == Right(False)
+        assert Valid("").to_result() == Right("")
+        assert Valid([]).to_result() == Right([])
+
+    def test_invalid_to_result(self):
+        from funstruct.monad.either import Left
+
+        assert Invalid(["err"]).to_result() == Left(["err"])
+
+    def test_valid_to_result_or(self):
+        from funstruct.monad.either import Right
+
+        assert Valid(1).to_result_or(ValueError) == Right(1)
+
+    def test_invalid_to_result_or(self):
+        from funstruct.monad.either import Left
+
+        result = Invalid(["a", "b"]).to_result_or(ValueError)
+        match result:
+            case Left(e):
+                assert isinstance(e, ValueError)
+                assert "a; b" in str(e)
+
+    def test_invalid_to_result_or_custom_combine(self):
+        from funstruct.monad.either import Left
+
+        result = Invalid([1, 2, 3]).to_result_or(
+            TypeError, combine=lambda errs: str(sum(errs))
+        )
+        match result:
+            case Left(e):
+                assert isinstance(e, TypeError)
+                assert "6" in str(e)

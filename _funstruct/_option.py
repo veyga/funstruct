@@ -21,6 +21,9 @@ if TYPE_CHECKING:
 A = TypeVar("A")
 
 
+B = TypeVar("B")
+
+
 class Option(Monad, Generic[A]):
     """Option[A]: either Some(value) or Nothing.
 
@@ -28,6 +31,12 @@ class Option(Monad, Generic[A]):
         - map/bind/ap: O(1)
         - pure:        O(1)
     """
+
+    def bind(self, f: Callable[[A], "Option[B]"]) -> "Option[B]":
+        raise NotImplementedError
+
+    def map(self, f: Callable[[A], B]) -> "Option[B]":
+        raise NotImplementedError
 
     @classmethod
     def pure(cls, value: A) -> Option[A]:
