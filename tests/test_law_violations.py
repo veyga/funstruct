@@ -16,7 +16,7 @@ Summary of violations:
     CountingBox (increments on map) | Functor identity      | map(id) != id
     DoublingBox (applies f twice)   | Functor composition   | map(f).map(g) != map(g∘f)
     TaggedBox (pure adds a tag)     | Monad left identity   | pure(a).bind(f) != f(a)
-    SemigroupWriter (no empty)      | Writer needs Monoid   | pure crashes — no identity element
+    SemigroupWriter (no empty)      | Writer needs Monoid   | pure crashes — no identity
 
 Semigroup vs Monoid requirement:
 
