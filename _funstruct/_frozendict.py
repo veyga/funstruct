@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterator, KeysView, ValuesView, ItemsView
+from collections.abc import Callable, Iterator, KeysView, ValuesView, ItemsView
 from copy import deepcopy
 from typing import Generic, TypeVar
 
@@ -192,6 +192,14 @@ class frozendict(Generic[K, V]):
             A new frozendict containing all key-value pairs from both frozendicts.
         """
         return frozendict({**self.raw, **other.raw})
+
+    def __add__(self, other: "frozendict") -> "frozendict":
+        """Semigroup combine (merge). Right-biased on key conflicts."""
+        return self.combine(other)
+
+    def map(self, f: Callable) -> "frozendict":
+        """Apply f to every value, preserving keys."""
+        return frozendict({k: f(v) for k, v in self._dict.items()})
 
     @property
     def raw(self) -> dict:

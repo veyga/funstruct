@@ -45,7 +45,7 @@ docs = [
 root = ["."]
 
 [tool.ruff]
-line-length = 88
+line-length = 80
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]

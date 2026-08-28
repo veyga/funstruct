@@ -53,5 +53,5 @@ Invalid(["e"]).to_result()  # Failure(["e"])
 
 ## API Reference
 
-::: \_funstruct.\_validated.Validated ::: \_funstruct.\_validated.Valid :::
-\_funstruct.\_validated.Invalid
+::: ::: \_funstruct.\_validated.Validated ::: \_funstruct.\_validated.Valid :::
+\_funstruct.\_validated.Invalid \_funstruct.\_validated.Invalid

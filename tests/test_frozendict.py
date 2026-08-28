@@ -2,6 +2,88 @@ import pytest
 from parametrization import Parametrization as P
 
 from funstruct.collections.frozendict import frozendict
+from tests.laws import (
+    assert_functor_laws,
+    assert_monoid_laws,
+    assert_semigroup_laws,
+)
+
+
+class TestFrozendictLaws:
+    def test_semigroup(self):
+        assert_semigroup_laws(
+            frozendict({"a": 1}),
+            frozendict({"b": 2}),
+            frozendict({"c": 3}),
+        )
+
+    def test_monoid(self):
+        assert_monoid_laws(frozendict({"a": 1, "b": 2}), frozendict())
+
+    def test_functor(self):
+        assert_functor_laws(frozendict({"x": 1, "y": 2}))
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="double values",
+    fd=frozendict({"a": 1, "b": 2}),
+    f=lambda x: x * 2,
+    expected=frozendict({"a": 2, "b": 4}),
+)
+@P.case(
+    name="to string",
+    fd=frozendict({"x": 10, "y": 20}),
+    f=str,
+    expected=frozendict({"x": "10", "y": "20"}),
+)
+@P.case(
+    name="empty",
+    fd=frozendict(),
+    f=lambda x: x + 1,
+    expected=frozendict(),
+)
+@P.case(
+    name="nested map",
+    fd=frozendict(
+        {"a": frozendict({"inner": 1}), "b": frozendict({"inner": 2})}
+    ),
+    f=lambda d: d.map(lambda v: v + 100),
+    expected=frozendict(
+        {"a": frozendict({"inner": 101}), "b": frozendict({"inner": 102})}
+    ),
+)
+def test_map(fd, f, expected):
+    assert fd.map(f) == expected
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="disjoint keys",
+    a=frozendict({"x": 1}),
+    b=frozendict({"y": 2}),
+    expected=frozendict({"x": 1, "y": 2}),
+)
+@P.case(
+    name="overlapping keys right-biased",
+    a=frozendict({"x": 1, "y": 2}),
+    b=frozendict({"y": 99, "z": 3}),
+    expected=frozendict({"x": 1, "y": 99, "z": 3}),
+)
+@P.case(
+    name="empty left",
+    a=frozendict(),
+    b=frozendict({"a": 1}),
+    expected=frozendict({"a": 1}),
+)
+@P.case(
+    name="empty right",
+    a=frozendict({"a": 1}),
+    b=frozendict(),
+    expected=frozendict({"a": 1}),
+)
+def test_add(a, b, expected):
+    assert a + b == expected
 
 
 @pytest.fixture
@@ -197,7 +279,7 @@ def test_put__returns_new(fd_parity1):
     assert updated is not initial
 
 
-def test_combine_is_not_associative():
+def test_combine_returns_new_instance():
     a = frozendict({"x": 1})
     b = frozendict({"x": 2})
     combined = a.combine(b)
@@ -206,13 +288,52 @@ def test_combine_is_not_associative():
     assert combined == {"x": 2}
 
 
-def test_combine_dicts_is_not_associative():
+def test_combine_dicts_returns_new_instance():
     a = frozendict({"x": 1})
     b = frozendict({"x": 2})
     combined = frozendict.combine_dicts(a, b)
     assert combined is not a
     assert combined is not b
     assert combined == {"x": 2}
+
+
+def test_semigroup_associativity_with_overlapping_keys():
+    """Associativity holds even with key conflicts.
+
+    a = {x:1, y:10}
+    b = {x:2, z:20}
+    c = {y:3, z:30}
+
+    Left:   (a + b) + c
+            {x:2, y:10, z:20} + {y:3, z:30}
+            = {x:2, y:3, z:30}
+
+    Right:  a + (b + c)
+            {x:1, y:10} + {x:2, y:3, z:30}
+            = {x:2, y:3, z:30}
+
+    Left == Right
+    """
+    a = frozendict({"x": 1, "y": 10})
+    b = frozendict({"x": 2, "z": 20})
+    c = frozendict({"y": 3, "z": 30})
+    assert (a + b) + c == a + (b + c)
+
+
+def test_not_commutative():
+    """Merge is NOT commutative (rightmost wins on conflict).
+
+    a = {x:1}
+    b = {x:2}
+
+    a + b = {x:2}   (b's value wins)
+    b + a = {x:1}   (a's value wins)
+
+    a + b != b + a
+    """
+    a = frozendict({"x": 1})
+    b = frozendict({"x": 2})
+    assert a + b != b + a
 
 
 def test_fd_can_be_created_from_keys():
