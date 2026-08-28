@@ -139,6 +139,31 @@ class Either(Monad, Generic[E, A]):
             case _:
                 return Nothing()
 
+    @abstractmethod
+    def alt(self, f: Callable[[E], E]) -> Either[E, A]:
+        """Transform the error without recovering. No-op on Right."""
+        ...
+
+    @abstractmethod
+    def or_else(self, f: Callable[[E], Either]) -> Either:
+        """Handle error — f can recover (Right) or re-fail (Left). No-op on Right."""
+        ...
+
+    @abstractmethod
+    def get_or_else(self, default: A) -> A:
+        """Extract the value, or return default if Left."""
+        ...
+
+    @abstractmethod
+    def fold(self, on_left: Callable, on_right: Callable):
+        """Eliminate — apply on_left or on_right depending on the case."""
+        ...
+
+    @abstractmethod
+    def swap(self) -> Either[A, E]:
+        """Swap Left and Right."""
+        ...
+
     @property
     @abstractmethod
     def is_right(self) -> bool: ...
@@ -180,13 +205,15 @@ class Right(Either[E, A]):
         return self
 
     def get_or_else(self, default: A) -> A:
+        """Return the value (ignores default on Right)."""
         return self.value
 
     def fold(self, on_left: Callable, on_right: Callable):
+        """Apply on_right to the value."""
         return on_right(self.value)
 
     def swap(self) -> Either[A, E]:
-        """Swap Left/Right."""
+        """Swap Right(v) → Left(v)."""
         return Left(self.value)
 
     def __eq__(self, other: object) -> bool:
@@ -238,13 +265,15 @@ class Left(Either[E, A]):
         return f(self.error)
 
     def get_or_else(self, default: A) -> A:
+        """Return default (error is discarded)."""
         return default
 
     def fold(self, on_left: Callable, on_right: Callable):
+        """Apply on_left to the error."""
         return on_left(self.error)
 
     def swap(self) -> Either[A, E]:
-        """Swap Left/Right."""
+        """Swap Left(e) → Right(e)."""
         return Right(self.error)
 
     def __eq__(self, other: object) -> bool:

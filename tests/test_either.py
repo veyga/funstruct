@@ -74,6 +74,25 @@ class TestLeft:
         assert Left("err").is_left is True
         assert Left("err").is_right is False
 
+    def test_alt_transforms_error(self):
+        assert Left("err").alt(str.upper) == Left("ERR")
+
+    def test_alt_preserves_error_type(self):
+        result = Left(ValueError("x")).alt(lambda e: TypeError(str(e)))
+        match result:
+            case Left(e):
+                assert type(e) is TypeError
+
+
+class TestAlt:
+    """alt transforms the error without recovering."""
+
+    def test_right_alt_is_noop(self):
+        assert Right(1).alt(str.upper) == Right(1)
+
+    def test_left_alt_transforms_error(self):
+        assert Left("err").alt(lambda e: f"wrapped: {e}") == Left("wrapped: err")
+
 
 class TestDo:
     def test_success(self):

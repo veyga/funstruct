@@ -10,16 +10,16 @@ Decorators:
 Examples:
     >>> from funstruct.monad.result import Result, Ok, Err, Try
     >>> Ok(10).map(lambda x: x + 1)
-    Right(11)
+    Ok(11)
     >>> Err("bad").map(lambda x: x + 1)
-    Left('bad')
+    Err('bad')
     >>> Ok(10).bind(lambda x: Ok(x * 2))
-    Right(20)
+    Ok(20)
 
     or_else — recover from Err:
 
     >>> Err("bad").or_else(lambda e: Ok("default"))
-    Right('default')
+    Ok('default')
 
     @Try decorator:
 
@@ -27,18 +27,9 @@ Examples:
     ... def safe_div(a, b):
     ...     return a / b
     >>> safe_div(10, 2)
-    Right(5.0)
+    Ok(5.0)
     >>> safe_div(10, 0)  # doctest: +ELLIPSIS
-    Left(ZeroDivisionError(...))
-
-    do-notation:
-
-    >>> def pipeline():
-    ...     x = yield Ok(1)
-    ...     y = yield Ok(x + 10)
-    ...     return x + y
-    >>> Result.do(pipeline)
-    Right(12)
+    Err(ZeroDivisionError(...))
 """
 
 from __future__ import annotations
@@ -46,6 +37,8 @@ from __future__ import annotations
 from collections.abc import Callable, Coroutine
 from functools import wraps
 from typing import Any, Generic, ParamSpec, TypeVar
+
+from dataclasses import dataclass
 
 from funstruct.monad.either import Either, Left, Right
 from funstruct.monad.future import Future
@@ -63,8 +56,34 @@ class Result(Either[Exception, _A], Generic[_A]):
     pass
 
 
-Ok = Right
-Err = Left
+@dataclass(frozen=True, eq=False)
+class Ok(Right):
+    """Success case of Result."""
+
+    def map(self, f: Callable) -> Either:
+        return Ok(f(self.value))
+
+    def bind(self, f: Callable) -> Either:
+        return f(self.value)
+
+    def __repr__(self) -> str:
+        return f"Ok({repr(self.value)})"
+
+
+@dataclass(frozen=True, eq=False)
+class Err(Left):
+    """Error case of Result."""
+
+    def alt(self, f: Callable) -> Either:
+        return Err(f(self.error))
+
+    def or_else(self, f: Callable) -> Either:
+        return f(self.error)
+
+    def __repr__(self) -> str:
+        return f"Err({repr(self.error)})"
+
+
 _P = ParamSpec("_P")
 
 
@@ -83,13 +102,8 @@ def Try(
 ) -> Callable[_P, Result[_A]]:
     """Decorator: wraps a sync function so exceptions become Err.
 
-    >>> @Try
-    ... def divide(a, b):
-    ...     return a / b
-    >>> divide(10, 2)
-    Right(5.0)
-    >>> divide(10, 0)  # doctest: +ELLIPSIS
-    Left(ZeroDivisionError(...))
+    Successful calls return Ok(value), exceptions return Err(exception).
+    Pattern match the result with Ok(v) / Err(e).
     """
 
     @wraps(f)

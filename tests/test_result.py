@@ -40,17 +40,23 @@ class TestTry:
 
 
 class TestAliases:
-    def test_ok_is_right(self):
+    def test_ok_extends_right(self):
         from funstruct.monad.either import Right
 
-        assert Ok is Right
+        assert issubclass(Ok, Right)
 
-    def test_err_is_left(self):
+    def test_err_extends_left(self):
         from funstruct.monad.either import Left
 
-        assert Err is Left
+        assert issubclass(Err, Left)
 
     def test_result_extends_either(self):
         from funstruct.monad.either import Either
 
         assert issubclass(Result, Either)
+
+    def test_ok_repr(self):
+        assert repr(Ok(42)) == "Ok(42)"
+
+    def test_err_repr(self):
+        assert repr(Err("bad")) == "Err('bad')"
