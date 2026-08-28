@@ -391,6 +391,11 @@ class CList(Monad, Generic[A]):
         Returns:
             True if the lists are equal, False otherwise.
         """
+        match other:
+            case list():
+                return list(self) == other
+            case _:
+                pass
         match self, other:
             case Cons(sh, st), Cons(oh, ot):
                 return sh == oh and st == ot
@@ -526,7 +531,7 @@ class Nil(CList):
         return Cons(value, Nil())
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class Cons(CList[A]):
     """Represents a non-empty list with a head element and a tail list."""
 

@@ -27,6 +27,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
+from _funstruct._cons import CList, Cons, Nil
 from funstruct.typeclass.applicative import Applicative
 
 _A = TypeVar("_A")
@@ -61,27 +62,19 @@ class Validated(Applicative):
 
     @staticmethod
     def invalid(error: _E) -> Validated:
-        """Lift a single error into Invalid."""
-        return Invalid([error])
+        """Lift a single error into Invalid.
 
-    @staticmethod
-    def invalid_nel(errors: list[_E]) -> Validated:
-        """Lift a list of errors into Invalid."""
-        return Invalid(errors)
+        Default semigroup: CList (cons list over +/append).
+        For a custom semigroup, construct Invalid(your_value) directly.
+        """
+        return Invalid(Cons.pure(error))
 
     @staticmethod
     def cond(test: bool, value: _A, error: _E) -> Validated:
-        """Conditional — Valid(value) if test, else Invalid([error])."""
+        """Conditional — Valid(value) if test, else Invalid(Cons(error))."""
         if test:
             return Valid(value)
-        return Invalid([error])
-
-    @staticmethod
-    def cond_nel(test: bool, value: _A, errors: list[_E]) -> Validated:
-        """Conditional with error list."""
-        if test:
-            return Valid(value)
-        return Invalid(errors)
+        return Invalid(Cons.pure(error))
 
 
 @dataclass(frozen=True)

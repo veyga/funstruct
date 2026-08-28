@@ -647,8 +647,72 @@ def test_str(lst, expected):
     assert actual == expected
 
 
-# ❯ i think the Validated should take a default semigroup of Cons list over +, but allow
-#   users to override it. Lets
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    clist=Nil(),
+    pylist=[],
+    expected=True,
+)
+@P.case(
+    name="single",
+    clist=Cons.pure(1),
+    pylist=[1],
+    expected=True,
+)
+@P.case(
+    name="multiple",
+    clist=2 << Cons(1),
+    pylist=[2, 1],
+    expected=True,
+)
+@P.case(
+    name="nested",
+    clist=Cons(4, Cons(Cons(3, Cons(2, Nil())), Cons(5, Nil()))),
+    pylist=[4, [3, 2], 5],
+    expected=True,
+)
+@P.case(
+    name="different length",
+    clist=Cons(1, Cons(2, Nil())),
+    pylist=[1],
+    expected=False,
+)
+@P.case(
+    name="different values",
+    clist=Cons(1, Cons(2, Nil())),
+    pylist=[1, 3],
+    expected=False,
+)
+@P.case(
+    name="nil vs non-empty list",
+    clist=Nil(),
+    pylist=[1],
+    expected=False,
+)
+@P.case(
+    name="cons vs empty list",
+    clist=Cons.pure(1),
+    pylist=[],
+    expected=False,
+)
+@P.case(
+    name="wrong nested structure",
+    clist=Cons(1, Cons(2, Nil())),
+    pylist=[1, [2]],
+    expected=False,
+)
+@P.case(
+    name="nested mismatch values",
+    clist=Cons(Cons(1, Nil()), Nil()),
+    pylist=[[2]],
+    expected=False,
+)
+def test_cons_list_can_equal_py_list(clist, pylist, expected):
+    if expected:
+        assert clist == pylist
+    else:
+        assert not clist == pylist
 
 
 @P.autodetect_parameters()

@@ -1,6 +1,10 @@
 """Tests for Validated applicative"""
 
+from parametrization import Parametrization as P
+
 from funstruct.applicative.validated import Invalid, Valid, Validated
+from funstruct.collections.cons import Cons, Nil
+from funstruct.collections.frozendict import frozendict
 
 
 class TestValid:
@@ -157,3 +161,78 @@ class TestAddOperator:
         a = Valid(1)
         b = Invalid(["err"])
         assert (a + b) == a.ap(b)
+
+
+class TestSemigroup:
+    """Validated works with any Semigroup (type with +), not just CList."""
+
+    def test_string_semigroup(self):
+        """str is a Semigroup over concatenation."""
+        validated = Invalid("error1: ").ap(Invalid("error2"))
+        assert validated == Invalid("error1: error2")
+
+    def test_int_semigroup(self):
+        """int is a Semigroup over addition — count errors."""
+        validated = Invalid(1).ap(Invalid(1)).ap(Invalid(1))
+        assert validated == Invalid(3)
+
+    def test_int_semigroup_valid(self):
+        """int is a Semigroup over addition — count errors."""
+        validated = Valid(1) + Invalid(2) + Invalid(3)
+        assert validated == Invalid(5)
+
+    def test_default_uses_cons_list(self):
+        """Validated.invalid() wraps in CList by default."""
+        validated = Validated.invalid("a").ap(Validated.invalid("b"))
+        assert validated.fold(
+            on_invalid=lambda errs: errs == ["a", "b"],
+            on_valid=lambda _: False,
+        )
+
+    @P.autodetect_parameters()
+    @P.case(
+        name="both OK",
+        dct=frozendict({"a": "a", "b": "b"}),
+        invalids=Nil(),
+    )
+    @P.case(
+        name="a wrong",
+        dct=frozendict({"a": "A", "b": "b"}),
+        invalids=Cons.pure("a wrong"),
+    )
+    @P.case(
+        name="b wrong",
+        dct=frozendict({"a": "a", "b": "B"}),
+        invalids=Cons.pure("b wrong"),
+    )
+    @P.case(
+        name="both wrong",
+        dct=frozendict({"a": "A", "b": "B"}),
+        invalids=["a wrong", "b wrong"],
+    )
+    def test_implicit_semigroup_on_cond(self, dct, invalids):
+        def a(dct: dict):
+            return Validated.cond(
+                dct.get("a") == "a",
+                None,
+                "a wrong",
+            )
+
+        def b(dct: dict):
+            return Validated.cond(
+                dct.get("b") == "b",
+                None,
+                "b wrong",
+            )
+
+        validated = a(dct) + b(dct)
+        if invalids:
+            assert validated.fold(
+                on_invalid=lambda errs: errs == invalids,
+                on_valid=lambda _: False,
+            )
+        else:
+            assert validated.fold(
+                on_invalid=lambda _: False,
+                on_valid=lambda _: True,
+            )
