@@ -18,7 +18,7 @@ Example::
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses.monad import Monad
+from funstruct.typeclasses._monad import Monad
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")

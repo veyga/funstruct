@@ -5,7 +5,7 @@ from parametrization import Parametrization as P
 from funstruct.collections.frozendict import frozendict
 from funstruct.applicative.validated import Invalid, Valid, Validated
 from funstruct.collections.cons import Cons, Nil
-from funstruct.typeclasses.semigroup import Semigroup
+from funstruct.typeclasses import Semigroup
 from tests.laws import assert_functor_laws, assert_semigroup_laws
 
 invalid_concat = Semigroup(typ=Invalid, combine=lambda a, b: a.ap(b))

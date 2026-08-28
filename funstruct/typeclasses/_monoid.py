@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from funstruct.typeclasses import Semigroup
+from funstruct.typeclasses._semigroup import Semigroup
 
 
 from typing import final

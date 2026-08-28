@@ -9,7 +9,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 
-from funstruct.typeclasses import Applicative
+from funstruct.typeclasses._applicative import Applicative
 
 
 class Monad(Applicative):

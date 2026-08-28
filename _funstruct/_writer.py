@@ -7,13 +7,9 @@ Writer is abstract — subclass it with a _monoid class attribute:
 
 Example::
 
-    >>> from funstruct.monad.writer import Writer
-    >>> from funstruct.typeclass.monoid import Monoid
-    >>> from funstruct.collections.cons import Cons, Nil
-    >>> class LogWriter(Writer):
-    ...     _monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
-    >>> LogWriter(10, ["started"]).bind(lambda x: LogWriter(x + 1, ["inc"]))
-    LogWriter(value=11, output=['started', 'inc'])
+    >>> from funstruct.monad.writer import Writer, ListWriter
+    >>> ListWriter(10, ["started"]).bind(lambda x: ListWriter(x + 1, ["inc"]))
+    ListWriter(value=11, output=['started', 'inc'])
 """
 
 from __future__ import annotations
@@ -21,8 +17,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses.monad import Monad
-from funstruct.typeclasses.monoid import Monoid
+from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._monoid import Monoid
 
 _W = TypeVar("_W")
 _A = TypeVar("_A")

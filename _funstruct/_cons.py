@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses.monad import Monad
+from funstruct.typeclasses._monad import Monad
 
 A = TypeVar("A")
 B = TypeVar("B")

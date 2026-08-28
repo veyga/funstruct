@@ -1,15 +1,13 @@
 """Writer monad — computations with accumulated output.
 
->>> from funstruct.monad.writer import Writer
->>> from funstruct.typeclass.monoid import Monoid
->>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
->>> w = Writer(1, ["init"], list_m)
+>>> from funstruct.monad.writer import ListWriter
+>>> w = ListWriter(1, ["init"])
 >>> w.map(lambda x: x + 10)
-Writer(value=11, output=['init'])
->>> w.bind(lambda x: Writer(x + 1, ["inc"], list_m))
-Writer(value=2, output=['init', 'inc'])
->>> Writer.pure(99, list_m)
-Writer(value=99, output=[])
+ListWriter(value=11, output=['init'])
+>>> w.bind(lambda x: ListWriter(x + 1, ["inc"]))
+ListWriter(value=2, output=['init', 'inc'])
+>>> ListWriter.pure(99)
+ListWriter(value=99, output=[])
 """
 
 from _funstruct._writer import Writer
@@ -18,6 +16,10 @@ from funstruct.collections.cons import CList, Nil
 
 
 class ListWriter(Writer):
+    _monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+
+
+class CListWriter(Writer):
     _monoid = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())
 
 

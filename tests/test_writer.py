@@ -1,20 +1,7 @@
 """Tests for Writer monad."""
 
-from funstruct.monad.writer import Writer
-from funstruct.typeclasses.monoid import Monoid
+from funstruct.monad.writer import ListWriter, StrWriter, IntWriter
 from tests.laws import assert_functor_laws, assert_monad_laws
-
-
-class ListWriter(Writer):
-    _monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
-
-
-class StrWriter(Writer):
-    _monoid = Monoid(typ=str, combine=lambda a, b: a + b, empty="")
-
-
-class IntWriter(Writer):
-    _monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
 
 
 def _writer_eq(a, b):
