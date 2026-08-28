@@ -79,9 +79,11 @@ class Monad(Applicative):
     def bind(self, f) -> Monad: ...
 ```
 
+### ~ Scala equivalent
+
 ```scala
 trait Semigroup[A] {
-  def combine(x: A, y: A): A
+  def +(x: A, y: A): A
 }
 
 trait Monoid[A] extends Semigroup[A] {
@@ -98,6 +100,6 @@ trait Applicative[F[_]] extends Functor[F] {
 }
 
 trait Monad[F[_]] extends Applicative[F] {
-  def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
+  def bind(fa: F[A])(f: A => F[B]): F[B]
 }
 ```

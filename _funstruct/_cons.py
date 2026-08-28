@@ -359,6 +359,10 @@ class CList(Monad, Generic[A]):
         """
         return self.prepend(other)
 
+    def __add__(self, other: CList) -> CList:
+        """Concatenate two lists (Monoid append, not Applicative ap)."""
+        return self.append(other)
+
     def __len__(self) -> int:
         """Compute the length of the list.
 
@@ -407,11 +411,9 @@ class Nil(CList):
         return cls._instance
 
     def __repr__(self) -> str:
-        """Return a string representation of the empty list.
+        return "Nil()"
 
-        Returns:
-            A string representing the empty list.
-        """
+    def __str__(self) -> str:
         return "Nil"
 
     def append(self, other: CList) -> CList:
@@ -532,12 +534,17 @@ class Cons(CList[A]):
     tail: CList[A] = field(default_factory=Nil)
 
     def __repr__(self) -> str:
-        """Return a string representation of the non-empty list.
+        return f"Cons({repr(self.head)}, {repr(self.tail)})"
 
-        Returns:
-            A string representing the list, showing the head and tail.
-        """
-        return f"{self.head} << {self.tail}"
+    def __str__(self) -> str:
+        def _fmt(elem) -> str:
+            match elem:
+                case CList():
+                    return f"[{', '.join(_fmt(e) for e in elem)}]"
+                case _:
+                    return str(elem)
+
+        return f"CList([{', '.join(_fmt(e) for e in self)}])"
 
     def append(self, other: CList) -> CList:
         """Append another list to the end of this non-empty list.

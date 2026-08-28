@@ -535,7 +535,7 @@ def test_sorted(original, expected, request):
 @P.case(
     name="nestd 1 level, more elements",
     input=Cons(Cons(1, Cons(1)), Cons(Cons(2, Cons(2)))),
-    expected=Cons.from_iterable([1, 1, 2, 2]),
+    expected=CList.from_iterable([1, 1, 2, 2]),
 )
 @P.case(
     name="nested 1+ levels",
@@ -562,7 +562,7 @@ def test_flatten(input, expected):
 @P.case(
     name="it maps and flattens",
     original=Cons(2, Cons(1)),
-    expected=Cons.from_iterable([6, 6, 3, 3]),
+    expected=CList.from_iterable([6, 6, 3, 3]),
 )
 def test_flat_map(original, expected):
     triple = lambda n: CList.from_iterable([n * 3, n * 3])
@@ -583,3 +583,95 @@ def test_bind_on_nil():
 def test_bind_single_element():
     result = Cons(5, Nil()) >> (lambda x: Cons(x + 1, Cons(x + 2, Nil())))
     assert result == Cons(6, Cons(7, Nil()))
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    a=Nil(),
+    b=Nil(),
+    expected=Nil(),
+)
+@P.case(
+    name="single",
+    a=Cons.pure(1),
+    b=Nil(),
+    expected=Cons(1, Nil()),
+)
+@P.case(
+    name="single nil left",
+    a=Nil(),
+    b=Cons.pure(1),
+    expected=Cons(1, Nil()),
+)
+@P.case(
+    name="multiple",
+    a=Cons(4, Cons(3, Nil())),
+    b=Cons(2, Cons(1, Nil())),
+    expected=CList.from_iterable([4, 3, 2, 1]),
+)
+@P.case(
+    name="nested",
+    a=Cons(4, Cons(Cons(3, Cons(2, Nil())), Nil())),
+    b=Cons(5, Nil()),
+    expected=Cons(4, Cons(Cons(3, Cons(2, Nil())), Cons(5, Nil()))),
+)
+def test_add(a, b, expected):
+    c = a + b
+    assert c == expected
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    lst=Nil(),
+    expected="Nil",
+)
+@P.case(
+    name="single",
+    lst=Cons.pure(1),
+    expected="CList([1])",
+)
+@P.case(
+    name="multiple",
+    lst=2 << Cons.pure(1),
+    expected="CList([2, 1])",
+)
+@P.case(
+    name="nested",
+    lst=Cons(4, Cons(Cons(3, Cons(2, Nil())), Cons(5, Nil()))),
+    expected="CList([4, [3, 2], 5])",
+)
+def test_str(lst, expected):
+    actual = str(lst)
+    assert actual == expected
+
+
+# ❯ i think the Validated should take a default semigroup of Cons list over +, but allow
+#   users to override it. Lets
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    lst=Nil(),
+    expected="Nil()",
+)
+@P.case(
+    name="single",
+    lst=Cons.pure(1),
+    expected="Cons(1, Nil())",
+)
+@P.case(
+    name="multiple",
+    lst=2 << Cons.pure(1),
+    expected="Cons(2, Cons(1, Nil()))",
+)
+@P.case(
+    name="nested",
+    lst=Cons(4, Cons(Cons(3, Cons(2, Nil())), Nil())),
+    expected="Cons(4, Cons(Cons(3, Cons(2, Nil())), Nil()))",
+)
+def test_repr(lst, expected):
+    actual = repr(lst)
+    assert actual == expected
