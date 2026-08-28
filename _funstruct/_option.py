@@ -8,6 +8,7 @@ Mirrors Scala's Option[A] from fpinscala.
 
 from __future__ import annotations
 
+from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
@@ -25,16 +26,11 @@ class Option(Monad, Generic[A]):
 
     Performance characteristics:
         - map/bind/ap: O(1)
-        - from_value:  O(1)
+        - pure:        O(1)
     """
 
     @classmethod
     def pure(cls, value: A) -> Option[A]:
-        return Some(value)
-
-    @classmethod
-    def from_value(cls, value: A) -> Option[A]:
-        """Alias for pure — lifts a value into Some."""
         return Some(value)
 
     @classmethod
@@ -90,8 +86,8 @@ class Option(Monad, Generic[A]):
             return Some(e.value)
 
     @property
-    def is_some(self) -> bool:
-        raise NotImplementedError
+    @abstractmethod
+    def is_some(self) -> bool: ...
 
     @property
     def is_nothing(self) -> bool:

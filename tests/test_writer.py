@@ -1,6 +1,7 @@
 """Tests for Writer monad."""
 
-from funstruct.monad.writer import IntWriter, ListWriter, StrWriter
+from funstruct.collections.cons import CList, Cons, Nil
+from funstruct.monad.writer import CListWriter, IntWriter, ListWriter, StrWriter
 from tests.laws import assert_functor_laws, assert_monad_laws
 
 
@@ -104,3 +105,47 @@ class TestOperators:
         w = ListWriter(1, ["a"]) >> (lambda x: ListWriter(x + 1, ["b"]))
         assert w.value == 2
         assert w.output == ["a", "b"]
+
+
+class TestCListWriter:
+    """Writer with CList output — same behavior, immutable accumulator."""
+
+    def test_pure(self):
+        w = CListWriter.pure(42)
+        assert w.value == 42
+        assert w.output == Nil()
+
+    def test_bind_accumulates(self):
+        w = CListWriter(1, Cons("start", Nil()))
+        result = w.bind(lambda x: CListWriter(x + 1, Cons("inc", Nil())))
+        assert result.value == 2
+        assert result.output == Cons("start", Cons("inc", Nil()))
+
+    def test_chain(self):
+        w = (
+            CListWriter(0, Cons("init", Nil()))
+            >> (lambda x: CListWriter(x + 1, Cons("step1", Nil())))
+            >> (lambda x: CListWriter(x + 1, Cons("step2", Nil())))
+        )
+        assert w.value == 2
+        assert w.output == CList.from_iterable(["init", "step1", "step2"])
+
+    def test_tell(self):
+        w = CListWriter.tell(Cons("logged", Nil()))
+        assert w.value is None
+        assert w.output == Cons("logged", Nil())
+
+    def test_map_preserves_output(self):
+        w = CListWriter(5, Cons("a", Nil()))
+        result = w.map(lambda x: x * 2)
+        assert result.value == 10
+        assert result.output == Cons("a", Nil())
+
+    def test_monad_laws(self):
+        assert_monad_laws(
+            pure_fn=CListWriter.pure,
+            m=CListWriter(5, Cons("init", Nil())),
+            f=lambda x: CListWriter(x + 1, Cons("f", Nil())),
+            g=lambda x: CListWriter(x * 10, Cons("g", Nil())),
+            eq=_writer_eq,
+        )

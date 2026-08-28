@@ -1,0 +1,172 @@
+"""Generic Writer monad transformer.
+
+``WriterT[F, W, A]`` wraps ``F[(A, W)]`` where ``F`` is any monad with
+``.bind()``, ``.map()``, and ``W`` is combined via a class-level Monoid.
+
+Adds accumulated output/logging to any monad F.
+
+Example with Either::
+
+    >>> from _funstruct._either import Either, Right, Left
+    >>> from _funstruct._writer_t import WriterT
+    >>> from funstruct.typeclasses._monoid import Monoid
+
+    >>> list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+    >>> class LogT(WriterT):
+    ...     _monoid = list_monoid
+
+    >>> LogT.pure(42, Either).run()
+    Right((42, []))
+    >>> LogT.tell(["started"], Either).run()
+    Right((None, ['started']))
+
+"""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Generic, TypeVar
+
+from funstruct.typeclasses._monad_transformer import MonadTransformer
+from funstruct.typeclasses._monoid import Monoid
+
+_F = TypeVar("_F")
+_W = TypeVar("_W")
+_A = TypeVar("_A")
+_B = TypeVar("_B")
+
+
+class WriterT(MonadTransformer, Generic[_F, _W, _A]):
+    """Generic writer transformer: ``F[(A, W)]``.
+
+    ``F`` is the wrapping monad (Either, Option, etc.).
+    ``W`` is the output type, combined via a class-level Monoid.
+
+    Subclass and set ``_monoid`` to use.
+
+    Haskell: ``WriterT w m a``
+    Scala:   ``WriterT[F[_], W, A]``
+    """
+
+    _monoid: Monoid
+
+    __slots__ = ("_run",)
+
+    def __init__(self, run) -> None:
+        self._run = run
+
+    def run(self):
+        """Execute, returning F[(A, W)]."""
+        return self._run
+
+    def map(self, f: Callable[[_A], _B]) -> WriterT[_F, _W, _B]:
+        """Transform the value, keep the output."""
+        cls = self.__class__
+        return cls(self._run.map(lambda aw: (f(aw[0]), aw[1])))
+
+    def bind(self, f: Callable[[_A], WriterT]) -> WriterT:
+        """Chain: run f on the value, combine outputs via monoid."""
+        cls = self.__class__
+        monoid = cls._monoid
+
+        def _step(aw):
+            a, w1 = aw
+            return f(a).run().map(lambda bw: (bw[0], monoid.combine(w1, bw[1])))
+
+        return cls(self._run.bind(_step))
+
+    def then(self, next_wt: WriterT) -> WriterT:
+        """Sequence: run self, discard value, run next."""
+        return self.bind(lambda _: next_wt)
+
+    def ap(self, other: WriterT) -> WriterT:
+        """Applicative: run both, tuple the values, combine outputs."""
+        return self.bind(lambda a: other.map(lambda b: (a, b)))
+
+    def or_else(self, f: Callable) -> WriterT:
+        """Recover from failure via inner monad's or_else."""
+        cls = self.__class__
+        return cls(self._run.or_else(lambda err: f(err).run()))
+
+    @classmethod
+    def pure(cls, value, monad: type) -> WriterT:
+        """Lift a value with empty output.
+
+        >>> from _funstruct._either import Either, Right
+        >>> from funstruct.typeclasses._monoid import Monoid
+        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LT(WriterT):
+        ...     _monoid = list_m
+        >>> LT.pure(42, Either).run()
+        Right((42, []))
+        """
+        return cls(monad.pure((value, cls._monoid.empty)))
+
+    @classmethod
+    def tell(cls, output, monad: type) -> WriterT:
+        """Produce output with no meaningful value.
+
+        >>> from _funstruct._either import Either, Right
+        >>> from funstruct.typeclasses._monoid import Monoid
+        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LT(WriterT):
+        ...     _monoid = list_m
+        >>> LT.tell(["hello"], Either).run()
+        Right((None, ['hello']))
+        """
+        return cls(monad.pure((None, output)))
+
+    @classmethod
+    def lift(cls, fa) -> WriterT:
+        """Lift F[A] into WriterT — output is empty.
+
+        Haskell: ``lift :: m a -> WriterT w m a``
+        """
+        return cls(fa.map(lambda a: (a, cls._monoid.empty)))
+
+    @classmethod
+    def do(cls, gen_fn) -> WriterT:
+        """Do-notation via generators. Accumulates output across yields."""
+
+        def _unwrap(first_run):
+            gen = gen_fn()
+            next(gen)
+
+            monoid = cls._monoid
+
+            def step(aw):
+                a, w_acc = aw
+                try:
+                    next_wt = gen.send(a)
+                    return next_wt.run().bind(
+                        lambda bw: step((bw[0], monoid.combine(w_acc, bw[1])))
+                    )
+                except StopIteration as e:
+                    return first_run.__class__.pure((e.value, w_acc))
+
+            return step
+
+        def _run_do():
+            gen = gen_fn()
+            first_wt = next(gen)
+            first_fa = first_wt.run()
+            return first_fa.bind(_unwrap(first_fa))
+
+        return cls(_run_do())
+
+    def and_then(self, other: WriterT) -> WriterT:
+        """Kleisli composition: value from self feeds into other."""
+        cls = self.__class__
+        monoid = cls._monoid
+
+        def _step(aw):
+            a, w1 = aw
+            return other.run().map(lambda bw: (bw[0], monoid.combine(w1, bw[1])))
+
+        return cls(self._run.bind(_step))
+
+    def __repr__(self) -> str:
+        return f"WriterT({self._run})"
+
+
+__all__ = ["WriterT"]

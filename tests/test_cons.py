@@ -782,3 +782,12 @@ def test_cons_list_can_equal_py_list(clist, pylist, expected):
 def test_repr(lst, expected):
     actual = repr(lst)
     assert actual == expected
+
+
+class TestTruthiness:
+    def test_cons_is_truthy(self):
+        assert bool(Cons(1, Nil())) is True
+        assert bool(Cons(0, Nil())) is True
+
+    def test_nil_is_falsy(self):
+        assert bool(Nil()) is False

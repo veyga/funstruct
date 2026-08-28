@@ -162,3 +162,20 @@ class TestLaws:
             f=lambda x: Right(x + 1),
             g=lambda x: Right(x * 2),
         )
+
+
+class TestTruthiness:
+    """Either has no __bool__ — both cases are always truthy (Python default).
+
+    This is intentional: Either is a generic sum type where neither case
+    is "empty." Use .is_right/.is_left or pattern matching, not `if x:`.
+    """
+
+    def test_right_is_truthy(self):
+        assert bool(Right(1)) is True
+        assert bool(Right(0)) is True
+        assert bool(Right(None)) is True
+
+    def test_left_is_also_truthy(self):
+        assert bool(Left("err")) is True
+        assert bool(Left(None)) is True

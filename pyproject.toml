@@ -23,6 +23,7 @@ packages = ["funstruct"]
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "pytest-cov>=7.1.0",
     "pytest-parametrization>=2022.2.1",
     "ruff>=0.8.0",
     "debugpy>=1.8.0",
@@ -41,10 +42,25 @@ docs = [
 ]
 
 [tool.ty]
+# Subclasses narrow return types (e.g. Option.bind returns Option, not Monad).
+# This is correct covariant narrowing but ty flags it as Liskov violation.
 rules.invalid-method-override = "ignore"
+# Transformers accept `monad` as a plain `type` param but call .pure()/.bind()
+# on it (duck-typed). ty can't see the protocol — it just sees `type`.
+rules.unresolved-attribute = "ignore"
+# `cls(...)` returns Self which ty can't reconcile with declared return types
+# like `WriterT[F, W, B]` when the TypeVars shift in map/bind.
+rules.invalid-return-type = "ignore"
 
 [tool.ty.environment]
 root = ["."]
+
+[tool.coverage.run]
+source = ["_funstruct", "funstruct"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"

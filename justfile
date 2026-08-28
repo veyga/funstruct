@@ -26,6 +26,15 @@ fmt-docs:
 test *args:
   uv run pytest {{args}}
 
+# run pytest with coverage report
+cover *args:
+  uv run pytest --cov --cov-report=term-missing {{args}}
+
+# generate html coverage report
+cover-html:
+  uv run pytest --cov --cov-report=html
+  @echo "Open htmlcov/index.html"
+
 # debug a pytest
 dtest *args:
   PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest {{args}}

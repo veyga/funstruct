@@ -107,6 +107,13 @@ class TestBind:
         pipeline = push(1).bind(lambda _: push(2)).bind(lambda _: push(3))
         assert pipeline.run([]) == Right(([1, 2, 3], 3))
 
+    def test_bind_chains_state_with_clist(self):
+        from funstruct.collections.cons import CList, Cons, Nil
+
+        push = lambda v: StateT(lambda s: Right((Cons(v, s), v)))
+        pipeline = push(1).bind(lambda _: push(2)).bind(lambda _: push(3))
+        assert pipeline.run(Nil()) == Right((CList.from_iterable([3, 2, 1]), 3))
+
 
 class TestOrElse:
     def test_or_else_recovers_from_failure(self):

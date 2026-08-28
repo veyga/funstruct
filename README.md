@@ -197,3 +197,31 @@ Every implementation must satisfy these mathematical laws:
 - Left identity: `pure(a).bind(f) == f(a)`
 - Right identity: `m.bind(pure) == m`
 - Associativity: `m.bind(f).bind(g) == m.bind(λx. f(x).bind(g))`
+
+## Why no IO type?
+
+In Haskell, `IO` exists because the language is purely functional — there is
+no way to perform side effects without wrapping them in the `IO` monad. The
+type system enforces purity: if a function doesn't return `IO`, it cannot
+touch the network, filesystem, or mutable state.
+
+Python has no such constraint. Any function can perform side effects at any
+time. An `IO` wrapper in Python would be:
+
+1. **Unenforceable** — nothing stops you from doing I/O outside the wrapper.
+    The type system can't prevent `print()` in a "pure" function.
+1. **Purely ceremonial** — it adds a wrapper you must manually construct and
+    unwrap, but provides no guarantee. It's a comment dressed as a type.
+1. **Redundant with async** — Python's `async/await` already separates
+    "description of a computation" from "execution of that computation,"
+    which is most of what `IO` provides in Haskell.
+
+Instead, funstruct provides:
+
+- **`Either[E, A]`** — for operations that might fail (the error is a value)
+- **`Future[E, A]`** — for async operations that might fail (lazy, composable)
+- **`@Try` / `@TryAsync`** — for wrapping exception-throwing code at boundaries
+
+These give you the composition benefits of monadic pipelines where they
+matter (error handling, async sequencing) without pretending Python is
+something it isn't.

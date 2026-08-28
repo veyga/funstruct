@@ -82,6 +82,16 @@ class TestBind:
         pipeline = push(1).bind(lambda _: push(2)).bind(lambda _: push(3))
         assert pipeline.run([]) == ([1, 2, 3], 3)
 
+    def test_bind_chains_state_with_clist(self):
+        from funstruct.collections.cons import CList, Cons, Nil
+
+        push = lambda v: State(lambda s: (Cons(v, s), v))
+        pipeline = push(1).bind(lambda _: push(2)).bind(lambda _: push(3))
+        assert pipeline.run(Nil()) == (
+            CList.from_iterable([3, 2, 1]),
+            3,
+        )
+
 
 class TestThen:
     def test_then_discards_value(self):

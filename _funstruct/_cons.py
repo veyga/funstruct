@@ -333,11 +333,6 @@ class CList(Monad, Generic[A]):
         """Lift a value into a single-element list."""
         return Cons(value)
 
-    @classmethod
-    def from_value(cls, value) -> CList:
-        """Alias for pure — lifts a value into a single-element list."""
-        return Cons(value)
-
     @staticmethod
     def cons(a: A) -> CList:
         """Create a new list with a single element.
@@ -460,6 +455,9 @@ class Nil(CList):
     def __str__(self) -> str:
         return "Nil"
 
+    def __bool__(self) -> bool:
+        return False
+
     def append(self, other: CList) -> CList:
         """Append another list to the empty list.
 
@@ -576,6 +574,9 @@ class Cons(CList[A]):
 
     head: A
     tail: CList[A] = field(default_factory=Nil)
+
+    def __bool__(self) -> bool:
+        return True
 
     def __repr__(self) -> str:
         return f"Cons({repr(self.head)}, {repr(self.tail)})"

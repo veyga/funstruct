@@ -1,7 +1,15 @@
-"""
-Functor: transform the value inside a context.
+"""Functor: transform the value inside a context without changing the structure.
 
 F[A] ---( f: A -> B )---> F[B]
+
+When to use:
+    Any time you have a value "in a box" and want to transform it without
+    unwrapping. The box's structure is preserved — only the contents change.
+
+Business examples:
+    - Tree.map(format_price): format every price in a product tree
+    - frozendict.map(encrypt): encrypt every value in a config dict
+    - Option.map(str.upper): uppercase a name if it exists
 """
 
 from __future__ import annotations

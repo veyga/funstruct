@@ -249,3 +249,12 @@ class TestSemigroup:
                 on_invalid=lambda _: False,
                 on_valid=lambda _: True,
             )
+
+
+class TestTruthiness:
+    def test_valid_is_truthy(self):
+        assert bool(Valid(1)) is True
+        assert bool(Valid(None)) is True
+
+    def test_invalid_is_falsy(self):
+        assert bool(Invalid(Cons("err", Nil()))) is False

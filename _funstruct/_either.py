@@ -11,6 +11,7 @@ Rust:    Result<T, E> (with flipped param order)
 
 from __future__ import annotations
 
+from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
@@ -30,6 +31,10 @@ class Either(Monad, Generic[E, A]):
 
     Right-biased monad. bind/map/>> operate on the Right value
     and short-circuit on Left.
+
+    No __bool__: Either deliberately has no truthiness. Both Right and Left
+    carry a value — neither case is "empty" or "absent." Use .is_right /
+    .is_left or pattern matching instead of `if my_either:`.
     """
 
     @classmethod
@@ -98,8 +103,8 @@ class Either(Monad, Generic[E, A]):
         return cls.sequence(values.map(f))
 
     @property
-    def is_right(self) -> bool:
-        raise NotImplementedError
+    @abstractmethod
+    def is_right(self) -> bool: ...
 
     @property
     def is_left(self) -> bool:

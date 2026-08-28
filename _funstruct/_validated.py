@@ -65,6 +65,9 @@ class Valid(Validated, Generic[_A]):
     def is_valid(self) -> bool:
         return True
 
+    def __bool__(self) -> bool:
+        return True
+
     def fold(self, on_invalid: Callable, on_valid: Callable):
         """Eliminate — applies on_valid to the value."""
         return on_valid(self.value)
@@ -97,6 +100,9 @@ class Invalid(Validated, Generic[_E]):
 
     @property
     def is_valid(self) -> bool:
+        return False
+
+    def __bool__(self) -> bool:
         return False
 
     def map(self, f) -> Invalid[_E]:
