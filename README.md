@@ -147,12 +147,14 @@ StateT[F, S, A]  =  S -> F[(S, A)]
 ```python
 class MonadTransformer(Monad, Generic[_F, _A]):
     def and_then(self, other) -> MonadTransformer: ...  # Kleisli composition
-    def do(cls, gen_fn) -> MonadTransformer: ...        # do-notation
+    def do(cls, gen_fn) -> MonadTransformer: ...  # do-notation
+
 
 class ReaderT(MonadTransformer[_F, _A]):
     # bind: both steps share the same context
     # and_then: output of one becomes context of next
     ...
+
 
 class StateT(MonadTransformer[_F, _A]):
     # bind: state threads through each step

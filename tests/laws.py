@@ -25,7 +25,7 @@ Eq = Callable[[object, object], bool]
 
 
 def assert_semigroup_laws(a: A, b: A, c: A, sg: Semigroup) -> None:
-    """Associativity: sg.combine(sg.combine(a, b), c) == sg.combine(a, sg.combine(b, c))"""
+    """Associativity: combine(combine(a, b), c) == combine(a, combine(b, c))."""
     left = sg.combine(sg.combine(a, b), c)
     right = sg.combine(a, sg.combine(b, c))
     assert left == right, "Semigroup associativity violated"
@@ -79,9 +79,7 @@ def assert_monad_laws(
         "Monad left identity violated: pure(a).bind(f) != f(a)"
     )
 
-    assert _eq(m.bind(pure_fn), m), (
-        "Monad right identity violated: m.bind(pure) != m"
-    )
+    assert _eq(m.bind(pure_fn), m), "Monad right identity violated: m.bind(pure) != m"
 
     assert _eq(m.bind(f).bind(g), m.bind(lambda x: f(x).bind(g))), (
         "Monad associativity violated"

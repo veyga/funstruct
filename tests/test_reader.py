@@ -126,10 +126,7 @@ class TestDoNotation:
             scheme = "https" if port == 443 else "http"
             return f"{scheme}://{host}:{port}"
 
-        assert (
-            build_url.run({"host": "prod.co", "port": 443})
-            == "https://prod.co:443"
-        )
+        assert build_url.run({"host": "prod.co", "port": 443}) == "https://prod.co:443"
         assert (
             build_url.run({"host": "localhost", "port": 8080})
             == "http://localhost:8080"
@@ -142,9 +139,7 @@ class TestDoNotation:
             name = yield Reader(lambda c: c["name"])
             return f"{name} has {len(ctx)} fields"
 
-        assert (
-            describe.run({"name": "Alice", "age": 30}) == "Alice has 2 fields"
-        )
+        assert describe.run({"name": "Alice", "age": 30}) == "Alice has 2 fields"
 
 
 class TestDoNotationEquivalentWithBind:

@@ -13,7 +13,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from _funstruct._cons import CList, Cons, Nil
+from _funstruct._cons import CList, Cons
 from funstruct.typeclasses._functor import Functor
 
 A = TypeVar("A")

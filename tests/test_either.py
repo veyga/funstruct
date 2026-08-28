@@ -1,5 +1,5 @@
-from funstruct.monad.either import Either, Right, Left
-from funstruct.collections.cons import Cons, Nil, CList
+from funstruct.collections.cons import CList, Cons, Nil
+from funstruct.monad.either import Either, Left, Right
 from tests.laws import assert_functor_laws, assert_monad_laws
 
 

@@ -1,4 +1,4 @@
-from funstruct.monad.result import Result, Ok, Err, Try
+from funstruct.monad.result import Err, Ok, Result, Try
 
 
 class TestTry:

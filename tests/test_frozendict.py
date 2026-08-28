@@ -9,9 +9,7 @@ from tests.laws import (
     assert_semigroup_laws,
 )
 
-FrozenDictMerge = Monoid(
-    typ=frozendict, combine=lambda a, b: a + b, empty=frozendict()
-)
+FrozenDictMerge = Monoid(typ=frozendict, combine=lambda a, b: a + b, empty=frozendict())
 
 
 class TestFrozendictLaws:
@@ -51,9 +49,7 @@ class TestFrozendictLaws:
 )
 @P.case(
     name="nested map",
-    fd=frozendict(
-        {"a": frozendict({"inner": 1}), "b": frozendict({"inner": 2})}
-    ),
+    fd=frozendict({"a": frozendict({"inner": 1}), "b": frozendict({"inner": 2})}),
     f=lambda d: d.map(lambda v: v + 100),
     expected=frozendict(
         {"a": frozendict({"inner": 101}), "b": frozendict({"inner": 102})}

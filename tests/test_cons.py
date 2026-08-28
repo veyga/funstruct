@@ -1,8 +1,8 @@
 import pytest
 from parametrization import Parametrization as P
 
-import funstruct.semigroup as semigroup
 import funstruct.monoid as monoid
+import funstruct.semigroup as semigroup
 from funstruct.collections.cons import CList, Cons, Nil
 from tests.laws import (
     assert_applicative_laws,

@@ -1,6 +1,6 @@
 """Tests for ReaderT monad transformer."""
 
-from funstruct.monad import Either, Right, Left, ReaderT, StateT
+from funstruct.monad import Either, Left, ReaderT, Right, StateT
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,
@@ -231,28 +231,27 @@ class TestWithOption:
     """ReaderT wrapping Option — tests transformer generality."""
 
     def test_pure_with_option(self):
-        from funstruct.monad.option import Option, Some, Nothing
+        from funstruct.monad.option import Option, Some
 
         step = ReaderT.pure(42, Option)
         assert step.run("anything") == Some(42)
 
     def test_bind_with_option(self):
-        from funstruct.monad.option import Option, Some, Nothing
+        from funstruct.monad.option import Some
 
         step1 = ReaderT(lambda ctx: Some(ctx))
         step2 = lambda a: ReaderT(lambda ctx: Some(a + ctx))
         assert step1.bind(step2).run(5) == Some(10)
 
     def test_bind_short_circuits_nothing(self):
-        from funstruct.monad.option import Option, Some, Nothing
+        from funstruct.monad.option import Nothing, Some
 
         step1 = ReaderT(lambda ctx: Nothing())
         step2 = lambda a: ReaderT(lambda ctx: Some("never"))
         assert step1.bind(step2).run(0) == Nothing()
 
     def test_do_with_option(self):
-        from funstruct.monad.option import Option, Some, Nothing
-        from funstruct.collections.cons import CList, Cons, Nil
+        from funstruct.monad.option import Some
 
         @ReaderT.do
         def pipeline():
@@ -263,8 +262,7 @@ class TestWithOption:
         assert pipeline.run(10) == Some(11)
 
     def test_do_short_circuits_nothing(self):
-        from funstruct.monad.option import Option, Some, Nothing
-        from funstruct.collections.cons import CList, Cons, Nil
+        from funstruct.monad.option import Nothing, Some
 
         @ReaderT.do
         def pipeline():

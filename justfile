@@ -8,7 +8,7 @@ lint *args:
 # format code
 format:
   uv run ruff format
-  uv run --group docs docformatter --in-place --config pyproject.toml _funstruct/ funstruct/
+  -uv run --group docs docformatter --in-place --config pyproject.toml _funstruct/ funstruct/
 
 # run ty check
 check:

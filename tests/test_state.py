@@ -174,9 +174,7 @@ class TestDoNotationEquivalentWithBind:
 
         count_to_three = inc.bind(
             lambda a: inc.bind(
-                lambda b: inc.bind(
-                    lambda c: get.map(lambda total: (a, b, c, total))
-                )
+                lambda b: inc.bind(lambda c: get.map(lambda total: (a, b, c, total)))
             )
         )
 

@@ -1,6 +1,6 @@
 """Tests for Writer monad."""
 
-from funstruct.monad.writer import ListWriter, StrWriter, IntWriter
+from funstruct.monad.writer import IntWriter, ListWriter, StrWriter
 from tests.laws import assert_functor_laws, assert_monad_laws
 
 
