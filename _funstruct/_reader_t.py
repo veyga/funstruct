@@ -91,13 +91,7 @@ class ReaderT(Monad, Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def ap(self, other) -> ReaderT:
-        """Applicative ap: delegates to M's product."""
-
-        def inner(ctx):
-            return self._run(ctx).ap(other._run(ctx))
-
-        return ReaderT(inner)
+    # ap inherited from Monad (derived from bind + map)
 
     def then(
         self,

@@ -17,4 +17,6 @@ class Functor(ABC):
     def map(self, f: Callable) -> Functor: ...
 
 
-__all__ = ["Functor"]
+__all__ = [
+    "Functor",
+]

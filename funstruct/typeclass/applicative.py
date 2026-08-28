@@ -16,10 +16,9 @@ from funstruct.typeclass.functor import Functor
 class Applicative(Functor):
     """Combine independent computations."""
 
-    @classmethod
+    @abstractmethod
     def pure(cls, value, *args, **kwargs) -> Applicative:
         """Lift a value into the context."""
-        raise NotImplementedError
 
     @abstractmethod
     def ap(self, other: Applicative) -> Applicative: ...
@@ -28,4 +27,6 @@ class Applicative(Functor):
         return self.ap(other)
 
 
-__all__ = ["Applicative"]
+__all__ = [
+    "Applicative",
+]

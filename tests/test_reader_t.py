@@ -20,9 +20,12 @@ class TestReaderTLaws:
         assert_functor_laws(ReaderT.pure(1, Result), eq=_reader_t_eq)
 
     def test_applicative(self):
-        # Skipped: ReaderT.ap delegates to inner monad's .ap(),
-        # but returns.Result doesn't implement .ap()
-        pass
+        assert_applicative_laws(
+            pure_fn=lambda v: ReaderT.pure(v, Result),
+            fa=ReaderT.pure(1, Result),
+            fb=ReaderT.pure(2, Result),
+            eq=_reader_t_eq,
+        )
 
     def test_monad(self):
         assert_monad_laws(
