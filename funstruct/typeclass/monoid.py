@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from types import SimpleNamespace as ___
 
 from funstruct.typeclass.semigroup import Semigroup
+from funstruct.collections.cons import CList
 
 
 from typing import final
@@ -32,7 +33,7 @@ COMMON = ___(
     INT_ADD=Monoid(typ=int, combine=lambda a, b: a + b, empty=0),
     INT_MUL=Monoid(typ=int, combine=lambda a, b: a * b, empty=1),
     STR_CONCAT=Monoid(typ=str, combine=lambda a, b: a + b, empty=""),
-    LIST_CONCAT=Monoid(typ=list, combine=lambda a, b: a + b, empty=[]),
+    CLIST_CONCAT=Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil()),
 )
 
 

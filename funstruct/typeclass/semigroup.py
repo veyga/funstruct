@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from funstruct.collections.cons import CList
 from types import SimpleNamespace as ___
 
 
@@ -26,7 +27,7 @@ COMMON = ___(
     INT_ADD=Semigroup(typ=int, combine=lambda a, b: a + b),
     INT_MUL=Semigroup(typ=int, combine=lambda a, b: a * b),
     STR_CONCAT=Semigroup(typ=str, combine=lambda a, b: a + b),
-    LIST_CONCAT=Semigroup(typ=list, combine=lambda a, b: a + b),
+    CLIST_CONCAT=Semigroup(typ=CList, combine=lambda a, b: a + b),
 )
 
 
