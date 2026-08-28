@@ -7,11 +7,12 @@ Monad transformer types.
 
 A monad transformer combines one monad with another monadic effect.
 
-Nesting monads is always possible. Transformers make the nesting implicit. You write
-one flat pipeline; the transformer peels both layers in bind.
+Nesting monads is always possible. Transformers make the nesting implicit.
+You write one flat pipeline; the transformer peels both layers in bind.
 
-This is the entire reason transformers exist — not to enable nesting (you can already
-do that), but to eliminate the boilerplate of unwrapping nested layers at every step.
+This is the entire reason transformers exist — not to enable nesting
+(you can already do that), but to eliminate the boilerplate of unwrapping
+nested layers at every step.
 
 Pattern:
 - StateT[F, S, A] = S -> F[(S, A)] — adds state to F
