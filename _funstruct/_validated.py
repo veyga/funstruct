@@ -1,18 +1,3 @@
-"""
-Validated: applicative error-accumulating functor.
-
-Use Validated for independent validations.
-
-Example::
-
-    >>> from funstruct.applicative.validated import Validated
-    >>> (Validated.valid(None)
-    ...     .ap(Validated.invalid("too short"))
-    ...     .ap(Validated.invalid("missing @")))
-    Invalid(errors=Cons('too short', Cons('missing @', Nil())))
-
-"""
-
 from __future__ import annotations
 
 from abc import abstractmethod
@@ -20,7 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from _funstruct._cons import CList, Cons, Nil
+from _funstruct._cons import Cons
 from funstruct.typeclass.applicative import Applicative
 
 _A = TypeVar("_A")

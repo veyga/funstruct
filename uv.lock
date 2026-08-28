@@ -278,6 +278,18 @@ wheels = [
 ]
 
 [[package]]
+name = "docformatter"
+version = "1.7.8"
+source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
+dependencies = [
+    { name = "charset-normalizer" },
+]
+sdist = { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/docformatter/1.7.8/docformatter-1.7.8.tar.gz", hash = "sha256:6589b62a8f38c62c4c8c84cb1afa296af007c88c959e4c9d25c74c1f933c4dbf" }
+wheels = [
+    { url = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/packages/docformatter/1.7.8/docformatter-1.7.8-py3-none-any.whl", hash = "sha256:8e518948bacb8d8df5d5f625060e214a200f0a908d8e6797c9ebbdd2cdd17467" },
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://nexus.thejellyfish.net/repository/jf-pypi-repo/simple" }
@@ -319,6 +331,7 @@ dev = [
     { name = "ty" },
 ]
 docs = [
+    { name = "docformatter" },
     { name = "mdformat" },
     { name = "mdformat-mkdocs" },
     { name = "mike" },
@@ -345,6 +358,7 @@ dev = [
     { name = "ty", specifier = ">=0.0.74" },
 ]
 docs = [
+    { name = "docformatter", specifier = ">=1.7" },
     { name = "mdformat", specifier = ">=1.0" },
     { name = "mdformat-mkdocs", specifier = ">=3.0" },
     { name = "mike", specifier = ">=2.2.0" },
