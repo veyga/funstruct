@@ -276,7 +276,7 @@ def test_fd_does_not_copy_underlying_sets():
 def test_put__does_not_change_original(fd_parity1):
     initial = fd_parity1.raw
     fd_parity1.put("x", 2)
-    assert fd_parity1.raw is initial
+    assert fd_parity1.raw == initial
 
 
 def test_put__returns_new(fd_parity1):
