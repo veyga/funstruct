@@ -275,3 +275,56 @@ class TestDoNotationEquivalentWithBind:
         assert build_profile.run({"name": "", "email": "a@b.co"}) == Failure(
             "empty name"
         )
+
+
+class TestReaderTMonadAgnostic:
+    """ReaderT works with ANY monad as inner type — not just Result."""
+
+    def test_with_option_success(self):
+        """ReaderT over Option: shared context, short-circuits on Nothing."""
+        from funstruct.monad.option import Option, Some, Nothing
+
+        get_name = ReaderT(lambda cfg: Some(cfg["name"]))
+        get_age = ReaderT(lambda cfg: Some(cfg["age"]))
+
+        pipeline = get_name.bind(
+            lambda name: get_age.map(lambda age: f"{name} is {age}")
+        )
+
+        assert pipeline.run({"name": "Alice", "age": 30}) == Some("Alice is 30")
+
+    def test_with_option_short_circuits(self):
+        """ReaderT over Option: Nothing short-circuits the chain."""
+        from funstruct.monad.option import Option, Some, Nothing
+
+        get_name = ReaderT(lambda cfg: Some(cfg.get("name")))
+        get_missing = ReaderT(
+            lambda cfg: Option.from_optional(cfg.get("email"))
+        )
+
+        pipeline = get_name.bind(
+            lambda name: get_missing.map(lambda email: f"{name} <{email}>")
+        )
+
+        assert pipeline.run({"name": "Alice"}) == Nothing()
+        assert pipeline.run({"name": "Alice", "email": "a@b"}) == Some(
+            "Alice <a@b>"
+        )
+
+    def test_with_cons_nondeterminism(self):
+        """ReaderT over Cons: shared context, non-deterministic results."""
+        from funstruct.collections.cons import CList, Cons, Nil
+
+        get_names = ReaderT(lambda cfg: CList.from_iterable(cfg["names"]))
+        get_greetings = ReaderT(
+            lambda cfg: CList.from_iterable(cfg["greetings"])
+        )
+
+        pipeline = get_names.bind(
+            lambda name: get_greetings.map(lambda greet: f"{greet} {name}")
+        )
+
+        result = pipeline.run(
+            {"names": ["Alice", "Bob"], "greetings": ["Hi", "Hey"]}
+        )
+        assert result == ["Hi Alice", "Hey Alice", "Hi Bob", "Hey Bob"]

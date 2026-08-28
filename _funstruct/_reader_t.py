@@ -38,6 +38,14 @@ from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad_transformer import MonadTransformer
 
+
+def lift(monad_cls, value):
+    """Lift a value into a monad — uses from_value if available, else pure."""
+    if hasattr(monad_cls, "from_value"):
+        return monad_cls.from_value(value)
+    return monad_cls.pure(value)
+
+
 _Ctx = TypeVar("_Ctx")
 _M = TypeVar("_M")
 _A = TypeVar("_A")
@@ -122,7 +130,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
                     next_val = gen.send(value)
                     return next_val._run(ctx).bind(step)
                 except StopIteration as e:
-                    return monadic_val._run(ctx).__class__.from_value(e.value)
+                    return lift(monadic_val._run(ctx).__class__, e.value)
 
             return monadic_val._run(ctx).bind(step)
 
@@ -140,7 +148,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
     @classmethod
     def pure(cls, value, monad) -> ReaderT:
         """Lift a raw value into ReaderT via monad.from_value."""
-        return cls(lambda _: monad.from_value(value))
+        return cls(lambda _: lift(monad, value))
 
     @classmethod
     def lift(cls, m) -> ReaderT:

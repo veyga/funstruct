@@ -85,12 +85,6 @@ class Valid(Validated, Generic[_A]):
             case _:
                 return other
 
-    def to_result(self):
-        """Convert to returns.result.Success."""
-        from returns.result import Success
-
-        return Success(self.value)
-
 
 @dataclass(frozen=True)
 class Invalid(Validated, Generic[_E]):
@@ -120,12 +114,6 @@ class Invalid(Validated, Generic[_E]):
                 return Invalid(self.errors + errs)
             case _:
                 return self
-
-    def to_result(self):
-        """Convert to returns.result.Failure."""
-        from returns.result import Failure
-
-        return Failure(self.errors)
 
 
 __all__ = [

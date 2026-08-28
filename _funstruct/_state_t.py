@@ -20,6 +20,14 @@ from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad_transformer import MonadTransformer
 
+
+def lift(monad_cls, value):
+    """Lift a value into a monad — uses from_value if available, else pure."""
+    if hasattr(monad_cls, "from_value"):
+        return monad_cls.from_value(value)
+    return monad_cls.pure(value)
+
+
 _F = TypeVar("_F")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -54,7 +62,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         """FlatMap: thread state, pass value to ``f``.
 
         >>> from returns.result import Result
-        >>> StateT.pure(1, Result).bind(lambda x: StateT.pure(x + 10, Result)).run(0)
+        >>> StateT.from_value(1, Result).bind(lambda x: StateT.from_value(x + 10, Result)).run(0)
         <Success: (0, 11)>
         """
 
@@ -67,7 +75,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         """Transform the produced value without touching state.
 
         >>> from returns.result import Result
-        >>> StateT.pure(5, Result).map(lambda x: x * 2).run(0)
+        >>> StateT.from_value(5, Result).map(lambda x: x * 2).run(0)
         <Success: (0, 10)>
         """
 
@@ -83,7 +91,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
         >>> from returns.result import Result
         >>> failing = StateT(lambda s: Result.from_failure(ValueError("oops")))
-        >>> recovered = failing.lash(lambda e: StateT.pure("ok", Result))
+        >>> recovered = failing.lash(lambda e: StateT.from_value("ok", Result))
         >>> recovered.run(0)
         <Success: (0, 'ok')>
 
@@ -144,7 +152,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
         State unchanged. Uses ``monad.from_value``.
                 >>> from returns.result import Result
-                >>> StateT.pure("hello", Result).run(99)
+                >>> StateT.from_value("hello", Result).run(99)
                 <Success: (99, 'hello')>
         """
         return cls(lambda s: monad.from_value((s, value)))

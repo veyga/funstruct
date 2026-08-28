@@ -335,6 +335,11 @@ class CList(Monad, Generic[A]):
         """Lift a value into a single-element list."""
         return Cons(value)
 
+    @classmethod
+    def from_value(cls, value) -> CList:
+        """Alias for pure — lifts a value into a single-element list."""
+        return Cons(value)
+
     @staticmethod
     def cons(a: A) -> CList:
         """Create a new list with a single element.

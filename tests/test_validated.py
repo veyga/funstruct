@@ -42,11 +42,6 @@ class TestValid:
         result = Valid(1).ap(Invalid(["err"]))
         assert result == Invalid(["err"])
 
-    def test_to_result(self):
-        from returns.result import Success
-
-        assert Valid(42).to_result() == Success(42)
-
 
 class TestInvalid:
     def test_is_valid(self):
@@ -69,11 +64,6 @@ class TestInvalid:
             on_valid=lambda _: [],
         )
         assert result == ["A", "B"]
-
-    def test_to_result(self):
-        from returns.result import Failure
-
-        assert Invalid(["err"]).to_result() == Failure(["err"])
 
 
 class TestValidatedConstructors:

@@ -1,5 +1,8 @@
 """Monad types."""
 
+from _funstruct._option import Nothing as Nothing
+from _funstruct._option import Option as Option
+from _funstruct._option import Some as Some
 from _funstruct._reader import Reader as Reader
 from _funstruct._state import State as State
 from _funstruct._writer import Writer as Writer

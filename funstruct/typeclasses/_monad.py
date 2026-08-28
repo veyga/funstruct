@@ -43,6 +43,15 @@ class Monad(Applicative[_A]):
         """
         return self.bind(lambda a: other.map(lambda b: (a, b)))
 
+    def map2(self, other: "Monad[_B]", f: Callable) -> "Monad":
+        """Combine two monadic values with a function.
+
+        map2(fa, fb, f) = fa.bind(a => fb.map(b => f(a, b)))
+
+        Like ap, but you choose the combiner instead of always tupling.
+        """
+        return self.bind(lambda a: other.map(lambda b: f(a, b)))
+
     def flat_map(self, f: Callable[[_A], "Monad[_B]"]) -> "Monad[_B]":
         """Alias for bind."""
         return self.bind(f)
