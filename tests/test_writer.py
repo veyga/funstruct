@@ -149,3 +149,51 @@ class TestCListWriter:
             g=lambda x: CListWriter(x * 10, Cons("g", Nil())),
             eq=_writer_eq,
         )
+
+
+class TestDoNotation:
+    """Writer do-notation accumulates output across yields."""
+
+    def test_do_accumulates(self):
+        @ListWriter.do
+        def pipeline():
+            x = yield ListWriter(1, ["start"])
+            y = yield ListWriter(x + 1, ["step"])
+            return x + y
+
+        assert pipeline.value == 3
+        assert pipeline.output == ["start", "step"]
+
+    def test_do_three_steps(self):
+        @ListWriter.do
+        def pipeline():
+            a = yield ListWriter(10, ["a"])
+            b = yield ListWriter(20, ["b"])
+            c = yield ListWriter(30, ["c"])
+            return a + b + c
+
+        assert pipeline.value == 60
+        assert pipeline.output == ["a", "b", "c"]
+
+    def test_do_with_clist(self):
+        @CListWriter.do
+        def pipeline():
+            x = yield CListWriter(1, Cons("first", Nil()))
+            y = yield CListWriter(x + 10, Cons("second", Nil()))
+            return y
+
+        assert pipeline.value == 11
+        assert pipeline.output == CList.from_iterable(["first", "second"])
+
+
+class TestWriterEquality:
+    """__eq__ via pattern matching."""
+
+    def test_equal_writers(self):
+        assert ListWriter(1, ["a"]) == ListWriter(1, ["a"])
+
+    def test_not_equal_different_type(self):
+        assert ListWriter(1, ["a"]) != "not a writer"
+
+    def test_not_equal_int(self):
+        assert ListWriter(1, ["a"]) != 42

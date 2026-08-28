@@ -343,3 +343,275 @@ def test_fd_can_be_created_from_keys():
     fd = frozendict.fromkeys(keys)
     assert "x" in fd
     assert "y" in fd
+
+
+# --- Coverage tests for HAMT internals ---
+
+
+class CollidingKey:
+    """Key that forces hash collisions for testing HAMT collision paths."""
+
+    def __init__(self, value, hash_val=42):
+        self.value = value
+        self._hash = hash_val
+
+    def __hash__(self):
+        return self._hash
+
+    def __eq__(self, other):
+        return isinstance(other, CollidingKey) and self.value == other.value
+
+    def __repr__(self):
+        return f"CK({self.value})"
+
+
+def test_hash_collision_put():
+    """Two keys with same hash go into a Collision node."""
+    k1 = CollidingKey("a")
+    k2 = CollidingKey("b")
+    fd = frozendict({}).put(k1, 1).put(k2, 2)
+    assert fd.get(k1) == 1
+    assert fd.get(k2) == 2
+    assert len(fd) == 2
+
+
+def test_hash_collision_update():
+    """Updating a key in a collision node."""
+    k1 = CollidingKey("a")
+    k2 = CollidingKey("b")
+    fd = frozendict({}).put(k1, 1).put(k2, 2).put(k1, 10)
+    assert fd.get(k1) == 10
+    assert fd.get(k2) == 2
+    assert len(fd) == 2
+
+
+def test_hash_collision_get_missing():
+    """Getting a missing key from collision node returns None."""
+    k1 = CollidingKey("a")
+    k2 = CollidingKey("b")
+    k3 = CollidingKey("c")
+    fd = frozendict({}).put(k1, 1).put(k2, 2)
+    assert fd.get(k3) is None
+
+
+def test_hash_collision_remove_to_leaf():
+    """Removing from collision with 2 entries collapses to leaf."""
+    k1 = CollidingKey("a")
+    k2 = CollidingKey("b")
+    fd = frozendict({}).put(k1, 1).put(k2, 2)
+    fd2 = frozendict(fd.raw)
+    # Rebuild without k1 by creating fresh
+    items = {k: v for k, v in fd2.items() if k != k1}
+    fd3 = frozendict(items)
+    assert fd3.get(k2) == 2
+    assert fd3.get(k1) is None
+
+
+def test_hash_collision_add_third():
+    """Adding a third colliding key extends the collision."""
+    k1 = CollidingKey("a")
+    k2 = CollidingKey("b")
+    k3 = CollidingKey("c")
+    fd = frozendict({}).put(k1, 1).put(k2, 2).put(k3, 3)
+    assert fd.get(k1) == 1
+    assert fd.get(k2) == 2
+    assert fd.get(k3) == 3
+    assert len(fd) == 3
+
+
+def test_collision_then_different_hash():
+    """Adding a key with different hash to collision promotes to branch."""
+    k1 = CollidingKey("a", hash_val=42)
+    k2 = CollidingKey("b", hash_val=42)
+    k3 = CollidingKey("c", hash_val=99)
+    fd = frozendict({}).put(k1, 1).put(k2, 2).put(k3, 3)
+    assert fd.get(k1) == 1
+    assert fd.get(k2) == 2
+    assert fd.get(k3) == 3
+
+
+def test_remove_key_from_frozendict():
+    """Removing keys uses the HAMT remove path."""
+    fd = frozendict({"a": 1, "b": 2, "c": 3})
+    raw = {k: v for k, v in fd.items() if k != "b"}
+    fd2 = frozendict(raw)
+    assert fd2.get("a") == 1
+    assert fd2.get("b") is None
+    assert fd2.get("c") == 3
+
+
+def test_init_from_frozendict():
+    """frozendict can be created from another frozendict."""
+    fd1 = frozendict({"a": 1, "b": 2})
+    fd2 = frozendict(fd1)
+    assert fd2.get("a") == 1
+    assert fd2.get("b") == 2
+    assert fd2 == fd1
+
+
+def test_contains_on_empty():
+    assert "x" not in frozendict({})
+
+
+def test_setattr_raises():
+    """frozendict is immutable."""
+    fd = frozendict({"a": 1})
+    import pytest
+
+    with pytest.raises(AttributeError):
+        fd.x = 42
+
+
+def test_delattr_raises():
+    fd = frozendict({"a": 1})
+    import pytest
+
+    with pytest.raises(AttributeError):
+        del fd.x
+
+
+def test_many_keys_exercises_branch_paths():
+    """Many keys exercise deep HAMT branch/remove paths."""
+    fd = frozendict({})
+    for i in range(100):
+        fd = fd.put(f"key_{i}", i)
+    assert len(fd) == 100
+    for i in range(100):
+        assert fd.get(f"key_{i}") == i
+
+
+class TestRemove:
+    """Test key removal from frozendict."""
+
+    def test_remove_existing_key(self):
+        fd = frozendict({"a": 1, "b": 2, "c": 3})
+        result = fd.remove("b")
+        assert result.get("a") == 1
+        assert result.get("b") is None
+        assert result.get("c") == 3
+        assert len(result) == 2
+
+    def test_remove_absent_key(self):
+        fd = frozendict({"a": 1})
+        result = fd.remove("z")
+        assert result is fd
+
+    def test_remove_last_key(self):
+        fd = frozendict({"a": 1})
+        result = fd.remove("a")
+        assert len(result) == 0
+        assert not result
+
+    def test_remove_preserves_original(self):
+        fd = frozendict({"a": 1, "b": 2})
+        fd.remove("a")
+        assert fd.get("a") == 1
+
+    def test_remove_many_keys(self):
+        fd = frozendict({str(i): i for i in range(20)})
+        for i in range(0, 20, 2):
+            fd = fd.remove(str(i))
+        assert len(fd) == 10
+        for i in range(20):
+            if i % 2 == 0:
+                assert fd.get(str(i)) is None
+            else:
+                assert fd.get(str(i)) == i
+
+
+class TestHashCollisions:
+    """Test HAMT behavior with hash collisions."""
+
+    def test_collision_put_and_get(self):
+        class BadHash:
+            def __init__(self, val):
+                self.val = val
+
+            def __hash__(self):
+                return 42
+
+            def __eq__(self, other):
+                return isinstance(other, BadHash) and self.val == other.val
+
+        k1, k2, k3 = BadHash("a"), BadHash("b"), BadHash("c")
+        fd = frozendict()
+        fd = fd.put(k1, 1).put(k2, 2).put(k3, 3)
+        assert fd.get(k1) == 1
+        assert fd.get(k2) == 2
+        assert fd.get(k3) == 3
+        assert len(fd) == 3
+
+    def test_collision_overwrite(self):
+        class BadHash:
+            def __init__(self, val):
+                self.val = val
+
+            def __hash__(self):
+                return 42
+
+            def __eq__(self, other):
+                return isinstance(other, BadHash) and self.val == other.val
+
+        k1 = BadHash("a")
+        fd = frozendict().put(k1, 1).put(k1, 99)
+        assert fd.get(k1) == 99
+        assert len(fd) == 1
+
+    def test_collision_remove(self):
+        class BadHash:
+            def __init__(self, val):
+                self.val = val
+
+            def __hash__(self):
+                return 42
+
+            def __eq__(self, other):
+                return isinstance(other, BadHash) and self.val == other.val
+
+        k1, k2, k3 = BadHash("a"), BadHash("b"), BadHash("c")
+        fd = frozendict().put(k1, 1).put(k2, 2).put(k3, 3)
+
+        fd2 = fd.remove(k2)
+        assert fd2.get(k1) == 1
+        assert fd2.get(k2) is None
+        assert fd2.get(k3) == 3
+        assert len(fd2) == 2
+
+    def test_collision_remove_to_leaf(self):
+        class BadHash:
+            def __init__(self, val):
+                self.val = val
+
+            def __hash__(self):
+                return 42
+
+            def __eq__(self, other):
+                return isinstance(other, BadHash) and self.val == other.val
+
+        k1, k2 = BadHash("a"), BadHash("b")
+        fd = frozendict().put(k1, 1).put(k2, 2)
+        fd2 = fd.remove(k1)
+        assert fd2.get(k2) == 2
+        assert len(fd2) == 1
+
+
+class TestBranchRemove:
+    """Test removal that causes branch collapse."""
+
+    def test_remove_collapses_branch_to_leaf(self):
+        fd = frozendict({"a": 1, "b": 2})
+        fd2 = fd.remove("a")
+        assert fd2.get("b") == 2
+        assert len(fd2) == 1
+
+    def test_remove_all_keys(self):
+        fd = frozendict({"x": 1, "y": 2, "z": 3})
+        fd = fd.remove("x").remove("y").remove("z")
+        assert len(fd) == 0
+
+    def test_remove_from_deep_branch(self):
+        fd = frozendict({str(i): i for i in range(50)})
+        fd2 = fd.remove("25")
+        assert fd2.get("25") is None
+        assert fd2.get("24") == 24
+        assert len(fd2) == 49

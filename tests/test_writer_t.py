@@ -204,3 +204,51 @@ class TestSemigroupVsMonoid:
 
         w = IntLogT.pure(42, Either).bind(lambda x: IntLogT(Right((x + 1, 5))))
         assert w.run() == Right((43, 5))
+
+
+class TestDoNotation:
+    """WriterT do-notation accumulates output across yields."""
+
+    def test_do_accumulates_output(self):
+        @LogT.do
+        def pipeline():
+            x = yield LogT(Right((1, ["start"])))
+            y = yield LogT(Right((x + 10, ["step"])))
+            return x + y
+
+        assert pipeline.run() == Right((12, ["start", "step"]))
+
+    def test_do_short_circuits_on_left(self):
+        @LogT.do
+        def pipeline():
+            x = yield LogT(Right((1, ["ok"])))
+            y = yield LogT(Left("boom"))
+            return x + y
+
+        assert pipeline.run() == Left("boom")
+
+    def test_do_with_clist(self):
+        @CLogT.do
+        def pipeline():
+            x = yield CLogT(Right((1, Cons("a", Nil()))))
+            y = yield CLogT(Right((2, Cons("b", Nil()))))
+            return x + y
+
+        result = pipeline.run()
+        assert result == Right((3, CList.from_iterable(["a", "b"])))
+
+
+class TestAndThen:
+    """Kleisli composition — value from self feeds into other."""
+
+    def test_and_then_chains(self):
+        step1 = LogT(Right((10, ["first"])))
+        step2 = LogT(Right((99, ["second"])))
+        result = step1.and_then(step2).run()
+        assert result == Right((99, ["first", "second"]))
+
+    def test_and_then_short_circuits(self):
+        step1 = LogT(Left("err"))
+        step2 = LogT(Right((99, ["second"])))
+        result = step1.and_then(step2).run()
+        assert result == Left("err")

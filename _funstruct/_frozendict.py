@@ -305,6 +305,17 @@ class frozendict(Generic[K, V]):
         object.__setattr__(new_fd, "_frozendict__hash_cache", None)
         return new_fd
 
+    def remove(self, k: K) -> frozendict:
+        """Remove a key, returning a new frozendict. No-op if key absent."""
+        if k not in self:
+            return self
+        new_root = self.__root.remove(k, hash(k), 0)
+        new_fd = object.__new__(frozendict)
+        object.__setattr__(new_fd, "_frozendict__root", new_root)
+        object.__setattr__(new_fd, "_frozendict__size", self.__size - 1)
+        object.__setattr__(new_fd, "_frozendict__hash_cache", None)
+        return new_fd
+
     def combine(self, other: frozendict) -> frozendict:
         result = self
         for k, v in other.__root.items_iter():

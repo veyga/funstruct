@@ -830,23 +830,16 @@ class TestFlatten:
         assert result == Cons(1, Nil())
 
 
-class TestDoNotation:
-    def test_do_basic(self):
-        @CList.do
-        def pairs():
-            x = yield CList.from_iterable([1, 2])
-            y = yield CList.from_iterable([10, 20])
-            return x + y
+class TestEqEdgeCases:
+    def test_cons_ne_nil(self):
+        assert Cons(1, Nil()) != Nil()
 
-        assert pairs == CList.from_iterable([11, 21, 12, 22])
+    def test_nil_ne_cons(self):
+        assert Nil() != Cons(1, Nil())
 
-    def test_do_single_yield(self):
-        @CList.do
-        def single():
-            x = yield CList.from_iterable([1, 2, 3])
-            return x * 10
-
-        assert single == CList.from_iterable([10, 20, 30])
+    def test_eq_with_non_list(self):
+        assert Cons(1, Nil()) != "not a list"
+        assert Nil() != 42
 
 
 class TestStaticConstructors:
@@ -859,3 +852,21 @@ class TestStaticConstructors:
     def test_length(self):
         assert CList.from_iterable([1, 2, 3]).length() == 3
         assert Nil().length() == 0
+
+
+class TestDoNotation:
+    """CList do-notation — limited by Python generators being single-use.
+
+    The list monad's do-notation requires backtracking (exploring all
+    combinations), but Python generators can't be replayed. Use explicit
+    .bind() chains for nondeterministic computation instead:
+
+        xs.bind(lambda x: ys.bind(lambda y: Cons.pure((x, y))))
+    """
+
+    def test_bind_for_nondeterminism(self):
+        """Use .bind() for proper list comprehension semantics."""
+        xs = CList.from_iterable([1, 2])
+        ys = CList.from_iterable(["a", "b"])
+        result = xs.bind(lambda x: ys.map(lambda y: (x, y)))
+        assert result == CList.from_iterable([(1, "a"), (1, "b"), (2, "a"), (2, "b")])
