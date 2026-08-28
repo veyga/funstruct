@@ -23,8 +23,8 @@ Pattern:
 
 """
 
-from _funstruct._either_t import EitherT as EitherT
-from _funstruct._option_t import OptionT as OptionT
-from _funstruct._reader_t import ReaderT as ReaderT
-from _funstruct._state_t import StateT as StateT
-from _funstruct._writer_t import WriterT as WriterT
+from funstruct.monadtransformer.either_t import EitherT as EitherT
+from funstruct.monadtransformer.option_t import OptionT as OptionT
+from funstruct.monadtransformer.reader_t import ReaderT as ReaderT
+from funstruct.monadtransformer.state_t import StateT as StateT
+from funstruct.monadtransformer.writer_t import WriterT as WriterT

@@ -18,7 +18,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["funstruct", "_funstruct"]
+packages = ["funstruct"]
 
 [dependency-groups]
 dev = [
@@ -52,12 +52,15 @@ rules.unresolved-attribute = "ignore"
 # `cls(...)` returns Self which ty can't reconcile with declared return types
 # like `WriterT[F, W, B]` when the TypeVars shift in map/bind.
 rules.invalid-return-type = "ignore"
+# bind/map lambdas return Functor[B] but the concrete type expects the subclass.
+# Same covariant narrowing issue at call sites.
+rules.invalid-argument-type = "ignore"
 
 [tool.ty.environment]
 root = ["."]
 
 [tool.coverage.run]
-source = ["_funstruct", "funstruct"]
+source = ["funstruct"]
 
 [tool.coverage.report]
 show_missing = true

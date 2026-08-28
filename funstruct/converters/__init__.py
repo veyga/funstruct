@@ -16,8 +16,8 @@ Examples:
     Nothing()
 """
 
-from _funstruct._either import Left, Right
-from _funstruct._option import Nothing, Option, Some
+from funstruct.monad.either import Left, Right
+from funstruct.monad.option import Nothing, Option, Some
 
 
 def option_to_result(opt: Option, error):

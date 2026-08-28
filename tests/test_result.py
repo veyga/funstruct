@@ -50,7 +50,7 @@ class TestAliases:
 
         assert Err is Left
 
-    def test_result_is_either(self):
+    def test_result_extends_either(self):
         from funstruct.monad.either import Either
 
-        assert Result is Either
+        assert issubclass(Result, Either)

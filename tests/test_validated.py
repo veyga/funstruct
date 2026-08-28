@@ -261,7 +261,7 @@ class TestTruthiness:
 
 
 class TestToResult:
-    """to_result converts Validated to Either. Valid always → Right, Invalid always → Left.
+    """to_result converts Validated to Either. Valid → Right, Invalid → Left.
 
     The value's truthiness is irrelevant — Valid(0), Valid(None), Valid(False)
     all produce Right. Validation status determines the case, not the value.

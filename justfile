@@ -8,11 +8,11 @@ lint *args:
 # format code
 format:
   uv run ruff format
-  -uv run --group docs docformatter --in-place --config pyproject.toml _funstruct/ funstruct/
+  -uv run --group docs docformatter --in-place --config pyproject.toml funstruct/
 
 # run ty check
 check:
-  uv run ty check _funstruct/
+  uv run ty check funstruct/
 
 # Serve docs locally at http://127.0.0.1:8000
 docs:
@@ -51,6 +51,7 @@ bench *args:
   else
     uv run pytest benchmarks/ -v --benchmark-only --benchmark-disable-gc {{args}}
   fi
+
 
 # Run nox (all sessions, or specify: just nox -s tests)
 nox *args:

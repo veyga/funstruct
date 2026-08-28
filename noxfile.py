@@ -14,14 +14,14 @@ def tests(session):
 def lint(session):
     """Run ruff linter."""
     session.install("ruff")
-    session.run("ruff", "check", "_funstruct/", "funstruct/")
+    session.run("ruff", "check", "funstruct/")
 
 
 @nox.session
 def typecheck(session):
     """Run type checker."""
     session.install(".", "--group", "dev")
-    session.run("ty", "check", "_funstruct/")
+    session.run("ty", "check", "funstruct/_impl/")
 
 
 @nox.session
