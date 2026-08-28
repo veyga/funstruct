@@ -61,11 +61,16 @@ A ─┘
 ```
 
 ```python
-class Semigroup(Protocol):
-    def __add__(self, other) -> Semigroup: ...
+@dataclass(frozen=True)
+class Semigroup:
+    typ: type
+    combine: Callable  # (A, A) -> A
 
-class Monoid(Semigroup, Protocol):
-    def empty() -> Monoid: ...
+@dataclass(frozen=True)
+class Monoid(Semigroup):
+    typ: type
+    combine: Callable  # (A, A) -> A
+    empty: object      # identity element
 
 class Functor(ABC):
     def map(self, f) -> Functor: ...
@@ -77,13 +82,24 @@ class Applicative(Functor):
 
 class Monad(Applicative):
     def bind(self, f) -> Monad: ...
+    def __rshift__ = bind  # >>
+```
+
+```python
+# Multiple semigroups for the same type:
+int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
+int_mul = Monoid(typ=int, combine=lambda a, b: a * b, empty=1)
 ```
 
 ### ~ Scala equivalent
 
 ```scala
 trait Semigroup[A] {
-  def +(x: A, y: A): A
+  def combine(x: A, y: A): A
+}
+
+trait Monoid[A] extends Semigroup[A] {
+  def empty: A
 }
 
 trait Monoid[A] extends Semigroup[A] {

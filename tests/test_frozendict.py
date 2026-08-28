@@ -2,10 +2,15 @@ import pytest
 from parametrization import Parametrization as P
 
 from funstruct.collections.frozendict import frozendict
+from funstruct.typeclass.monoid import Monoid
 from tests.laws import (
     assert_functor_laws,
     assert_monoid_laws,
     assert_semigroup_laws,
+)
+
+fd_merge = Monoid(
+    typ=frozendict, combine=lambda a, b: a + b, empty=frozendict()
 )
 
 
@@ -15,10 +20,11 @@ class TestFrozendictLaws:
             frozendict({"a": 1}),
             frozendict({"b": 2}),
             frozendict({"c": 3}),
+            sg=fd_merge,
         )
 
     def test_monoid(self):
-        assert_monoid_laws(frozendict({"a": 1, "b": 2}), frozendict())
+        assert_monoid_laws(frozendict({"a": 1, "b": 2}), sg=fd_merge)
 
     def test_functor(self):
         assert_functor_laws(frozendict({"x": 1, "y": 2}))

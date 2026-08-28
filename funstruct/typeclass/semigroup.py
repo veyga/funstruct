@@ -1,18 +1,31 @@
 """
-Semigroup: a type with an associative binary combine operation.
+Semigroup: an associative binary combine operation over a type.
 
 Law: combine(combine(a, b), c) == combine(a, combine(b, c))
+
+Unlike a Protocol/ABC, this is a value — you can have multiple
+Semigroup instances for the same type (e.g. int under + vs int under *).
 """
 
 from __future__ import annotations
 
-from typing import Protocol
+from collections.abc import Callable
+from dataclasses import dataclass
 
 
-class Semigroup(Protocol):
-    """Any type that supports + (associative combine)."""
+@dataclass(frozen=True)
+class Semigroup:
+    """An associative binary operation over a type."""
 
-    def __add__(self, other: Semigroup) -> Semigroup: ...
+    typ: type
+    combine: Callable
 
 
-__all__ = ["Semigroup"]
+# Common instances
+int_add = Semigroup(typ=int, combine=lambda a, b: a + b)
+int_mul = Semigroup(typ=int, combine=lambda a, b: a * b)
+str_concat = Semigroup(typ=str, combine=lambda a, b: a + b)
+list_concat = Semigroup(typ=list, combine=lambda a, b: a + b)
+
+
+__all__ = ["Semigroup", "int_add", "int_mul", "str_concat", "list_concat"]

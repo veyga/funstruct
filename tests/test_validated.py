@@ -5,7 +5,10 @@ from parametrization import Parametrization as P
 from funstruct.collections.frozendict import frozendict
 from funstruct.applicative.validated import Invalid, Valid, Validated
 from funstruct.collections.cons import Cons, Nil
+from funstruct.typeclass.semigroup import Semigroup
 from tests.laws import assert_functor_laws, assert_semigroup_laws
+
+invalid_concat = Semigroup(typ=Invalid, combine=lambda a, b: a.ap(b))
 
 
 class TestValidatedLaws:
@@ -14,6 +17,7 @@ class TestValidatedLaws:
             Invalid(Cons("a", Nil())),
             Invalid(Cons("b", Nil())),
             Invalid(Cons("c", Nil())),
+            sg=invalid_concat,
         )
 
     def test_functor_valid(self):
@@ -97,7 +101,10 @@ class TestProduct:
 
     def test_mixed_accumulates_errors_only(self):
         result = (
-            Valid(None).ap(Invalid(["first"])).ap(Valid(None)).ap(Invalid(["second"]))
+            Valid(None)
+            .ap(Invalid(["first"]))
+            .ap(Valid(None))
+            .ap(Invalid(["second"]))
         )
         assert result == Invalid(["first", "second"])
 
@@ -164,14 +171,19 @@ class TestAddOperator:
         assert result == Invalid(["a", "b", "c"])
 
     def test_cond_chain_with_add(self):
-        result = Validated.cond(True, None, "x") + Validated.cond(True, None, "y")
+        result = Validated.cond(True, None, "x") + Validated.cond(
+            True, None, "y"
+        )
         assert result.is_valid
 
     def test_cond_chain_failures_with_add(self):
         result = Validated.cond(False, None, "first") + Validated.cond(
             False, None, "second"
         )
-        assert result.fold(lambda errs: errs, lambda _: []) == ["first", "second"]
+        assert result.fold(lambda errs: errs, lambda _: []) == [
+            "first",
+            "second",
+        ]
 
     def test_add_is_same_as_product(self):
         a = Valid(1)

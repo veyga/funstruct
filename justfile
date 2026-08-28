@@ -17,6 +17,10 @@ check:
 docs:
   uv run --group docs mkdocs serve
 
+# Format markdown docs
+fmt-docs:
+  uv run --group docs mdformat docs/ README.md
+
 # run pytest
 test *args:
   uv run pytest {{args}}

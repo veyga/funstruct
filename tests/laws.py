@@ -7,18 +7,25 @@ For types without structural equality (State, StateT, ReaderT),
 pass an `eq` function that evaluates/runs the values for comparison.
 """
 
-from operator import add
+from funstruct.typeclass.semigroup import Semigroup
 
 
-def assert_semigroup_laws(a, b, c, op=add):
-    """Associativity: op(op(a, b), c) == op(a, op(b, c))"""
-    assert op(op(a, b), c) == op(a, op(b, c)), "Semigroup associativity violated"
+def assert_semigroup_laws(a, b, c, sg: Semigroup):
+    """Associativity: sg.combine(sg.combine(a, b), c) == sg.combine(a, sg.combine(b, c))"""
+    left = sg.combine(sg.combine(a, b), c)
+    right = sg.combine(a, sg.combine(b, c))
+    assert left == right, "Semigroup associativity violated"
 
 
-def assert_monoid_laws(a, empty, op=add):
-    """Left/right identity: op(empty, a) == a == op(a, empty)"""
-    assert op(empty, a) == a, "Monoid left identity violated"
-    assert op(a, empty) == a, "Monoid right identity violated"
+def assert_monoid_laws(a, sg):
+    """Left/right identity: combine(empty, a) == a == combine(a, empty)"""
+    from funstruct.typeclass.monoid import Monoid
+
+    assert isinstance(sg, Monoid), (
+        "assert_monoid_laws requires a Monoid (has empty)"
+    )
+    assert sg.combine(sg.empty, a) == a, "Monoid left identity violated"
+    assert sg.combine(a, sg.empty) == a, "Monoid right identity violated"
 
 
 def assert_functor_laws(fa, eq=None):
@@ -68,7 +75,9 @@ def assert_monad_laws(pure_fn, m, f, g, eq=None):
         "Monad left identity violated: pure(a).bind(f) != f(a)"
     )
 
-    assert _eq(m.bind(pure_fn), m), "Monad right identity violated: m.bind(pure) != m"
+    assert _eq(m.bind(pure_fn), m), (
+        "Monad right identity violated: m.bind(pure) != m"
+    )
 
     assert _eq(m.bind(f).bind(g), m.bind(lambda x: f(x).bind(g))), (
         "Monad associativity violated"
