@@ -1,16 +1,14 @@
-"""
-Validated: applicative error-accumulating functor.
+"""Validated: applicative error-accumulating functor.
 
-Use Validated for independent validations.
-
-Example::
-
-    >>> from funstruct.applicative.validated import Validated
-    >>> (Validated.valid(None)
-    ...     .ap(Validated.invalid("too short"))
-    ...     .ap(Validated.invalid("missing @")))
-    Invalid(errors=Cons('too short', Cons('missing @', Nil())))
-
+>>> from funstruct.applicative.validated import Validated, Valid, Invalid
+>>> Validated.cond(True, 42, "err")
+Valid(value=42)
+>>> Validated.cond(False, 42, "err")
+Invalid(errors=Cons('err', Nil()))
+>>> Valid(1) + Valid(2)
+Valid(value=(1, 2))
+>>> Invalid("a:") + Invalid("b")
+Invalid(errors='a:b')
 """
 
 from _funstruct._validated import *  # noqa F403

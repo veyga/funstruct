@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from types import SimpleNamespace as ___
 
 
 @dataclass(frozen=True)
@@ -21,11 +22,15 @@ class Semigroup:
     combine: Callable
 
 
-# Common instances
-int_add = Semigroup(typ=int, combine=lambda a, b: a + b)
-int_mul = Semigroup(typ=int, combine=lambda a, b: a * b)
-str_concat = Semigroup(typ=str, combine=lambda a, b: a + b)
-list_concat = Semigroup(typ=list, combine=lambda a, b: a + b)
+COMMON = ___(
+    INT_ADD=Semigroup(typ=int, combine=lambda a, b: a + b),
+    INT_MUL=Semigroup(typ=int, combine=lambda a, b: a * b),
+    STR_CONCAT=Semigroup(typ=str, combine=lambda a, b: a + b),
+    LIST_CONCAT=Semigroup(typ=list, combine=lambda a, b: a + b),
+)
 
 
-__all__ = ["Semigroup", "int_add", "int_mul", "str_concat", "list_concat"]
+__all__ = [
+    "Semigroup",
+    "COMMON",
+]

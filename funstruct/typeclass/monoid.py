@@ -10,10 +10,15 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from types import SimpleNamespace as ___
 
 from funstruct.typeclass.semigroup import Semigroup
 
 
+from typing import final
+
+
+@final
 @dataclass(frozen=True)
 class Monoid(Semigroup):
     """A Semigroup with an identity element (empty)."""
@@ -23,11 +28,15 @@ class Monoid(Semigroup):
     empty: object
 
 
-# Common instances
-int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
-int_mul = Monoid(typ=int, combine=lambda a, b: a * b, empty=1)
-str_concat = Monoid(typ=str, combine=lambda a, b: a + b, empty="")
-list_concat = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+COMMON = ___(
+    INT_ADD=Monoid(typ=int, combine=lambda a, b: a + b, empty=0),
+    INT_MUL=Monoid(typ=int, combine=lambda a, b: a * b, empty=1),
+    STR_CONCAT=Monoid(typ=str, combine=lambda a, b: a + b, empty=""),
+    LIST_CONCAT=Monoid(typ=list, combine=lambda a, b: a + b, empty=[]),
+)
 
 
-__all__ = ["Monoid", "int_add", "int_mul", "str_concat", "list_concat"]
+__all__ = [
+    "Monoid",
+    "COMMON",
+]
