@@ -30,10 +30,10 @@ test *args:
 cover *args:
   uv run pytest --cov --cov-report=term-missing {{args}}
 
-# generate html coverage report
+# generate html coverage report and open in browser
 cover-html:
   uv run pytest --cov --cov-report=html
-  @echo "Open htmlcov/index.html"
+  {{ if os() == "macos" { "open" } else { "xdg-open" } }} htmlcov/index.html
 
 # debug a pytest
 dtest *args:
