@@ -64,6 +64,10 @@ class Future(Generic[E, A]):
     def __init__(self, coro: Awaitable[Either[E, A]]) -> None:
         self._coro = coro
 
+    def __del__(self):
+        if hasattr(self._coro, "close"):
+            self._coro.close()
+
     def __await__(self) -> Generator[None, None, Either[E, A]]:
         return self._awaitable().__await__()
 
