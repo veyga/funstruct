@@ -17,16 +17,24 @@ theme:
 
 nav:
   - Home: index.md
-  - Modules:
-      - State: modules/state.md
-      - StateT: modules/state_t.md
-      - ReaderT: modules/reader_t.md
-      - Validated: modules/validated.md
-      - Cons: modules/cons.md
-      - FrozenDict: modules/frozendict.md
-      - TailRec: modules/tailrec.md
-  - API Reference:
-      - funstruct: api/index.md
+  - typeclass:
+      - Overview: typeclass/index.md
+      - Semigroup: typeclass/semigroup.md
+      - Monoid: typeclass/monoid.md
+      - Functor: typeclass/functor.md
+      - Applicative: typeclass/applicative.md
+      - Monad: typeclass/monad.md
+  - applicative:
+      - Validated: applicative/validated.md
+  - monad:
+      - State: monad/state.md
+      - StateT: monad/state_t.md
+      - ReaderT: monad/reader_t.md
+  - collections:
+      - Cons: collections/cons.md
+      - frozendict: collections/frozendict.md
+  - util:
+      - tailrec: util/tailrec.md
 
 plugins:
   - search

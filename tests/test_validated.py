@@ -11,11 +11,11 @@ class TestValid:
         assert Valid(5).map(lambda x: x * 2) == Valid(10)
 
     def test_product_both_valid(self):
-        result = Valid(1).product(Valid(2))
+        result = Valid(1).ap(Valid(2))
         assert result == Valid((1, 2))
 
     def test_product_with_invalid(self):
-        result = Valid(1).product(Invalid(["err"]))
+        result = Valid(1).ap(Invalid(["err"]))
         assert result == Invalid(["err"])
 
     def test_to_result(self):
@@ -32,11 +32,11 @@ class TestInvalid:
         assert Invalid(["err"]).map(lambda x: x * 2) == Invalid(["err"])
 
     def test_product_accumulates(self):
-        result = Invalid(["a"]).product(Invalid(["b"]))
+        result = Invalid(["a"]).ap(Invalid(["b"]))
         assert result == Invalid(["a", "b"])
 
     def test_product_with_valid(self):
-        result = Invalid(["a"]).product(Valid(1))
+        result = Invalid(["a"]).ap(Valid(1))
         assert result == Invalid(["a"])
 
     def test_fold(self):
@@ -68,19 +68,16 @@ class TestValidatedConstructors:
 
 class TestProduct:
     def test_chain_multiple_valid(self):
-        result = Valid(None).product(Valid(None)).product(Valid(None))
+        result = Valid(None).ap(Valid(None)).ap(Valid(None))
         assert result.is_valid
 
     def test_chain_accumulates_all_errors(self):
-        result = Invalid(["a"]).product(Invalid(["b"])).product(Invalid(["c"]))
+        result = Invalid(["a"]).ap(Invalid(["b"])).ap(Invalid(["c"]))
         assert result == Invalid(["a", "b", "c"])
 
     def test_mixed_accumulates_errors_only(self):
         result = (
-            Valid(None)
-            .product(Invalid(["first"]))
-            .product(Valid(None))
-            .product(Invalid(["second"]))
+            Valid(None).ap(Invalid(["first"])).ap(Valid(None)).ap(Invalid(["second"]))
         )
         assert result == Invalid(["first", "second"])
 
@@ -89,16 +86,16 @@ class TestValidatedCond:
     def test_real_world_validation(self):
         result = (
             Validated.cond("value" == "value", None, "bad auth")
-            .product(Validated.cond("a" in ["a", "b"], None, "no member"))
-            .product(Validated.cond(1 < 2, None, "less than"))
+            .ap(Validated.cond("a" in ["a", "b"], None, "no member"))
+            .ap(Validated.cond(1 < 2, None, "less than"))
         )
         assert result.is_valid
 
     def test_real_world_multiple_failures(self):
         result = (
             Validated.cond("wrong" == "value", None, "bad auth")
-            .product(Validated.cond("unknown" in ["a", "b"], None, "no member"))
-            .product(Validated.cond(5 < 2, None, "less than"))
+            .ap(Validated.cond("unknown" in ["a", "b"], None, "no member"))
+            .ap(Validated.cond(5 < 2, None, "less than"))
         )
         assert not result.is_valid
         assert result.fold(lambda errs: errs, lambda _: []) == [
@@ -159,4 +156,4 @@ class TestAddOperator:
     def test_add_is_same_as_product(self):
         a = Valid(1)
         b = Invalid(["err"])
-        assert (a + b) == a.product(b)
+        assert (a + b) == a.ap(b)

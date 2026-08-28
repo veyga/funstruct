@@ -1,14 +1,17 @@
-from abc import ABC, abstractmethod
-from collections.abc import Callable, Iterable
+from __future__ import annotations
+
+from abc import abstractmethod
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import TypeVar
+from typing import Generic, TypeVar
+
+from funstruct.typeclass.monad import Monad
 
 A = TypeVar("A")
+B = TypeVar("B")
 
-type _CList[A] = "CList[A]"
 
-
-class CList[A](ABC):
+class CList(Monad, Generic[A]):
     """A Lisp/ML/Scala style singly linked list (cons list).
 
     Provides an interface for working with a singly linked list, including methods for
@@ -16,7 +19,7 @@ class CList[A](ABC):
     """
 
     @abstractmethod
-    def append(self, other: _CList) -> _CList:
+    def append(self, other: CList) -> CList:
         """Append another list to the end of this list.
 
         Args:
@@ -28,7 +31,7 @@ class CList[A](ABC):
         ...
 
     @abstractmethod
-    def fold_right[B](self, acc: B, f: Callable[[A, B], B]) -> B:
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
         """Fold the list from right to left.
 
         Args:
@@ -41,7 +44,7 @@ class CList[A](ABC):
         ...
 
     @abstractmethod
-    def fold_left[B](self, acc: B, f: Callable[[B, A], B]) -> B:
+    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
         """Fold the list from left to right.
 
         Args:
@@ -54,7 +57,7 @@ class CList[A](ABC):
         ...
 
     @abstractmethod
-    def drop(self, n: int) -> _CList:
+    def drop(self, n: int) -> CList:
         """Drop the first `n` elements from the list.
 
         Args:
@@ -66,7 +69,7 @@ class CList[A](ABC):
         ...
 
     @abstractmethod
-    def drop_while(self, f: Callable[[A], bool]) -> _CList:
+    def drop_while(self, f: Callable[[A], bool]) -> CList:
         """Drop elements from the list as long as the predicate function `f` is true.
 
         Args:
@@ -78,7 +81,7 @@ class CList[A](ABC):
         ...
 
     @abstractmethod
-    def take(self, n: int) -> _CList:
+    def take(self, n: int) -> CList:
         """Take the first `n` elements from the list.
 
         Args:
@@ -90,7 +93,7 @@ class CList[A](ABC):
         ...
 
     @abstractmethod
-    def take_while(self, f: Callable[[A], bool]) -> _CList:
+    def take_while(self, f: Callable[[A], bool]) -> CList:
         """Take elements from the list as long as the predicate function `f` is true.
 
         Args:
@@ -102,7 +105,7 @@ class CList[A](ABC):
         ...
 
     @abstractmethod
-    def split_at(self, i: int) -> tuple[_CList, _CList]:
+    def split_at(self, i: int) -> tuple[CList, CList]:
         """Split the list into two lists at index `i`.
 
         Args:
@@ -114,7 +117,19 @@ class CList[A](ABC):
         """
         ...
 
-    def partition(self, f: Callable[[A], bool]) -> tuple[_CList, _CList]:
+    @abstractmethod
+    def insert_at(self, i: int, value: A) -> CList:
+        """Insert an element at index `i`.
+
+        Args:
+            i: The index to split at.
+
+        Returns:
+            The new list
+        """
+        ...
+
+    def partition(self, f: Callable[[A], bool]) -> tuple[CList, CList]:
         """Partition the list into two lists based on a predicate function.
 
         Args:
@@ -135,7 +150,7 @@ class CList[A](ABC):
         """
         return self.fold_right(0, lambda _, acc: acc + 1)
 
-    def prepend(self, new_head: A) -> _CList:
+    def prepend(self, new_head: A) -> CList:
         """Prepend an element to the list.
 
         Args:
@@ -146,7 +161,7 @@ class CList[A](ABC):
         """
         return Cons(new_head, self)
 
-    def reversed(self) -> _CList:
+    def reversed(self) -> CList:
         """Reverse the order of the elements in the list.
 
         Returns:
@@ -154,7 +169,7 @@ class CList[A](ABC):
         """
         return self.fold_left(Nil(), lambda acc, h: Cons(h, acc))
 
-    def map[B](self, f: Callable[[A], B]) -> "CList[B]":
+    def map(self, f: Callable) -> CList:
         """Apply a function to each element of the list, producing a new list
         with the results.
 
@@ -166,7 +181,11 @@ class CList[A](ABC):
         """
         return self.fold_right(Nil(), lambda a, acc: Cons(f(a), acc))
 
-    def filter(self, f: Callable[[A], bool]) -> _CList:
+    def ap(self, other) -> CList:
+        """Cartesian product — pair each element of self with each element of other."""
+        return self.bind(lambda a: other.map(lambda b: (a, b)))
+
+    def filter(self, f: Callable[[A], bool]) -> CList:
         """Filter the elements of the list based on a predicate function.
 
         Args:
@@ -177,7 +196,7 @@ class CList[A](ABC):
         """
         return self.fold_right(Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc)
 
-    def flatten(self) -> _CList:
+    def flatten(self) -> CList:
         """Flatten a list of lists into a single list.
 
         Returns:
@@ -185,7 +204,7 @@ class CList[A](ABC):
         """
         return CList.flatten_(self)  # type: ignore
 
-    def flat_map[B](self, f: Callable[[A], "CList[B]"]) -> "CList[B]":
+    def flat_map(self, f: Callable[[A], CList]) -> CList:
         """Apply a function to each element of the list,
         then flatten the resulting lists.
 
@@ -198,7 +217,7 @@ class CList[A](ABC):
         """
         return self.map(f).flatten()
 
-    def bind[B](self, f: Callable[[A], "CList[B]"]) -> "CList[B]":
+    def bind(self, f: Callable[[A], CList]) -> CList:
         """Apply a function to each element of the list and flatten the results.
         (alias for 'flat_map')
 
@@ -211,7 +230,7 @@ class CList[A](ABC):
         """
         return self.flat_map(f)
 
-    def sorted(self, cmp: Callable[[A, A], int]) -> _CList:
+    def sorted(self, cmp: Callable[[A, A], int]) -> CList:
         """Sort the list using a comparison function.
 
         Args:
@@ -221,7 +240,7 @@ class CList[A](ABC):
             A new list with the elements sorted according to `cmp`.
         """
 
-        def merge(left: _CList, right: _CList) -> _CList:
+        def merge(left: CList, right: CList) -> CList:
             match left, right:
                 case Nil(), r:
                     return r
@@ -241,7 +260,7 @@ class CList[A](ABC):
         return merge(left.sorted(cmp), right.sorted(cmp))
 
     @staticmethod
-    def flatten_(lst: "CList[CList[A]]") -> _CList:
+    def flatten_(lst: CList[CList[A]]) -> CList:
         """Flatten a nested list of lists into a single list.
 
         Args:
@@ -260,7 +279,7 @@ class CList[A](ABC):
                 case _:
                     return Nil()
 
-        def flatten(lst: "CList[CList[A]]") -> "CList[A]":
+        def flatten(lst: CList[CList[A]]) -> CList[A]:
             match lst:
                 case Nil():
                     return Nil()
@@ -275,8 +294,13 @@ class CList[A](ABC):
 
         return flatten(lst)
 
+    @classmethod
+    def pure(cls, value) -> CList:
+        """Lift a value into a single-element list."""
+        return Cons(value)
+
     @staticmethod
-    def cons(a: A) -> _CList:
+    def cons(a: A) -> CList:
         """Create a new list with a single element.
 
         Args:
@@ -288,7 +312,7 @@ class CList[A](ABC):
         return Cons(a)
 
     @staticmethod
-    def empty() -> _CList:
+    def empty() -> CList:
         """Create an empty list.
 
         Returns:
@@ -297,7 +321,7 @@ class CList[A](ABC):
         return Nil()
 
     @staticmethod
-    def new(*xs: A) -> _CList:
+    def new(*xs: A) -> CList:
         """Create a new list from the given elements.
 
         Args:
@@ -309,7 +333,7 @@ class CList[A](ABC):
         return Cons(xs[0], CList.new(*xs[1:])) if xs else Nil()
 
     @staticmethod
-    def from_iterable(iterable: Iterable[A]) -> _CList:
+    def from_iterable(iterable: Iterable[A]) -> CList:
         """Create a new list from an iterable of elements.
         Ex:
         CList.from_iterable([1,2]) == Cons(1, Cons(2))
@@ -322,7 +346,7 @@ class CList[A](ABC):
         """
         return CList.new(*iterable)
 
-    def __rlshift__(self, other) -> _CList:
+    def __rlshift__(self, other: A) -> CList:
         """Prepend an element to the list using the `<<` operator.
         Ex:
         1 << Nil() == Cons(1)
@@ -335,18 +359,6 @@ class CList[A](ABC):
         """
         return self.prepend(other)
 
-    def __add__(self, other) -> _CList:
-        """Append another list to the end of this list using the `+` operator.
-        (alias for 'append')
-
-        Args:
-            other: The list to append.
-
-        Returns:
-            A new list with the elements of `other` appended to this list.
-        """
-        return self.append(other)
-
     def __len__(self) -> int:
         """Compute the length of the list.
 
@@ -355,7 +367,7 @@ class CList[A](ABC):
         """
         return self.fold_right(0, lambda _, acc: acc + 1)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[A]:
         """Iterate over the elements of the list.
 
         Yields:
@@ -366,7 +378,7 @@ class CList[A](ABC):
             yield current.head
             current = current.tail
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check if this list is equal to another list.
 
         Args:
@@ -394,7 +406,7 @@ class Nil(CList):
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of the empty list.
 
         Returns:
@@ -402,7 +414,7 @@ class Nil(CList):
         """
         return "Nil"
 
-    def append(self, other: _CList) -> _CList:
+    def append(self, other: CList) -> CList:
         """Append another list to the empty list.
 
         Args:
@@ -413,7 +425,7 @@ class Nil(CList):
         """
         return other
 
-    def fold_right[A, B](self, acc: B, f: Callable[[A, B], B]) -> B:
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
         """Fold the empty list from right to left.
 
         Args:
@@ -426,7 +438,7 @@ class Nil(CList):
         """
         return acc
 
-    def fold_left[A, B](self, acc: B, f: Callable[[B, A], B]) -> B:
+    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
         """Fold the empty list from left to right.
 
         Args:
@@ -439,7 +451,7 @@ class Nil(CList):
         """
         return acc
 
-    def drop(self, n: int) -> _CList:
+    def drop(self, n: int) -> CList:
         """Drop the first `n` elements from the empty list.
 
         Args:
@@ -451,7 +463,7 @@ class Nil(CList):
         """
         return self
 
-    def drop_while(self, f: Callable[[A], bool]) -> _CList:
+    def drop_while(self, f: Callable[[A], bool]) -> CList:
         """Drop elements from the empty list as long as the predicate function
         `f` is true.
 
@@ -464,7 +476,7 @@ class Nil(CList):
         """
         return self
 
-    def take(self, n: int) -> _CList:
+    def take(self, n: int) -> CList:
         """Take the first `n` elements from the empty list.
 
         Args:
@@ -476,7 +488,7 @@ class Nil(CList):
         """
         return self
 
-    def take_while(self, f: Callable[[A], bool]) -> _CList:
+    def take_while(self, f: Callable[[A], bool]) -> CList:
         """Take elements from the empty list as long as the predicate function
         `f` is true.
 
@@ -489,7 +501,7 @@ class Nil(CList):
         """
         return self
 
-    def split_at(self, i: int) -> tuple[_CList, _CList]:
+    def split_at(self, i: int) -> tuple[CList, CList]:
         """Split the empty list into two lists at index `i`.
 
         Args:
@@ -500,15 +512,26 @@ class Nil(CList):
         """
         return self, self
 
+    def insert_at(self, i: int, value: A) -> CList:
+        """Insert an element at index `i`.
+
+        Args:
+            i: The index to split at.
+
+        Returns:
+            The new list
+        """
+        return Cons(value, Nil())
+
 
 @dataclass(frozen=True)
-class Cons[A](CList[A]):
+class Cons(CList[A]):
     """Represents a non-empty list with a head element and a tail list."""
 
     head: A
     tail: CList[A] = field(default_factory=Nil)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of the non-empty list.
 
         Returns:
@@ -516,7 +539,7 @@ class Cons[A](CList[A]):
         """
         return f"{self.head} << {self.tail}"
 
-    def append(self, other: _CList) -> _CList:
+    def append(self, other: CList) -> CList:
         """Append another list to the end of this non-empty list.
 
         Args:
@@ -527,7 +550,7 @@ class Cons[A](CList[A]):
         """
         return Cons(self.head, self.tail.append(other))
 
-    def fold_right[B](self, acc: B, f: Callable[[A, B], B]) -> B:
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
         """Fold the non-empty list from right to left.
 
         Args:
@@ -539,7 +562,7 @@ class Cons[A](CList[A]):
         """
         return f(self.head, self.tail.fold_right(acc, f))
 
-    def fold_left[B](self, acc: B, f: Callable[[B, A], B]) -> B:
+    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
         """Fold the non-empty list from left to right.
 
         Args:
@@ -551,7 +574,7 @@ class Cons[A](CList[A]):
         """
         return self.tail.fold_left(f(acc, self.head), f)
 
-    def drop(self, n: int) -> _CList:
+    def drop(self, n: int) -> CList:
         """Drop the first `n` elements from the non-empty list.
 
         Args:
@@ -562,7 +585,7 @@ class Cons[A](CList[A]):
         """
         return self if n <= 0 else self.tail.drop(n - 1)
 
-    def drop_while(self, f: Callable[[A], bool]) -> _CList:
+    def drop_while(self, f: Callable[[A], bool]) -> CList:
         """Drop elements from the non-empty list as long as the predicate function
         `f` is true.
 
@@ -574,7 +597,7 @@ class Cons[A](CList[A]):
         """
         return self if not f(self.head) else self.tail.drop_while(f)
 
-    def take(self, n: int) -> _CList:
+    def take(self, n: int) -> CList:
         """Take the first `n` elements from the non-empty list.
 
         Args:
@@ -585,7 +608,7 @@ class Cons[A](CList[A]):
         """
         return Cons(self.head) if n <= 1 else self.head << self.tail.take(n - 1)
 
-    def take_while(self, f: Callable[[A], bool]) -> _CList:
+    def take_while(self, f: Callable[[A], bool]) -> CList:
         """Take elements from the non-empty list as long as the predicate function
         `f` is true.
 
@@ -597,7 +620,7 @@ class Cons[A](CList[A]):
         """
         return self.head << self.tail.take_while(f) if f(self.head) else Nil()
 
-    def split_at(self, i: int) -> tuple[_CList, _CList]:
+    def split_at(self, i: int) -> tuple[CList, CList]:
         """Split the non-empty list into two lists at index `i`.
 
         Args:
@@ -608,6 +631,19 @@ class Cons[A](CList[A]):
             and the second containing the rest.
         """
         return self.take(i), self.drop(i)
+
+    def insert_at(self, i: int, value: A) -> CList:
+        """Insert an element at index `i`.
+
+        Args:
+            i: The index to split at.
+
+        Returns:
+            The new list
+        """
+        if i <= 0:
+            return Cons(value, self)
+        return Cons(self.head, self.tail.insert_at(i - 1, value))
 
 
 __all__ = [

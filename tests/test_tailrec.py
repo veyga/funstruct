@@ -1,5 +1,6 @@
 import pytest
-from funstruct.tailrec import tco, tail_call
+
+from funstruct.util.tailrec import tail_call, tco
 
 # pytest affects the default of 1000
 RECURSION_LIMIT = 700
@@ -65,7 +66,7 @@ def test_no_tco_returns_trampoline():
 
     limit = RECURSION_LIMIT * 2
     count = recurse(limit)
-    assert type(count) != int
+    assert type(count) is not int
 
 
 def test_no_tail_call_stack_overflow():

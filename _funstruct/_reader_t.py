@@ -36,13 +36,15 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
+from funstruct.typeclass.monad import Monad
+
 _Ctx = TypeVar("_Ctx")
 _M = TypeVar("_M")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class ReaderT(Generic[_Ctx, _M, _A]):
+class ReaderT(Monad, Generic[_Ctx, _M, _A]):
     """ReaderT: ``Ctx -> M[A]``.
 
     M is the inner monad (StateT, Result, etc.). Composition delegates to M's
@@ -89,11 +91,11 @@ class ReaderT(Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def product(self, other: ReaderT[_Ctx, _M, _B]) -> ReaderT[_Ctx, _M, _B]:
-        """Applicative product: delegates to M's product."""
+    def ap(self, other) -> ReaderT:
+        """Applicative ap: delegates to M's product."""
 
         def inner(ctx):
-            return self._run(ctx).product(other._run(ctx))
+            return self._run(ctx).ap(other._run(ctx))
 
         return ReaderT(inner)
 
@@ -105,7 +107,7 @@ class ReaderT(Generic[_Ctx, _M, _A]):
         return self.bind(lambda _: next_step)
 
     @classmethod
-    def pure(cls, value, monad: type) -> ReaderT:
+    def pure(cls, value, monad) -> ReaderT:
         """Lift a raw value into ReaderT via monad.from_value."""
         return cls(lambda _: monad.from_value(value))
 

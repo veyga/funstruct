@@ -371,7 +371,6 @@ def test_map(initial, expected):
 def test_append(initial, to_append, expected, request):
     e = request.getfixturevalue(expected)
     assert initial.append(to_append) == e
-    assert initial + to_append == e
 
 
 @P.autodetect_parameters()
@@ -407,6 +406,61 @@ def test_append(initial, to_append, expected, request):
 )
 def test_split_at(original, split_at, expected):
     actual = original.split_at(split_at)
+    assert actual == expected
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    original=Nil(),
+    index=0,
+    value=99,
+    expected=Cons(99, Nil()),
+)
+@P.case(
+    name="Nil oob",
+    original=Nil(),
+    index=10,
+    value=99,
+    expected=Cons(99, Nil()),
+)
+@P.case(
+    name="Cons simple",
+    original=Cons(1, Nil()),
+    index=0,
+    value=99,
+    expected=Cons(99, Cons(1, Nil())),
+)
+@P.case(
+    name="Cons head",
+    original=Cons(1, Nil()),
+    index=1,
+    value=99,
+    expected=Cons(1, Cons(99, Nil())),
+)
+@P.case(
+    name="Cons chain",
+    original=Cons(2, Cons(1, Cons(0, Nil()))),
+    index=1,
+    value=99,
+    expected=Cons(2, Cons(99, Cons(1, Cons(0, Nil())))),
+)
+@P.case(
+    name="Cons chain head",
+    original=Cons(2, Cons(1, Cons(0, Nil()))),
+    index=0,
+    value=99,
+    expected=Cons(99, Cons(2, Cons(1, Cons(0, Nil())))),
+)
+@P.case(
+    name="Cons chain head negative",
+    original=Cons(2, Cons(1, Cons(0, Nil()))),
+    index=-1,
+    value=99,
+    expected=Cons(99, Cons(2, Cons(1, Cons(0, Nil())))),
+)
+def test_insert_at(original, index, value, expected):
+    actual = original.insert_at(index, value)
     assert actual == expected
 
 
@@ -513,3 +567,19 @@ def test_flatten(input, expected):
 def test_flat_map(original, expected):
     triple = lambda n: CList.from_iterable([n * 3, n * 3])
     assert original.flat_map(triple) == expected
+
+
+def test_bind_duplicates_elements():
+    xs = Cons(1, Cons(2, Cons(3, Nil())))
+    result = xs >> (lambda x: Cons(x, Cons(x, Nil())))
+    assert result == Cons(1, Cons(1, Cons(2, Cons(2, Cons(3, Cons(3, Nil()))))))
+
+
+def test_bind_on_nil():
+    result = Nil() >> (lambda x: Cons(x, Nil()))
+    assert result == Nil()
+
+
+def test_bind_single_element():
+    result = Cons(5, Nil()) >> (lambda x: Cons(x + 1, Cons(x + 2, Nil())))
+    assert result == Cons(6, Cons(7, Nil()))

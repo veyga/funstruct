@@ -1,0 +1,32 @@
+"""
+Applicative: combine independent computations.
+
+F[A] ─┐
+       ├──> F[(A, B)]
+F[B] ─┘
+"""
+
+from __future__ import annotations
+
+from abc import abstractmethod
+
+from funstruct.typeclass.functor import Functor
+
+
+class Applicative(Functor):
+    """Combine independent computations."""
+
+    @classmethod
+    @abstractmethod
+    def pure(cls, value) -> Applicative:
+        """Lift a value into the context."""
+        ...
+
+    @abstractmethod
+    def ap(self, other: Applicative) -> Applicative: ...
+
+    def __add__(self, other: Applicative) -> Applicative:
+        return self.ap(other)
+
+
+__all__ = ["Applicative"]

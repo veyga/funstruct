@@ -7,7 +7,7 @@ For failable computations, use ``StateT``.
 Operators::
 
     >>  bind (monadic flatMap)
-    +   product (applicative, tuples values)
+    +   ap (applicative, tuples values)
 
 Example::
 
@@ -23,11 +23,13 @@ Example::
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
+from funstruct.typeclass.monad import Monad
+
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class State(Generic[_A]):
+class State(Monad, Generic[_A]):
     """Pure State monad: ``S -> (S, A)``.
 
     Always succeeds. No exceptions, no Result, no error rail.
@@ -80,11 +82,9 @@ class State(Generic[_A]):
 
         return State(inner)
 
-    def product(self, other: "State[_B]") -> "State[tuple]":
-        """Applicative product: run both, tuple the values."""
+    def ap(self, other) -> "State":
+        """Applicative ap: run both, tuple the values."""
         return self.bind(lambda a: other.map(lambda b: (a, b)))
-
-    __add__ = product
 
     def then(self, next_state: "State[_B]") -> "State[_B]":
         """Sequence: run self, discard value, run next."""

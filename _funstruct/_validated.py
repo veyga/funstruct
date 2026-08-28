@@ -4,7 +4,7 @@ Validated: applicative error-accumulating functor.
 Scala Cats equivalent: ``Validated[NonEmptyList[E], A]``
 
 Unlike Result/Either (monadic, short-circuits on first error),
-Validated accumulates ALL errors via .product() / .map_n().
+Validated accumulates ALL errors via .ap() / .map_n().
 
 Use Validated for independent validations that should all report.
 Use Result/bind for sequential operations where later steps
@@ -14,8 +14,8 @@ Example::
 
     >>> from jf_commons.functional.validated import Validated
     >>> (Validated.valid(None)
-    ...     .product(Validated.invalid("too short"))
-    ...     .product(Validated.invalid("missing @")))
+    ...     .ap(Validated.invalid("too short"))
+    ...     .ap(Validated.invalid("missing @")))
     Invalid(errors=['too short', 'missing @'])
 
 """
@@ -27,7 +27,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from _funstruct._functor import Applicative
+from funstruct.typeclass.applicative import Applicative
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -38,7 +38,7 @@ class Validated(Applicative):
     """Base class for Valid/Invalid — provides constructors and supports + operator."""
 
     @abstractmethod
-    def product(self, other: Validated) -> Validated: ...
+    def ap(self, other) -> Validated: ...
 
     @property
     @abstractmethod
@@ -49,9 +49,14 @@ class Validated(Applicative):
         """Eliminate the Validated — apply on_invalid or on_valid."""
         ...
 
+    @classmethod
+    def pure(cls, value) -> Validated:
+        """Lift a value into Valid."""
+        return Valid(value)
+
     @staticmethod
     def valid(value: _A) -> Validated:
-        """Lift a value into Valid."""
+        """Alias for pure."""
         return Valid(value)
 
     @staticmethod
@@ -97,7 +102,7 @@ class Valid(Validated, Generic[_A]):
         """Transform the success value."""
         return Valid(f(self.value))
 
-    def product(self, other: Validated) -> Validated:
+    def ap(self, other) -> Validated:
         """Combine with another Validated (applicative).
 
         Accumulates errors from both sides.
@@ -137,7 +142,7 @@ class Invalid(Validated, Generic[_E]):
         """Eliminate — applies on_invalid to the errors."""
         return on_invalid(self.errors)
 
-    def product(self, other: Validated) -> Validated:
+    def ap(self, other) -> Validated:
         """Combine — accumulates errors from both sides."""
         match other:
             case Invalid(errs):

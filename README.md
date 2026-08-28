@@ -2,41 +2,32 @@
 
 A small, helpful collection of functional utilities.
 
-(These are not meant to be highly performant, but are useful for smaller datasets)
+These are not meant to be highly performant, but are useful for smaller datasets.
 
-Like all functional stuctures, they play very well with recursive algos, and compose
-quit well
+## Install
 
-### Install
-
-Install like any PyPI package:</br> `pip install funstruct`, `uv add funstruct`, ...
-
-###
-
-```python
-from funstruct import tailrec
-from funstruct.collections import Cons, FrozenDict
-from funstruct.monad import State, StateT, ReaderT
-from funstruct.applicative import Validated, Valid, Invalid, map_n
-from funstruct.typeclass import Semigroup
+```bash
+pip install funstruct || uv add funstruct
 ```
 
 ## Functional Primer
 
-TODO
+### Type Class Hierarchy
 
-### Type Class Diagrams
+```
+Semigroup              Functor
+    │                      │
+ Monoid              Applicative
+                        │
+                       Monad
+```
+
+#### Diagrams
 
 **Functor** — transform the value inside a context
 
 ```
 F[A] ---( f: A -> B )---> F[B]
-```
-
-**Monad** — sequence computations that produce new contexts
-
-```
-F[A] ---( f: A -> F[B] )---> F[B]
 ```
 
 **Applicative** — combine independent computations
@@ -45,6 +36,12 @@ F[A] ---( f: A -> F[B] )---> F[B]
 F[A] ─┐
        ├──> F[(A, B)]
 F[B] ─┘
+```
+
+**Monad** — sequence computations that produce new contexts
+
+```
+F[A] ---( f: A -> F[B] )---> F[B]
 ```
 
 **Semigroup** — associative combine (any type with `+`)
@@ -63,4 +60,44 @@ A ─┐
 A ─┘
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup.
+```python
+class Semigroup(Protocol):
+    def __add__(self, other) -> Semigroup: ...
+
+class Monoid(Semigroup, Protocol):
+    def empty() -> Monoid: ...
+
+class Functor(ABC):
+    def map(self, f) -> Functor: ...
+
+class Applicative(Functor):
+    def pure(cls, value) -> Applicative: ...
+    def ap(self, other) -> Applicative: ...
+    def __add__ = ap  # alias
+
+class Monad(Applicative):
+    def bind(self, f) -> Monad: ...
+```
+
+```scala
+trait Semigroup[A] {
+  def combine(x: A, y: A): A
+}
+
+trait Monoid[A] extends Semigroup[A] {
+  def empty: A
+}
+
+trait Functor[F[_]] {
+  def map[A, B](fa: F[A])(f: A => B): F[B]
+}
+
+trait Applicative[F[_]] extends Functor[F] {
+  def pure[A](a: A): F[A]
+  def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]
+}
+
+trait Monad[F[_]] extends Applicative[F] {
+  def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
+}
+```

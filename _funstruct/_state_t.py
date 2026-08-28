@@ -20,12 +20,14 @@ Example with Result::
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
+from funstruct.typeclass.monad import Monad
+
 _F = TypeVar("_F")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class StateT(Generic[_F, _A]):
+class StateT(Monad, Generic[_F, _A]):
     """Generic state transformer: ``S -> F[(S, A)]``.
 
     ``F`` is the wrapping monad (Result, FutureResult, Maybe, etc.).
@@ -92,8 +94,8 @@ class StateT(Generic[_F, _A]):
 
         return StateT(inner)
 
-    def product(self, other: "StateT[_F, _B]") -> "StateT[_F, tuple]":
-        """Applicative product: run both, tuple the values."""
+    def ap(self, other) -> "StateT":
+        """Applicative ap: run both, tuple the values."""
         return self.bind(lambda a: other.map(lambda b: (a, b)))
 
     def then(self, next_state: "StateT[_F, _B]") -> "StateT[_F, _B]":
@@ -103,7 +105,7 @@ class StateT(Generic[_F, _A]):
     # Constructors — monad class passed explicitly, StateT knows nothing about it
 
     @classmethod
-    def pure(cls, value, monad: type) -> "StateT":
+    def pure(cls, value, monad) -> "StateT":
         """Lift a value.
 
         State unchanged. Uses ``monad.from_value``.
@@ -114,7 +116,7 @@ class StateT(Generic[_F, _A]):
         return cls(lambda s: monad.from_value((s, value)))
 
     @classmethod
-    def fail(cls, err, monad: type) -> "StateT":
+    def fail(cls, err, monad) -> "StateT":
         """Lift an error.
 
         Uses ``monad.from_failure``.
@@ -125,7 +127,7 @@ class StateT(Generic[_F, _A]):
         return cls(lambda _: monad.from_failure(err))
 
     @classmethod
-    def get(cls, monad: type) -> "StateT":
+    def get(cls, monad) -> "StateT":
         """Produce current state as the value.
 
         >>> from returns.result import Result
@@ -135,7 +137,7 @@ class StateT(Generic[_F, _A]):
         return cls(lambda s: monad.from_value((s, s)))
 
     @classmethod
-    def modify(cls, f: Callable, monad: type) -> "StateT":
+    def modify(cls, f: Callable, monad) -> "StateT":
         """Modify state, produce None.
 
         >>> from returns.result import Result

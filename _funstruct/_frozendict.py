@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 from copy import deepcopy
+from typing import Generic, TypeVar
+
+K = TypeVar("K")
+V = TypeVar("V")
 
 
-class frozendict[K, V]:
+class frozendict(Generic[K, V]):
     """An immutable wrapper around a mutable dict.
 
     This class provides an immutable dictionary-like object.
@@ -10,15 +16,15 @@ class frozendict[K, V]:
     methods for immutability and safe usage.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: K, **kwargs: V) -> None:
         """Initializes a frozendict instance with the given arguments.
 
         Args:
             *args: Positional arguments passed to the dictionary constructor.
             **kwargs: Keyword arguments passed to the dictionary constructor.
         """
-        self._dict = dict(*args, **kwargs)
-        self._hash = None
+        self._dict: dict = dict(*args, **kwargs)
+        self._hash: int | None = None
 
     def __getitem__(self, key: K) -> V:
         """Retrieves the value associated with the given key.
@@ -49,7 +55,7 @@ class frozendict[K, V]:
             return item
         return None
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Checks if the current frozendict is equal to another
         dictionary or frozendict.
 
@@ -68,7 +74,7 @@ class frozendict[K, V]:
             case _:
                 return False
 
-    def __contains__(self, key) -> bool:
+    def __contains__(self, key: K) -> bool:
         """Checks if the dictionary contains the given key.
 
         Args:
@@ -87,7 +93,7 @@ class frozendict[K, V]:
         """
         return len(self._dict)
 
-    def keys(self):
+    def keys(self) -> KeysView[K]:
         """Returns an iterator over the dictionary's keys.
 
         Returns:
@@ -95,7 +101,7 @@ class frozendict[K, V]:
         """
         return self._dict.keys()
 
-    def values(self):
+    def values(self) -> ValuesView[V]:
         """Returns an iterator over the dictionary's values.
 
         Returns:
@@ -103,7 +109,7 @@ class frozendict[K, V]:
         """
         return self._dict.values()
 
-    def items(self):
+    def items(self) -> ItemsView[K, V]:
         """Returns an iterator over the dictionary's key-value pairs.
 
         Returns:
@@ -111,7 +117,7 @@ class frozendict[K, V]:
         """
         return self._dict.items()
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[K]:
         """Returns an iterator over the dictionary's keys.
 
         Returns:
@@ -152,7 +158,7 @@ class frozendict[K, V]:
             self._hash = h
         return self._hash
 
-    def put(self, k: K, v: V) -> "frozendict":
+    def put(self, k: K, v: V) -> frozendict:
         """Returns a new frozendict with an updated value for the given key.
 
         This method creates a new frozendict instance with the same
@@ -170,7 +176,7 @@ class frozendict[K, V]:
         new_dict[k] = v
         return frozendict(new_dict)
 
-    def combine(self, other) -> "frozendict":
+    def combine(self, other: frozendict) -> frozendict:
         """Combines the current frozendict with another frozendict.
 
         This method returns a new frozendict that contains all key-value pairs
@@ -196,7 +202,7 @@ class frozendict[K, V]:
         return self._dict
 
     @classmethod
-    def fromkeys(cls, *args, **kwargs) -> "frozendict":
+    def fromkeys(cls, *args: K, **kwargs: V) -> frozendict:
         """Creates a new frozendict with keys from the given iterable
         and values set to a specified value.
 
@@ -210,7 +216,7 @@ class frozendict[K, V]:
         return cls(dict.fromkeys(*args, **kwargs))
 
     @staticmethod
-    def new() -> "frozendict":
+    def new() -> frozendict:
         """Creates a new, empty frozendict.
 
         Returns:
@@ -219,7 +225,7 @@ class frozendict[K, V]:
         return frozendict()
 
     @staticmethod
-    def combine_dicts(fd1, fd2) -> "frozendict":
+    def combine_dicts(fd1: frozendict, fd2: frozendict) -> frozendict:
         """Combines two frozendicts into a new frozendict.
 
         This method returns a new frozendict that contains all key-value pairs
