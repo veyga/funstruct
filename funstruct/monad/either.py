@@ -30,4 +30,6 @@ Examples:
     Right(12)
 """
 
-from _funstruct._either import *  # noqa: F403
+from _funstruct._either import Either as Either
+from _funstruct._either import Left as Left
+from _funstruct._either import Right as Right

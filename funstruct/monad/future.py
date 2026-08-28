@@ -39,4 +39,5 @@ Examples:
     Left(ValueError('not found: 99'))
 """
 
-from _funstruct._future import *  # noqa: F403
+from _funstruct._future import Future as Future
+from _funstruct._future import TryAsync as TryAsync

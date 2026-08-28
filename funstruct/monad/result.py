@@ -41,4 +41,9 @@ Examples:
     Right(12)
 """
 
-from _funstruct._result import *  # noqa: F403
+from _funstruct._result import AsyncResult as AsyncResult
+from _funstruct._result import Err as Err
+from _funstruct._result import Ok as Ok
+from _funstruct._result import Result as Result
+from _funstruct._result import Try as Try
+from _funstruct._result import TryAsync as TryAsync
