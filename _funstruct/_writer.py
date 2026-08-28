@@ -21,8 +21,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclass.monad import Monad
-from funstruct.typeclass.monoid import Monoid
+from funstruct.typeclasses.monad import Monad
+from funstruct.typeclasses.monoid import Monoid
 
 _W = TypeVar("_W")
 _A = TypeVar("_A")

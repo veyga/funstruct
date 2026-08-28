@@ -7,7 +7,7 @@ For types without structural equality (State, StateT, ReaderT),
 pass an `eq` function that evaluates/runs the values for comparison.
 """
 
-from funstruct.typeclass.semigroup import Semigroup
+from funstruct.typeclasses.semigroup import Semigroup
 
 
 def assert_semigroup_laws(a, b, c, sg: Semigroup):

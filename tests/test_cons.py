@@ -1,9 +1,8 @@
 import pytest
+import funstruct.semigroup as semigroup
 from parametrization import Parametrization as P
 
 from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.typeclass.monoid import Monoid
-from funstruct.typeclass.semigroup import Semigroup
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,
@@ -12,7 +11,7 @@ from tests.laws import (
     assert_semigroup_laws,
 )
 
-clist_concat = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())
+# clist_concat = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())
 
 
 class TestCListLaws:
@@ -21,7 +20,7 @@ class TestCListLaws:
             Cons(1, Cons(2, Nil())),
             Cons(3, Nil()),
             Cons(4, Cons(5, Nil())),
-            sg=clist_concat,
+            sg=semigroup.CListConcat,
         )
 
     def test_monoid(self):

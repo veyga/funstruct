@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from funstruct.typeclass.functor import Functor
+from funstruct.typeclasses import Functor
 
 
 class Applicative(Functor):

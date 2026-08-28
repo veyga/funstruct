@@ -2,7 +2,7 @@ import pytest
 from parametrization import Parametrization as P
 
 from funstruct.collections.frozendict import frozendict
-from funstruct.typeclass.monoid import Monoid
+from funstruct.typeclasses.monoid import Monoid
 from tests.laws import (
     assert_functor_laws,
     assert_monoid_laws,

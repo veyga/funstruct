@@ -1,7 +1,7 @@
 """Tests for Writer monad."""
 
 from funstruct.monad.writer import Writer
-from funstruct.typeclass.monoid import Monoid
+from funstruct.typeclasses.monoid import Monoid
 from tests.laws import assert_functor_laws, assert_monad_laws
 
 

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from _funstruct._cons import Cons
-from funstruct.typeclass.applicative import Applicative
+from funstruct.typeclasses.applicative import Applicative
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
