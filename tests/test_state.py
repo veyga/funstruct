@@ -132,3 +132,64 @@ class TestLaws:
         left = m.bind(f).bind(g).run(0)
         right = m.bind(lambda x: f(x).bind(g)).run(0)
         assert left == right
+
+
+class TestDoNotation:
+    def test_counter(self):
+        inc = State(lambda s: (s + 1, s))
+        get = State(lambda s: (s, s))
+
+        @State.do
+        def count_to_three():
+            a = yield inc
+            b = yield inc
+            c = yield inc
+            total = yield get
+            return (a, b, c, total)
+
+        assert count_to_three.run(0) == (3, (0, 1, 2, 3))
+
+    def test_with_conditionals(self):
+        get = State(lambda s: (s, s))
+        inc = State(lambda s: (s + 1, None))
+        dec = State(lambda s: (s - 1, None))
+
+        @State.do
+        def conditional_update():
+            current = yield get
+            _ = yield dec if current > 5 else inc
+            final_state = yield get
+            return final_state
+
+        assert conditional_update.run(3) == (4, 4)
+        assert conditional_update.run(10) == (9, 9)
+
+
+class TestDoNotationEquivalentWithBind:
+    """Same logic as TestDoNotation but using bind chains."""
+
+    def test_counter(self):
+        inc = State(lambda s: (s + 1, s))
+        get = State(lambda s: (s, s))
+
+        count_to_three = inc.bind(
+            lambda a: inc.bind(
+                lambda b: inc.bind(
+                    lambda c: get.map(lambda total: (a, b, c, total))
+                )
+            )
+        )
+
+        assert count_to_three.run(0) == (3, (0, 1, 2, 3))
+
+    def test_with_conditionals(self):
+        get = State(lambda s: (s, s))
+        inc = State(lambda s: (s + 1, None))
+        dec = State(lambda s: (s - 1, None))
+
+        conditional_update = get.bind(
+            lambda current: (dec if current > 5 else inc).bind(lambda _: get)
+        )
+
+        assert conditional_update.run(3) == (4, 4)
+        assert conditional_update.run(10) == (9, 9)

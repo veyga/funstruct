@@ -18,14 +18,16 @@ Example with Result::
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._monad_transformer import MonadTransformer
 
 _F = TypeVar("_F")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
+# class StateT(MonadTransformer[_F, _A, _B]):
 
-class StateT(Monad, Generic[_F, _A]):
+
+class StateT(MonadTransformer, Generic[_F, _A]):
     """Generic state transformer: ``S -> F[(S, A)]``.
 
     ``F`` is the wrapping monad (Result, FutureResult, Maybe, etc.).
@@ -96,6 +98,13 @@ class StateT(Monad, Generic[_F, _A]):
         """Applicative ap: run both, tuple the values."""
         return self.bind(lambda a: other.map(lambda b: (a, b)))
 
+    def and_then(self, other: "StateT") -> "StateT":
+        """Kleisli composition: value from self becomes initial state for other.
+
+        Short-circuits on inner monad failure.
+        """
+        return StateT(lambda s: self._run(s).bind(lambda sa: other._run(sa[1])))
+
     def then(self, next_state: "StateT[_F, _B]") -> "StateT[_F, _B]":
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_state)
@@ -103,7 +112,34 @@ class StateT(Monad, Generic[_F, _A]):
     # Constructors — monad class passed explicitly, StateT knows nothing about it
 
     @classmethod
-    def pure(cls, value, monad) -> "StateT":
+    def do(cls, gen_fn) -> "StateT":
+        """Do-notation via generators. Flattens nested binds.
+
+        Each `yield` extracts the value from a StateT.
+        State threads through, short-circuits on inner monad failure.
+        """
+
+        def _run(s):
+            gen = gen_fn()
+            try:
+                first = next(gen)
+            except StopIteration:
+                raise ValueError("do block must yield at least once")
+
+            def step(sa):
+                new_s, value = sa
+                try:
+                    next_val = gen.send(value)
+                    return next_val.run(new_s).bind(step)
+                except StopIteration as e:
+                    return first.run(s).__class__.from_value((new_s, e.value))
+
+            return first.run(s).bind(step)
+
+        return cls(_run)
+
+    @classmethod
+    def pure(cls, value, monad: type) -> "StateT":
         """Lift a value.
 
         State unchanged. Uses ``monad.from_value``.

@@ -262,3 +262,52 @@ class TestLift:
             StateT.pure("never", Result)
         )
         assert pipeline.run(0) == Failure("stop")
+
+
+class TestDoNotation:
+    def test_stateful_with_failure(self):
+        inc = StateT(lambda s: Result.from_value((s + 1, s)))
+        check = StateT(
+            lambda s: (
+                Result.from_value((s, "ok"))
+                if s < 5
+                else Result.from_failure("too high")
+            )
+        )
+
+        @StateT.do
+        def pipeline():
+            a = yield inc
+            b = yield inc
+            c = yield inc
+            msg = yield check
+            return (a, b, c, msg)
+
+        assert pipeline.run(0) == Success((3, (0, 1, 2, "ok")))
+        assert pipeline.run(3) == Failure("too high")
+
+
+class TestDoNotationEquivalentWithBind:
+    """Same logic as TestDoNotation but using bind chains."""
+
+    def test_stateful_with_failure(self):
+        inc = StateT(lambda s: Result.from_value((s + 1, s)))
+        check = StateT(
+            lambda s: (
+                Result.from_value((s, "ok"))
+                if s < 5
+                else Result.from_failure("too high")
+            )
+        )
+
+        # fmt: off
+        pipeline = (
+            inc
+            .bind(lambda a: inc
+            .bind(lambda b: inc
+            .bind(lambda c: check
+            .map(lambda msg: (a, b, c, msg)))))
+        )
+
+        assert pipeline.run(0) == Success((3, (0, 1, 2, "ok")))
+        assert pipeline.run(3) == Failure("too high")

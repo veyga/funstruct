@@ -96,3 +96,97 @@ class TestOperators:
     def test_add_ap(self):
         r = Reader.pure(1) + Reader.pure(2)
         assert r.run("ctx") == (1, 2)
+
+
+class TestDoNotation:
+    def test_shared_context(self):
+        get_x = Reader(lambda ctx: ctx["x"])
+        get_y = Reader(lambda ctx: ctx["y"])
+        get_z = Reader(lambda ctx: ctx.get("z", 0))
+
+        @Reader.do
+        def compute():
+            x = yield get_x
+            y = yield get_y
+            z = yield get_z
+            return x + y + z
+
+        x = compute.run({"x": 1, "y": 2, "z": 3})
+        assert x == 6
+        assert compute.run({"x": 10, "y": 20}) == 30
+
+    def test_with_conditionals(self):
+        get_port = Reader(lambda cfg: cfg["port"])
+        get_host = Reader(lambda cfg: cfg["host"])
+
+        @Reader.do
+        def build_url():
+            host = yield get_host
+            port = yield get_port
+            scheme = "https" if port == 443 else "http"
+            return f"{scheme}://{host}:{port}"
+
+        assert (
+            build_url.run({"host": "prod.co", "port": 443})
+            == "https://prod.co:443"
+        )
+        assert (
+            build_url.run({"host": "localhost", "port": 8080})
+            == "http://localhost:8080"
+        )
+
+    def test_with_ask(self):
+        @Reader.do
+        def describe():
+            ctx = yield Reader.ask()
+            name = yield Reader(lambda c: c["name"])
+            return f"{name} has {len(ctx)} fields"
+
+        assert (
+            describe.run({"name": "Alice", "age": 30}) == "Alice has 2 fields"
+        )
+
+
+class TestDoNotationEquivalentWithBind:
+    """Same logic as TestDoNotation but using bind/map chains."""
+
+    def test_shared_context(self):
+        get_x = Reader(lambda ctx: ctx["x"])
+        get_y = Reader(lambda ctx: ctx["y"])
+        get_z = Reader(lambda ctx: ctx.get("z", 0))
+
+        # the do syntax helps for the 'vertical style'
+        # fmt: off
+        compute = (
+            get_x
+            .bind(lambda x: get_y
+            .bind(lambda y: get_z
+            .map(lambda z: x + y + z)))
+        )
+
+        assert compute.run({"x": 1, "y": 2, "z": 3}) == 6
+        assert compute.run({"x": 10, "y": 20}) == 30
+
+    def test_with_conditionals(self):
+        get_port = Reader(lambda cfg: cfg["port"])
+        get_host = Reader(lambda cfg: cfg["host"])
+
+        # fmt: off
+        build_url = (
+            get_host
+            .bind(lambda host: get_port
+            .map(lambda port: f"{'https' if port == 443 else 'http'}://{host}:{port}"))
+        )
+
+        assert build_url.run({"host": "prod.co", "port": 443}) == "https://prod.co:443"
+        assert build_url.run({"host": "localhost", "port": 8080}) == "http://localhost:8080"
+
+    def test_with_ask(self):
+        # fmt: off
+        describe = (
+            Reader.ask()
+            .bind(lambda ctx: Reader(lambda c: c["name"])
+            .map(lambda name: f"{name} has {len(ctx)} fields"))
+        )
+
+        assert describe.run({"name": "Alice", "age": 30}) == "Alice has 2 fields"

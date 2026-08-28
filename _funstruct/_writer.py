@@ -51,6 +51,21 @@ class Writer(Monad, Generic[_W, _A]):
         )
 
     @classmethod
+    def do(cls, gen_fn) -> Writer:
+        """Do-notation for Writer. Accumulates output across yields."""
+        gen = gen_fn()
+        try:
+            first = next(gen)
+            output = first.output
+            value = first.value
+            while True:
+                next_w = gen.send(value)
+                output = cls._monoid.combine(output, next_w.output)
+                value = next_w.value
+        except StopIteration as e:
+            return cls(e.value, output)
+
+    @classmethod
     def pure(cls, value) -> Writer:
         """Lift a value with empty output (uses _monoid.empty)."""
         return cls(value, cls._monoid.empty)

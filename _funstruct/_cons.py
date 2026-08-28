@@ -297,6 +297,28 @@ class CList(Monad, Generic[A]):
         return flatten(lst)
 
     @classmethod
+    def do(cls, gen_fn) -> CList:
+        """Do-notation for CList. Collects all yielded results via flatMap."""
+
+        def _collect():
+            gen = gen_fn()
+            try:
+                first = next(gen)
+                result = first.bind(lambda v: _send(gen, v))
+                return result
+            except StopIteration as e:
+                return Cons.pure(e.value)
+
+        def _send(gen, value):
+            try:
+                next_val = gen.send(value)
+                return next_val.bind(lambda v: _send(gen, v))
+            except StopIteration as e:
+                return Cons.pure(e.value)
+
+        return _collect()
+
+    @classmethod
     def pure(cls, value) -> CList:
         """Lift a value into a single-element list."""
         return Cons(value)

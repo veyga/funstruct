@@ -45,5 +45,5 @@ plugins:
             show_source: true
             show_root_heading: true
             members_order: source
-            # docstring_style: google
-            # show_docstring_examples: true
+            docstring_style: google
+            show_docstring_examples: true

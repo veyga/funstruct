@@ -20,9 +20,27 @@ Semigroup              Functor
  Monoid              Applicative
                         │
                        Monad
+                        |
+                      MonadTransformer
 ```
 
 #### Diagrams
+
+**Semigroup** — associative combine (`+` being the canonical 'combine' operation)
+
+```
+A ─┐
+    ├──( + )──> A
+A ─┘
+```
+
+**Monoid** — semigroup with an identity element
+
+```
+A ─┐
+    ├──( + )──> A       (+ identity = A)
+A ─┘
+```
 
 **Functor** — transform the value inside a context
 
@@ -42,22 +60,6 @@ F[B] ─┘
 
 ```
 F[A] ---( f: A -> F[B] )---> F[B]
-```
-
-**Semigroup** — associative combine (any type with `+`)
-
-```
-A ─┐
-    ├──( + )──> A
-A ─┘
-```
-
-**Monoid** — semigroup with an identity element
-
-```
-A ─┐
-    ├──( + )──> A       (+ identity = A)
-A ─┘
 ```
 
 ```python
@@ -82,7 +84,11 @@ class Applicative(Functor):
 
 class Monad(Applicative):
     def bind(self, f) -> Monad: ...
+    def do(cls, gen_fn) -> Monad: ...
     def __rshift__ = bind  # >>
+
+class MonadTransformer(Monad, Generic[_F, _A]):
+    def and_then(self, other) -> MonadTransformer: ...
 ```
 
 ```python
@@ -119,6 +125,47 @@ trait Monad[F[_]] extends Applicative[F] {
   def bind(fa: F[A])(f: A => F[B]): F[B]
 }
 ```
+
+### Monad Transformers
+
+A monad transformer wraps one monad inside another, combining their effects.
+
+```
+MonadTransformer[F, A]  — F is the inner monad, A is the value
+```
+
+**ReaderT** — shared environment + inner monad's effects (failure, state, etc.)
+
+```
+ReaderT[F, Ctx, A]  =  Ctx -> F[A]
+```
+
+**StateT** — threaded state + inner monad's effects
+
+```
+StateT[F, S, A]  =  S -> F[(S, A)]
+```
+
+```python
+class MonadTransformer(Monad, Generic[_F, _A]):
+    def and_then(self, other) -> MonadTransformer: ...  # Kleisli composition
+    def do(cls, gen_fn) -> MonadTransformer: ...        # do-notation
+
+class ReaderT(MonadTransformer[_F, _A]):
+    # bind: both steps share the same context
+    # and_then: output of one becomes context of next
+    ...
+
+class StateT(MonadTransformer[_F, _A]):
+    # bind: state threads through each step
+    # and_then: value from one becomes input of next
+    ...
+```
+
+**Why transformers?** Plain `Reader` can only read from an environment.
+`ReaderT[Result, Ctx, A]` can read from an environment AND fail.
+`StateT[Result, S, A]` can thread state AND fail. You compose effects
+without writing a new monad for every combination.
 
 ### Laws
 

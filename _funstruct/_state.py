@@ -86,6 +86,26 @@ class State(Monad, Generic[_A]):
         return self.bind(lambda _: next_state)
 
     @classmethod
+    def do(cls, gen_fn) -> "State":
+        """Do-notation via generators. Flattens nested binds.
+
+        Each `yield` extracts the value from a State (state threads through).
+        """
+
+        def _run(s):
+            gen = gen_fn()
+            try:
+                monadic_val = next(gen)
+                while True:
+                    new_s, result = monadic_val.run(s)
+                    s = new_s
+                    monadic_val = gen.send(result)
+            except StopIteration as e:
+                return (s, e.value)
+
+        return cls(_run)
+
+    @classmethod
     def pure(cls, value) -> "State":
         """Lift a value without modifying state.
 

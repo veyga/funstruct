@@ -190,3 +190,88 @@ class TestLaws:
         left = m.bind(f).bind(g).run(5)
         right = m.bind(lambda x: f(x).bind(g)).run(5)
         assert left == right
+
+
+class TestDoNotation:
+    def test_shared_context_with_failure(self):
+        get_name = ReaderT(lambda cfg: Result.from_value(cfg["name"]))
+        get_email = ReaderT(
+            lambda cfg: (
+                Result.from_value(cfg["email"])
+                if "email" in cfg
+                else Result.from_failure("missing email")
+            )
+        )
+        validate_name = lambda n: ReaderT(
+            lambda cfg: (
+                Result.from_value(n)
+                if len(n) > 0
+                else Result.from_failure("empty name")
+            )
+        )
+
+        @ReaderT.do
+        def build_profile():
+            name = yield get_name
+            name = yield validate_name(name)
+            email = yield get_email
+            return {"name": name, "email": email}
+
+        assert build_profile.run(
+            {"name": "Alice", "email": "a@b.co"}
+        ) == Success({"name": "Alice", "email": "a@b.co"})
+        assert build_profile.run({"name": "Alice"}) == Failure("missing email")
+        assert build_profile.run({"name": "", "email": "a@b.co"}) == Failure(
+            "empty name"
+        )
+
+    def test_and_then_in_do(self):
+        parse = ReaderT(
+            lambda s: (
+                Result.from_value(int(s))
+                if s.isdigit()
+                else Result.from_failure(f"bad: {s}")
+            )
+        )
+        double = ReaderT(lambda n: Result.from_value(n * 2))
+
+        pipeline = parse.and_then(double)
+        assert pipeline.run("5") == Success(10)
+        assert pipeline.run("x") == Failure("bad: x")
+
+
+class TestDoNotationEquivalentWithBind:
+    """Same logic as TestDoNotation but using bind chains."""
+
+    def test_shared_context_with_failure(self):
+        get_name = ReaderT(lambda cfg: Result.from_value(cfg["name"]))
+        get_email = ReaderT(
+            lambda cfg: (
+                Result.from_value(cfg["email"])
+                if "email" in cfg
+                else Result.from_failure("missing email")
+            )
+        )
+        validate_name = lambda n: ReaderT(
+            lambda cfg: (
+                Result.from_value(n)
+                if len(n) > 0
+                else Result.from_failure("empty name")
+            )
+        )
+
+        build_profile = get_name.bind(
+            lambda name: validate_name(name).bind(
+                lambda name: get_email.map(
+                    lambda email: {"name": name, "email": email}
+                )
+            )
+        )
+
+        assert build_profile.run(
+            {"name": "Alice", "email": "a@b.co"}
+        ) == Success({"name": "Alice", "email": "a@b.co"})
+        assert build_profile.run({"name": "Alice"}) == Failure("missing email")
+        assert build_profile.run({"name": "", "email": "a@b.co"}) == Failure(
+            "empty name"
+        )

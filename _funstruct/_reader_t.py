@@ -36,7 +36,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._monad_transformer import MonadTransformer
 
 _Ctx = TypeVar("_Ctx")
 _M = TypeVar("_M")
@@ -44,7 +44,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class ReaderT(Monad, Generic[_Ctx, _M, _A]):
+class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
     """ReaderT: ``Ctx -> M[A]``.
 
     M is the inner monad (StateT, Result, etc.). Composition delegates to M's
@@ -93,12 +93,49 @@ class ReaderT(Monad, Generic[_Ctx, _M, _A]):
 
     # ap inherited from Monad (derived from bind + map)
 
+    def and_then(self, other: ReaderT) -> ReaderT:
+        """Kleisli composition: output of self becomes input (ctx) of other.
+
+        Short-circuits on inner monad failure.
+        """
+        return ReaderT(
+            lambda ctx: self._run(ctx).bind(lambda result: other._run(result))
+        )
+
+    @classmethod
+    def do(cls, gen_fn) -> ReaderT:
+        """Do-notation via generators. Flattens nested binds.
+
+        Each `yield` extracts the value from a ReaderT (shared ctx).
+        Short-circuits on inner monad failure.
+        """
+
+        def _run(ctx):
+            gen = gen_fn()
+            try:
+                monadic_val = next(gen)
+            except StopIteration:
+                raise ValueError("do block must yield at least once")
+
+            def step(value):
+                try:
+                    next_val = gen.send(value)
+                    return next_val._run(ctx).bind(step)
+                except StopIteration as e:
+                    return monadic_val._run(ctx).__class__.from_value(e.value)
+
+            return monadic_val._run(ctx).bind(step)
+
+        return cls(_run)
+
     def then(
         self,
         next_step: ReaderT[_Ctx, _M, _B],
     ) -> ReaderT[_Ctx, _M, _B]:
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_step)
+
+        return cls(_run)
 
     @classmethod
     def pure(cls, value, monad) -> ReaderT:
