@@ -1,5 +1,9 @@
 """Monad types."""
 
+from _funstruct._either import Either as Either
+from _funstruct._either import Left as Left
+from _funstruct._either import Right as Right
+from _funstruct._either import attempt as attempt
 from _funstruct._option import Nothing as Nothing
 from _funstruct._option import Option as Option
 from _funstruct._option import Some as Some
