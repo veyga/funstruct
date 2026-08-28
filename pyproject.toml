@@ -41,10 +41,15 @@ docs = [
     "mkdocstrings[python]>=0.27",
     "mdformat>=1.0",
     "mdformat-mkdocs>=3.0",
+    "docformatter>=1.7",
 ]
 
 [tool.ty.environment]
 root = ["."]
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 
 [tool.ruff]
 line-length = 80

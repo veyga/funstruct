@@ -1,22 +1,15 @@
 """
 Validated: applicative error-accumulating functor.
 
-Scala Cats equivalent: ``Validated[NonEmptyList[E], A]``
-
-Unlike Result/Either (monadic, short-circuits on first error),
-Validated accumulates ALL errors via .ap() / .map_n().
-
-Use Validated for independent validations that should all report.
-Use Result/bind for sequential operations where later steps
-depend on earlier results.
+Use Validated for independent validations.
 
 Example::
 
-    >>> from jf_commons.functional.validated import Validated
+    >>> from funstruct.applicative.validated import Validated
     >>> (Validated.valid(None)
     ...     .ap(Validated.invalid("too short"))
     ...     .ap(Validated.invalid("missing @")))
-    Invalid(errors=['too short', 'missing @'])
+    Invalid(errors=Cons('too short', Cons('missing @', Nil())))
 
 """
 

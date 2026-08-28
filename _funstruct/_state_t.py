@@ -8,7 +8,7 @@ Generic State monad transformer.
 Example with Result::
 
     >>> from returns.result import Result
-    >>> from funstruct.state_t import StateT
+    >>> from funstruct.monad import StateT
     >>> inc = StateT(lambda s: Result.from_value((s + 1, s)))
     >>> inc.then(inc).then(inc).run(0)
     <Success: (3, 2)>

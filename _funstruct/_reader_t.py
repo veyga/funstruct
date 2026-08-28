@@ -13,7 +13,7 @@ Scala cats:   ``Kleisli[F, Ctx, A]``
 Example with Result::
 
     >>> from returns.result import Result
-    >>> from funstruct.reader_t import ReaderT
+    >>> from funstruct.monad import ReaderT
     >>> step = ReaderT(lambda ctx: Result.from_value(ctx + 1))
     >>> step.run(5)
     <Success: 6>
@@ -21,8 +21,8 @@ Example with Result::
 Example with StateT::
 
     >>> from returns.result import Result
-    >>> from funstruct.state_t import StateT
-    >>> from funstruct.reader_t import ReaderT
+    >>> from funstruct.monad import StateT
+    >>> from funstruct.monad import ReaderT
     >>> step = ReaderT(lambda ctx: StateT(
     ...     lambda s: Result.from_value((s + ctx, s))
     ... ))
