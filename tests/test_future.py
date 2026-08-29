@@ -3,8 +3,7 @@
 import asyncio
 
 from funstruct.monad.either import Left, Right
-from funstruct.monad.future import Future
-from funstruct.monad.result import AsyncResult, TryAsync, Ok, Err
+from funstruct.monad.result import AsyncResult, TryAsync
 
 
 def run(future):

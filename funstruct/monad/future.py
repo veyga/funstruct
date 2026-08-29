@@ -30,7 +30,7 @@ class Future(Generic[A]):
 
     def __del__(self):
         if hasattr(self._coro, "close"):
-            self._coro.close()
+            getattr(self._coro, "close")()
 
     def __await__(self) -> Generator[None, None, A]:
         return self._awaitable().__await__()
