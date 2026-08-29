@@ -87,14 +87,153 @@ class Err(Left):
 _P = ParamSpec("_P")
 
 
-class AsyncResult(Future[Exception, _A], Generic[_A]):
-    """Future[Exception, A] — async computation that may fail.
+class AsyncResult(Generic[_A]):
+    """Lazy async computation that produces Result[A] (Ok or Err) when awaited.
 
-    Single type parameter: AsyncResult[User] = Future[Exception, User].
-    All Future methods inherited. Constructed via @TryAsync, .pure(), .from_error().
+    AsyncResult[User] = async computation → Ok(user) or Err(exception).
+    Compose with .bind(), .map(), .alt(), .or_else() — no await needed.
+    Execute once at the boundary with await.
     """
 
-    pass
+    __slots__ = ("_coro",)
+
+    def __init__(self, coro: Awaitable[Either[Exception, _A]]) -> None:
+        self._coro = coro
+
+    def __del__(self):
+        if hasattr(self._coro, "close"):
+            self._coro.close()
+
+    def __await__(self):
+        return self._awaitable().__await__()
+
+    async def _awaitable(self) -> Either[Exception, _A]:
+        return await self._coro
+
+    def map(self, f: Callable[[_A], Any]) -> AsyncResult:
+        """Transform the success value without executing."""
+
+        async def _inner():
+            result = await self._coro
+            return result.map(f)
+
+        return AsyncResult(_inner())
+
+    def bind(self, f: Callable[[_A], AsyncResult]) -> AsyncResult:
+        """Chain: f receives value, returns new AsyncResult. Short-circuits on Err."""
+
+        async def _inner():
+            result = await self._coro
+            match result:
+                case Right(value):
+                    return await f(value)
+                case _:
+                    return result
+
+        return AsyncResult(_inner())
+
+    def bind_either(self, f: Callable[[_A], Either]) -> AsyncResult:
+        """Chain with a sync function that returns Either."""
+
+        async def _inner():
+            result = await self._coro
+            match result:
+                case Right(value):
+                    return f(value)
+                case _:
+                    return result
+
+        return AsyncResult(_inner())
+
+    def alt(self, f: Callable) -> AsyncResult:
+        """Transform the error without recovering."""
+
+        async def _inner():
+            result = await self._coro
+            match result:
+                case Left(error):
+                    return Err(f(error))
+                case _:
+                    return result
+
+        return AsyncResult(_inner())
+
+    def or_else(self, f: Callable) -> AsyncResult:
+        """Recover from error: f receives error, returns new AsyncResult."""
+
+        async def _inner():
+            result = await self._coro
+            match result:
+                case Left(error):
+                    return await f(error)
+                case _:
+                    return result
+
+        return AsyncResult(_inner())
+
+    def bind_awaitable(self, f: Callable) -> AsyncResult:
+        """Chain with an async function that returns a plain value."""
+
+        async def _inner():
+            result = await self._coro
+            match result:
+                case Right(value):
+                    return Ok(await f(value))
+                case _:
+                    return result
+
+        return AsyncResult(_inner())
+
+    def or_else_either(self, f: Callable) -> AsyncResult:
+        """Recover with a sync function returning Either."""
+
+        async def _inner():
+            result = await self._coro
+            match result:
+                case Left(error):
+                    return f(error)
+                case _:
+                    return result
+
+        return AsyncResult(_inner())
+
+    def then(self, next_result: AsyncResult) -> AsyncResult:
+        """Sequence: run self, discard value, run next."""
+        return self.bind(lambda _: next_result)
+
+    def ap(self, other: AsyncResult) -> AsyncResult:
+        """Applicative: run both, tuple the values."""
+        return self.bind(lambda a: other.map(lambda b: (a, b)))
+
+    @classmethod
+    def pure(cls, value: _A) -> AsyncResult[_A]:
+        """Lift a plain value into Ok."""
+
+        async def _inner():
+            return Ok(value)
+
+        return cls(_inner())
+
+    @classmethod
+    def from_error(cls, error: Exception) -> AsyncResult:
+        """Lift an error into Err."""
+
+        async def _inner():
+            return Err(error)
+
+        return cls(_inner())
+
+    @classmethod
+    def from_either(cls, either: Either) -> AsyncResult:
+        """Lift a sync Either/Result into AsyncResult."""
+
+        async def _inner():
+            return either
+
+        return cls(_inner())
+
+    def __repr__(self) -> str:
+        return f"AsyncResult({self._coro})"
 
 
 def Try(
