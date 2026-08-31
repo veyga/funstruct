@@ -35,14 +35,16 @@ Examples:
 from __future__ import annotations
 
 import inspect
-from collections.abc import Awaitable, Callable
+from abc import abstractmethod
+from collections.abc import Awaitable, Callable, Coroutine
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Generic, ParamSpec, TypeVar
+from typing import Any, Generic, ParamSpec, TypeVar, overload
 
 from funstruct.monad.either import Either, Left, Right
 
 _A = TypeVar("_A")
+_B = TypeVar("_B")
 
 
 class Result(Either[Exception, _A], Generic[_A]):
@@ -52,18 +54,31 @@ class Result(Either[Exception, _A], Generic[_A]):
     Same as Either[Exception, A] but with 1 param for cleaner annotations.
     """
 
-    pass
+    @abstractmethod
+    def map(self, f: Callable[[_A], _B]) -> Result[_B]: ...
+    @abstractmethod
+    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
+    @abstractmethod
+    def alt(self, f: Callable[[Exception], Exception]) -> Result[_A]: ...
+    @abstractmethod
+    def or_else(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]: ...
 
 
 @dataclass(frozen=True, eq=False)
 class Ok(Right):
     """Success case of Result."""
 
-    def map(self, f: Callable) -> Either:
+    def map(self, f: Callable[[_A], _B]) -> Result[_B]:
         return Ok(f(self.value))
 
-    def bind(self, f: Callable) -> Either:
+    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return f(self.value)
+
+    def alt(self, f: Callable[[Exception], Exception]) -> Result[_A]:
+        return self
+
+    def or_else(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+        return self
 
     def __repr__(self) -> str:
         return f"Ok({repr(self.value)})"
@@ -73,10 +88,16 @@ class Ok(Right):
 class Err(Left):
     """Error case of Result."""
 
-    def alt(self, f: Callable) -> Either:
+    def map(self, f: Callable[[_A], _B]) -> Result[_B]:
+        return self
+
+    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
+        return self
+
+    def alt(self, f: Callable[[Exception], Exception]) -> Result[_A]:
         return Err(f(self.error))
 
-    def or_else(self, f: Callable) -> Either:
+    def or_else(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
         return f(self.error)
 
     def __repr__(self) -> str:
@@ -96,7 +117,7 @@ class AsyncResult(Generic[_A]):
 
     __slots__ = ("_coro",)
 
-    def __init__(self, coro: Awaitable[Either[Exception, _A]]) -> None:
+    def __init__(self, coro: Awaitable[Result[_A]]) -> None:
         self._coro = coro
 
     def __del__(self):
@@ -106,10 +127,10 @@ class AsyncResult(Generic[_A]):
     def __await__(self):
         return self._awaitable().__await__()
 
-    async def _awaitable(self) -> Either[Exception, _A]:
+    async def _awaitable(self) -> Result[_A]:
         return await self._coro
 
-    def map(self, f: Callable[[_A], Any]) -> AsyncResult:
+    def map(self, f: Callable[[_A], _B]) -> AsyncResult[_B]:
         """Transform the success value without executing."""
 
         async def _inner():
@@ -118,11 +139,11 @@ class AsyncResult(Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def bind(self, f: Callable) -> AsyncResult:
+    def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
         """Chain: f receives value. Short-circuits on Err.
 
         Handles all return types from f:
-        - AsyncResult[B] → awaited, produces Either
+        - AsyncResult[B] → awaited, produces Result
         - Either[E, B] / Result[B] → used directly
         - Awaitable[B] → awaited, plain value wrapped in Ok
         - Plain B → wrapped in Ok
@@ -143,7 +164,7 @@ class AsyncResult(Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def alt(self, f: Callable) -> AsyncResult:
+    def alt(self, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
         """Transform the error without recovering."""
 
         async def _inner():
@@ -156,11 +177,11 @@ class AsyncResult(Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def or_else(self, f: Callable) -> AsyncResult:
+    def or_else(self, f: Callable[[Exception], Any]) -> AsyncResult:
         """Recover from error: f receives error. Short-circuits on success.
 
         Handles all return types from f:
-        - AsyncResult[A] → awaited, produces Either
+        - AsyncResult[A] → awaited, produces Result
         - Either[E, A] / Result[A] → used directly
         - Awaitable[A] → awaited, plain value wrapped in Ok
         - Plain A → wrapped in Ok
@@ -181,11 +202,11 @@ class AsyncResult(Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def then(self, next_result: AsyncResult) -> AsyncResult:
+    def then(self, next_result: AsyncResult[_B]) -> AsyncResult[_B]:
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_result)
 
-    def ap(self, other: AsyncResult) -> AsyncResult:
+    def ap(self, other: AsyncResult[_B]) -> AsyncResult[tuple[_A, _B]]:
         """Applicative: run both, tuple the values."""
         return self.bind(lambda a: other.map(lambda b: (a, b)))
 
@@ -239,6 +260,14 @@ def Try(
     return wrapper
 
 
+@overload
+def TryAsync(
+    f: Callable[_P, Coroutine[Any, Any, _A]],
+) -> Callable[_P, AsyncResult[_A]]: ...
+@overload
+def TryAsync(
+    f: Callable[_P, _A],
+) -> Callable[_P, AsyncResult[_A]]: ...
 def TryAsync(
     f: Callable[_P, _A],
 ) -> Callable[_P, AsyncResult[_A]]:

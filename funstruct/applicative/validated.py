@@ -17,6 +17,10 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from funstruct.monad.result import Result
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import Cons
@@ -33,6 +37,9 @@ class Validated(Applicative):
     @abstractmethod
     def ap(self, other) -> Validated: ...
 
+    def __add__(self, other) -> Validated:
+        return self.ap(other)
+
     @property
     @abstractmethod
     def is_valid(self) -> bool: ...
@@ -41,6 +48,12 @@ class Validated(Applicative):
     def fold(self, on_invalid: Callable, on_valid: Callable):
         """Eliminate the Validated — apply on_invalid or on_valid."""
         ...
+
+    @abstractmethod
+    def to_result(self) -> Result: ...
+
+    @abstractmethod
+    def to_result_or(self, exc_cls, combine=None) -> Result: ...
 
     @classmethod
     def pure(cls, value) -> Validated:
