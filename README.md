@@ -86,6 +86,7 @@ class Monad(Applicative):
     def __rshift__ = bind  # >>
 
 class MonadTransformer(Monad, Generic[_F, _A]):
+    def lift_f(cls, inner: _F) -> MonadTransformer: ...
     def and_then(self, other) -> MonadTransformer: ...
 ```
 
