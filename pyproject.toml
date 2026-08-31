@@ -1,6 +1,6 @@
 [project]
 name = "funstruct"
-version = "1.0.0"
+version = "1.0.1"
 description = "Fun & functional structures for Python"
 authors = [{name = "Andrew Stefanich", email = "andrewstefanich@gmail.com"}]
 license = {text = "MIT"}
@@ -10,7 +10,8 @@ keywords = ["functional", "immutable", "fp", "data structures", "cons"]
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/veyga/funstruct"
+Homepage = "https://veyga.github.io/funstruct/"
+Documentation = "https://veyga.github.io/funstruct/"
 Repository = "https://github.com/veyga/funstruct"
 
 [build-system]
