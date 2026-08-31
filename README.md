@@ -161,11 +161,14 @@ every step. Transformers flatten that into one `bind`:
 
 ```python
 # Without transformer — nested pattern matching at every step:
-result = fetch_user(id)          # Either[Err, Option[User]]
+result = fetch_user(id)  # Either[Err, Option[User]]
 match result:
-    case Left(e): ...            # handle error
-    case Right(Nothing()): ...   # handle absence
-    case Right(Some(user)): ...  # finally, the value
+    case Left(e):
+        ...  # handle error
+    case Right(Nothing()):
+        ...  # handle absence
+    case Right(Some(user)):
+        ...  # finally, the value
 
 # With OptionT — one flat pipeline:
 pipeline = (
