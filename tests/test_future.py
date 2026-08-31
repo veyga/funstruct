@@ -3,7 +3,8 @@
 import asyncio
 
 from funstruct.monad.either import Left, Right
-from funstruct.monad.result import AsyncResult, TryAsync
+from funstruct.monad.future import Future
+from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
 
 
 def run(future):
@@ -77,33 +78,33 @@ class TestBind:
         assert result == Left("failed")
 
 
-class TestBindEither:
+class TestBindWithEither:
     def test_success(self):
-        result = run(AsyncResult.pure(5).bind_either(lambda x: Right(x * 2)))
+        result = run(AsyncResult.pure(5).bind(lambda x: Right(x * 2)))
         assert result == Right(10)
 
     def test_failure(self):
-        result = run(AsyncResult.pure(5).bind_either(lambda x: Left("nope")))
+        result = run(AsyncResult.pure(5).bind(lambda x: Left("nope")))
         assert result == Left("nope")
 
     def test_skips_on_initial_error(self):
-        result = run(AsyncResult.from_error("err").bind_either(lambda x: Right(99)))
+        result = run(AsyncResult.from_error("err").bind(lambda x: Right(99)))
         assert result == Left("err")
 
 
-class TestBindAwaitable:
+class TestBindWithAwaitable:
     def test_success(self):
         async def double(x):
             return x * 2
 
-        result = run(AsyncResult.pure(5).bind_awaitable(double))
+        result = run(AsyncResult.pure(5).bind(double))
         assert result == Right(10)
 
     def test_skips_on_error(self):
         async def double(x):
             return x * 2
 
-        result = run(AsyncResult.from_error("err").bind_awaitable(double))
+        result = run(AsyncResult.from_error("err").bind(double))
         assert result == Left("err")
 
 
@@ -120,10 +121,8 @@ class TestOrElse:
         result = run(AsyncResult.pure(42).or_else(lambda e: AsyncResult.pure(0)))
         assert result == Right(42)
 
-    def test_or_else_either(self):
-        result = run(
-            AsyncResult.from_error("oops").or_else_either(lambda e: Right("fixed"))
-        )
+    def test_or_else_with_either(self):
+        result = run(AsyncResult.from_error("oops").or_else(lambda e: Right("fixed")))
         assert result == Right("fixed")
 
 
@@ -211,3 +210,170 @@ class TestPipeline:
             .map(lambda v: v.upper())
         )
         assert run(pipeline) == Right("CACHED")
+
+
+class TestTryAsyncWithSyncFunctions:
+    """TryAsync accepts sync functions, wrapping them in AsyncResult."""
+
+    def test_sync_success(self):
+        @TryAsync
+        def parse_int(s):
+            return int(s)
+
+        assert run(parse_int("42")) == Ok(42)
+
+    def test_sync_catches_exception(self):
+        @TryAsync
+        def parse_int(s):
+            return int(s)
+
+        result = run(parse_int("not a number"))
+        assert isinstance(result, Err)
+        match result:
+            case Err(e):
+                assert isinstance(e, ValueError)
+
+    def test_sync_preserves_function_name(self):
+        @TryAsync
+        def my_sync_func():
+            return 1
+
+        assert my_sync_func.__name__ == "my_sync_func"
+
+    def test_sync_with_args(self):
+        @TryAsync
+        def add(a, b):
+            return a + b
+
+        assert run(add(3, 4)) == Ok(7)
+
+
+class TestTryAsyncWithFuture:
+    """TryAsync accepts functions returning Future (awaitable, not coroutine)."""
+
+    def test_future_returning_function(self):
+        @TryAsync
+        def get_value():
+            return Future.pure(42)
+
+        assert run(get_value()) == Ok(42)
+
+    def test_future_with_args(self):
+        @TryAsync
+        def double(x):
+            return Future.pure(x * 2)
+
+        assert run(double(21)) == Ok(42)
+
+    def test_future_exception_in_wrapper(self):
+        @TryAsync
+        def bad():
+            raise RuntimeError("sync boom")
+
+        result = run(bad())
+        assert isinstance(result, Err)
+        match result:
+            case Err(e):
+                assert isinstance(e, RuntimeError)
+
+
+class TestTryAsyncComposition:
+    """Compose sync, async, and Future-returning functions in one pipeline."""
+
+    def test_sync_into_async_pipeline(self):
+        @TryAsync
+        def parse(raw):
+            return int(raw)
+
+        @TryAsync
+        async def fetch(id):
+            return {"id": id, "name": "alice"}
+
+        pipeline = parse("1").bind(fetch)
+        assert run(pipeline) == Ok({"id": 1, "name": "alice"})
+
+    def test_async_into_sync_pipeline(self):
+        @TryAsync
+        async def fetch_name():
+            return "alice"
+
+        @TryAsync
+        def upper(s):
+            return s.upper()
+
+        pipeline = fetch_name().bind(upper)
+        assert run(pipeline) == Ok("ALICE")
+
+    def test_sync_into_future_pipeline(self):
+        @TryAsync
+        def parse(raw):
+            return int(raw)
+
+        def async_double(x):
+            return AsyncResult.pure(x * 2)
+
+        pipeline = parse("5").bind(async_double)
+        assert run(pipeline) == Ok(10)
+
+    def test_three_step_mixed_pipeline(self):
+        @TryAsync
+        def parse(raw):
+            return int(raw)
+
+        @TryAsync
+        async def fetch_user(id):
+            if id == 1:
+                return "alice@example.com"
+            raise ValueError(f"not found: {id}")
+
+        @TryAsync
+        def format_email(email):
+            return f"<{email}>"
+
+        pipeline = parse("1").bind(fetch_user).bind(format_email)
+        assert run(pipeline) == Ok("<alice@example.com>")
+
+    def test_mixed_pipeline_short_circuits_on_sync_error(self):
+        @TryAsync
+        def parse(raw):
+            return int(raw)
+
+        @TryAsync
+        async def fetch_user(id):
+            return {"id": id}
+
+        pipeline = parse("bad").bind(fetch_user)
+        result = run(pipeline)
+        assert isinstance(result, Err)
+
+    def test_mixed_pipeline_short_circuits_on_async_error(self):
+        @TryAsync
+        def parse(raw):
+            return int(raw)
+
+        @TryAsync
+        async def fetch_user(id):
+            raise ValueError(f"not found: {id}")
+
+        pipeline = parse("99").bind(fetch_user)
+        result = run(pipeline)
+        assert isinstance(result, Err)
+
+    def test_map_after_sync(self):
+        @TryAsync
+        def parse(raw):
+            return int(raw)
+
+        result = run(parse("10").map(lambda x: x * 2))
+        assert result == Ok(20)
+
+    def test_alt_after_sync_error(self):
+        @TryAsync
+        def parse(raw):
+            return int(raw)
+
+        result = run(parse("bad").alt(lambda e: TypeError("parse failed")))
+        assert isinstance(result, Err)
+        match result:
+            case Err(e):
+                assert isinstance(e, TypeError)

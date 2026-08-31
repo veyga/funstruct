@@ -25,8 +25,10 @@ nav:
       - Applicative: typeclass/applicative.md
       - Monad: typeclass/monad.md
   - applicative:
+      - Overview: applicative/index.md
       - Validated: applicative/validated.md
   - monad:
+      - Overview: monad/index.md
       - Either: monad/either.md
       - Option: monad/option.md
       - Result: monad/result.md
@@ -35,12 +37,14 @@ nav:
       - State: monad/state.md
       - Future: monad/future.md
   - monadtransformer:
+      - Overview: monadtransformer/index.md
       - ReaderT: monad/reader_t.md
       - StateT: monad/state_t.md
       - EitherT: monadtransformer/either_t.md
       - OptionT: monadtransformer/option_t.md
       - WriterT: monadtransformer/writer_t.md
   - collections:
+      - Overview: collections/index.md
       - Cons: collections/cons.md
       - frozendict: collections/frozendict.md
       - Tree: collections/tree.md

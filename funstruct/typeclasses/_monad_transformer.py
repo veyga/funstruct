@@ -2,6 +2,9 @@
 
 MonadTransformer[F, A] — F is the inner monad, A is the value type.
 
+A monad transformer is not really a typeclass, but for the ergonomics
+of this library, we treat it as such
+
 The problem transformers solve:
 
     Monads don't compose automatically. If you have Either (for errors)
@@ -82,7 +85,8 @@ class MonadTransformer(Monad, Generic[_F, _A]):
     """Base for monad transformers.
 
     Mathematically, a monad transformer is a type constructor (Monad -> Monad).
-    In Haskell: `class MonadTrans t where lift :: Monad m => m a -> t m a`.
+    Haskell equivalent: `class MonadTrans t where lift :: Monad m => m a -> t m a`.
+    In funstruct this is `lift_f` to distinguish from function-lifting combinators.
     Python lacks higher-kinded types, so this class is a pragmatic marker.
 
     Type parameters:
@@ -93,12 +97,8 @@ class MonadTransformer(Monad, Generic[_F, _A]):
 
     @classmethod
     @abstractmethod
-    def lift(cls, inner: _F) -> MonadTransformer[_F, _A]:
-        """Lift an inner monad value into the transformer.
-
-        This is the defining operation of a monad transformer —
-        the bridge from the inner monad into the combined monad.
-        """
+    def lift_f(cls, inner: _F) -> MonadTransformer[_F, _A]:
+        """Lift an inner monad value into the transformer."""
         ...
 
     @abstractmethod

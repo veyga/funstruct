@@ -107,14 +107,14 @@ class TestThen:
 
 class TestLift:
     def test_lift_wraps_with_empty_output(self):
-        assert LogT.lift(Right(42)).run() == Right((42, []))
+        assert LogT.lift_f(Right(42)).run() == Right((42, []))
 
     def test_lift_propagates_failure(self):
-        assert LogT.lift(Left("err")).run() == Left("err")
+        assert LogT.lift_f(Left("err")).run() == Left("err")
 
     def test_lift_with_option(self):
-        assert LogT.lift(Some(5)).run() == Some((5, []))
-        assert LogT.lift(Nothing()).run() == Nothing()
+        assert LogT.lift_f(Some(5)).run() == Some((5, []))
+        assert LogT.lift_f(Nothing()).run() == Nothing()
 
 
 class TestOrElse:
@@ -194,7 +194,7 @@ class TestSemigroupVsMonoid:
             _monoid = int_add_sg
 
         with pytest.raises(AttributeError):
-            BadWriterT.lift(Right(42))
+            BadWriterT.lift_f(Right(42))
 
     def test_monoid_satisfies_all(self):
         int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)

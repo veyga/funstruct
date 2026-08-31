@@ -111,11 +111,11 @@ class TestFromError:
 
 class TestLift:
     def test_lift_wraps_value_in_right(self):
-        result = EitherT.lift(Some(42))
+        result = EitherT.lift_f(Some(42))
         assert result.run() == Some(Right(42))
 
     def test_lift_preserves_nothing(self):
-        result = EitherT.lift(Nothing())
+        result = EitherT.lift_f(Nothing())
         assert result.run() == Nothing()
 
 
@@ -127,6 +127,23 @@ class TestFromEither:
     def test_from_either_left(self):
         result = EitherT.from_either(Left("err"), Option)
         assert result.run() == Some(Left("err"))
+
+
+class TestAndThen:
+    def test_chains_discarding_value(self):
+        a = EitherT(Some(Right(1)))
+        b = EitherT(Some(Right(2)))
+        assert a.and_then(b).run() == Some(Right(2))
+
+    def test_short_circuits_on_inner_left(self):
+        a = EitherT(Some(Left("stop")))
+        b = EitherT(Some(Right("never")))
+        assert a.and_then(b).run() == Some(Left("stop"))
+
+    def test_short_circuits_on_outer_nothing(self):
+        a = EitherT(Nothing())
+        b = EitherT(Some(Right("never")))
+        assert a.and_then(b).run() == Nothing()
 
 
 class TestThen:

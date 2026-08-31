@@ -35,9 +35,9 @@ Examples:
     ... ).run()
     Right(Some(99))
 
-    lift — bring F[A] into OptionT (wraps in Some):
+    lift_f — bring F[A] into OptionT (wraps in Some):
 
-    >>> OptionT.lift(Right(42)).run()
+    >>> OptionT.lift_f(Right(42)).run()
     Right(Some(42))
 """
 
@@ -201,16 +201,16 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         return cls(monad.pure(Nothing()))
 
     @classmethod
-    def lift(cls, fa) -> OptionT:
+    def lift_f(cls, fa) -> OptionT:
         """Lift F[A] into OptionT — wraps value in Some.
 
-        Haskell: ``lift :: m a -> OptionT m a``
+        Haskell equivalent: ``lift :: m a -> OptionT m a``
 
         >>> from funstruct.monad.either import Right, Left
         >>> from funstruct.monad.option import Some
-        >>> OptionT.lift(Right(42)).run()
+        >>> OptionT.lift_f(Right(42)).run()
         Right(Some(42))
-        >>> OptionT.lift(Left("err")).run()
+        >>> OptionT.lift_f(Left("err")).run()
         Left('err')
         """
         return cls(fa.map(lambda a: Some(a)))

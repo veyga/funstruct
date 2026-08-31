@@ -70,6 +70,12 @@ class Option(Monad, Generic[A]):
     @abstractmethod
     def map(self, f: Callable[[A], B]) -> Option[B]: ...
 
+    @abstractmethod
+    def get_or_else(self, default: A) -> A: ...
+
+    @abstractmethod
+    def or_else(self, fallback: Callable[[], Option[A]]) -> Option[A]: ...
+
     @classmethod
     def pure(cls, value: A) -> Option[A]:
         return Some(value)

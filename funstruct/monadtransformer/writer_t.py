@@ -28,9 +28,9 @@ Examples:
     >>> LogT.tell(["hello"], Either).run()
     Right((None, ['hello']))
 
-    lift wraps F[A] with empty output:
+    lift_f wraps F[A] with empty output:
 
-    >>> LogT.lift(Right(42)).run()
+    >>> LogT.lift_f(Right(42)).run()
     Right((42, []))
 
     short-circuits on Left:
@@ -134,10 +134,10 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         return cls(monad.pure((None, output)))
 
     @classmethod
-    def lift(cls, fa) -> WriterT:
+    def lift_f(cls, fa) -> WriterT:
         """Lift F[A] into WriterT — output is empty.
 
-        Haskell: ``lift :: m a -> WriterT w m a``
+        Haskell equivalent: ``lift :: m a -> WriterT w m a``
         """
         return cls(fa.map(lambda a: (a, cls._monoid.empty)))
 

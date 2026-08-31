@@ -167,10 +167,10 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         return cls(lambda _: _pure(monad, value))
 
     @classmethod
-    def lift(cls, m) -> ReaderT:
+    def lift_f(cls, m) -> ReaderT:
         """Lift M[A] into ReaderT (ignoring context).
 
-        Haskell: ``lift :: m a -> ReaderT r m a``
+        Haskell equivalent: ``lift :: m a -> ReaderT r m a``
         """
         return cls(lambda _: m)
 

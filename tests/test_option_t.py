@@ -91,10 +91,27 @@ class TestPure:
 
 class TestLift:
     def test_lift_right(self):
-        assert OptionT.lift(Right(42)).run() == Right(Some(42))
+        assert OptionT.lift_f(Right(42)).run() == Right(Some(42))
 
     def test_lift_left(self):
-        assert OptionT.lift(Left("err")).run() == Left("err")
+        assert OptionT.lift_f(Left("err")).run() == Left("err")
+
+
+class TestAndThen:
+    def test_chains_discarding_value(self):
+        a = OptionT(Right(Some(1)))
+        b = OptionT(Right(Some(2)))
+        assert a.and_then(b).run() == Right(Some(2))
+
+    def test_short_circuits_on_nothing(self):
+        a = OptionT(Right(Nothing()))
+        b = OptionT(Right(Some("never")))
+        assert a.and_then(b).run() == Right(Nothing())
+
+    def test_short_circuits_on_left(self):
+        a = OptionT(Left("err"))
+        b = OptionT(Right(Some("never")))
+        assert a.and_then(b).run() == Left("err")
 
 
 class TestWithOption:

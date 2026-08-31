@@ -31,12 +31,12 @@ Examples:
     ... ).run()
     Some(Right('recovered: err'))
 
-    lift — bring F[A] into EitherT (wraps value in Right):
+    lift_f — bring F[A] into EitherT (wraps value in Right):
 
-    >>> EitherT.lift(Some(42)).run()
+    >>> EitherT.lift_f(Some(42)).run()
     Some(Right(42))
 
-    pure — lift a plain value:
+    pure — lift_f a plain value into EitherT:
 
     >>> EitherT.pure(99, Option).run()
     Some(Right(99))
@@ -126,10 +126,10 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return cls(monad.pure(Left(error)))
 
     @classmethod
-    def lift(cls, fa) -> EitherT:
+    def lift_f(cls, fa) -> EitherT:
         """Lift F[A] into EitherT — wraps the value in Right.
 
-        Haskell: ``lift :: m a -> EitherT e m a``
+        Haskell equivalent: ``lift :: m a -> EitherT e m a``
         """
         return cls(fa.map(lambda a: Right(a)))
 

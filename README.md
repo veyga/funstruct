@@ -1,6 +1,6 @@
 # funstruct
 
-A small, helpful collection of functional utilities.
+A helpful collection of functional utilities.
 
 ## Install
 

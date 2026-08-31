@@ -34,7 +34,8 @@ Examples:
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, Coroutine
+import inspect
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from functools import wraps
 from typing import Any, Generic, ParamSpec, TypeVar
@@ -117,27 +118,26 @@ class AsyncResult(Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def bind(self, f: Callable[[_A], AsyncResult]) -> AsyncResult:
-        """Chain: f receives value, returns new AsyncResult. Short-circuits on Err."""
+    def bind(self, f: Callable) -> AsyncResult:
+        """Chain: f receives value. Short-circuits on Err.
+
+        Handles all return types from f:
+        - AsyncResult[B] → awaited, produces Either
+        - Either[E, B] / Result[B] → used directly
+        - Awaitable[B] → awaited, plain value wrapped in Ok
+        - Plain B → wrapped in Ok
+        """
 
         async def _inner():
             result = await self._coro
             match result:
                 case Right(value):
-                    return await f(value)
-                case _:
-                    return result
-
-        return AsyncResult(_inner())
-
-    def bind_either(self, f: Callable[[_A], Either]) -> AsyncResult:
-        """Chain with a sync function that returns Either."""
-
-        async def _inner():
-            result = await self._coro
-            match result:
-                case Right(value):
-                    return f(value)
+                    inner = f(value)
+                    if inspect.isawaitable(inner):
+                        inner = await inner
+                    if isinstance(inner, Either):
+                        return inner
+                    return Ok(inner)
                 case _:
                     return result
 
@@ -157,39 +157,25 @@ class AsyncResult(Generic[_A]):
         return AsyncResult(_inner())
 
     def or_else(self, f: Callable) -> AsyncResult:
-        """Recover from error: f receives error, returns new AsyncResult."""
+        """Recover from error: f receives error. Short-circuits on success.
+
+        Handles all return types from f:
+        - AsyncResult[A] → awaited, produces Either
+        - Either[E, A] / Result[A] → used directly
+        - Awaitable[A] → awaited, plain value wrapped in Ok
+        - Plain A → wrapped in Ok
+        """
 
         async def _inner():
             result = await self._coro
             match result:
                 case Left(error):
-                    return await f(error)
-                case _:
-                    return result
-
-        return AsyncResult(_inner())
-
-    def bind_awaitable(self, f: Callable) -> AsyncResult:
-        """Chain with an async function that returns a plain value."""
-
-        async def _inner():
-            result = await self._coro
-            match result:
-                case Right(value):
-                    return Ok(await f(value))
-                case _:
-                    return result
-
-        return AsyncResult(_inner())
-
-    def or_else_either(self, f: Callable) -> AsyncResult:
-        """Recover with a sync function returning Either."""
-
-        async def _inner():
-            result = await self._coro
-            match result:
-                case Left(error):
-                    return f(error)
+                    inner = f(error)
+                    if inspect.isawaitable(inner):
+                        inner = await inner
+                    if isinstance(inner, Either):
+                        return inner
+                    return Ok(inner)
                 case _:
                     return result
 
@@ -254,13 +240,13 @@ def Try(
 
 
 def TryAsync(
-    f: Callable[_P, Coroutine[Any, Any, _A]],
+    f: Callable[_P, _A],
 ) -> Callable[_P, AsyncResult[_A]]:
-    """Decorator: wraps an async function so exceptions become Err.
+    """Decorator: wraps a function so exceptions become Err.
 
-    Returns AsyncResult[A] — a lazy computation. Await at the boundary
-    to get Result[A] (Ok or Err). Compose with .bind(), .map(), .alt()
-    without awaiting.
+    Accepts both sync and async functions. Returns AsyncResult[A] — a
+    lazy computation. Await at the boundary to get Result[A] (Ok or Err).
+    Compose with .bind(), .map(), .alt() without awaiting.
 
     Usage::
 
@@ -271,11 +257,15 @@ def TryAsync(
                 raise NotFoundError(f"user {id}")
             return User(**resp.json())
 
+        @TryAsync
+        def parse_id(raw: str) -> int:
+            return int(raw)
+
         # Build pipeline — no await needed:
         pipeline = (
-            fetch_user(42)
+            parse_id("42")
+            .bind(lambda id: fetch_user(id))
             .map(lambda u: u.email)
-            .alt(lambda e: FallbackError(str(e)))
         )
 
         # Await once at the boundary:
@@ -286,7 +276,10 @@ def TryAsync(
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> AsyncResult[_A]:
         async def _inner():
             try:
-                return Ok(await f(*args, **kwargs))
+                result = f(*args, **kwargs)
+                if inspect.isawaitable(result):
+                    result = await result
+                return Ok(result)
             except Exception as e:
                 return Err(e)
 

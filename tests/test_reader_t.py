@@ -120,13 +120,13 @@ class TestPure:
 class TestLift:
     def test_lift_ignores_context(self):
         inner = Right(42)
-        step = ReaderT.lift(inner)
+        step = ReaderT.lift_f(inner)
         assert step.run("anything") == Right(42)
         assert step.run(None) == Right(42)
 
     def test_lift_propagates_failure(self):
         inner = Left("err")
-        step = ReaderT.lift(inner)
+        step = ReaderT.lift_f(inner)
         assert step.run(0) == Left("err")
 
 
@@ -139,20 +139,39 @@ class TestWithStateT:
 
     def test_lift_state_t(self):
         state_op = StateT(lambda s: Right((s + 1, s)))
-        step = ReaderT.lift(state_op)
+        step = ReaderT.lift_f(state_op)
         assert step.run("ignored").run(5) == Right((6, 5))
 
     def test_bind_composes_full_stack(self):
-        inc = ReaderT.lift(StateT(lambda s: Right((s + 1, None))))
-        get = ReaderT.lift(StateT(lambda s: Right((s, s))))
+        inc = ReaderT.lift_f(StateT(lambda s: Right((s + 1, None))))
+        get = ReaderT.lift_f(StateT(lambda s: Right((s, s))))
         pipeline = inc.then(inc).then(get)
         assert pipeline.run("ctx").run(0) == Right((2, 2))
 
     def test_or_else_with_state_t(self):
-        failing = ReaderT.lift(StateT(lambda s: Left(ValueError("expired"))))
+        failing = ReaderT.lift_f(StateT(lambda s: Left(ValueError("expired"))))
         recover = ReaderT(lambda ctx: StateT(lambda s: Right((s, f"recovered-{ctx}"))))
         pipeline = failing.or_else(lambda err: recover)
         assert pipeline.run("myctx").run(0) == Right((0, "recovered-myctx"))
+
+
+class TestAndThen:
+    def test_output_becomes_next_context(self):
+        # a reads ctx and returns ctx + 10; b reads that as its ctx
+        a = ReaderT(lambda ctx: Right(ctx + 10))
+        b = ReaderT(lambda ctx: Right(ctx * 2))
+        assert a.and_then(b).run(5) == Right(30)
+
+    def test_short_circuits_on_failure(self):
+        a = ReaderT(lambda ctx: Left("err"))
+        b = ReaderT(lambda ctx: Right("never"))
+        assert a.and_then(b).run(0) == Left("err")
+
+    def test_chains_three_steps(self):
+        add_one = ReaderT(lambda ctx: Right(ctx + 1))
+        double = ReaderT(lambda ctx: Right(ctx * 2))
+        to_str = ReaderT(lambda ctx: Right(str(ctx)))
+        assert add_one.and_then(double).and_then(to_str).run(4) == Right("10")
 
 
 class TestLaws:

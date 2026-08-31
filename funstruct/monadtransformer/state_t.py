@@ -172,15 +172,15 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return cls(lambda s: _pure(monad, (f(s), None)))
 
     @classmethod
-    def lift(cls, inner) -> "StateT":
+    def lift_f(cls, inner) -> "StateT":
         """Lift F[A] into StateT — state unchanged.
 
-        Haskell: ``lift :: m a -> StateT s m a``
+        Haskell equivalent: ``lift :: m a -> StateT s m a``
 
         >>> from funstruct.monad.option import Option, Some, Nothing
-        >>> StateT.lift(Some(42)).run(0)
+        >>> StateT.lift_f(Some(42)).run(0)
         Some((0, 42))
-        >>> StateT.lift(Nothing()).run(0)
+        >>> StateT.lift_f(Nothing()).run(0)
         Nothing()
         """
         return cls(lambda s: inner.map(lambda a: (s, a)))

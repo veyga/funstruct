@@ -268,15 +268,37 @@ class TestDoNotation:
         assert pipeline.run(1) == Right((22, 22))
 
 
+class TestAndThen:
+    def test_value_becomes_next_state(self):
+        # a produces value=15, b receives 15 as its initial state
+        a = StateT(lambda s: Right((s, s + 10)))
+        b = StateT(lambda s: Right((s, s * 2)))
+        result = a.and_then(b).run(5)
+        assert result == Right((15, 30))
+
+    def test_short_circuits_on_failure(self):
+        a = StateT(lambda s: Left("err"))
+        b = StateT(lambda s: Right((s, "never")))
+        result = a.and_then(b).run(0)
+        assert result == Left("err")
+
+    def test_original_state_discarded(self):
+        # a's state (999) is discarded; b gets a's value (42) as state
+        a = StateT(lambda s: Right((999, 42)))
+        b = StateT(lambda s: Right((s + 1, "done")))
+        result = a.and_then(b).run(0)
+        assert result == Right((43, "done"))
+
+
 class TestLift:
     def test_lift_success(self):
-        result = StateT.lift(Right(42)).run(0)
+        result = StateT.lift_f(Right(42)).run(0)
         assert result == Right((0, 42))
 
     def test_lift_failure(self):
-        result = StateT.lift(Left("err")).run(0)
+        result = StateT.lift_f(Left("err")).run(0)
         assert result == Left("err")
 
     def test_lift_preserves_state(self):
-        result = StateT.lift(Right("val")).run(99)
+        result = StateT.lift_f(Right("val")).run(99)
         assert result == Right((99, "val"))
