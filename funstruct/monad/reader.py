@@ -65,6 +65,13 @@ class Reader(Monad, Generic[_Ctx, _A]):
 
         Each `yield` extracts the value from a Reader (all share the same ctx).
         The final `return` value becomes the Reader's result.
+
+        >>> def pipeline():
+        ...     x = yield Reader(lambda ctx: ctx["x"])
+        ...     y = yield Reader(lambda ctx: ctx["y"])
+        ...     return x + y
+        >>> Reader.do(pipeline).run({"x": 1, "y": 10})
+        11
         """
 
         def _run(ctx):
@@ -93,4 +100,6 @@ class Reader(Monad, Generic[_Ctx, _A]):
         return f"Reader({self._run})"
 
 
-__all__ = ["Reader"]
+__all__ = [
+    "Reader",
+]

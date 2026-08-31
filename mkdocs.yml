@@ -21,8 +21,10 @@ nav:
       - Overview: typeclass/index.md
       - Semigroup: typeclass/semigroup.md
       - Monoid: typeclass/monoid.md
+      - Functor: functor/index.md
       - Applicative: typeclass/applicative.md
       - Monad: typeclass/monad.md
+      - MonadTransformer: typeclass/monadtransformer.md
   - functor:
       - Overview: functor/index.md
   - applicative:

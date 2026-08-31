@@ -288,4 +288,11 @@ def TryAsync(
     return wrapper
 
 
-__all__ = ["Result", "Ok", "Err", "Try", "AsyncResult", "TryAsync"]
+__all__ = [
+    "Result",
+    "Ok",
+    "Err",
+    "Try",
+    "AsyncResult",
+    "TryAsync",
+]

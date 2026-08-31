@@ -114,6 +114,14 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
         Each `yield` extracts the value from a StateT.
         State threads through, short-circuits on inner monad failure.
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> def pipeline():
+        ...     x = yield StateT(lambda s: Right((s + 1, s)))
+        ...     y = yield StateT(lambda s: Right((s + 1, s)))
+        ...     return x + y
+        >>> StateT.do(pipeline).run(0)
+        Right((2, 1))
         """
 
         def _run(s):

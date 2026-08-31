@@ -154,7 +154,17 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
 
     @classmethod
     def do(cls, gen_fn) -> OptionT:
-        """Do-notation via generators. Short-circuits on Nothing."""
+        """Do-notation via generators. Short-circuits on Nothing.
+
+        >>> from funstruct.monad.either import Right
+        >>> from funstruct.monad.option import Some
+        >>> def pipeline():
+        ...     x = yield OptionT(Right(Some(1)))
+        ...     y = yield OptionT(Right(Some(x + 10)))
+        ...     return x + y
+        >>> OptionT.do(pipeline).run()
+        Right(Some(12))
+        """
 
         def _run_do():
             gen = gen_fn()

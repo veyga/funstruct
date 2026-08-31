@@ -134,6 +134,14 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         Each `yield` extracts the value from a ReaderT (shared ctx).
         Short-circuits on inner monad failure.
+
+        >>> from funstruct.monad.either import Right
+        >>> def pipeline():
+        ...     x = yield ReaderT(lambda ctx: Right(ctx))
+        ...     y = yield ReaderT(lambda ctx: Right(x + ctx))
+        ...     return y
+        >>> ReaderT.do(pipeline).run(5)
+        Right(10)
         """
 
         def _run(ctx):

@@ -143,7 +143,20 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
     @classmethod
     def do(cls, gen_fn) -> WriterT:
-        """Do-notation via generators. Accumulates output across yields."""
+        """Do-notation via generators. Accumulates output across yields.
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.typeclasses import Monoid
+        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LogT(WriterT):
+        ...     _monoid = list_m
+        >>> def pipeline():
+        ...     x = yield LogT(Right((1, ["init"])))
+        ...     y = yield LogT(Right((x + 10, ["step"])))
+        ...     return x + y
+        >>> LogT.do(pipeline).run()
+        Right((12, ['init', 'step']))
+        """
 
         def _unwrap(first_run):
             gen = gen_fn()
@@ -186,4 +199,6 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         return f"WriterT({self._run})"
 
 
-__all__ = ["WriterT"]
+__all__ = [
+    "WriterT",
+]

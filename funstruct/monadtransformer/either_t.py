@@ -144,6 +144,15 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
 
         Each ``yield`` extracts the Right value from an EitherT.
         Short-circuits on Left (propagated through F).
+
+        >>> from funstruct.monad.option import Some
+        >>> from funstruct.monad.either import Right
+        >>> def pipeline():
+        ...     x = yield EitherT(Some(Right(1)))
+        ...     y = yield EitherT(Some(Right(x + 10)))
+        ...     return x + y
+        >>> EitherT.do(pipeline).run()
+        Some(Right(12))
         """
 
         def _bind_step(either_t, gen):
@@ -171,4 +180,6 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return f"EitherT({repr(self._value)})"
 
 
-__all__ = ["EitherT"]
+__all__ = [
+    "EitherT",
+]

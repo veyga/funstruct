@@ -86,6 +86,13 @@ class State(Monad, Generic[_A]):
         """Do-notation via generators. Flattens nested binds.
 
         Each `yield` extracts the value from a State (state threads through).
+
+        >>> def pipeline():
+        ...     x = yield State(lambda s: (s + 1, s))
+        ...     y = yield State(lambda s: (s + 1, s))
+        ...     return x + y
+        >>> State.do(pipeline).run(0)
+        (2, 1)
         """
 
         def _run(s):

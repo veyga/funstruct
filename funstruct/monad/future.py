@@ -73,4 +73,6 @@ class Future(Generic[A]):
         return f"Future({self._coro})"
 
 
-__all__ = ["Future"]
+__all__ = [
+    "Future",
+]

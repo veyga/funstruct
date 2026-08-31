@@ -119,7 +119,15 @@ class Option(Monad, Generic[A]):
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Option:
-        """Do-notation. Short-circuits on Nothing."""
+        """Do-notation. Short-circuits on Nothing.
+
+        >>> def pipeline():
+        ...     x = yield Some(1)
+        ...     y = yield Some(x + 10)
+        ...     return x + y
+        >>> Option.do(pipeline)
+        Some(12)
+        """
         gen = gen_fn()
         try:
             monadic_val = next(gen)
@@ -255,4 +263,8 @@ class Nothing(Option):
         return "Nothing()"
 
 
-__all__ = ["Option", "Some", "Nothing"]
+__all__ = [
+    "Option",
+    "Some",
+    "Nothing",
+]

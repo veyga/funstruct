@@ -51,7 +51,15 @@ class Writer(Monad, Generic[_W, _A]):
 
     @classmethod
     def do(cls, gen_fn) -> Writer:
-        """Do-notation for Writer. Accumulates output across yields."""
+        """Do-notation for Writer. Accumulates output across yields.
+
+        >>> def pipeline():
+        ...     x = yield ListWriter(1, ["init"])
+        ...     y = yield ListWriter(x + 10, ["step"])
+        ...     return x + y
+        >>> ListWriter.do(pipeline)
+        ListWriter(value=12, output=['init', 'step'])
+        """
         gen = gen_fn()
         try:
             first = next(gen)
