@@ -104,15 +104,15 @@ class Valid(Validated, Generic[_A]):
 
     def to_result(self):
         """Convert to Ok(value)."""
-        from funstruct.monad.either import Right
+        from funstruct.monad.result import Ok
 
-        return Right(self.value)
+        return Ok(self.value)
 
     def to_result_or(self, exc_cls):
         """Convert to Ok(value) — exc_cls unused on Valid."""
-        from funstruct.monad.either import Right
+        from funstruct.monad.result import Ok
 
-        return Right(self.value)
+        return Ok(self.value)
 
 
 @dataclass(frozen=True)
@@ -149,17 +149,17 @@ class Invalid(Validated, Generic[_E]):
 
     def to_result(self):
         """Convert to Err(errors)."""
-        from funstruct.monad.either import Left
+        from funstruct.monad.result import Err
 
-        return Left(self.errors)
+        return Err(self.errors)
 
     def to_result_or(
         self, exc_cls, combine=lambda errs: "; ".join(str(e) for e in errs)
     ):
         """Convert to Err(exc_cls(combined_errors))."""
-        from funstruct.monad.either import Left
+        from funstruct.monad.result import Err
 
-        return Left(exc_cls(combine(self.errors)))
+        return Err(exc_cls(combine(self.errors)))
 
 
 __all__ = [

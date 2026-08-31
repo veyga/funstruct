@@ -261,52 +261,87 @@ class TestTruthiness:
 
 
 class TestToResult:
-    """to_result converts Validated to Either. Valid → Right, Invalid → Left.
+    """to_result converts Validated to Result. Valid → Ok, Invalid → Err.
 
     The value's truthiness is irrelevant — Valid(0), Valid(None), Valid(False)
-    all produce Right. Validation status determines the case, not the value.
+    all produce Ok. Validation status determines the case, not the value.
     """
 
     def test_valid_to_result(self):
-        from funstruct.monad.either import Right
+        from funstruct.monad.result import Ok
 
-        assert Valid(42).to_result() == Right(42)
+        assert Valid(42).to_result() == Ok(42)
 
-    def test_valid_falsey_values_still_right(self):
-        from funstruct.monad.either import Right
+    def test_valid_to_result_is_ok(self):
+        from funstruct.monad.result import Ok
 
-        assert Valid(0).to_result() == Right(0)
-        assert Valid(None).to_result() == Right(None)
-        assert Valid(False).to_result() == Right(False)
-        assert Valid("").to_result() == Right("")
-        assert Valid([]).to_result() == Right([])
+        result = Valid(42).to_result()
+        assert isinstance(result, Ok)
+
+    def test_valid_falsey_values_still_ok(self):
+        from funstruct.monad.result import Ok
+
+        assert Valid(0).to_result() == Ok(0)
+        assert Valid(None).to_result() == Ok(None)
+        assert Valid(False).to_result() == Ok(False)
+        assert Valid("").to_result() == Ok("")
+        assert Valid([]).to_result() == Ok([])
 
     def test_invalid_to_result(self):
-        from funstruct.monad.either import Left
+        from funstruct.monad.result import Err
 
-        assert Invalid(["err"]).to_result() == Left(["err"])
+        assert Invalid(["err"]).to_result() == Err(["err"])
+
+    def test_invalid_to_result_is_err(self):
+        from funstruct.monad.result import Err
+
+        result = Invalid(["err"]).to_result()
+        assert isinstance(result, Err)
 
     def test_valid_to_result_or(self):
-        from funstruct.monad.either import Right
+        from funstruct.monad.result import Ok
 
-        assert Valid(1).to_result_or(ValueError) == Right(1)
+        assert Valid(1).to_result_or(ValueError) == Ok(1)
+
+    def test_valid_to_result_or_is_ok(self):
+        from funstruct.monad.result import Ok
+
+        result = Valid(1).to_result_or(ValueError)
+        assert isinstance(result, Ok)
 
     def test_invalid_to_result_or(self):
-        from funstruct.monad.either import Left
+        from funstruct.monad.result import Err
 
         result = Invalid(["a", "b"]).to_result_or(ValueError)
+        assert isinstance(result, Err)
         match result:
-            case Left(e):
+            case Err(e):
                 assert isinstance(e, ValueError)
                 assert "a; b" in str(e)
 
     def test_invalid_to_result_or_custom_combine(self):
-        from funstruct.monad.either import Left
+        from funstruct.monad.result import Err
 
         result = Invalid([1, 2, 3]).to_result_or(
             TypeError, combine=lambda errs: str(sum(errs))
         )
+        assert isinstance(result, Err)
         match result:
-            case Left(e):
+            case Err(e):
                 assert isinstance(e, TypeError)
                 assert "6" in str(e)
+
+    def test_invalid_to_result_or_pattern_match(self):
+        """Err pattern-matches in case statements — the mint test scenario."""
+        from funstruct.monad.result import Err
+
+        result = (
+            Validated.cond(False, None, "bad auth")
+            + Validated.cond(False, None, "no access")
+        ).to_result_or(ValueError)
+
+        match result:
+            case Err(ValueError()):
+                pass
+            case other:
+                raise AssertionError(f"Expected Err(ValueError), got {other}")
