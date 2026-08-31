@@ -12,7 +12,7 @@ format:
 
 # run ty check
 check:
-  uv run ty check funstruct/
+  uv run --frozen ty check funstruct/
 
 # Serve docs locally at http://127.0.0.1:8000
 docs:
