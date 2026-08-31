@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/andrewstefanich/dev/jf/jellyfish/**)",
+      "Bash(make start-auth-build *)"
+    ]
+  }
+}

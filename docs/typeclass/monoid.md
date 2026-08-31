@@ -1,0 +1,3 @@
+# Monoid
+
+::: funstruct.typeclasses.Monoid

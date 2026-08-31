@@ -1,0 +1,3 @@
+# Monad
+
+::: funstruct.typeclasses.Monad

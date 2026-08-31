@@ -1,0 +1,3 @@
+# Applicative
+
+::: funstruct.typeclasses.Applicative

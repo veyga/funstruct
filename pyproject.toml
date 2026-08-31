@@ -1,61 +1,88 @@
-[tool.poetry]
+[project]
 name = "funstruct"
-version = "0.1.2"
-description = "fun & functional structures"
-authors = ["Andrew Stefanich <andrewstefanich@gmail.com>"]
-license = "MIT"
+version = "1.0.0"
+description = "Fun & functional structures for Python"
+authors = [{name = "Andrew Stefanich", email = "andrewstefanich@gmail.com"}]
+license = {text = "MIT"}
 readme = "README.md"
-homepage = "https://github.com/veyga/funstruct"
-repository = "https://github.com/veyga/funstruct"
+requires-python = ">=3.10"
 keywords = ["functional", "immutable", "fp", "data structures", "cons"]
+dependencies = []
 
-[tool.poetry.dependencies]
-python = "^3.12"
+[project.urls]
+Homepage = "https://github.com/veyga/funstruct"
+Repository = "https://github.com/veyga/funstruct"
 
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.2"
-pytest-parametrization = "^2022.2.1"
-debugpy = "^1.8.2"
-pre-commit = "^3.7.1"
-sphinx = "^7.4.7"
-ruff = "^0.6.9"
-mypy = "^1.11.2"
+[tool.hatch.build.targets.wheel]
+packages = ["funstruct"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-benchmark[histogram]>=5.3.0",
+    "pytest-cov>=7.1.0",
+    "pytest-parametrization>=2022.2.1",
+    "ruff>=0.8.0",
+    "debugpy>=1.8.0",
+    "ty>=0.0.74",
+    "nox[uv]>=2026.8.17",
+    "pre-commit>=4.6.2",
+]
+docs = [
+    "mike>=2.2.0",
+    "mkdocs>=1.6,<2.0",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+    "mdformat>=1.0",
+    "mdformat-mkdocs>=3.0",
+    "docformatter>=1.7",
+]
+
+[tool.ty]
+# Subclasses narrow return types (e.g. Option.bind returns Option, not Monad).
+# This is correct covariant narrowing but ty flags it as Liskov violation.
+rules.invalid-method-override = "ignore"
+# Transformers accept `monad` as a plain `type` param but call .pure()/.bind()
+# on it (duck-typed). ty can't see the protocol — it just sees `type`.
+rules.unresolved-attribute = "ignore"
+# `cls(...)` returns Self which ty can't reconcile with declared return types
+# like `WriterT[F, W, B]` when the TypeVars shift in map/bind.
+rules.invalid-return-type = "ignore"
+# bind/map lambdas return Functor[B] but the concrete type expects the subclass.
+# Same covariant narrowing issue at call sites.
+rules.invalid-argument-type = "ignore"
+
+[tool.ty.environment]
+root = ["."]
+
+[tool.coverage.run]
+source = ["funstruct"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --ignore=benchmarks"
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
+
 
 [tool.ruff]
 line-length = 88
 
 [tool.ruff.lint]
-select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "N",  # PEP8 naming convetions
-    "D"  # pydocstyle
-]
+select = ["E", "F", "I", "UP"]
 ignore = [
-    "E731", # allow assignment of lambdas to a symbol
-    "N801", # class CapWords convention
-    "D415", # docstring - first line should end with period
-    "D205", # docstring - 1 blank line between summary and description
-]
-exclude = [
-  "tests/*.py",
-  "docs/*.py",
+    "E731", # Do not assign a `lambda` expression, use a `def`
 ]
 
-[tool.ruff.lint.pydocstyle]
-convention = "google"
 
-[tool.mypy]
-python_version = "3.12"
-files = [
-  "_funstruct/",
-]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.docformatter]
+wrap-summaries = 80
+wrap-descriptions = 80
+# pre-summary-newline = false
+# close-quotes-on-newline = false

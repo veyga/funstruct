@@ -1,0 +1,67 @@
+site_name: funstruct
+site_description: Fun & functional structures for Python
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep-purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep-purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+nav:
+  - Home: index.md
+  - typeclass:
+      - Overview: typeclass/index.md
+      - Semigroup: typeclass/semigroup.md
+      - Monoid: typeclass/monoid.md
+      - Functor: functor/index.md
+      - Applicative: typeclass/applicative.md
+      - Monad: typeclass/monad.md
+      - MonadTransformer: typeclass/monadtransformer.md
+  - functor:
+      - Overview: functor/index.md
+  - applicative:
+      - Overview: applicative/index.md
+      - Validated: applicative/validated.md
+  - monad:
+      - Overview: monad/index.md
+      - Either: monad/either.md
+      - Option: monad/option.md
+      - Result: monad/result.md
+      - Reader: monad/reader.md
+      - Writer: monad/writer.md
+      - State: monad/state.md
+      - Future: monad/future.md
+  - monadtransformer:
+      - Overview: monadtransformer/index.md
+      - ReaderT: monadtransformer/reader_t.md
+      - StateT: monadtransformer/state_t.md
+      - EitherT: monadtransformer/either_t.md
+      - OptionT: monadtransformer/option_t.md
+      - WriterT: monadtransformer/writer_t.md
+  - collections:
+      - Overview: collections/index.md
+      - Cons: collections/cons.md
+      - frozendict: collections/frozendict.md
+      - Tree: collections/tree.md
+  - util:
+      - tailrec: util/tailrec.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            members_order: source
+            docstring_style: google
+            show_docstring_examples: true

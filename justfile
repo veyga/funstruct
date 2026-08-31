@@ -1,47 +1,61 @@
-# List all available commands
 _default:
   just --list
 
-# debug an individual test under tests/
-dtest TEST:
-  python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest tests/{{TEST}}
+# lint (--fix)
+lint *args:
+  uv run ruff check {{args}}
 
-# debug an individual test with -k flag
-dktest ARG:
-  python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest -k {{ARG}}
-
-# debug a script
-dscript FILE:
-  python -m debugpy --listen 0.0.0.0:5680 --wait-for-client {{FILE}}
-
-# format the repo
+# format code
 format:
-  poetry run ruff format
+  uv run ruff format
+  -uv run --group docs docformatter --in-place --config pyproject.toml funstruct/
 
-# install the pre-commit hooks
-installhooks:
-  poetry run pre-commit install
+# run ty check
+check:
+  uv run --frozen ty check funstruct/
 
-# lint the repo
-lint:
-  poetry run ruff check
+# Serve docs locally at http://127.0.0.1:8000
+docs:
+  uv run --group docs mkdocs serve
 
-# lint the repo (+ auto-fix)
-lintfix:
-  poetry run ruff check --fix
+# Format markdown docs
+fmt-docs:
+  uv run --group docs mdformat docs/ README.md
 
-# Run all test suites
-tests:
-  pytest
+# run pytest
+test *args:
+  uv run pytest {{args}}
 
-# run an individual test under tests/
-test TEST:
-  pytest tests/{{TEST}}
+# run pytest with coverage (pass 'html' to open browser report)
+cover *args:
+  #!/usr/bin/env bash
+  if [[ "{{args}}" == *"html"* ]]; then
+    uv run pytest --cov --cov-report=html
+    {{ if os() == "macos" { "open" } else { "xdg-open" } }} htmlcov/index.html
+  else
+    uv run pytest --cov --cov-report=term-missing {{args}}
+  fi
 
-# run an individual test with -k flag
-ktest ARG:
-  pytest -k {{ARG}}
+# debug a pytest
+dtest *args:
+  PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest {{args}}
 
-# run typechecker
-tc:
-  poetry run mypy --enable-incomplete-feature=NewGenericSyntax # py3.12 generics
+# run benchmarks (pass 'html' to generate histogram and open in browser)
+# --benchmark-disable-gc pauses GC only during each timed iteration,
+# not the whole process. Prevents GC pauses from skewing measurements.
+bench *args:
+  #!/usr/bin/env bash
+  if [[ "{{args}}" == *"html"* ]]; then
+    uv run pytest benchmarks/ -v --benchmark-only --benchmark-disable-gc --benchmark-histogram=.benchmarks/histogram
+    {{ if os() == "macos" { "open" } else { "xdg-open" } }} .benchmarks/histogram.svg
+  else
+    uv run pytest benchmarks/ -v --benchmark-only --benchmark-disable-gc {{args}}
+  fi
+
+
+# Run nox (all sessions, or specify: just nox -s tests)
+nox *args:
+  uv run nox {{args}}
+
+# docs-build:
+#   uv run mkdocs build

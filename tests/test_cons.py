@@ -1,7 +1,50 @@
 import pytest
 from parametrization import Parametrization as P
-from funstruct.cons import CList, Cons, Nil
-from funstruct.tailrec import tco, tail_call
+
+import funstruct.monoid as monoid
+import funstruct.semigroup as semigroup
+from funstruct.collections.cons import CList, Cons, Nil
+from tests.laws import (
+    assert_applicative_laws,
+    assert_functor_laws,
+    assert_monad_laws,
+    assert_monoid_laws,
+    assert_semigroup_laws,
+)
+
+
+class TestCListLaws:
+    def test_semigroup(self):
+        assert_semigroup_laws(
+            Cons(1, Cons(2, Nil())),
+            Cons(3, Nil()),
+            Cons(4, Cons(5, Nil())),
+            sg=semigroup.CListConcat,
+        )
+
+    def test_monoid(self):
+        assert_monoid_laws(Cons(1, Cons(2, Nil())), sg=monoid.CListConcat)
+
+    def test_functor_cons(self):
+        assert_functor_laws(Cons(1, Cons(2, Cons(3, Nil()))))
+
+    def test_functor_nil(self):
+        assert_functor_laws(Nil())
+
+    def test_applicative(self):
+        assert_applicative_laws(
+            pure_fn=Cons.pure,
+            fa=Cons(1, Nil()),
+            fb=Cons(2, Nil()),
+        )
+
+    def test_monad(self):
+        assert_monad_laws(
+            pure_fn=Cons.pure,
+            m=Cons(1, Cons(2, Nil())),
+            f=lambda x: Cons(x, Cons(x + 1, Nil())),
+            g=lambda x: Cons(x * 10, Nil()),
+        )
 
 
 @pytest.fixture
@@ -371,7 +414,6 @@ def test_map(initial, expected):
 def test_append(initial, to_append, expected, request):
     e = request.getfixturevalue(expected)
     assert initial.append(to_append) == e
-    assert initial + to_append == e
 
 
 @P.autodetect_parameters()
@@ -407,6 +449,61 @@ def test_append(initial, to_append, expected, request):
 )
 def test_split_at(original, split_at, expected):
     actual = original.split_at(split_at)
+    assert actual == expected
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    original=Nil(),
+    index=0,
+    value=99,
+    expected=Cons(99, Nil()),
+)
+@P.case(
+    name="Nil oob",
+    original=Nil(),
+    index=10,
+    value=99,
+    expected=Cons(99, Nil()),
+)
+@P.case(
+    name="Cons simple",
+    original=Cons(1, Nil()),
+    index=0,
+    value=99,
+    expected=Cons(99, Cons(1, Nil())),
+)
+@P.case(
+    name="Cons head",
+    original=Cons(1, Nil()),
+    index=1,
+    value=99,
+    expected=Cons(1, Cons(99, Nil())),
+)
+@P.case(
+    name="Cons chain",
+    original=Cons(2, Cons(1, Cons(0, Nil()))),
+    index=1,
+    value=99,
+    expected=Cons(2, Cons(99, Cons(1, Cons(0, Nil())))),
+)
+@P.case(
+    name="Cons chain head",
+    original=Cons(2, Cons(1, Cons(0, Nil()))),
+    index=0,
+    value=99,
+    expected=Cons(99, Cons(2, Cons(1, Cons(0, Nil())))),
+)
+@P.case(
+    name="Cons chain head negative",
+    original=Cons(2, Cons(1, Cons(0, Nil()))),
+    index=-1,
+    value=99,
+    expected=Cons(99, Cons(2, Cons(1, Cons(0, Nil())))),
+)
+def test_insert_at(original, index, value, expected):
+    actual = original.insert_at(index, value)
     assert actual == expected
 
 
@@ -481,7 +578,7 @@ def test_sorted(original, expected, request):
 @P.case(
     name="nestd 1 level, more elements",
     input=Cons(Cons(1, Cons(1)), Cons(Cons(2, Cons(2)))),
-    expected=Cons.from_iterable([1, 1, 2, 2]),
+    expected=CList.from_iterable([1, 1, 2, 2]),
 )
 @P.case(
     name="nested 1+ levels",
@@ -508,8 +605,268 @@ def test_flatten(input, expected):
 @P.case(
     name="it maps and flattens",
     original=Cons(2, Cons(1)),
-    expected=Cons.from_iterable([6, 6, 3, 3]),
+    expected=CList.from_iterable([6, 6, 3, 3]),
 )
-def test_flat_map(original, expected):
+def test_bind(original, expected):
     triple = lambda n: CList.from_iterable([n * 3, n * 3])
-    assert original.flat_map(triple) == expected
+    assert original.bind(triple) == expected
+
+
+def test_bind_duplicates_elements():
+    xs = Cons(1, Cons(2, Cons(3, Nil())))
+    result = xs >> (lambda x: Cons(x, Cons(x, Nil())))
+    assert result == Cons(1, Cons(1, Cons(2, Cons(2, Cons(3, Cons(3, Nil()))))))
+
+
+def test_bind_on_nil():
+    result = Nil() >> (lambda x: Cons(x, Nil()))
+    assert result == Nil()
+
+
+def test_bind_single_element():
+    result = Cons(5, Nil()) >> (lambda x: Cons(x + 1, Cons(x + 2, Nil())))
+    assert result == Cons(6, Cons(7, Nil()))
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    a=Nil(),
+    b=Nil(),
+    expected=Nil(),
+)
+@P.case(
+    name="single",
+    a=Cons.pure(1),
+    b=Nil(),
+    expected=Cons(1, Nil()),
+)
+@P.case(
+    name="single nil left",
+    a=Nil(),
+    b=Cons.pure(1),
+    expected=Cons(1, Nil()),
+)
+@P.case(
+    name="multiple",
+    a=Cons(4, Cons(3, Nil())),
+    b=Cons(2, Cons(1, Nil())),
+    expected=CList.from_iterable([4, 3, 2, 1]),
+)
+@P.case(
+    name="nested",
+    a=Cons(4, Cons(Cons(3, Cons(2, Nil())), Nil())),
+    b=Cons(5, Nil()),
+    expected=Cons(4, Cons(Cons(3, Cons(2, Nil())), Cons(5, Nil()))),
+)
+def test_add(a, b, expected):
+    c = a + b
+    assert c == expected
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    lst=Nil(),
+    expected="Nil",
+)
+@P.case(
+    name="single",
+    lst=Cons.pure(1),
+    expected="CList([1])",
+)
+@P.case(
+    name="multiple",
+    lst=2 << Cons.pure(1),
+    expected="CList([2, 1])",
+)
+@P.case(
+    name="nested",
+    lst=Cons(4, Cons(Cons(3, Cons(2, Nil())), Cons(5, Nil()))),
+    expected="CList([4, [3, 2], 5])",
+)
+def test_str(lst, expected):
+    actual = str(lst)
+    assert actual == expected
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    clist=Nil(),
+    pylist=[],
+    expected=True,
+)
+@P.case(
+    name="single",
+    clist=Cons.pure(1),
+    pylist=[1],
+    expected=True,
+)
+@P.case(
+    name="multiple",
+    clist=2 << Cons(1),
+    pylist=[2, 1],
+    expected=True,
+)
+@P.case(
+    name="nested",
+    clist=Cons(4, Cons(Cons(3, Cons(2, Nil())), Cons(5, Nil()))),
+    pylist=[4, [3, 2], 5],
+    expected=True,
+)
+@P.case(
+    name="different length",
+    clist=Cons(1, Cons(2, Nil())),
+    pylist=[1],
+    expected=False,
+)
+@P.case(
+    name="different values",
+    clist=Cons(1, Cons(2, Nil())),
+    pylist=[1, 3],
+    expected=False,
+)
+@P.case(
+    name="nil vs non-empty list",
+    clist=Nil(),
+    pylist=[1],
+    expected=False,
+)
+@P.case(
+    name="cons vs empty list",
+    clist=Cons.pure(1),
+    pylist=[],
+    expected=False,
+)
+@P.case(
+    name="wrong nested structure",
+    clist=Cons(1, Cons(2, Nil())),
+    pylist=[1, [2]],
+    expected=False,
+)
+@P.case(
+    name="nested mismatch values",
+    clist=Cons(Cons(1, Nil()), Nil()),
+    pylist=[[2]],
+    expected=False,
+)
+def test_cons_list_can_equal_py_list(clist, pylist, expected):
+    if expected:
+        assert clist == pylist
+    else:
+        assert not clist == pylist
+
+
+@P.autodetect_parameters()
+@P.case(
+    name="Nil",
+    lst=Nil(),
+    expected="Nil()",
+)
+@P.case(
+    name="single",
+    lst=Cons.pure(1),
+    expected="Cons(1, Nil())",
+)
+@P.case(
+    name="multiple",
+    lst=2 << Cons.pure(1),
+    expected="Cons(2, Cons(1, Nil()))",
+)
+@P.case(
+    name="nested",
+    lst=Cons(4, Cons(Cons(3, Cons(2, Nil())), Nil())),
+    expected="Cons(4, Cons(Cons(3, Cons(2, Nil())), Nil()))",
+)
+def test_repr(lst, expected):
+    actual = repr(lst)
+    assert actual == expected
+
+
+class TestTruthiness:
+    def test_cons_is_truthy(self):
+        assert bool(Cons(1, Nil())) is True
+        assert bool(Cons(0, Nil())) is True
+
+    def test_nil_is_falsy(self):
+        assert bool(Nil()) is False
+
+
+class TestSorted:
+    def test_sorted_empty(self):
+        assert Nil().sorted(lambda a, b: a - b) == Nil()
+
+    def test_sorted_single(self):
+        assert Cons(1, Nil()).sorted(lambda a, b: a - b) == Cons(1, Nil())
+
+    def test_sorted_multiple(self):
+        lst = CList.from_iterable([3, 1, 4, 1, 5, 2])
+        result = lst.sorted(lambda a, b: a - b)
+        assert result == CList.from_iterable([1, 1, 2, 3, 4, 5])
+
+    def test_sorted_already_sorted(self):
+        lst = CList.from_iterable([1, 2, 3])
+        assert lst.sorted(lambda a, b: a - b) == lst
+
+    def test_sorted_reverse(self):
+        lst = CList.from_iterable([3, 2, 1])
+        result = lst.sorted(lambda a, b: a - b)
+        assert result == CList.from_iterable([1, 2, 3])
+
+
+class TestFlatten:
+    def test_flatten_nested(self):
+        nested = Cons(Cons(1, Cons(2, Nil())), Cons(Cons(3, Nil()), Nil()))
+        result = CList.flatten_(nested)
+        assert result == CList.from_iterable([1, 2, 3])
+
+    def test_flatten_empty(self):
+        assert CList.flatten_(Nil()) == Nil()
+
+    def test_flatten_single(self):
+        nested = Cons(Cons(1, Nil()), Nil())
+        result = CList.flatten_(nested)
+        assert result == Cons(1, Nil())
+
+
+class TestEqEdgeCases:
+    def test_cons_ne_nil(self):
+        assert Cons(1, Nil()) != Nil()
+
+    def test_nil_ne_cons(self):
+        assert Nil() != Cons(1, Nil())
+
+    def test_eq_with_non_list(self):
+        assert Cons(1, Nil()) != "not a list"
+        assert Nil() != 42
+
+
+class TestStaticConstructors:
+    def test_cons_static(self):
+        assert CList.cons(42) == Cons(42, Nil())
+
+    def test_empty_static(self):
+        assert CList.empty() == Nil()
+
+    def test_length(self):
+        assert CList.from_iterable([1, 2, 3]).length() == 3
+        assert Nil().length() == 0
+
+
+class TestDoNotation:
+    """CList do-notation — limited by Python generators being single-use.
+
+    The list monad's do-notation requires backtracking (exploring all
+    combinations), but Python generators can't be replayed. Use explicit
+    .bind() chains for nondeterministic computation instead:
+
+        xs.bind(lambda x: ys.bind(lambda y: Cons.pure((x, y))))
+    """
+
+    def test_bind_for_nondeterminism(self):
+        """Use .bind() for proper list comprehension semantics."""
+        xs = CList.from_iterable([1, 2])
+        ys = CList.from_iterable(["a", "b"])
+        result = xs.bind(lambda x: ys.map(lambda y: (x, y)))
+        assert result == CList.from_iterable([(1, "a"), (1, "b"), (2, "a"), (2, "b")])

@@ -1,0 +1,9 @@
+[tools]
+python = "3.14"
+uv = "latest"
+ruff = "latest"
+just = "latest"
+ty = "latest"
+
+[hooks.postinstall]
+run = "uv run pre-commit install && uv sync"

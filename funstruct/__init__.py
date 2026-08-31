@@ -1,1 +1,1 @@
-"""A FP library containing common structures."""
+"""Fun & functional structures for Python."""

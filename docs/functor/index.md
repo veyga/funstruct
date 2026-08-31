@@ -1,0 +1,3 @@
+# Functor
+
+::: funstruct.typeclasses.Functor

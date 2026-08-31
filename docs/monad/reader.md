@@ -1,0 +1,3 @@
+# Reader
+
+::: funstruct.monad.reader
