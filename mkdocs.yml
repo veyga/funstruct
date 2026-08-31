@@ -21,9 +21,10 @@ nav:
       - Overview: typeclass/index.md
       - Semigroup: typeclass/semigroup.md
       - Monoid: typeclass/monoid.md
-      - Functor: typeclass/functor.md
       - Applicative: typeclass/applicative.md
       - Monad: typeclass/monad.md
+  - functor:
+      - Overview: functor/index.md
   - applicative:
       - Overview: applicative/index.md
       - Validated: applicative/validated.md
@@ -38,8 +39,8 @@ nav:
       - Future: monad/future.md
   - monadtransformer:
       - Overview: monadtransformer/index.md
-      - ReaderT: monad/reader_t.md
-      - StateT: monad/state_t.md
+      - ReaderT: monadtransformer/reader_t.md
+      - StateT: monadtransformer/state_t.md
       - EitherT: monadtransformer/either_t.md
       - OptionT: monadtransformer/option_t.md
       - WriterT: monadtransformer/writer_t.md

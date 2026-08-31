@@ -229,9 +229,8 @@ class CList(Monad, Generic[A]):
         """
         return CList.flatten_(self)
 
-    def flat_map(self, f: Callable[[A], CList]) -> CList:
-        """Apply a function to each element of the list,
-        then flatten the resulting lists.
+    def bind(self, f: Callable[[A], CList]) -> CList:
+        """Apply a function to each element and flatten the results.
 
         Args:
             f: A function that returns a list for each element.
@@ -241,19 +240,6 @@ class CList(Monad, Generic[A]):
             flattened into a single list.
         """
         return self.map(f).flatten()
-
-    def bind(self, f: Callable[[A], CList]) -> CList:
-        """Apply a function to each element of the list and flatten the results.
-        (alias for 'flat_map')
-
-        Args:
-            f: A function that returns a list for each element.
-
-        Returns:
-            A new list with the results of applying `f` to each element,
-            flattened into a single list.
-        """
-        return self.flat_map(f)
 
     def sorted(self, cmp: Callable[[A, A], int]) -> CList:
         """Sort the list using a comparison function.

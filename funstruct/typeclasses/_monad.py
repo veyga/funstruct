@@ -73,10 +73,6 @@ class Monad(Applicative[_A]):
         """
         return self.bind(lambda a: other.map(lambda b: f(a, b)))
 
-    def flat_map(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
-        """Alias for bind."""
-        return self.bind(f)
-
     def __rshift__(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
         """Alias for bind."""
         return self.bind(f)

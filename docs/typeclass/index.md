@@ -10,6 +10,6 @@ Semigroup               Functor
 
 - [Semigroup](semigroup.md)
 - [Monoid](monoid.md)
-- [Functor](functor.md)
+- [Functor](../functor/index.md)
 - [Applicative](applicative.md)
 - [Monad](monad.md)

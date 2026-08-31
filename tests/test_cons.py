@@ -607,9 +607,9 @@ def test_flatten(input, expected):
     original=Cons(2, Cons(1)),
     expected=CList.from_iterable([6, 6, 3, 3]),
 )
-def test_flat_map(original, expected):
+def test_bind(original, expected):
     triple = lambda n: CList.from_iterable([n * 3, n * 3])
-    assert original.flat_map(triple) == expected
+    assert original.bind(triple) == expected
 
 
 def test_bind_duplicates_elements():
