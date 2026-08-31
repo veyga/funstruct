@@ -35,10 +35,10 @@ Examples:
 from __future__ import annotations
 
 import inspect
+from abc import abstractmethod
 from collections.abc import Awaitable, Callable, Coroutine
 from dataclasses import dataclass
 from functools import wraps
-from abc import abstractmethod
 from typing import Any, Generic, ParamSpec, TypeVar, overload
 
 from funstruct.monad.either import Either, Left, Right
