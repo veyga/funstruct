@@ -3,7 +3,7 @@ import nox
 nox.options.default_venv_backend = "uv"
 
 
-@nox.session(python=["3.10", "3.11", "3.12"])
+@nox.session(python=["3.10", "3.11", "3.12", "3.13", "3.14"])
 def tests(session):
     """Run the test suite."""
     session.install(".", "--group", "dev")
@@ -21,7 +21,7 @@ def lint(session):
 def typecheck(session):
     """Run type checker."""
     session.install(".", "--group", "dev")
-    session.run("ty", "check", "funstruct/_impl/")
+    session.run("ty", "check", "funstruct/")
 
 
 @nox.session
