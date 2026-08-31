@@ -54,6 +54,10 @@ nav:
   - util:
       - tailrec: util/tailrec.md
 
+extra:
+  version:
+    provider: mike
+
 plugins:
   - search
   - mkdocstrings:
