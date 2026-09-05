@@ -142,7 +142,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         return cls(fa.map(lambda a: (a, cls._monoid.empty)))
 
     @classmethod
-    def do(cls, gen_fn) -> WriterT:
+    def do(cls, gen_fn, *args, **kwargs) -> WriterT:
         """Do-notation via generators. Accumulates output across yields.
 
         >>> from funstruct.monad.either import Either, Right
@@ -159,7 +159,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         """
 
         def _unwrap(first_run):
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             next(gen)
 
             monoid = cls._monoid
@@ -177,7 +177,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
             return step
 
         def _run_do():
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             first_wt = next(gen)
             first_fa = first_wt.run()
             return first_fa.bind(_unwrap(first_fa))

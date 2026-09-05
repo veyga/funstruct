@@ -9,8 +9,8 @@ Haskell and Scala have built-in `do`/`for` syntax that flattens nested
 give us something close.
 
 Every monad in funstruct provides a `do` classmethod that accepts a
-**zero-argument generator function**. Each `yield` unwraps a monadic value;
-the final `return` is wrapped back into the monad.
+generator function. Each `yield` unwraps a monadic value; the final
+`return` is wrapped back into the monad.
 
 ### Basic usage
 
@@ -42,18 +42,37 @@ Each `yield` is equivalent to a `bind` — it unwraps the value if the
 computation succeeds, or short-circuits if it doesn't (e.g., `Left`,
 `Nothing`, depending on the monad).
 
-### The zero-argument rule
+### Passing arguments
 
-`do` always takes a **zero-argument function**. This is because Python
-generators are single-use — `do` calls `gen_fn()` internally to create the
-generator and drives it to completion.
-
-If your pipeline needs arguments, wrap the generator in a regular function
-and close over them:
+`do` forwards extra arguments to the generator function, so your pipeline
+can accept parameters directly:
 
 ```python
 from funstruct.monad.option import Option, Some, Nothing
 
+def lookup(user_id: int):
+    user = yield find_user(user_id)
+    email = yield get_email(user)
+    return email
+
+Option.do(lookup, 42)  # Some("alice@example.com") or Nothing()
+```
+
+This also works with keyword arguments:
+
+```python
+def scaled_pipeline(multiplier=1):
+    x = yield Some(5)
+    return x * multiplier
+
+Option.do(scaled_pipeline, multiplier=3)  # Some(15)
+```
+
+When using `do` as a decorator (see below), the decorated function runs
+immediately with no arguments. If you need arguments with the decorator
+style, close over them:
+
+```python
 def lookup(user_id: int) -> Option[str]:
     @Option.do
     def _run():
@@ -134,23 +153,34 @@ pipeline.run()  # Some(Right(12))
 
 ### Future (async)
 
-`Future.do` uses a regular (sync) generator — not `async def`. The driver
-loop handles awaiting internally. Using `async def` with `yield` creates an
-async generator, which Python forbids from returning a value.
+`Future.do` uses a regular (sync) generator — **not `async def`**. The
+driver loop handles awaiting internally. Using `async def` with `yield`
+creates an async generator, which Python forbids from returning a value.
 
 ```python
 from funstruct.monad.future import Future
 
+# Pass arguments directly:
+def fetch_and_transform(url):
+    response = yield fetch(url)
+    parsed = yield parse(response)
+    return parsed.title
+
+result = await Future.do(fetch_and_transform, "https://example.com")
+```
+
+Or use the decorator style with a closure:
+
+```python
 def fetch_and_transform(url: str) -> Future[str]:
     @Future.do
     def _run():
-        response = yield fetch(url)       # yield awaits the Future
+        response = yield fetch(url)       # url captured from closure
         parsed = yield parse(response)
         return parsed.title
 
     return _run
 
-# await at the boundary
 result = await fetch_and_transform("https://example.com")
 ```
 

@@ -129,7 +129,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         )
 
     @classmethod
-    def do(cls, gen_fn) -> ReaderT:
+    def do(cls, gen_fn, *args, **kwargs) -> ReaderT:
         """Do-notation via generators. Flattens nested binds.
 
         Each `yield` extracts the value from a ReaderT (shared ctx).
@@ -145,7 +145,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         """
 
         def _run(ctx):
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             try:
                 monadic_val = next(gen)
             except StopIteration:

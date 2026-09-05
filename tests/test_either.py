@@ -120,6 +120,14 @@ class TestDo:
 
         assert Either.do(pipeline) == Right(6)
 
+    def test_with_args(self):
+        def pipeline(base):
+            x = yield Right(base)
+            y = yield Right(x + 10)
+            return x + y
+
+        assert Either.do(pipeline, 5) == Right(20)
+
 
 class TestSequenceTraverse:
     def test_sequence_all_right(self):

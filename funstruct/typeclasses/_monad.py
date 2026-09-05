@@ -50,7 +50,7 @@ class Monad(Applicative[_A]):
 
     @classmethod
     @abstractmethod
-    def do(cls, gen_fn: Callable) -> Monad[_A]:
+    def do(cls, gen_fn: Callable, *args, **kwargs) -> Monad[_A]:
         """Do-notation via generators. Flattens nested binds."""
         ...
 

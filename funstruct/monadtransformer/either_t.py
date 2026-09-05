@@ -139,7 +139,7 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return cls(monad.pure(either))
 
     @classmethod
-    def do(cls, gen_fn) -> EitherT:
+    def do(cls, gen_fn, *args, **kwargs) -> EitherT:
         """Do-notation via generators.
 
         Each ``yield`` extracts the Right value from an EitherT.
@@ -169,7 +169,7 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
 
             return EitherT(either_t.run().bind(_step))
 
-        gen = gen_fn()
+        gen = gen_fn(*args, **kwargs)
         try:
             first = next(gen)
         except StopIteration:

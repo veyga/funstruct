@@ -125,6 +125,21 @@ class TestDo:
 
         assert Option.do(pipeline) == Some(60)
 
+    def test_with_args(self):
+        def pipeline(x, y):
+            a = yield Some(x)
+            b = yield Some(y)
+            return a + b
+
+        assert Option.do(pipeline, 3, 7) == Some(10)
+
+    def test_with_kwargs(self):
+        def pipeline(multiplier=1):
+            x = yield Some(5)
+            return x * multiplier
+
+        assert Option.do(pipeline, multiplier=3) == Some(15)
+
 
 class TestFromOptional:
     def test_some_value(self):

@@ -82,7 +82,7 @@ class State(Monad, Generic[_A]):
         return self.bind(lambda _: next_state)
 
     @classmethod
-    def do(cls, gen_fn) -> "State":
+    def do(cls, gen_fn, *args, **kwargs) -> "State":
         """Do-notation via generators. Flattens nested binds.
 
         Each `yield` extracts the value from a State (state threads through).
@@ -96,7 +96,7 @@ class State(Monad, Generic[_A]):
         """
 
         def _run(s):
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             try:
                 monadic_val = next(gen)
                 while True:

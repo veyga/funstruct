@@ -235,6 +235,15 @@ class TestFutureDo:
 
         assert self._run_future(pipeline) == 60
 
+    def test_with_args(self):
+        def pipeline(base):
+            x = yield Future.pure(base)
+            y = yield Future.pure(x * 2)
+            return y
+
+        result = self._run_future(Future.do(pipeline, 21))
+        assert result == 42
+
 
 class TestTryAsyncWithSyncFunctions:
     """TryAsync accepts sync functions, wrapping them in AsyncResult."""

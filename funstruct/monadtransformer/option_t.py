@@ -153,7 +153,7 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         return self.bind(lambda _: next_t)
 
     @classmethod
-    def do(cls, gen_fn) -> OptionT:
+    def do(cls, gen_fn, *args, **kwargs) -> OptionT:
         """Do-notation via generators. Short-circuits on Nothing.
 
         >>> from funstruct.monad.either import Right
@@ -167,7 +167,7 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         """
 
         def _run_do():
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             try:
                 first = next(gen)
             except StopIteration:

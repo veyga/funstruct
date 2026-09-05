@@ -60,7 +60,7 @@ class Reader(Monad, Generic[_Ctx, _A]):
         return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
 
     @classmethod
-    def do(cls, gen_fn: Callable[[], Generator[Reader, object, _R]]) -> Reader:
+    def do(cls, gen_fn: Callable, *args, **kwargs) -> Reader:
         """Do-notation via generators. Flattens nested binds.
 
         Each `yield` extracts the value from a Reader (all share the same ctx).
@@ -75,7 +75,7 @@ class Reader(Monad, Generic[_Ctx, _A]):
         """
 
         def _run(ctx):
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             try:
                 monadic_val = next(gen)
                 while True:

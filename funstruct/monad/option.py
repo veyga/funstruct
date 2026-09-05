@@ -118,7 +118,7 @@ class Option(Monad, Generic[A]):
         return cls.sequence(values.map(f))
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Option:
+    def do(cls, gen_fn: Callable, *args, **kwargs) -> Option:
         """Do-notation. Short-circuits on Nothing.
 
         >>> def pipeline():
@@ -128,7 +128,7 @@ class Option(Monad, Generic[A]):
         >>> Option.do(pipeline)
         Some(12)
         """
-        gen = gen_fn()
+        gen = gen_fn(*args, **kwargs)
         try:
             monadic_val = next(gen)
             while True:

@@ -141,6 +141,14 @@ class TestDoNotation:
 
         assert describe.run({"name": "Alice", "age": 30}) == "Alice has 2 fields"
 
+    def test_with_args(self):
+        def lookup(key):
+            value = yield Reader(lambda ctx: ctx[key])
+            return value
+
+        result = Reader.do(lookup, "name")
+        assert result.run({"name": "Alice", "age": 30}) == "Alice"
+
 
 class TestDoNotationEquivalentWithBind:
     """Same logic as TestDoNotation but using bind/map chains."""

@@ -57,7 +57,7 @@ class Future(Generic[A]):
         return Future(_inner())
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Future:
+    def do(cls, gen_fn: Callable, *args, **kwargs) -> Future:
         """Do-notation for Future. Each yield awaits a Future.
 
         The generator must be a regular function (not async def) — the
@@ -71,7 +71,7 @@ class Future(Generic[A]):
         """
 
         async def _run():
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             try:
                 monadic_val = next(gen)
                 while True:

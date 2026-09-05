@@ -68,7 +68,7 @@ class Either(Monad, Generic[E, A]):
         return Left(error)
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Either:
+    def do(cls, gen_fn: Callable, *args, **kwargs) -> Either:
         """Do-notation. Short-circuits on Left.
 
         >>> Right(1).bind(lambda x: Right(x + 10))
@@ -80,7 +80,7 @@ class Either(Monad, Generic[E, A]):
         >>> Either.do(pipeline)
         Right(12)
         """
-        gen = gen_fn()
+        gen = gen_fn(*args, **kwargs)
         try:
             monadic_val = next(gen)
             while True:

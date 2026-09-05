@@ -109,7 +109,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
     # Constructors — monad class passed explicitly, StateT knows nothing about it
 
     @classmethod
-    def do(cls, gen_fn) -> "StateT":
+    def do(cls, gen_fn, *args, **kwargs) -> "StateT":
         """Do-notation via generators. Flattens nested binds.
 
         Each `yield` extracts the value from a StateT.
@@ -125,7 +125,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         """
 
         def _run(s):
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             try:
                 first = next(gen)
             except StopIteration:

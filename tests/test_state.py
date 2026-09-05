@@ -174,6 +174,16 @@ class TestDoNotation:
         assert conditional_update.run(3) == (4, 4)
         assert conditional_update.run(10) == (9, 9)
 
+    def test_with_args(self):
+        def push_n_times(n):
+            for _ in range(n):
+                yield State(lambda s: (s + 1, s))
+            s = yield State(lambda s: (s, s))
+            return s
+
+        result = State.do(push_n_times, 3)
+        assert result.run(0) == (3, 3)
+
 
 class TestDoNotationEquivalentWithBind:
     """Same logic as TestDoNotation but using bind chains."""

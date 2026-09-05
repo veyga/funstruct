@@ -306,11 +306,11 @@ class CList(Monad, Generic[A]):
         return flatten(lst)
 
     @classmethod
-    def do(cls, gen_fn) -> CList:
+    def do(cls, gen_fn, *args, **kwargs) -> CList:
         """Do-notation for CList. Collects all yielded results via flatMap."""
 
         def _collect():
-            gen = gen_fn()
+            gen = gen_fn(*args, **kwargs)
             try:
                 first = next(gen)
                 result = first.bind(lambda v: _send(gen, v))
