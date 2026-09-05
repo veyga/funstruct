@@ -35,7 +35,7 @@ class CList(Monad, Generic[A]):
         - drop(k):       O(k) — follows k tail pointers
         - take(k):       O(k) — copies k nodes
         - map/filter:    O(n) — traverses and rebuilds
-        - bind/flatMap:  O(n*m) — maps then flattens
+        - bind:          O(n*m) — maps then flattens
         - reversed:      O(n) — builds new list via fold
         - index access:  O(n) — no random access (use Python list for that)
 
@@ -194,18 +194,6 @@ class CList(Monad, Generic[A]):
         """
         return self.fold_left(Nil(), lambda acc, h: Cons(h, acc))
 
-    def map(self, f: Callable[[A], B]) -> CList[B]:
-        """Apply a function to each element of the list, producing a new list
-        with the results.
-
-        Args:
-            f: A function to apply to each element.
-
-        Returns:
-            A new list with the results of applying `f` to each element.
-        """
-        return self.fold_right(Nil(), lambda a, acc: Cons(f(a), acc))
-
     def filter(self, f: Callable[[A], bool]) -> CList:
         """Filter the elements of the list based on a predicate function.
 
@@ -235,7 +223,7 @@ class CList(Monad, Generic[A]):
             A new list with the results of applying `f` to each element,
             flattened into a single list.
         """
-        return self.map(f).flatten()
+        return self.fold_right(Nil(), lambda a, acc: f(a).append(acc))
 
     def sorted(self, cmp: Callable[[A, A], int]) -> CList:
         """Sort the list using a comparison function.
