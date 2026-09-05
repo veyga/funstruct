@@ -42,6 +42,7 @@ from functools import wraps
 from typing import Any, Generic, ParamSpec, TypeVar, overload
 
 from funstruct.monad.either import Either, Left, Right
+from funstruct.typeclasses._monad import Monad
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -111,7 +112,7 @@ class Err(Left):
 _P = ParamSpec("_P")
 
 
-class AsyncResult(Generic[_A]):
+class AsyncResult(Monad, Generic[_A]):
     """Lazy async computation that produces Result[A] (Ok or Err) when awaited.
 
     AsyncResult[User] = async computation → Ok(user) or Err(exception).
@@ -133,15 +134,6 @@ class AsyncResult(Generic[_A]):
 
     async def _awaitable(self) -> Result[_A]:
         return await self._coro
-
-    def map(self, f: Callable[[_A], _B]) -> AsyncResult[_B]:
-        """Transform the success value without executing."""
-
-        async def _inner():
-            result = await self._coro
-            return result.map(f)
-
-        return AsyncResult(_inner())
 
     def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
         """Chain: f receives value. Short-circuits on Err.
@@ -206,14 +198,6 @@ class AsyncResult(Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def then(self, next_result: AsyncResult[_B]) -> AsyncResult[_B]:
-        """Sequence: run self, discard value, run next."""
-        return self.bind(lambda _: next_result)
-
-    def ap(self, other: AsyncResult[_A]) -> AsyncResult[_B]:
-        """Apply: self contains a function, apply it to other's value."""
-        return self.bind(lambda f: other.map(f))
-
     @classmethod
     def pure(cls, value: _A) -> AsyncResult[_A]:
         """Lift a plain value into Ok."""
@@ -240,6 +224,42 @@ class AsyncResult(Generic[_A]):
             return either
 
         return cls(_inner())
+
+    @classmethod
+    def do(cls, gen_fn: Callable) -> Callable[..., AsyncResult]:
+        """Do-notation for AsyncResult. Short-circuits on Err. Returns a callable.
+
+        Each yield can be an AsyncResult (awaited) or a sync Either
+        (used directly). Right values are sent back, Left short-circuits.
+
+        >>> @AsyncResult.do
+        ... def pipeline():
+        ...     x = yield AsyncResult.pure(1)
+        ...     y = yield AsyncResult.pure(x + 10)
+        ...     return x + y
+        """
+
+        def _thunk(*args, **kwargs):
+            async def _run():
+                gen = gen_fn(*args, **kwargs)
+                try:
+                    monadic_val = next(gen)
+                    while True:
+                        if isinstance(monadic_val, Either):
+                            result = monadic_val
+                        else:
+                            result = await monadic_val
+                        match result:
+                            case Right(value):
+                                monadic_val = gen.send(value)
+                            case _:
+                                return result
+                except StopIteration as e:
+                    return Ok(e.value)
+
+            return cls(_run())
+
+        return _thunk
 
     def __repr__(self) -> str:
         return f"AsyncResult({self._coro})"

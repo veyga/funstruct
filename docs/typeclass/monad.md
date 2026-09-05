@@ -8,19 +8,16 @@ Haskell and Scala have built-in `do`/`for` syntax that flattens nested
 `bind` chains into sequential-looking code. Python doesn't, but generators
 give us something close.
 
-Every monad in funstruct provides a `do` classmethod:
+Every monad in funstruct provides a `do` classmethod that wraps a generator
+function, returning a **callable**:
 
 ```python
-Monad.do(gen_fn, *args, **kwargs)
+Monad.do(gen_fn)  # → Callable[..., Monad]
 ```
 
-It calls `gen_fn(*args, **kwargs)` to create a generator, drives it to
-completion, and returns the monadic result. Each `yield` unwraps a monadic
-value (equivalent to `bind`); the final `return` is wrapped back into the
-monad.
-
-Since `do` is a regular function, it can be used as a decorator (`@Monad.do`)
-or called directly (`Monad.do(fn, arg1, arg2)`).
+Call the result with `()` to execute the pipeline. Each `yield` unwraps a
+monadic value (equivalent to `bind`); the final `return` is wrapped back
+into the monad.
 
 ### Basic usage
 
@@ -37,18 +34,50 @@ result = (
 # Right(12)
 ```
 
-With do-notation, the same logic reads top-to-bottom:
+With do-notation:
 
 ```python
+@Either.do
 def pipeline():
     x = yield Right(1)
     y = yield Right(x + 10)
     return x + y
 
-Either.do(pipeline)  # Right(12)
+pipeline()  # Right(12) — note the ()
 ```
 
-As a decorator (equivalent to `count_to_three = State.do(count_to_three)`):
+Or called directly:
+
+```python
+Either.do(pipeline)()  # Right(12)
+```
+
+### With arguments
+
+`do` returns a callable, so arguments are passed naturally:
+
+```python
+from funstruct.monad.option import Option, Some, Nothing
+
+@Option.do
+def lookup(user_id):
+    user = yield find_user(user_id)
+    email = yield get_email(user)
+    return email
+
+lookup(42)  # Some("alice@example.com") or Nothing()
+```
+
+Or without the decorator:
+
+```python
+Option.do(lookup)(42)
+```
+
+### As a decorator
+
+`@Monad.do` wraps the generator function. The decorated name is a callable
+that produces the monad when called:
 
 ```python
 from funstruct.monad.state import State
@@ -64,20 +93,7 @@ def count_to_three():
     total = yield get
     return (a, b, c, total)
 
-count_to_three.run(0)  # (3, (0, 1, 2, 3))
-```
-
-With arguments:
-
-```python
-from funstruct.monad.option import Option, Some, Nothing
-
-def lookup(user_id):
-    user = yield find_user(user_id)
-    email = yield get_email(user)
-    return email
-
-Option.do(lookup, 42)  # Some("alice@example.com") or Nothing()
+count_to_three().run(0)  # (3, (0, 1, 2, 3))
 ```
 
 ### Short-circuiting
@@ -85,25 +101,23 @@ Option.do(lookup, 42)  # Some("alice@example.com") or Nothing()
 Each monad's `do` knows how to short-circuit according to its semantics:
 
 ```python
-from funstruct.monad.option import Option, Some, Nothing
-
+@Option.do
 def pipeline():
     x = yield Some(1)
     y = yield Nothing()   # short-circuits here
     return x + y          # never reached
 
-Option.do(pipeline)  # Nothing()
+pipeline()  # Nothing()
 ```
 
 ```python
-from funstruct.monad.either import Either, Right, Left
-
+@Either.do
 def pipeline():
     x = yield Right(1)
     y = yield Left("boom")   # short-circuits here
     return x + y              # never reached
 
-Either.do(pipeline)  # Left("boom")
+pipeline()  # Left("boom")
 ```
 
 ### Monad transformers
@@ -112,8 +126,8 @@ Monad transformers also support do-notation. The short-circuiting respects
 both layers:
 
 ```python
-from funstruct.monad.either import Right, Left
-from funstruct.monad.option import Some, Nothing
+from funstruct.monad.either import Right
+from funstruct.monad.option import Some
 from funstruct.monadtransformer.either_t import EitherT
 
 @EitherT.do
@@ -122,24 +136,41 @@ def pipeline():
     y = yield EitherT(Some(Right(x + 10)))
     return x + y
 
-pipeline.run()  # Some(Right(12))
+pipeline().run()  # Some(Right(12))
 ```
 
-### Future (async)
+### Future and AsyncResult (async)
 
-`Future.do` uses a regular (sync) generator — **not `async def`**. The
-driver loop handles awaiting internally. Using `async def` with `yield`
-creates an async generator, which Python forbids from returning a value.
+`Future.do` and `AsyncResult.do` use regular (sync) generators — **not
+`async def`**. The driver loop handles awaiting internally. Using `async def`
+with `yield` creates an async generator, which Python forbids from returning
+a value.
 
 ```python
 from funstruct.monad.future import Future
 
+@Future.do
 def fetch_and_transform(url):
     response = yield fetch(url)
     parsed = yield parse(response)
     return parsed.title
 
-result = await Future.do(fetch_and_transform, "https://example.com")
+result = await fetch_and_transform("https://example.com")
+```
+
+`AsyncResult.do` additionally accepts sync `Either` values (Ok/Err)
+alongside `AsyncResult` values:
+
+```python
+from funstruct.monad.result import AsyncResult, Ok, Err
+
+@AsyncResult.do
+def get_user_email(username):
+    user = yield get_user(username)       # AsyncResult
+    email = yield validate_email(user)    # can be Ok/Err or AsyncResult
+    return email
+
+result = await get_user_email("alice")  # Ok("alice@example.com")
 ```
 
 ### CList (the exception)

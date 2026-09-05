@@ -116,7 +116,7 @@ class TestDo:
             y = yield Some(x + 10)
             return x + y
 
-        assert Option.do(pipeline) == Some(12)
+        assert Option.do(pipeline)() == Some(12)
 
     def test_short_circuits(self):
         def pipeline():
@@ -124,7 +124,7 @@ class TestDo:
             y = yield Nothing()
             return x + y
 
-        assert Option.do(pipeline) == Nothing()
+        assert Option.do(pipeline)() == Nothing()
 
     def test_multiple_values(self):
         def pipeline():
@@ -133,7 +133,7 @@ class TestDo:
             c = yield Some(30)
             return a + b + c
 
-        assert Option.do(pipeline) == Some(60)
+        assert Option.do(pipeline)() == Some(60)
 
     def test_with_args(self):
         def pipeline(x, y):
@@ -141,14 +141,14 @@ class TestDo:
             b = yield Some(y)
             return a + b
 
-        assert Option.do(pipeline, 3, 7) == Some(10)
+        assert Option.do(pipeline)(3, 7) == Some(10)
 
     def test_with_kwargs(self):
         def pipeline(multiplier=1):
             x = yield Some(5)
             return x * multiplier
 
-        assert Option.do(pipeline, multiplier=3) == Some(15)
+        assert Option.do(pipeline)(multiplier=3) == Some(15)
 
 
 class TestFromOptional:

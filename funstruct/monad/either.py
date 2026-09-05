@@ -26,7 +26,7 @@ Examples:
     ...     x = yield Right(1)
     ...     y = yield Right(x + 10)
     ...     return x + y
-    >>> Either.do(pipeline)
+    >>> Either.do(pipeline)()
     Right(12)
 """
 
@@ -69,29 +69,31 @@ class Either(Monad, Generic[E, A]):
         return Left(error)
 
     @classmethod
-    def do(cls, gen_fn: Callable, *args, **kwargs) -> Either:
-        """Do-notation. Short-circuits on Left.
+    def do(cls, gen_fn: Callable) -> Callable[..., Either]:
+        """Do-notation. Short-circuits on Left. Returns a callable.
 
-        >>> Right(1).bind(lambda x: Right(x + 10))
-        Right(11)
         >>> def pipeline():
         ...     x = yield Right(1)
         ...     y = yield Right(x + 10)
         ...     return x + y
-        >>> Either.do(pipeline)
+        >>> Either.do(pipeline)()
         Right(12)
         """
-        gen = gen_fn(*args, **kwargs)
-        try:
-            monadic_val = next(gen)
-            while True:
-                match monadic_val:
-                    case Left():
-                        return monadic_val
-                    case Right(value):
-                        monadic_val = gen.send(value)
-        except StopIteration as e:
-            return Right(e.value)
+
+        def _thunk(*args, **kwargs):
+            gen = gen_fn(*args, **kwargs)
+            try:
+                monadic_val = next(gen)
+                while True:
+                    match monadic_val:
+                        case Left():
+                            return monadic_val
+                        case Right(value):
+                            monadic_val = gen.send(value)
+            except StopIteration as e:
+                return Right(e.value)
+
+        return _thunk
 
     @classmethod
     def sequence(cls, eithers: CList[Either[E, A]]) -> Either[E, CList[A]]:

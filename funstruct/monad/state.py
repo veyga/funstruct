@@ -65,8 +65,8 @@ class State(Monad, Generic[_A]):
         return self.bind(lambda _: next_state)
 
     @classmethod
-    def do(cls, gen_fn, *args, **kwargs) -> "State":
-        """Do-notation via generators. Flattens nested binds.
+    def do(cls, gen_fn) -> Callable[..., "State"]:
+        """Do-notation via generators. Returns a callable.
 
         Each `yield` extracts the value from a State (state threads through).
 
@@ -74,22 +74,25 @@ class State(Monad, Generic[_A]):
         ...     x = yield State(lambda s: (s + 1, s))
         ...     y = yield State(lambda s: (s + 1, s))
         ...     return x + y
-        >>> State.do(pipeline).run(0)
+        >>> State.do(pipeline)().run(0)
         (2, 1)
         """
 
-        def _run(s):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                monadic_val = next(gen)
-                while True:
-                    new_s, result = monadic_val.run(s)
-                    s = new_s
-                    monadic_val = gen.send(result)
-            except StopIteration as e:
-                return (s, e.value)
+        def _thunk(*args, **kwargs):
+            def _run(s):
+                gen = gen_fn(*args, **kwargs)
+                try:
+                    monadic_val = next(gen)
+                    while True:
+                        new_s, result = monadic_val.run(s)
+                        s = new_s
+                        monadic_val = gen.send(result)
+                except StopIteration as e:
+                    return (s, e.value)
 
-        return cls(_run)
+            return cls(_run)
+
+        return _thunk
 
     @classmethod
     def pure(cls, value) -> "State":

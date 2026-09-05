@@ -218,15 +218,15 @@ class TestDoNotation:
             return {"name": name, "email": email}
 
         cfg_ok = {"name": "Alice", "email": "alice@example.com"}
-        assert build_profile.run(cfg_ok) == Right(
+        assert build_profile().run(cfg_ok) == Right(
             {"name": "Alice", "email": "alice@example.com"}
         )
 
         cfg_no_email = {"name": "Bob"}
-        assert build_profile.run(cfg_no_email) == Left("missing email")
+        assert build_profile().run(cfg_no_email) == Left("missing email")
 
         cfg_empty_name = {"name": "", "email": "x@y.z"}
-        assert build_profile.run(cfg_empty_name) == Left("empty name")
+        assert build_profile().run(cfg_empty_name) == Left("empty name")
 
     def test_do_threads_context(self):
         @ReaderT.do
@@ -235,7 +235,7 @@ class TestDoNotation:
             y = yield ReaderT(lambda ctx: Right(x + ctx))
             return y
 
-        assert pipeline.run(5) == Right(10)
+        assert pipeline().run(5) == Right(10)
 
     def test_do_short_circuits(self):
         @ReaderT.do
@@ -244,7 +244,7 @@ class TestDoNotation:
             y = yield ReaderT(lambda ctx: Left("boom"))
             return x + y
 
-        assert pipeline.run(0) == Left("boom")
+        assert pipeline().run(0) == Left("boom")
 
 
 class TestWithOption:
@@ -279,7 +279,7 @@ class TestWithOption:
             y = yield ReaderT(lambda ctx: Some(x + 1))
             return y
 
-        assert pipeline.run(10) == Some(11)
+        assert pipeline().run(10) == Some(11)
 
     def test_do_short_circuits_nothing(self):
         from funstruct.monad.option import Nothing, Some
@@ -290,4 +290,4 @@ class TestWithOption:
             y = yield ReaderT(lambda ctx: Nothing())
             return x + y
 
-        assert pipeline.run(0) == Nothing()
+        assert pipeline().run(0) == Nothing()

@@ -188,7 +188,7 @@ class TestDoNotation:
             y = yield EitherT(Some(Right(x + 10)))
             return x + y
 
-        assert pipeline.run() == Some(Right(12))
+        assert pipeline().run() == Some(Right(12))
 
     def test_short_circuits_on_left(self):
         @EitherT.do
@@ -197,7 +197,7 @@ class TestDoNotation:
             y = yield EitherT(Some(Left("boom")))
             return x + y
 
-        assert pipeline.run() == Some(Left("boom"))
+        assert pipeline().run() == Some(Left("boom"))
 
     def test_short_circuits_on_nothing(self):
         @EitherT.do
@@ -206,7 +206,7 @@ class TestDoNotation:
             y = yield EitherT(Nothing())
             return x + y
 
-        assert pipeline.run() == Nothing()
+        assert pipeline().run() == Nothing()
 
 
 class TestBrokenEitherT:

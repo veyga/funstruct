@@ -161,8 +161,8 @@ class TestDoNotation:
             y = yield ListWriter(x + 1, ["step"])
             return x + y
 
-        assert pipeline.value == 3
-        assert pipeline.output == ["start", "step"]
+        assert pipeline().value == 3
+        assert pipeline().output == ["start", "step"]
 
     def test_do_three_steps(self):
         @ListWriter.do
@@ -172,8 +172,8 @@ class TestDoNotation:
             c = yield ListWriter(30, ["c"])
             return a + b + c
 
-        assert pipeline.value == 60
-        assert pipeline.output == ["a", "b", "c"]
+        assert pipeline().value == 60
+        assert pipeline().output == ["a", "b", "c"]
 
     def test_do_with_clist(self):
         @CListWriter.do
@@ -182,8 +182,8 @@ class TestDoNotation:
             y = yield CListWriter(x + 10, Cons("second", Nil()))
             return y
 
-        assert pipeline.value == 11
-        assert pipeline.output == CList.from_iterable(["first", "second"])
+        assert pipeline().value == 11
+        assert pipeline().output == CList.from_iterable(["first", "second"])
 
 
 class TestWriterEquality:

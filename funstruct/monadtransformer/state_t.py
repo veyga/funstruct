@@ -101,8 +101,8 @@ class StateT(MonadTransformer, Generic[_F, _A]):
     # Constructors — monad class passed explicitly, StateT knows nothing about it
 
     @classmethod
-    def do(cls, gen_fn, *args, **kwargs) -> "StateT":
-        """Do-notation via generators. Flattens nested binds.
+    def do(cls, gen_fn) -> Callable[..., "StateT"]:
+        """Do-notation via generators. Returns a callable.
 
         Each `yield` extracts the value from a StateT.
         State threads through, short-circuits on inner monad failure.
@@ -112,29 +112,32 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         ...     x = yield StateT(lambda s: Right((s + 1, s)))
         ...     y = yield StateT(lambda s: Right((s + 1, s)))
         ...     return x + y
-        >>> StateT.do(pipeline).run(0)
+        >>> StateT.do(pipeline)().run(0)
         Right((2, 1))
         """
 
-        def _run(s):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                first = next(gen)
-            except StopIteration:
-                raise ValueError("do block must yield at least once")
-
-            def step(sa):
-                new_s, value = sa
+        def _thunk(*args, **kwargs):
+            def _run(s):
+                gen = gen_fn(*args, **kwargs)
                 try:
-                    next_val = gen.send(value)
-                    return next_val.run(new_s).bind(step)
-                except StopIteration as e:
-                    monad_cls = first.run(s).__class__
-                    return _pure(monad_cls, (new_s, e.value))
+                    first = next(gen)
+                except StopIteration:
+                    raise ValueError("do block must yield at least once")
 
-            return first.run(s).bind(step)
+                def step(sa):
+                    new_s, value = sa
+                    try:
+                        next_val = gen.send(value)
+                        return next_val.run(new_s).bind(step)
+                    except StopIteration as e:
+                        monad_cls = first.run(s).__class__
+                        return _pure(monad_cls, (new_s, e.value))
 
-        return cls(_run)
+                return first.run(s).bind(step)
+
+            return cls(_run)
+
+        return _thunk
 
     @classmethod
     def pure(cls, value, monad: type) -> "StateT":

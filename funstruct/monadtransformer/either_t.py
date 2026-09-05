@@ -131,8 +131,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return cls(monad.pure(either))
 
     @classmethod
-    def do(cls, gen_fn, *args, **kwargs) -> EitherT:
-        """Do-notation via generators.
+    def do(cls, gen_fn) -> Callable[..., EitherT]:
+        """Do-notation via generators. Returns a callable.
 
         Each ``yield`` extracts the Right value from an EitherT.
         Short-circuits on Left (propagated through F).
@@ -143,30 +143,33 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         ...     x = yield EitherT(Some(Right(1)))
         ...     y = yield EitherT(Some(Right(x + 10)))
         ...     return x + y
-        >>> EitherT.do(pipeline).run()
+        >>> EitherT.do(pipeline)().run()
         Some(Right(12))
         """
 
-        def _bind_step(either_t, gen):
-            def _step(either):
-                match either:
-                    case Right(value):
-                        try:
-                            next_et = gen.send(value)
-                            return _bind_step(next_et, gen).run()
-                        except StopIteration as e:
-                            return either_t.run().__class__.pure(Right(e.value))
-                    case _:
-                        return either_t.run().__class__.pure(either)
+        def _thunk(*args, **kwargs):
+            def _bind_step(either_t, gen):
+                def _step(either):
+                    match either:
+                        case Right(value):
+                            try:
+                                next_et = gen.send(value)
+                                return _bind_step(next_et, gen).run()
+                            except StopIteration as e:
+                                return either_t.run().__class__.pure(Right(e.value))
+                        case _:
+                            return either_t.run().__class__.pure(either)
 
-            return EitherT(either_t.run().bind(_step))
+                return EitherT(either_t.run().bind(_step))
 
-        gen = gen_fn(*args, **kwargs)
-        try:
-            first = next(gen)
-        except StopIteration:
-            raise ValueError("do block must yield at least once")
-        return _bind_step(first, gen)
+            gen = gen_fn(*args, **kwargs)
+            try:
+                first = next(gen)
+            except StopIteration:
+                raise ValueError("do block must yield at least once")
+            return _bind_step(first, gen)
+
+        return _thunk
 
     def __repr__(self) -> str:
         return f"EitherT({repr(self._value)})"

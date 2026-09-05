@@ -112,7 +112,7 @@ class MonadTransformer(ABC, Generic[_F, _A]):
 
     @classmethod
     @abstractmethod
-    def do(cls, gen_fn: Callable, *args, **kwargs) -> MonadTransformer: ...
+    def do(cls, gen_fn: Callable) -> Callable[..., MonadTransformer]: ...
 
     def ap(self, other: MonadTransformer) -> MonadTransformer:
         """Derived from bind + map."""

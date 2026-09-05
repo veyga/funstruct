@@ -47,27 +47,31 @@ class Writer(Monad, Generic[_W, _A]):
         )
 
     @classmethod
-    def do(cls, gen_fn, *args, **kwargs) -> Writer:
-        """Do-notation for Writer. Accumulates output across yields.
+    def do(cls, gen_fn) -> Callable[..., Writer]:
+        """Do-notation for Writer. Accumulates output across yields. Returns a callable.
 
         >>> def pipeline():
         ...     x = yield ListWriter(1, ["init"])
         ...     y = yield ListWriter(x + 10, ["step"])
         ...     return x + y
-        >>> ListWriter.do(pipeline)
+        >>> ListWriter.do(pipeline)()
         ListWriter(value=12, output=['init', 'step'])
         """
-        gen = gen_fn(*args, **kwargs)
-        try:
-            first = next(gen)
-            output = first.output
-            value = first.value
-            while True:
-                next_w = gen.send(value)
-                output = cls._monoid.combine(output, next_w.output)
-                value = next_w.value
-        except StopIteration as e:
-            return cls(e.value, output)
+
+        def _thunk(*args, **kwargs):
+            gen = gen_fn(*args, **kwargs)
+            try:
+                first = next(gen)
+                output = first.output
+                value = first.value
+                while True:
+                    next_w = gen.send(value)
+                    output = cls._monoid.combine(output, next_w.output)
+                    value = next_w.value
+            except StopIteration as e:
+                return cls(e.value, output)
+
+        return _thunk
 
     @classmethod
     def pure(cls, value) -> Writer:

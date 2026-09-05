@@ -129,8 +129,8 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         )
 
     @classmethod
-    def do(cls, gen_fn, *args, **kwargs) -> ReaderT:
-        """Do-notation via generators. Flattens nested binds.
+    def do(cls, gen_fn) -> Callable[..., ReaderT]:
+        """Do-notation via generators. Returns a callable.
 
         Each `yield` extracts the value from a ReaderT (shared ctx).
         Short-circuits on inner monad failure.
@@ -140,27 +140,30 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         ...     x = yield ReaderT(lambda ctx: Right(ctx))
         ...     y = yield ReaderT(lambda ctx: Right(x + ctx))
         ...     return y
-        >>> ReaderT.do(pipeline).run(5)
+        >>> ReaderT.do(pipeline)().run(5)
         Right(10)
         """
 
-        def _run(ctx):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                monadic_val = next(gen)
-            except StopIteration:
-                raise ValueError("do block must yield at least once")
-
-            def step(value):
+        def _thunk(*args, **kwargs):
+            def _run(ctx):
+                gen = gen_fn(*args, **kwargs)
                 try:
-                    next_val = gen.send(value)
-                    return next_val._run(ctx).bind(step)
-                except StopIteration as e:
-                    return _pure(monadic_val._run(ctx).__class__, e.value)
+                    monadic_val = next(gen)
+                except StopIteration:
+                    raise ValueError("do block must yield at least once")
 
-            return monadic_val._run(ctx).bind(step)
+                def step(value):
+                    try:
+                        next_val = gen.send(value)
+                        return next_val._run(ctx).bind(step)
+                    except StopIteration as e:
+                        return _pure(monadic_val._run(ctx).__class__, e.value)
 
-        return cls(_run)
+                return monadic_val._run(ctx).bind(step)
+
+            return cls(_run)
+
+        return _thunk
 
     @classmethod
     def pure(cls, value: _A, monad: type) -> ReaderT:

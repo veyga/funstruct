@@ -50,8 +50,8 @@ class Monad(Applicative[_A]):
 
     @classmethod
     @abstractmethod
-    def do(cls, gen_fn: Callable, *args, **kwargs) -> Monad[_A]:
-        """Do-notation via generators. Flattens nested binds."""
+    def do(cls, gen_fn: Callable) -> Callable[..., Monad[_A]]:
+        """Do-notation via generators. Returns a callable that produces the monad."""
         ...
 
     @final
@@ -77,6 +77,10 @@ class Monad(Applicative[_A]):
         Like ap, but you choose the combiner instead of always tupling.
         """
         return self.bind(lambda a: other.map(lambda b: f(a, b)))
+
+    def then(self, other: Monad[_B]) -> Monad[_B]:
+        """Sequence: run self, discard value, run other."""
+        return self.bind(lambda _: other)
 
     def __rshift__(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
         """Alias for bind."""

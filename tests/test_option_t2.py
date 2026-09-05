@@ -261,7 +261,7 @@ class TestDoNotation:
             y = yield OptionT(Right(Some(x + 10)))
             return x + y
 
-        assert pipeline.run() == Right(Some(12))
+        assert pipeline().run() == Right(Some(12))
 
     def test_short_circuits_nothing(self):
         @OptionT.do
@@ -270,7 +270,7 @@ class TestDoNotation:
             y = yield OptionT(Right(Nothing()))
             return x + y
 
-        assert pipeline.run() == Right(Nothing())
+        assert pipeline().run() == Right(Nothing())
 
     def test_short_circuits_left(self):
         @OptionT.do
@@ -279,7 +279,7 @@ class TestDoNotation:
             y = yield OptionT(Left("boom"))
             return x + y
 
-        assert pipeline.run() == Left("boom")
+        assert pipeline().run() == Left("boom")
 
 
 class TestLaws:

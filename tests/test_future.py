@@ -250,6 +250,63 @@ class TestPipeline:
         assert run(pipeline) == Right("CACHED")
 
 
+class TestAsyncResultDo:
+    def test_success(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield AsyncResult.pure(x + 10)
+            return x + y
+
+        assert run(pipeline()) == Ok(12)
+
+    def test_short_circuits_on_err(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield AsyncResult.from_exception(ValueError("boom"))
+            return x + y
+
+        result = run(pipeline())
+        assert result.is_left
+
+    def test_multiple_binds(self):
+        @AsyncResult.do
+        def pipeline():
+            a = yield AsyncResult.pure(10)
+            b = yield AsyncResult.pure(20)
+            c = yield AsyncResult.pure(30)
+            return a + b + c
+
+        assert run(pipeline()) == Ok(60)
+
+    def test_with_args(self):
+        def pipeline(base):
+            x = yield AsyncResult.pure(base)
+            y = yield AsyncResult.pure(x * 2)
+            return x + y
+
+        assert run(AsyncResult.do(pipeline)(5)) == Ok(15)
+
+    def test_accepts_sync_either(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield Right(10)
+            return x + y
+
+        assert run(pipeline()) == Ok(11)
+
+    def test_short_circuits_on_sync_left(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield Left("sync error")
+            return x + y
+
+        assert run(pipeline()) == Left("sync error")
+
+
 class TestFutureDo:
     def _run_future(self, future):
         return asyncio.run(future._awaitable())
@@ -261,7 +318,7 @@ class TestFutureDo:
             y = yield Future.pure(x + 10)
             return x + y
 
-        assert self._run_future(pipeline) == 12
+        assert self._run_future(pipeline()) == 12
 
     def test_multiple_binds(self):
         @Future.do
@@ -271,7 +328,7 @@ class TestFutureDo:
             c = yield Future.pure(30)
             return a + b + c
 
-        assert self._run_future(pipeline) == 60
+        assert self._run_future(pipeline()) == 60
 
     def test_with_args(self):
         def pipeline(base):
@@ -279,7 +336,7 @@ class TestFutureDo:
             y = yield Future.pure(x * 2)
             return y
 
-        result = self._run_future(Future.do(pipeline, 21))
+        result = self._run_future(Future.do(pipeline)(21))
         assert result == 42
 
 

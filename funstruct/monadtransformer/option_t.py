@@ -145,8 +145,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         return self.bind(lambda _: other)
 
     @classmethod
-    def do(cls, gen_fn, *args, **kwargs) -> OptionT:
-        """Do-notation via generators. Short-circuits on Nothing.
+    def do(cls, gen_fn) -> Callable[..., OptionT]:
+        """Do-notation via generators. Short-circuits on Nothing. Returns a callable.
 
         >>> from funstruct.monad.either import Right
         >>> from funstruct.monad.option import Some
@@ -154,31 +154,34 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         ...     x = yield OptionT(Right(Some(1)))
         ...     y = yield OptionT(Right(Some(x + 10)))
         ...     return x + y
-        >>> OptionT.do(pipeline).run()
+        >>> OptionT.do(pipeline)().run()
         Right(Some(12))
         """
 
-        def _run_do():
-            gen = gen_fn(*args, **kwargs)
-            try:
-                first = next(gen)
-            except StopIteration:
-                raise ValueError("do block must yield at least once")
+        def _thunk(*args, **kwargs):
+            def _run_do():
+                gen = gen_fn(*args, **kwargs)
+                try:
+                    first = next(gen)
+                except StopIteration:
+                    raise ValueError("do block must yield at least once")
 
-            def step(opt):
-                match opt:
-                    case Nothing():
-                        return first.run().__class__.pure(Nothing())
-                    case Some(value):
-                        try:
-                            next_t = gen.send(value)
-                            return next_t.run().bind(step)
-                        except StopIteration as e:
-                            return first.run().__class__.pure(Some(e.value))
+                def step(opt):
+                    match opt:
+                        case Nothing():
+                            return first.run().__class__.pure(Nothing())
+                        case Some(value):
+                            try:
+                                next_t = gen.send(value)
+                                return next_t.run().bind(step)
+                            except StopIteration as e:
+                                return first.run().__class__.pure(Some(e.value))
 
-            return first.run().bind(step)
+                return first.run().bind(step)
 
-        return cls(_run_do())
+            return cls(_run_do())
+
+        return _thunk
 
     @classmethod
     def pure(cls, value, monad: type) -> OptionT:

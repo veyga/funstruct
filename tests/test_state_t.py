@@ -237,7 +237,7 @@ class TestDoNotation:
             y = yield StateT.pure(x + 10, Either)
             return x + y
 
-        assert pipeline.run(0) == Right((0, 12))
+        assert pipeline().run(0) == Right((0, 12))
 
     def test_do_threads_state(self):
         @StateT.do
@@ -246,7 +246,7 @@ class TestDoNotation:
             y = yield StateT(lambda s: Right((s + 1, s)))
             return (x, y)
 
-        assert pipeline.run(0) == Right((2, (0, 1)))
+        assert pipeline().run(0) == Right((2, (0, 1)))
 
     def test_do_short_circuits(self):
         @StateT.do
@@ -255,7 +255,7 @@ class TestDoNotation:
             y = yield StateT(lambda _: Left("boom"))
             return x + y
 
-        assert pipeline.run(0) == Left("boom")
+        assert pipeline().run(0) == Left("boom")
 
     def test_do_modifies_state(self):
         @StateT.do
@@ -265,7 +265,7 @@ class TestDoNotation:
             s = yield StateT.get(Either)
             return s
 
-        assert pipeline.run(1) == Right((22, 22))
+        assert pipeline().run(1) == Right((22, 22))
 
 
 class TestAndThen:

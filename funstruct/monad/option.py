@@ -114,27 +114,31 @@ class Option(Monad, Generic[A]):
         return cls.sequence(values.map(f))
 
     @classmethod
-    def do(cls, gen_fn: Callable, *args, **kwargs) -> Option:
-        """Do-notation. Short-circuits on Nothing.
+    def do(cls, gen_fn: Callable) -> Callable[..., Option]:
+        """Do-notation. Short-circuits on Nothing. Returns a callable.
 
         >>> def pipeline():
         ...     x = yield Some(1)
         ...     y = yield Some(x + 10)
         ...     return x + y
-        >>> Option.do(pipeline)
+        >>> Option.do(pipeline)()
         Some(12)
         """
-        gen = gen_fn(*args, **kwargs)
-        try:
-            monadic_val = next(gen)
-            while True:
-                match monadic_val:
-                    case Nothing():
-                        return Nothing()
-                    case Some(value):
-                        monadic_val = gen.send(value)
-        except StopIteration as e:
-            return Some(e.value)
+
+        def _thunk(*args, **kwargs):
+            gen = gen_fn(*args, **kwargs)
+            try:
+                monadic_val = next(gen)
+                while True:
+                    match monadic_val:
+                        case Nothing():
+                            return Nothing()
+                        case Some(value):
+                            monadic_val = gen.send(value)
+            except StopIteration as e:
+                return Some(e.value)
+
+        return _thunk
 
     def to_result(self, error):
         """Convert to Either — Some(v) → Right(v), Nothing → Left(error).

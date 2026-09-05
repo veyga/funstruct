@@ -52,7 +52,7 @@ class TestDo:
             y = yield Ok(x + 10)
             return x + y
 
-        assert Result.do(pipeline) == Ok(12)
+        assert Result.do(pipeline)() == Ok(12)
 
     def test_short_circuits(self):
         def pipeline():
@@ -60,7 +60,7 @@ class TestDo:
             y = yield Err(ValueError("boom"))
             return x + y
 
-        result = Result.do(pipeline)
+        result = Result.do(pipeline)()
         assert result.is_left
 
     def test_multiple_binds(self):
@@ -70,7 +70,36 @@ class TestDo:
             c = yield Ok(3)
             return a + b + c
 
-        assert Result.do(pipeline) == Ok(6)
+        assert Result.do(pipeline)() == Ok(6)
+
+
+class TestConstructors:
+    def test_ok_direct_equals_pure(self):
+        assert Ok(42) == Ok.pure(42)
+
+    def test_ok_direct_is_ok_type(self):
+        assert type(Ok(42)) is Ok
+
+    def test_ok_pure_is_ok_type(self):
+        assert type(Ok.pure(42)) is Ok
+
+    def test_result_pure_is_ok_type(self):
+        assert type(Result.pure(42)) is Ok
+
+    def test_result_from_exception_is_err_type(self):
+        err = ValueError("bad")
+        assert type(Result.from_exception(err)) is Err
+
+    def test_result_from_exception_wraps_exception(self):
+        err = ValueError("bad")
+        result = Result.from_exception(err)
+        match result:
+            case Err(e):
+                assert e is err
+
+    def test_err_direct_vs_from_exception(self):
+        err = ValueError("bad")
+        assert Err(err) == Result.from_exception(err)
 
 
 class TestAliases:

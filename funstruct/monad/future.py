@@ -9,11 +9,13 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable, Generator
 from typing import Generic, TypeVar
 
+from funstruct.typeclasses._monad import Monad
+
 A = TypeVar("A")
 B = TypeVar("B")
 
 
-class Future(Generic[A]):
+class Future(Monad, Generic[A]):
     """Lazy async computation that produces A when awaited.
 
     Build pipelines with .bind(), .map() — no await needed.
@@ -38,15 +40,6 @@ class Future(Generic[A]):
     async def _awaitable(self) -> A:
         return await self._coro
 
-    def map(self, f: Callable[[A], B]) -> Future[B]:
-        """Transform the value without executing."""
-
-        async def _inner():
-            result = await self._coro
-            return f(result)
-
-        return Future(_inner())
-
     def bind(self, f: Callable[[A], Future[B]]) -> Future[B]:
         """Chain: f receives the value, returns a new Future."""
 
@@ -57,8 +50,8 @@ class Future(Generic[A]):
         return Future(_inner())
 
     @classmethod
-    def do(cls, gen_fn: Callable, *args, **kwargs) -> Future:
-        """Do-notation for Future. Each yield awaits a Future.
+    def do(cls, gen_fn: Callable) -> Callable[..., Future]:
+        """Do-notation for Future. Each yield awaits a Future. Returns a callable.
 
         The generator must be a regular function (not async def) — the
         driver loop handles awaiting. Use yield instead of await.
@@ -70,21 +63,20 @@ class Future(Generic[A]):
         ...     return x + y
         """
 
-        async def _run():
-            gen = gen_fn(*args, **kwargs)
-            try:
-                monadic_val = next(gen)
-                while True:
-                    value = await monadic_val
-                    monadic_val = gen.send(value)
-            except StopIteration as e:
-                return e.value
+        def _thunk(*args, **kwargs):
+            async def _run():
+                gen = gen_fn(*args, **kwargs)
+                try:
+                    monadic_val = next(gen)
+                    while True:
+                        value = await monadic_val
+                        monadic_val = gen.send(value)
+                except StopIteration as e:
+                    return e.value
 
-        return cls(_run())
+            return cls(_run())
 
-    def then(self, next_future: Future[B]) -> Future[B]:
-        """Sequence: run self, discard value, run next."""
-        return self.bind(lambda _: next_future)
+        return _thunk
 
     @classmethod
     def pure(cls, value: A) -> Future[A]:

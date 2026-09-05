@@ -150,8 +150,8 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         return cls(fa.map(lambda a: (a, cls._monoid.empty)))
 
     @classmethod
-    def do(cls, gen_fn, *args, **kwargs) -> WriterT:
-        """Do-notation via generators. Accumulates output across yields.
+    def do(cls, gen_fn) -> Callable[..., WriterT]:
+        """Do-notation via generators. Accumulates output across yields. Returns a callable.
 
         >>> from funstruct.monad.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
@@ -162,35 +162,38 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         ...     x = yield LogT(Right((1, ["init"])))
         ...     y = yield LogT(Right((x + 10, ["step"])))
         ...     return x + y
-        >>> LogT.do(pipeline).run()
+        >>> LogT.do(pipeline)().run()
         Right((12, ['init', 'step']))
         """
 
-        def _unwrap(first_run):
-            gen = gen_fn(*args, **kwargs)
-            next(gen)
+        def _thunk(*args, **kwargs):
+            def _unwrap(first_run):
+                gen = gen_fn(*args, **kwargs)
+                next(gen)
 
-            monoid = cls._monoid
+                monoid = cls._monoid
 
-            def step(aw):
-                a, w_acc = aw
-                try:
-                    next_wt = gen.send(a)
-                    return next_wt.run().bind(
-                        lambda bw: step((bw[0], monoid.combine(w_acc, bw[1])))
-                    )
-                except StopIteration as e:
-                    return first_run.__class__.pure((e.value, w_acc))
+                def step(aw):
+                    a, w_acc = aw
+                    try:
+                        next_wt = gen.send(a)
+                        return next_wt.run().bind(
+                            lambda bw: step((bw[0], monoid.combine(w_acc, bw[1])))
+                        )
+                    except StopIteration as e:
+                        return first_run.__class__.pure((e.value, w_acc))
 
-            return step
+                return step
 
-        def _run_do():
-            gen = gen_fn(*args, **kwargs)
-            first_wt = next(gen)
-            first_fa = first_wt.run()
-            return first_fa.bind(_unwrap(first_fa))
+            def _run_do():
+                gen = gen_fn(*args, **kwargs)
+                first_wt = next(gen)
+                first_fa = first_wt.run()
+                return first_fa.bind(_unwrap(first_fa))
 
-        return cls(_run_do())
+            return cls(_run_do())
+
+        return _thunk
 
     def and_then(self, other: WriterT) -> WriterT:
         """Kleisli composition: value from self feeds into other."""

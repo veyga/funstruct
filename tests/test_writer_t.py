@@ -216,7 +216,7 @@ class TestDoNotation:
             y = yield LogT(Right((x + 10, ["step"])))
             return x + y
 
-        assert pipeline.run() == Right((12, ["start", "step"]))
+        assert pipeline().run() == Right((12, ["start", "step"]))
 
     def test_do_short_circuits_on_left(self):
         @LogT.do
@@ -225,7 +225,7 @@ class TestDoNotation:
             y = yield LogT(Left("boom"))
             return x + y
 
-        assert pipeline.run() == Left("boom")
+        assert pipeline().run() == Left("boom")
 
     def test_do_with_clist(self):
         @CLogT.do
@@ -234,7 +234,7 @@ class TestDoNotation:
             y = yield CLogT(Right((2, Cons("b", Nil()))))
             return x + y
 
-        result = pipeline.run()
+        result = pipeline().run()
         assert result == Right((3, CList.from_iterable(["a", "b"])))
 
 

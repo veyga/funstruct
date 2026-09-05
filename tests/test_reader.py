@@ -115,9 +115,9 @@ class TestDoNotation:
             z = yield get_z
             return x + y + z
 
-        x = compute.run({"x": 1, "y": 2, "z": 3})
+        x = compute().run({"x": 1, "y": 2, "z": 3})
         assert x == 6
-        assert compute.run({"x": 10, "y": 20}) == 30
+        assert compute().run({"x": 10, "y": 20}) == 30
 
     def test_with_conditionals(self):
         get_port = Reader(lambda cfg: cfg["port"])
@@ -130,9 +130,9 @@ class TestDoNotation:
             scheme = "https" if port == 443 else "http"
             return f"{scheme}://{host}:{port}"
 
-        assert build_url.run({"host": "prod.co", "port": 443}) == "https://prod.co:443"
+        assert build_url().run({"host": "prod.co", "port": 443}) == "https://prod.co:443"
         assert (
-            build_url.run({"host": "localhost", "port": 8080})
+            build_url().run({"host": "localhost", "port": 8080})
             == "http://localhost:8080"
         )
 
@@ -143,14 +143,14 @@ class TestDoNotation:
             name = yield Reader(lambda c: c["name"])
             return f"{name} has {len(ctx)} fields"
 
-        assert describe.run({"name": "Alice", "age": 30}) == "Alice has 2 fields"
+        assert describe().run({"name": "Alice", "age": 30}) == "Alice has 2 fields"
 
     def test_with_args(self):
         def lookup(key):
             value = yield Reader(lambda ctx: ctx[key])
             return value
 
-        result = Reader.do(lookup, "name")
+        result = Reader.do(lookup)("name")
         assert result.run({"name": "Alice", "age": 30}) == "Alice"
 
 

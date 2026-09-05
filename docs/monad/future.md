@@ -15,7 +15,7 @@ This is different from monad transformers (`OptionT`, `EitherT`, etc.) which
 require `.run()` to unwrap the transformer layer before awaiting:
 
 ```python
-result = await option_t.run()  # Future[Option[A]] → Option[A]
+result = await option_t_pipeline().run()  # Future[Option[A]] → Option[A]
 ```
 
 ## Do-notation with Future
@@ -24,74 +24,44 @@ result = await option_t.run()  # Future[Option[A]] → Option[A]
 awaits each yielded `Future` internally. Using `async def` with `yield`
 creates an async generator, which Python forbids from returning a value.
 
-### Passing arguments
-
-Define a generator that takes parameters and call `Future.do` with args:
+`do` returns a **callable** — call it with `()` to execute:
 
 ```python
 from funstruct.monad.future import Future
 
-def get_city(username):
-    user = yield get_user(username)
-    address = yield get_address(user)
-    return address.street
-
-# Call with arguments:
-result = await Future.do(get_city, "alice")
-```
-
-Wrap it in a function for a reusable API:
-
-```python
-def get_city(username: str) -> Future[str]:
-    return Future.do(__get_city, username)
-
-def __get_city(username: str):
-    user = yield get_user(username)
-    address = yield get_address(user)
-    return address.street
-
-result = await get_city("alice")  # "avalon"
-```
-
-### As a decorator (zero-arg only)
-
-`@Future.do` runs immediately, so the generator cannot take arguments.
-This works for pipelines with no parameters:
-
-```python
 @Future.do
-def startup():
-    config = yield load_config()
-    db = yield connect(config)
-    return db
+def fetch_and_transform(url):
+    response = yield fetch(url)
+    parsed = yield parse(response)
+    return parsed.title
 
-db = await startup
+result = await fetch_and_transform("https://example.com")
 ```
 
-**This does not work** — the decorator calls `city()` with no args at
-definition time:
+Without the decorator:
 
 ```python
-@Future.do  # TypeError: city() missing argument 'username'
-def city(username: str):
-    user = yield get_user(username)
+result = await Future.do(fetch_and_transform)("https://example.com")
+```
+
+## Do-notation with AsyncResult
+
+`AsyncResult.do` works the same way, but short-circuits on `Err`. It also
+accepts sync `Either` values (Ok/Err) alongside `AsyncResult`:
+
+```python
+from funstruct.monad.result import AsyncResult, TryAsync
+
+@TryAsync
+def get_user(name):
     ...
-```
 
-### Baking in arguments at definition time
-
-`Future.do(gen_fn, args)` returns a `Future`, not a function. The arguments
-are captured when `do` is called:
-
-```python
-def __get_city(username):
+@AsyncResult.do
+def get_nickname(username):
     user = yield get_user(username)
-    address = yield get_address(user)
-    return address.street
+    age = yield get_age(user)
+    nickname = yield get_nickname_from_db(user)
+    return f"{nickname}{age}"
 
-# This is a Future[str], not a function — "andrew" is baked in:
-andrew_city: Future[str] = Future.do(__get_city, "andrew")
-
-result = await andrew_city  # not andrew_city("andrew")
+result = await get_nickname("me")  # Ok("andrew3000") or Err(...)
 ```

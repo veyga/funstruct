@@ -110,7 +110,7 @@ class TestDo:
             y = yield Right(x + 10)
             return x + y
 
-        assert Either.do(pipeline) == Right(12)
+        assert Either.do(pipeline)() == Right(12)
 
     def test_short_circuits(self):
         def pipeline():
@@ -118,7 +118,7 @@ class TestDo:
             y = yield Left("boom")
             return x + y
 
-        assert Either.do(pipeline) == Left("boom")
+        assert Either.do(pipeline)() == Left("boom")
 
     def test_multiple_binds(self):
         def pipeline():
@@ -127,7 +127,7 @@ class TestDo:
             c = yield Right(3)
             return a + b + c
 
-        assert Either.do(pipeline) == Right(6)
+        assert Either.do(pipeline)() == Right(6)
 
     def test_with_args(self):
         def pipeline(base):
@@ -135,7 +135,7 @@ class TestDo:
             y = yield Right(x + 10)
             return x + y
 
-        assert Either.do(pipeline, 5) == Right(20)
+        assert Either.do(pipeline)(5) == Right(20)
 
 
 class TestSequenceTraverse:

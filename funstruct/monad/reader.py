@@ -56,8 +56,8 @@ class Reader(Monad, Generic[_Ctx, _A]):
         return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
 
     @classmethod
-    def do(cls, gen_fn: Callable, *args, **kwargs) -> Reader:
-        """Do-notation via generators. Flattens nested binds.
+    def do(cls, gen_fn: Callable) -> Callable[..., Reader]:
+        """Do-notation via generators. Returns a callable.
 
         Each `yield` extracts the value from a Reader (all share the same ctx).
         The final `return` value becomes the Reader's result.
@@ -66,21 +66,24 @@ class Reader(Monad, Generic[_Ctx, _A]):
         ...     x = yield Reader(lambda ctx: ctx["x"])
         ...     y = yield Reader(lambda ctx: ctx["y"])
         ...     return x + y
-        >>> Reader.do(pipeline).run({"x": 1, "y": 10})
+        >>> Reader.do(pipeline)().run({"x": 1, "y": 10})
         11
         """
 
-        def _run(ctx):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                monadic_val = next(gen)
-                while True:
-                    result = monadic_val.run(ctx)
-                    monadic_val = gen.send(result)
-            except StopIteration as e:
-                return e.value
+        def _thunk(*args, **kwargs):
+            def _run(ctx):
+                gen = gen_fn(*args, **kwargs)
+                try:
+                    monadic_val = next(gen)
+                    while True:
+                        result = monadic_val.run(ctx)
+                        monadic_val = gen.send(result)
+                except StopIteration as e:
+                    return e.value
 
-        return cls(_run)
+            return cls(_run)
+
+        return _thunk
 
     @classmethod
     def pure(cls, value, *args, **kwargs) -> Reader:

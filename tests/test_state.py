@@ -161,7 +161,7 @@ class TestDoNotation:
             total = yield get
             return (a, b, c, total)
 
-        assert count_to_three.run(0) == (3, (0, 1, 2, 3))
+        assert count_to_three().run(0) == (3, (0, 1, 2, 3))
 
     def test_with_conditionals(self):
         get = State(lambda s: (s, s))
@@ -175,8 +175,8 @@ class TestDoNotation:
             final_state = yield get
             return final_state
 
-        assert conditional_update.run(3) == (4, 4)
-        assert conditional_update.run(10) == (9, 9)
+        assert conditional_update().run(3) == (4, 4)
+        assert conditional_update().run(10) == (9, 9)
 
     def test_with_args(self):
         def push_n_times(n):
@@ -185,7 +185,7 @@ class TestDoNotation:
             s = yield State(lambda s: (s, s))
             return s
 
-        result = State.do(push_n_times, 3)
+        result = State.do(push_n_times)(3)
         assert result.run(0) == (3, 3)
 
 
