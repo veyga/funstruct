@@ -96,10 +96,6 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_wt)
 
-    def ap(self, other: WriterT) -> WriterT:
-        """Apply: self contains a function, apply it to other's value."""
-        return self.bind(lambda f: other.map(f))
-
     def or_else(self, f: Callable) -> WriterT:
         """Recover from failure via inner monad's or_else."""
         cls = self.__class__

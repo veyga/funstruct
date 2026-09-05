@@ -54,8 +54,10 @@ class Result(Either[Exception, _A], Generic[_A]):
     Same as Either[Exception, A] but with 1 param for cleaner annotations.
     """
 
-    @abstractmethod
-    def map(self, f: Callable[[_A], _B]) -> Result[_B]: ...
+    @classmethod
+    def pure(cls, value: _A) -> Result[_A]:
+        return Ok(value)
+
     @abstractmethod
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
     @abstractmethod
@@ -68,8 +70,9 @@ class Result(Either[Exception, _A], Generic[_A]):
 class Ok(Right):
     """Success case of Result."""
 
-    def map(self, f: Callable[[_A], _B]) -> Result[_B]:
-        return Ok(f(self.value))
+    @classmethod
+    def pure(cls, value):
+        return Ok(value)
 
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return f(self.value)
@@ -87,9 +90,6 @@ class Ok(Right):
 @dataclass(frozen=True, eq=False)
 class Err(Left):
     """Error case of Result."""
-
-    def map(self, f: Callable[[_A], _B]) -> Result[_B]:
-        return self
 
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return self

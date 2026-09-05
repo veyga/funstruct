@@ -29,6 +29,7 @@ Business examples:
 from __future__ import annotations
 
 from abc import abstractmethod
+from collections.abc import Callable
 from typing import TypeVar
 
 from funstruct.typeclasses._functor import Functor
@@ -49,6 +50,14 @@ class Applicative(Functor[_A]):
     def pure(cls, value: _A, *args, **kwargs) -> Applicative[_A]:
         """Lift a value into the context."""
         ...
+
+    def map(self, f: Callable[[_A], _B]) -> Applicative[_B]:
+        """Derived from ap + pure: ``pure(f).ap(self)``.
+
+        Monad overrides this with ``bind + pure`` to break the
+        ap ↔ map circularity.
+        """
+        return self.__class__.pure(f).ap(self)
 
     @abstractmethod
     def ap(self, other: Applicative[_A]) -> Applicative[_B]:

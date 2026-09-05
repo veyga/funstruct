@@ -51,10 +51,6 @@ class Reader(Monad, Generic[_Ctx, _A]):
     def __call__(self, ctx):
         return self.run(ctx)
 
-    def map(self, f: Callable) -> Reader:
-        """Transform the produced value."""
-        return Reader(lambda ctx: f(self._run(ctx)))
-
     def bind(self, f: Callable) -> Reader:
         """Chain: f receives the value, returns a new Reader."""
         return Reader(lambda ctx: f(self._run(ctx)).run(ctx))

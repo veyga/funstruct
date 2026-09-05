@@ -161,10 +161,6 @@ class Invalid(Validated, Generic[_E]):
     def __bool__(self) -> bool:
         return False
 
-    def map(self, f) -> Invalid[_E]:
-        """No-op on Invalid."""
-        return self
-
     def fold(self, on_invalid: Callable, on_valid: Callable):
         """Eliminate — applies on_invalid to the errors."""
         return on_invalid(self.errors)

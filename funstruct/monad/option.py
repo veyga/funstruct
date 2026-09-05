@@ -68,9 +68,6 @@ class Option(Monad, Generic[A]):
     def bind(self, f: Callable[[A], Option[B]]) -> Option[B]: ...
 
     @abstractmethod
-    def map(self, f: Callable[[A], B]) -> Option[B]: ...
-
-    @abstractmethod
     def get_or_else(self, default: A) -> A: ...
 
     @abstractmethod
@@ -175,13 +172,6 @@ class Some(Option[A]):
     def is_some(self) -> bool:
         return True
 
-    def map(self, f: Callable) -> Option:
-        return Some(f(self.value))
-
-    def ap(self, other: Option) -> Option:
-        """Apply: self contains a function, apply it to other's value."""
-        return other.map(self.value)
-
     def bind(self, f: Callable[[A], Option]) -> Option:
         return f(self.value)
 
@@ -224,12 +214,6 @@ class Nothing(Option):
     @property
     def is_some(self) -> bool:
         return False
-
-    def map(self, f: Callable) -> Option:
-        return self
-
-    def ap(self, other: Option) -> Option:
-        return self
 
     def bind(self, f: Callable) -> Option:
         return self

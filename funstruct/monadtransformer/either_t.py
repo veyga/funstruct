@@ -107,10 +107,6 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         """Kleisli composition: value from self feeds into other's context."""
         return self.bind(lambda _: other)
 
-    def ap(self, other: EitherT) -> EitherT:
-        """Apply: self contains a function, apply it to other's value."""
-        return self.bind(lambda f: other.map(f))
-
     def then(self, next_step: EitherT[_F, _E, _B]) -> EitherT[_F, _E, _B]:
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_step)

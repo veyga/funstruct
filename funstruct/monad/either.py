@@ -183,19 +183,8 @@ class Right(Either[E, A]):
     def is_right(self) -> bool:
         return True
 
-    def map(self, f: Callable[[A], B]) -> Either[E, B]:
-        return Right(f(self.value))
-
     def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
         return f(self.value)
-
-    def ap(self, other: Either) -> Either:
-        """Apply: self contains a function, apply it to other's value."""
-        match other:
-            case Right(val):
-                return Right(self.value(val))
-            case _:
-                return other
 
     def alt(self, f: Callable[[E], E]) -> Either[E, A]:
         """No-op on Right — already succeeded."""
@@ -238,13 +227,7 @@ class Left(Either[E, A]):
     def is_right(self) -> bool:
         return False
 
-    def map(self, f: Callable) -> Either:
-        return self
-
     def bind(self, f: Callable) -> Either:
-        return self
-
-    def ap(self, other: Either) -> Either:
         return self
 
     def alt(self, f: Callable[[E], E]) -> Either[E, A]:

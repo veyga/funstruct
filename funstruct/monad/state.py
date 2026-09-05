@@ -60,23 +60,6 @@ class State(Monad, Generic[_A]):
 
     __rshift__ = bind
 
-    def map(self, f: Callable[[_A], _B]) -> "State[_B]":
-        """Transform the produced value without touching state.
-
-        >>> State.pure(5).map(lambda x: x * 2).run(0)
-        (0, 10)
-        """
-
-        def inner(s):
-            new_s, a = self._run(s)
-            return (new_s, f(a))
-
-        return State(inner)
-
-    def ap(self, other) -> "State":
-        """Apply: self contains a function, apply it to other's value."""
-        return self.bind(lambda f: other.map(f))
-
     def then(self, next_state: "State[_B]") -> "State[_B]":
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_state)

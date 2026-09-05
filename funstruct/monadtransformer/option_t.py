@@ -140,10 +140,6 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
 
         return OptionT(self._run.bind(_handle))
 
-    def ap(self, other: OptionT) -> OptionT:
-        """Apply: self contains a function, apply it to other's value."""
-        return self.bind(lambda f: other.map(f))
-
     def and_then(self, other: OptionT) -> OptionT:
         """Kleisli composition: value from self becomes input for other's run."""
         return self.bind(lambda _: other)

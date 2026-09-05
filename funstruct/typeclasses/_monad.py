@@ -30,7 +30,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Callable
-from typing import TypeVar
+from typing import TypeVar, final
 
 from funstruct.typeclasses._applicative import Applicative
 
@@ -54,13 +54,18 @@ class Monad(Applicative[_A]):
         """Do-notation via generators. Flattens nested binds."""
         ...
 
+    @final
+    def map(self, f: Callable[[_A], _B]) -> Monad[_B]:
+        """Derived from bind + pure. Overrides Applicative.map to avoid
+        the ap ↔ map circularity.
+        """
+        return self.bind(lambda a: self.__class__.pure(f(a)))
+
+    @final
     def ap(self, other: Monad[_A]) -> Monad[_B]:
-        """Default ap derived from bind + map.
+        """Derived from bind + map.
 
         self contains a function A → B, other contains A. Returns F[B].
-
-        Every Monad is an Applicative, and ap can always be derived from
-        bind + map. Standalone Applicatives must implement ap directly.
         """
         return self.bind(lambda f: other.map(f))
 

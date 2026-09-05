@@ -37,10 +37,6 @@ class Writer(Monad, Generic[_W, _A]):
         object.__setattr__(self, "value", value)
         object.__setattr__(self, "output", output)
 
-    def map(self, f: Callable) -> Writer:
-        """Transform the value, keep the output."""
-        return self.__class__(f(self.value), self.output)
-
     def bind(self, f: Callable) -> Writer:
         """Chain: run f on the value, combine outputs via monoid."""
         result = f(self.value)
