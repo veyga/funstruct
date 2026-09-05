@@ -220,8 +220,8 @@ class AsyncResult(Generic[_A]):
         return cls(_inner())
 
     @classmethod
-    def from_error(cls, error: Exception) -> AsyncResult:
-        """Lift an error into Err."""
+    def from_exception(cls, error: Exception) -> AsyncResult:
+        """Lift an exception into Err."""
 
         async def _inner():
             return Err(error)
@@ -293,7 +293,7 @@ def TryAsync(
         # Build pipeline — no await needed:
         pipeline = (
             parse_id("42")
-            .bind(lambda id: fetch_user(id))
+            .bind(fetch_user)
             .map(lambda u: u.email)
         )
 

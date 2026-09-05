@@ -8,9 +8,19 @@ Haskell and Scala have built-in `do`/`for` syntax that flattens nested
 `bind` chains into sequential-looking code. Python doesn't, but generators
 give us something close.
 
-Every monad in funstruct provides a `do` classmethod that accepts a
-generator function. Each `yield` unwraps a monadic value; the final
-`return` is wrapped back into the monad.
+Every monad in funstruct provides a `do` classmethod:
+
+```python
+Monad.do(gen_fn, *args, **kwargs)
+```
+
+It calls `gen_fn(*args, **kwargs)` to create a generator, drives it to
+completion, and returns the monadic result. Each `yield` unwraps a monadic
+value (equivalent to `bind`); the final `return` is wrapped back into the
+monad.
+
+Since `do` is a regular function, it can be used as a decorator (`@Monad.do`)
+or called directly (`Monad.do(fn, arg1, arg2)`).
 
 ### Basic usage
 
@@ -38,56 +48,7 @@ def pipeline():
 Either.do(pipeline)  # Right(12)
 ```
 
-Each `yield` is equivalent to a `bind` — it unwraps the value if the
-computation succeeds, or short-circuits if it doesn't (e.g., `Left`,
-`Nothing`, depending on the monad).
-
-### Passing arguments
-
-`do` forwards extra arguments to the generator function, so your pipeline
-can accept parameters directly:
-
-```python
-from funstruct.monad.option import Option, Some, Nothing
-
-def lookup(user_id: int):
-    user = yield find_user(user_id)
-    email = yield get_email(user)
-    return email
-
-Option.do(lookup, 42)  # Some("alice@example.com") or Nothing()
-```
-
-This also works with keyword arguments:
-
-```python
-def scaled_pipeline(multiplier=1):
-    x = yield Some(5)
-    return x * multiplier
-
-Option.do(scaled_pipeline, multiplier=3)  # Some(15)
-```
-
-When using `do` as a decorator (see below), the decorated function runs
-immediately with no arguments. If you need arguments with the decorator
-style, close over them:
-
-```python
-def lookup(user_id: int) -> Option[str]:
-    @Option.do
-    def _run():
-        user = yield find_user(user_id)      # user_id from closure
-        email = yield get_email(user)
-        return email
-
-    return _run
-```
-
-### As a decorator
-
-You can also use `do` as a decorator. The decorated function becomes the
-result (not a callable), so this works best for module-level definitions or
-inside a function that returns the result:
+As a decorator (equivalent to `count_to_three = State.do(count_to_three)`):
 
 ```python
 from funstruct.monad.state import State
@@ -104,6 +65,19 @@ def count_to_three():
     return (a, b, c, total)
 
 count_to_three.run(0)  # (3, (0, 1, 2, 3))
+```
+
+With arguments:
+
+```python
+from funstruct.monad.option import Option, Some, Nothing
+
+def lookup(user_id):
+    user = yield find_user(user_id)
+    email = yield get_email(user)
+    return email
+
+Option.do(lookup, 42)  # Some("alice@example.com") or Nothing()
 ```
 
 ### Short-circuiting
@@ -160,28 +134,12 @@ creates an async generator, which Python forbids from returning a value.
 ```python
 from funstruct.monad.future import Future
 
-# Pass arguments directly:
 def fetch_and_transform(url):
     response = yield fetch(url)
     parsed = yield parse(response)
     return parsed.title
 
 result = await Future.do(fetch_and_transform, "https://example.com")
-```
-
-Or use the decorator style with a closure:
-
-```python
-def fetch_and_transform(url: str) -> Future[str]:
-    @Future.do
-    def _run():
-        response = yield fetch(url)       # url captured from closure
-        parsed = yield parse(response)
-        return parsed.title
-
-    return _run
-
-result = await fetch_and_transform("https://example.com")
 ```
 
 ### CList (the exception)

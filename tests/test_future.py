@@ -16,8 +16,10 @@ class TestPure:
     def test_pure_succeeds(self):
         assert run(AsyncResult.pure(42)) == Right(42)
 
-    def test_from_error_fails(self):
-        assert run(AsyncResult.from_error("oops")) == Left("oops")
+    def test_from_exception_fails(self):
+        err = ValueError("oops")
+        result = run(AsyncResult.from_exception(err))
+        assert result == Left(err)
 
     def test_from_either_right(self):
         assert run(AsyncResult.from_either(Right(1))) == Right(1)
@@ -52,8 +54,9 @@ class TestMap:
         assert result == Right(10)
 
     def test_skips_on_error(self):
-        result = run(AsyncResult.from_error("err").map(lambda x: x * 2))
-        assert result == Left("err")
+        err = RuntimeError("err")
+        result = run(AsyncResult.from_exception(err).map(lambda x: x * 2))
+        assert result == Left(err)
 
     def test_chains_maps(self):
         result = run(AsyncResult.pure(1).map(lambda x: x + 1).map(lambda x: x * 10))
@@ -66,16 +69,18 @@ class TestBind:
         assert result == Right(11)
 
     def test_short_circuits_on_error(self):
+        err = RuntimeError("stop")
         result = run(
-            AsyncResult.from_error("stop").bind(lambda x: AsyncResult.pure(x + 1))
+            AsyncResult.from_exception(err).bind(lambda x: AsyncResult.pure(x + 1))
         )
-        assert result == Left("stop")
+        assert result == Left(err)
 
     def test_bind_can_fail(self):
+        err = RuntimeError("failed")
         result = run(
-            AsyncResult.pure(1).bind(lambda x: AsyncResult.from_error("failed"))
+            AsyncResult.pure(1).bind(lambda x: AsyncResult.from_exception(err))
         )
-        assert result == Left("failed")
+        assert result == Left(err)
 
 
 class TestBindWithEither:
@@ -88,8 +93,9 @@ class TestBindWithEither:
         assert result == Left("nope")
 
     def test_skips_on_initial_error(self):
-        result = run(AsyncResult.from_error("err").bind(lambda x: Right(99)))
-        assert result == Left("err")
+        err = RuntimeError("err")
+        result = run(AsyncResult.from_exception(err).bind(lambda x: Right(99)))
+        assert result == Left(err)
 
 
 class TestBindWithAwaitable:
@@ -104,14 +110,16 @@ class TestBindWithAwaitable:
         async def double(x):
             return x * 2
 
-        result = run(AsyncResult.from_error("err").bind(double))
-        assert result == Left("err")
+        err = RuntimeError("err")
+        result = run(AsyncResult.from_exception(err).bind(double))
+        assert result == Left(err)
 
 
 class TestOrElse:
     def test_recovers_from_error(self):
+        err = ValueError("oops")
         result = run(
-            AsyncResult.from_error("oops").or_else(
+            AsyncResult.from_exception(err).or_else(
                 lambda e: AsyncResult.pure(f"recovered: {e}")
             )
         )
@@ -122,7 +130,8 @@ class TestOrElse:
         assert result == Right(42)
 
     def test_or_else_with_either(self):
-        result = run(AsyncResult.from_error("oops").or_else(lambda e: Right("fixed")))
+        err = ValueError("oops")
+        result = run(AsyncResult.from_exception(err).or_else(lambda e: Right("fixed")))
         assert result == Right("fixed")
 
 
@@ -132,8 +141,9 @@ class TestThen:
         assert result == Right("keep")
 
     def test_short_circuits(self):
-        result = run(AsyncResult.from_error("stop").then(AsyncResult.pure("never")))
-        assert result == Left("stop")
+        err = RuntimeError("stop")
+        result = run(AsyncResult.from_exception(err).then(AsyncResult.pure("never")))
+        assert result == Left(err)
 
 
 class TestAp:
@@ -142,8 +152,9 @@ class TestAp:
         assert result == Right((1, 2))
 
     def test_short_circuits_left(self):
-        result = run(AsyncResult.from_error("err").ap(AsyncResult.pure(2)))
-        assert result == Left("err")
+        err = RuntimeError("err")
+        result = run(AsyncResult.from_exception(err).ap(AsyncResult.pure(2)))
+        assert result == Left(err)
 
 
 class TestTryAsync:
@@ -205,7 +216,7 @@ class TestPipeline:
 
     def test_pipeline_with_recovery(self):
         pipeline = (
-            AsyncResult.from_error("timeout")
+            AsyncResult.from_exception(TimeoutError("timeout"))
             .or_else(lambda e: AsyncResult.pure("cached"))
             .map(lambda v: v.upper())
         )
