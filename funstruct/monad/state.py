@@ -74,8 +74,8 @@ class State(Monad, Generic[_A]):
         return State(inner)
 
     def ap(self, other) -> "State":
-        """Applicative ap: run both, tuple the values."""
-        return self.bind(lambda a: other.map(lambda b: (a, b)))
+        """Apply: self contains a function, apply it to other's value."""
+        return self.bind(lambda f: other.map(f))
 
     def then(self, next_state: "State[_B]") -> "State[_B]":
         """Sequence: run self, discard value, run next."""

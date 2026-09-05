@@ -108,32 +108,29 @@ def assert_applicative_laws(
     fb: Applicative,
     eq: Eq | None = None,
 ) -> None:
-    """Applicative laws: homomorphism and ap/map2 consistency.
+    """Applicative laws: homomorphism and product/map2 consistency.
 
-    1. Homomorphism — pure values combine purely:
+    1. Homomorphism — pure(f).ap(pure(a)) == pure(f(a)):
 
-        pure(a).ap(pure(b)) == pure((a, b))
+        Wrapping a function and a value then applying is the same
+        as applying then wrapping.
 
-        pure(1) ⊛ pure(2) == pure((1, 2))
+    2. Consistency — product and map2 must agree when tupling:
 
-    2. Consistency — ap and map2 must agree when tupling:
-
-        fa.ap(fb) == fa.map2(fb, λa b → (a, b))
+        fa.product(fb) == fa.map2(fb, λa b → (a, b))
 
         Both produce the same paired result from two
         independent applicative values.
-
-    These ensure that `ap` is just "combine two independent
-    contexts" — no hidden sequencing or side effects.
     """
     _eq = eq or (lambda a, b: a == b)
 
-    assert _eq(pure_fn(1).ap(pure_fn(2)), pure_fn((1, 2))), (
-        "Applicative homomorphism violated: pure(1).ap(pure(2)) != pure((1,2))"
+    f = lambda x: (x, "tagged")
+    assert _eq(pure_fn(f).ap(pure_fn(1)), pure_fn(f(1))), (
+        "Applicative homomorphism violated: pure(f).ap(pure(a)) != pure(f(a))"
     )
 
-    assert _eq(fa.ap(fb), fa.map2(fb, lambda a, b: (a, b))), (
-        "Applicative ap/map2 consistency violated: ap must equal map2 with tupling"
+    assert _eq(fa.product(fb), fa.map2(fb, lambda a, b: (a, b))), (
+        "Applicative product/map2 consistency violated"
     )
 
 

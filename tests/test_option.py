@@ -19,10 +19,16 @@ class TestSome:
         assert Some(5).bind(lambda x: Nothing()) == Nothing()
 
     def test_ap_with_some(self):
-        assert Some(1).ap(Some(2)) == Some((1, 2))
+        assert Some(lambda x: x + 1).ap(Some(2)) == Some(3)
 
     def test_ap_with_nothing(self):
-        assert Some(1).ap(Nothing()) == Nothing()
+        assert Some(lambda x: x + 1).ap(Nothing()) == Nothing()
+
+    def test_product_with_some(self):
+        assert Some(1).product(Some(2)) == Some((1, 2))
+
+    def test_product_with_nothing(self):
+        assert Some(1).product(Nothing()) == Nothing()
 
     def test_get_or_else(self):
         assert Some(42).get_or_else(0) == 42
@@ -70,6 +76,9 @@ class TestNothing:
 
     def test_ap(self):
         assert Nothing().ap(Some(1)) == Nothing()
+
+    def test_product(self):
+        assert Nothing().product(Some(1)) == Nothing()
 
     def test_get_or_else(self):
         assert Nothing().get_or_else(99) == 99

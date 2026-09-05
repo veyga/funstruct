@@ -190,9 +190,10 @@ class Right(Either[E, A]):
         return f(self.value)
 
     def ap(self, other: Either) -> Either:
+        """Apply: self contains a function, apply it to other's value."""
         match other:
             case Right(val):
-                return Right((self.value, val))
+                return Right(self.value(val))
             case _:
                 return other
 

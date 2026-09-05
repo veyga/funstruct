@@ -108,8 +108,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return self.bind(lambda _: other)
 
     def ap(self, other: EitherT) -> EitherT:
-        """Applicative: run both, tuple the values."""
-        return self.bind(lambda a: other.map(lambda b: (a, b)))
+        """Apply: self contains a function, apply it to other's value."""
+        return self.bind(lambda f: other.map(f))
 
     def then(self, next_step: EitherT[_F, _E, _B]) -> EitherT[_F, _E, _B]:
         """Sequence: run self, discard value, run next."""

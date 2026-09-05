@@ -1,7 +1,11 @@
-"""Applicative: combine independent computations.
+"""Applicative: independent computations combined in context.
+
+F[A → B] ─┐
+           ├──ap──> F[B]
+F[A] ─────┘
 
 F[A] ─┐
-       ├──> F[(A, B)]
+       ├──product──> F[(A, B)]
 F[B] ─┘
 
 Key distinction from Monad:
@@ -18,7 +22,7 @@ When to use Applicative (not Monad):
 
 Business examples:
     - Validated: validate name + email + age independently, accumulate errors
-    - Parallel fetches: fetch(user_id).ap(fetch(prefs_id)) → (User, Prefs)
+    - Parallel fetches: fetch(user_id).product(fetch(prefs_id)) → (User, Prefs)
     - Schema parsing: parse each column independently, report all failures
 """
 
@@ -47,11 +51,23 @@ class Applicative(Functor[_A]):
         ...
 
     @abstractmethod
-    def ap(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]: ...
+    def ap(self, other: Applicative[_A]) -> Applicative[_B]:
+        """Apply a wrapped function to a wrapped value.
+
+        self contains a function A → B, other contains A. Returns F[B].
+        """
+        ...
+
+    def product(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
+        """Combine two independent values into a tuple.
+
+        Derived from map + ap: lift the tupling function, then apply.
+        """
+        return self.map(lambda a: lambda b: (a, b)).ap(other)
 
     def __add__(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
-        """Alias for ap."""
-        return self.ap(other)
+        """Alias for product."""
+        return self.product(other)
 
 
 __all__ = [

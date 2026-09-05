@@ -46,12 +46,12 @@ A ─┘
 F[A] ---( f: A -> B )---> F[B]
 ```
 
-**Applicative** — combine independent computations
+**Applicative** — apply a function in context to a value in context
 
 ```
-F[A] ─┐
-       ├──> F[(A, B)]
-F[B] ─┘
+F[A → B] ─┐
+           ├──ap──> F[B]
+F[A] ──────┘
 ```
 
 **Monad** — sequence computations that produce new contexts
@@ -77,12 +77,13 @@ class Functor(ABC):
 
 class Applicative(Functor):
     def pure(cls, value) -> Applicative: ...
-    def ap(self, other) -> Applicative: ...
-    def __add__ = ap  # alias
+    def ap(self, other) -> Applicative: ...      # self: F[A→B], other: F[A] → F[B]
+    def product(self, other) -> Applicative: ...  # F[A], F[B] → F[(A, B)]
+    def __add__ = product  # alias
 
 class Monad(Applicative):
     def bind(self, f) -> Monad: ...
-    def do(cls, gen_fn) -> Monad: ...
+    def do(cls, gen_fn, *args, **kwargs) -> Monad: ...
     def __rshift__ = bind  # >>
 
 class MonadTransformer(Monad, Generic[_F, _A]):
@@ -139,7 +140,7 @@ trait Monad[F[_]] extends Applicative[F] {
 | `Reader[Ctx, A]`    | Shared environment                          |
 | `Writer[W, A]`      | Accumulated output                          |
 | `Validated[E, A]`   | Error accumulation (applicative, not monad) |
-| `Future[E, A]`      | Lazy async + typed error                    |
+| `Future[A]`         | Lazy async computation                      |
 | `CList[A]`          | Persistent singly-linked list               |
 | `Tree[A]`           | Immutable binary tree (functor only)        |
 | `frozendict[K, V]`  | Persistent HAMT dictionary                  |

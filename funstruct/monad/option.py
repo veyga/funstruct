@@ -179,11 +179,8 @@ class Some(Option[A]):
         return Some(f(self.value))
 
     def ap(self, other: Option) -> Option:
-        match other:
-            case Some(val):
-                return Some((self.value, val))
-            case _:
-                return other
+        """Apply: self contains a function, apply it to other's value."""
+        return other.map(self.value)
 
     def bind(self, f: Callable[[A], Option]) -> Option:
         return f(self.value)

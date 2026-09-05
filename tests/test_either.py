@@ -14,10 +14,16 @@ class TestRight:
         assert Right(1).bind(lambda x: Left("fail")) == Left("fail")
 
     def test_ap(self):
-        assert Right(1).ap(Right(2)) == Right((1, 2))
+        assert Right(lambda x: x + 1).ap(Right(2)) == Right(3)
 
     def test_ap_left(self):
-        assert Right(1).ap(Left("err")) == Left("err")
+        assert Right(lambda x: x + 1).ap(Left("err")) == Left("err")
+
+    def test_product(self):
+        assert Right(1).product(Right(2)) == Right((1, 2))
+
+    def test_product_left(self):
+        assert Right(1).product(Left("err")) == Left("err")
 
     def test_or_else(self):
         assert Right(1).or_else(lambda e: Right(99)) == Right(1)
@@ -54,6 +60,9 @@ class TestLeft:
 
     def test_ap(self):
         assert Left("err").ap(Right(1)) == Left("err")
+
+    def test_product(self):
+        assert Left("err").product(Right(1)) == Left("err")
 
     def test_or_else(self):
         assert Left("err").or_else(lambda e: Right("recovered")) == Right("recovered")

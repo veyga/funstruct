@@ -95,7 +95,6 @@ class Future(Generic[A]):
 
         return cls(_inner())
 
-
     def __repr__(self) -> str:
         return f"Future({self._coro})"
 

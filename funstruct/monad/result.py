@@ -206,9 +206,9 @@ class AsyncResult(Generic[_A]):
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_result)
 
-    def ap(self, other: AsyncResult[_B]) -> AsyncResult[tuple[_A, _B]]:
-        """Applicative: run both, tuple the values."""
-        return self.bind(lambda a: other.map(lambda b: (a, b)))
+    def ap(self, other: AsyncResult[_A]) -> AsyncResult[_B]:
+        """Apply: self contains a function, apply it to other's value."""
+        return self.bind(lambda f: other.map(f))
 
     @classmethod
     def pure(cls, value: _A) -> AsyncResult[_A]:

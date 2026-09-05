@@ -147,9 +147,9 @@ class TestThen:
 
 
 class TestAp:
-    def test_tuples_values(self):
-        result = run(AsyncResult.pure(1).ap(AsyncResult.pure(2)))
-        assert result == Right((1, 2))
+    def test_applies_function(self):
+        result = run(AsyncResult.pure(lambda x: x + 1).ap(AsyncResult.pure(2)))
+        assert result == Right(3)
 
     def test_short_circuits_left(self):
         err = RuntimeError("err")

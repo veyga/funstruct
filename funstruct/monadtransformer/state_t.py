@@ -92,8 +92,8 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return StateT(inner)
 
     def ap(self, other) -> "StateT":
-        """Applicative ap: run both, tuple the values."""
-        return self.bind(lambda a: other.map(lambda b: (a, b)))
+        """Apply: self contains a function, apply it to other's value."""
+        return self.bind(lambda f: other.map(f))
 
     def and_then(self, other: "StateT") -> "StateT":
         """Kleisli composition: value from self becomes initial state for other.

@@ -35,10 +35,23 @@ class Validated(Applicative):
     """Base class for Valid/Invalid — provides constructors and supports + operator."""
 
     @abstractmethod
-    def ap(self, other) -> Validated: ...
+    def ap(self, other) -> Validated:
+        """Apply: self contains a function, apply it to other's value.
+
+        Accumulates errors from both sides on Invalid.
+        """
+        ...
+
+    @abstractmethod
+    def product(self, other) -> Validated:
+        """Combine two Validated values into a tuple.
+
+        Accumulates errors from both sides on Invalid.
+        """
+        ...
 
     def __add__(self, other) -> Validated:
-        return self.ap(other)
+        return self.product(other)
 
     @property
     @abstractmethod
@@ -104,11 +117,15 @@ class Valid(Validated, Generic[_A]):
         return Valid(f(self.value))
 
     def ap(self, other) -> Validated:
-        """Combine with another Validated (applicative).
+        """Apply: self contains a function, apply it to other's value."""
+        match other:
+            case Valid(val):
+                return Valid(self.value(val))
+            case _:
+                return other
 
-        Accumulates errors from both sides.
-        On success, tuples the values.
-        """
+    def product(self, other) -> Validated:
+        """Combine two Valid values into a tuple."""
         match other:
             case Valid(val):
                 return Valid((self.value, val))
@@ -153,6 +170,14 @@ class Invalid(Validated, Generic[_E]):
         return on_invalid(self.errors)
 
     def ap(self, other) -> Validated:
+        """Apply — accumulates errors from both sides."""
+        match other:
+            case Invalid(errs):
+                return Invalid(self.errors + errs)
+            case _:
+                return self
+
+    def product(self, other) -> Validated:
         """Combine — accumulates errors from both sides."""
         match other:
             case Invalid(errs):

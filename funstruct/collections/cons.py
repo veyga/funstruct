@@ -207,8 +207,8 @@ class CList(Monad, Generic[A]):
         return self.fold_right(Nil(), lambda a, acc: Cons(f(a), acc))
 
     def ap(self, other) -> CList:
-        """Cartesian product — pair each element of self with each element of other."""
-        return self.bind(lambda a: other.map(lambda b: (a, b)))
+        """Apply: self contains functions, apply each to every element of other."""
+        return self.bind(lambda f: other.map(f))
 
     def filter(self, f: Callable[[A], bool]) -> CList:
         """Filter the elements of the list based on a predicate function.

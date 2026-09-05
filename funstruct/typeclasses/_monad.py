@@ -54,15 +54,15 @@ class Monad(Applicative[_A]):
         """Do-notation via generators. Flattens nested binds."""
         ...
 
-    def ap(self, other: Monad[_B]) -> Monad[tuple[_A, _B]]:
+    def ap(self, other: Monad[_A]) -> Monad[_B]:
         """Default ap derived from bind + map.
 
+        self contains a function A → B, other contains A. Returns F[B].
+
         Every Monad is an Applicative, and ap can always be derived from
-        bind + map. This can't live on Applicative itself because Applicative
-        doesn't have bind — only Monad does. Standalone Applicatives
-        must implement ap directly.
+        bind + map. Standalone Applicatives must implement ap directly.
         """
-        return self.bind(lambda a: other.map(lambda b: (a, b)))
+        return self.bind(lambda f: other.map(f))
 
     def map2(self, other: Monad[_B], f: Callable) -> Monad:
         """Combine two monadic values with a function.
