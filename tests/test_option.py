@@ -2,6 +2,7 @@
 
 from funstruct.collections.cons import CList, Cons, Nil
 from funstruct.monad.option import Nothing, Option, Some
+from tests.laws import assert_type_contract
 
 
 class TestSome:
@@ -192,6 +193,11 @@ class TestTraverse:
 class TestPure:
     def test_pure(self):
         assert Option.pure(42) == Some(42)
+
+
+class TestLaws:
+    def test_type_contract(self):
+        assert_type_contract(Option.pure, Some)
 
 
 class TestRshift:

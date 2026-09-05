@@ -41,7 +41,7 @@ class Reader(Monad, Generic[_Ctx, _A]):
 
     __slots__ = ("_run",)
 
-    def __init__(self, run: Callable) -> None:
+    def __init__(self, run: Callable[[_Ctx], _A]) -> None:
         self._run = run
 
     def run(self, ctx):
@@ -51,7 +51,7 @@ class Reader(Monad, Generic[_Ctx, _A]):
     def __call__(self, ctx):
         return self.run(ctx)
 
-    def bind(self, f: Callable) -> Reader:
+    def bind(self, f: Callable[[_A], Reader[_Ctx, _B]]) -> Reader[_Ctx, _B]:
         """Chain: f receives the value, returns a new Reader."""
         return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
 

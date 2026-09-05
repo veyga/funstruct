@@ -45,6 +45,7 @@ if TYPE_CHECKING:
 E = TypeVar("E")
 A = TypeVar("A")
 B = TypeVar("B")
+C = TypeVar("C")
 
 
 class Either(Monad, Generic[E, A]):
@@ -116,7 +117,7 @@ class Either(Monad, Generic[E, A]):
         return _go(eithers, Nil())
 
     @classmethod
-    def traverse(cls, values, f: Callable) -> Either:
+    def traverse(cls, values, f: Callable[[A], Either[E, B]]) -> Either:
         """CList[A] -> (A -> Either[E, B]) -> Either[E, CList[B]].
 
         Applies f to each element, short-circuits on first Left.
@@ -155,7 +156,7 @@ class Either(Monad, Generic[E, A]):
         ...
 
     @abstractmethod
-    def fold(self, on_left: Callable, on_right: Callable):
+    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
         """Eliminate — apply on_left or on_right depending on the case."""
         ...
 
@@ -198,7 +199,7 @@ class Right(Either[E, A]):
         """Return the value (ignores default on Right)."""
         return self.value
 
-    def fold(self, on_left: Callable, on_right: Callable):
+    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
         """Apply on_right to the value."""
         return on_right(self.value)
 
@@ -227,7 +228,7 @@ class Left(Either[E, A]):
     def is_right(self) -> bool:
         return False
 
-    def bind(self, f: Callable) -> Either:
+    def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
         return self
 
     def alt(self, f: Callable[[E], E]) -> Either[E, A]:
@@ -252,7 +253,7 @@ class Left(Either[E, A]):
         """Return default (error is discarded)."""
         return default
 
-    def fold(self, on_left: Callable, on_right: Callable):
+    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
         """Apply on_left to the error."""
         return on_left(self.error)
 

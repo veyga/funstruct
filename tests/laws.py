@@ -24,6 +24,40 @@ A = TypeVar("A")
 Eq = Callable[[object, object], bool]
 
 
+def assert_type_contract(
+    pure_fn: Callable,
+    success_type: type,
+    is_monad: bool = True,
+) -> None:
+    """Verify a concrete type implements the required typeclass contract.
+
+    Every type extending Applicative must have a pure that returns the
+    correct success type. The derived map and ap must also preserve it.
+
+    For Monads, bind must also preserve the type.
+    """
+    val = pure_fn(1)
+    assert type(val) is success_type, (
+        f"pure must return {success_type.__name__}, got {type(val).__name__}"
+    )
+
+    mapped = pure_fn(1).map(lambda x: x + 1)
+    assert type(mapped) is success_type, (
+        f"map must return {success_type.__name__}, got {type(mapped).__name__}"
+    )
+
+    ap_result = pure_fn(lambda x: x).ap(pure_fn(1))
+    assert type(ap_result) is success_type, (
+        f"ap must return {success_type.__name__}, got {type(ap_result).__name__}"
+    )
+
+    if is_monad:
+        bound = pure_fn(1).bind(pure_fn)
+        assert type(bound) is success_type, (
+            f"bind must return {success_type.__name__}, got {type(bound).__name__}"
+        )
+
+
 def assert_semigroup_laws(a: A, b: A, c: A, sg: Semigroup) -> None:
     """Semigroup law: associativity.
 
@@ -108,21 +142,14 @@ def assert_applicative_laws(
     fb: Applicative,
     eq: Eq | None = None,
 ) -> None:
-    """Applicative laws: homomorphism and product/map2 consistency.
+    """Applicative laws: homomorphism, product/map2 consistency, type preservation.
 
-    1. Homomorphism — pure(f).ap(pure(a)) == pure(f(a)):
-
-        Wrapping a function and a value then applying is the same
-        as applying then wrapping.
-
-    2. Consistency — product and map2 must agree when tupling:
-
-        fa.product(fb) == fa.map2(fb, λa b → (a, b))
-
-        Both produce the same paired result from two
-        independent applicative values.
+    1. Homomorphism — pure(f).ap(pure(a)) == pure(f(a))
+    2. Consistency — fa.product(fb) == fa.map2(fb, λa b → (a, b))
+    3. Type preservation — pure, map, ap all return the expected type
     """
     _eq = eq or (lambda a, b: a == b)
+    success_type = type(pure_fn(1))
 
     f = lambda x: (x, "tagged")
     assert _eq(pure_fn(f).ap(pure_fn(1)), pure_fn(f(1))), (
@@ -133,6 +160,21 @@ def assert_applicative_laws(
         "Applicative product/map2 consistency violated"
     )
 
+    assert type(pure_fn(1)) is success_type, (
+        f"Type preservation: pure must return {success_type.__name__}, "
+        f"got {type(pure_fn(1)).__name__}"
+    )
+    mapped = pure_fn(1).map(lambda x: x)
+    assert type(mapped) is success_type, (
+        f"Type preservation: map must return {success_type.__name__}, "
+        f"got {type(mapped).__name__}"
+    )
+    ap_result = pure_fn(lambda x: x).ap(pure_fn(1))
+    assert type(ap_result) is success_type, (
+        f"Type preservation: ap must return {success_type.__name__}, "
+        f"got {type(ap_result).__name__}"
+    )
+
 
 def assert_monad_laws(
     pure_fn: Callable[[object], Monad],
@@ -141,36 +183,15 @@ def assert_monad_laws(
     g: Callable[[object], Monad],
     eq: Eq | None = None,
 ) -> None:
-    """Monad laws: left identity, right identity, associativity.
+    """Monad laws: left identity, right identity, associativity, type preservation.
 
-    1. Left identity — pure is a no-op wrapper for bind:
-
-        pure(a).bind(f) == f(a)
-
-        a --pure--> M[A] --bind(f)--> M[B]
-        a ---------f--------------------->    (same result)
-
-    2. Right identity — binding into pure changes nothing:
-
-        m.bind(pure) == m
-
-        M[A] --bind(pure)--> M[A]   (same value)
-
-    3. Associativity — bind chains are independent of grouping:
-
-        m.bind(f).bind(g) == m.bind(λx → f(x).bind(g))
-
-        M[A] → M[B] → M[C]     (left-to-right)
-             ≡
-        M[A] → (A → M[B] → M[C])  (nested)
-
-    These ensure that monadic pipelines behave predictably:
-    pure doesn't add effects, and sequencing is associative.
-
-    Counterexample: a monad where pure(a) adds a "tag" violates
-    left identity — pure(a).bind(f) has the tag, but f(a) doesn't.
+    1. Left identity — pure(a).bind(f) == f(a)
+    2. Right identity — m.bind(pure) == m
+    3. Associativity — m.bind(f).bind(g) == m.bind(λx → f(x).bind(g))
+    4. Type preservation — pure, map, bind, ap all return the expected type
     """
     _eq = eq or (lambda a, b: a == b)
+    success_type = type(pure_fn(1))
 
     a = 42
     assert _eq(pure_fn(a).bind(f), f(a)), (
@@ -181,4 +202,24 @@ def assert_monad_laws(
 
     assert _eq(m.bind(f).bind(g), m.bind(lambda x: f(x).bind(g))), (
         "Monad associativity violated"
+    )
+
+    assert type(pure_fn(1)) is success_type, (
+        f"Type preservation: pure must return {success_type.__name__}, "
+        f"got {type(pure_fn(1)).__name__}"
+    )
+    mapped = pure_fn(1).map(lambda x: x)
+    assert type(mapped) is success_type, (
+        f"Type preservation: map must return {success_type.__name__}, "
+        f"got {type(mapped).__name__}"
+    )
+    bound = pure_fn(1).bind(pure_fn)
+    assert type(bound) is success_type, (
+        f"Type preservation: bind must return {success_type.__name__}, "
+        f"got {type(bound).__name__}"
+    )
+    ap_result = pure_fn(lambda x: x).ap(pure_fn(1))
+    assert type(ap_result) is success_type, (
+        f"Type preservation: ap must return {success_type.__name__}, "
+        f"got {type(ap_result).__name__}"
     )

@@ -43,7 +43,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
     __slots__ = ("_run",)
 
-    def __init__(self, run: Callable) -> None:
+    def __init__(self, run: Callable[..., _F]) -> None:
         self._run = run
 
     def run(self, initial_state):
@@ -79,7 +79,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
         return StateT(inner)
 
-    def or_else(self, f: Callable) -> "StateT":
+    def or_else(self, f: Callable[..., "StateT"]) -> "StateT":
         """Recover from failure.
 
         ``f`` receives the error, returns a recovery StateT.
@@ -151,12 +151,12 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return cls(lambda s: _pure(monad, (s, value)))
 
     @classmethod
-    def fail(cls, err, monad) -> "StateT":
+    def fail(cls, err: _A, monad: type) -> "StateT":
         """Lift an error. Uses ``monad.from_error``."""
         return cls(lambda _: monad.from_error(err))
 
     @classmethod
-    def get(cls, monad) -> "StateT":
+    def get(cls, monad: type) -> "StateT":
         """Produce current state as the value.
 
         >>> from funstruct.monad.option import Option, Some
@@ -166,7 +166,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return cls(lambda s: _pure(monad, (s, s)))
 
     @classmethod
-    def modify(cls, f: Callable, monad) -> "StateT":
+    def modify(cls, f: Callable[..., object], monad: type) -> "StateT":
         """Modify state, produce None.
 
         >>> from funstruct.monad.option import Option, Some
@@ -176,7 +176,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return cls(lambda s: _pure(monad, (f(s), None)))
 
     @classmethod
-    def lift_f(cls, inner) -> "StateT":
+    def lift_f(cls, inner: _F) -> "StateT":
         """Lift F[A] into StateT — state unchanged.
 
         Haskell equivalent: ``lift :: m a -> StateT s m a``
@@ -188,6 +188,18 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         Nothing()
         """
         return cls(lambda s: inner.map(lambda a: (s, a)))
+
+    @classmethod
+    def from_state(cls, state: Callable[..., tuple], monad: type) -> "StateT":
+        """Lift a pure State (S → (S, A)) into StateT.
+
+        Use when you have the inner state function but not the outer monad.
+
+        >>> from funstruct.monad.option import Option, Some
+        >>> StateT.from_state(lambda s: (s + 1, s), Option).run(0)
+        Some((1, 0))
+        """
+        return cls(lambda s: _pure(monad, state(s)))
 
     def __repr__(self) -> str:
         return f"StateT({self._run})"

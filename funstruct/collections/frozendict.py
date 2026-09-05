@@ -329,7 +329,7 @@ class frozendict(Generic[K, V]):
         """Semigroup combine (merge). Right-biased on key conflicts."""
         return self.combine(other)
 
-    def map(self, f: Callable) -> frozendict:
+    def map(self, f: Callable[[V], V]) -> frozendict:
         """Apply f to every value, preserving keys."""
         root = _EMPTY
         size = 0

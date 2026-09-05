@@ -48,7 +48,13 @@ class Applicative(Functor[_A]):
     @classmethod
     @abstractmethod
     def pure(cls, value: _A, *args, **kwargs) -> Applicative[_A]:
-        """Lift a value into the context."""
+        """
+        Lift a value into the context.
+        typeclass contract: pure always lifts into the success case.
+
+        Concrete impls implement things from 'from_exception'/etc
+        to lift into the failure case.
+        """
         ...
 
     def map(self, f: Callable[[_A], _B]) -> Applicative[_B]:
@@ -60,10 +66,12 @@ class Applicative(Functor[_A]):
         return self.__class__.pure(f).ap(self)
 
     @abstractmethod
-    def ap(self, other: Applicative[_A]) -> Applicative[_B]:
+    def ap(self: Applicative[Callable[[_A], _B]], other: Applicative[_A]) -> Applicative[_B]:
         """Apply a wrapped function to a wrapped value.
 
-        self contains a function A → B, other contains A. Returns F[B].
+        Scala: ``def ap[A, B](f: F[A => B], a: F[A]): F[B]``
+
+        self: F[A → B], other: F[A] → F[B]
         """
         ...
 

@@ -46,7 +46,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.monad.option import Nothing, Some
+from funstruct.monad.option import Nothing, Option, Some
 from funstruct.typeclasses._monad_transformer import MonadTransformer
 
 _F = TypeVar("_F")
@@ -207,8 +207,10 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         return cls(monad.pure(Nothing()))
 
     @classmethod
-    def lift_f(cls, fa) -> OptionT:
+    def lift_f(cls, fa: _F) -> OptionT:
         """Lift F[A] into OptionT — wraps value in Some.
+
+        Use when you have the outer monad but not the inner Option.
 
         Haskell equivalent: ``lift :: m a -> OptionT m a``
 
@@ -220,6 +222,21 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         Left('err')
         """
         return cls(fa.map(lambda a: Some(a)))
+
+    @classmethod
+    def from_option(cls, option: Option[_A], monad: type) -> OptionT:
+        """Lift Option[A] into OptionT — wraps in the outer monad.
+
+        Use when you have the inner Option but not the outer monad.
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.monad.option import Some, Nothing
+        >>> OptionT.from_option(Some(42), Either).run()
+        Right(Some(42))
+        >>> OptionT.from_option(Nothing(), Either).run()
+        Right(Nothing())
+        """
+        return cls(monad.pure(option))
 
     def __repr__(self) -> str:
         return f"OptionT({repr(self._run)})"

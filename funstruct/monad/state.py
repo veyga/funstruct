@@ -12,7 +12,7 @@ Examples:
 """
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
 
@@ -31,7 +31,7 @@ class State(Monad, Generic[_A]):
 
     __slots__ = ("_run",)
 
-    def __init__(self, run: Callable) -> None:
+    def __init__(self, run: Callable[[Any], tuple[Any, _A]]) -> None:
         self._run = run
 
     def run(self, initial_state) -> tuple:
@@ -110,7 +110,7 @@ class State(Monad, Generic[_A]):
         return cls(lambda s: (s, s))
 
     @classmethod
-    def modify(cls, f: Callable) -> "State":
+    def modify(cls, f: Callable[[Any], Any]) -> "State":
         """Modify state, produce None.
 
         >>> State.modify(lambda s: s + 1).run(5)

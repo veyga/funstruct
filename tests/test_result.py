@@ -1,4 +1,10 @@
 from funstruct.monad.result import Err, Ok, Result, Try
+from tests.laws import assert_type_contract
+
+
+class TestTypeContract:
+    def test_ok_type_contract(self):
+        assert_type_contract(Ok.pure, Ok)
 
 
 class TestTry:

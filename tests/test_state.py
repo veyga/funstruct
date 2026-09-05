@@ -7,6 +7,7 @@ from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,
     assert_monad_laws,
+    assert_type_contract,
 )
 
 
@@ -35,6 +36,9 @@ class TestStateLaws:
             g=lambda x: State(lambda s: (s, x * 10)),
             eq=_state_eq,
         )
+
+    def test_type_contract(self):
+        assert_type_contract(State.pure, State)
 
 
 class TestRun:

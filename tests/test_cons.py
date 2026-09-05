@@ -10,6 +10,7 @@ from tests.laws import (
     assert_monad_laws,
     assert_monoid_laws,
     assert_semigroup_laws,
+    assert_type_contract,
 )
 
 
@@ -45,6 +46,9 @@ class TestCListLaws:
             f=lambda x: Cons(x, Cons(x + 1, Nil())),
             g=lambda x: Cons(x * 10, Nil()),
         )
+
+    def test_type_contract(self):
+        assert_type_contract(Cons.pure, Cons)
 
 
 @pytest.fixture

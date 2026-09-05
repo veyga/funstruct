@@ -1,6 +1,6 @@
 from funstruct.collections.cons import CList, Cons, Nil
 from funstruct.monad.either import Either, Left, Right
-from tests.laws import assert_functor_laws, assert_monad_laws
+from tests.laws import assert_functor_laws, assert_monad_laws, assert_type_contract
 
 
 class TestRight:
@@ -198,6 +198,9 @@ class TestLaws:
             f=lambda x: Right(x + 1),
             g=lambda x: Right(x * 2),
         )
+
+    def test_type_contract(self):
+        assert_type_contract(Either.pure, Right)
 
 
 class TestTruthiness:

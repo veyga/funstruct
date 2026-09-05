@@ -2,6 +2,8 @@
 
 import asyncio
 
+import pytest
+
 from funstruct.monad.either import Left, Right
 from funstruct.monad.future import Future
 from funstruct.monad.result import AsyncResult, Err, Ok, TryAsync
@@ -10,6 +12,31 @@ from funstruct.monad.result import AsyncResult, Err, Ok, TryAsync
 def run(future):
     """Helper: await a Future and return the Either."""
     return asyncio.run(future._awaitable())
+
+
+class TestAwaitable:
+    """Future and AsyncResult are directly awaitable — no .run() needed."""
+
+    def test_future_is_awaitable(self):
+        async def go():
+            return await Future.pure(42)
+
+        assert asyncio.run(go()) == 42
+
+    def test_async_result_is_awaitable(self):
+        async def go():
+            return await AsyncResult.pure(42)
+
+        assert asyncio.run(go()) == Ok(42)
+
+    def test_async_result_is_not_callable(self):
+        ar = AsyncResult.pure(42)
+        with pytest.raises(TypeError):
+            ar()
+
+    def test_async_result_has_no_run(self):
+        ar = AsyncResult.pure(42)
+        assert not hasattr(ar, "run")
 
 
 class TestPure:

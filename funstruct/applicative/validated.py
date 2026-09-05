@@ -28,6 +28,7 @@ from funstruct.typeclasses._applicative import Applicative
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
+_C = TypeVar("_C")
 _E = TypeVar("_E")
 
 
@@ -58,7 +59,7 @@ class Validated(Applicative):
     def is_valid(self) -> bool: ...
 
     @abstractmethod
-    def fold(self, on_invalid: Callable, on_valid: Callable):
+    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
         """Eliminate the Validated — apply on_invalid or on_valid."""
         ...
 
@@ -108,7 +109,7 @@ class Valid(Validated, Generic[_A]):
     def __bool__(self) -> bool:
         return True
 
-    def fold(self, on_invalid: Callable, on_valid: Callable):
+    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
         """Eliminate — applies on_valid to the value."""
         return on_valid(self.value)
 
@@ -161,7 +162,7 @@ class Invalid(Validated, Generic[_E]):
     def __bool__(self) -> bool:
         return False
 
-    def fold(self, on_invalid: Callable, on_valid: Callable):
+    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
         """Eliminate — applies on_invalid to the errors."""
         return on_invalid(self.errors)
 

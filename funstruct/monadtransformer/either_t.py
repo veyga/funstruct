@@ -112,17 +112,17 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return self.bind(lambda _: next_step)
 
     @classmethod
-    def pure(cls, value, monad) -> EitherT:
+    def pure(cls, value: _A, monad: type) -> EitherT:
         """Lift a plain value into EitherT via monad.pure(Right(value))."""
         return cls(monad.pure(Right(value)))
 
     @classmethod
-    def from_error(cls, error, monad) -> EitherT:
+    def from_error(cls, error: _E, monad: type) -> EitherT:
         """Lift an error into EitherT via monad.pure(Left(error))."""
         return cls(monad.pure(Left(error)))
 
     @classmethod
-    def lift_f(cls, fa) -> EitherT:
+    def lift_f(cls, fa: _F) -> EitherT:
         """Lift F[A] into EitherT — wraps the value in Right.
 
         Haskell equivalent: ``lift :: m a -> EitherT e m a``
@@ -130,7 +130,7 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return cls(fa.map(lambda a: Right(a)))
 
     @classmethod
-    def from_either(cls, either: Either, monad) -> EitherT:
+    def from_either(cls, either: Either, monad: type) -> EitherT:
         """Lift a plain Either into EitherT."""
         return cls(monad.pure(either))
 

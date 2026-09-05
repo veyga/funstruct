@@ -5,6 +5,7 @@ from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,
     assert_monad_laws,
+    assert_type_contract,
 )
 
 
@@ -32,6 +33,9 @@ class TestReaderLaws:
             g=lambda x: Reader.pure(x * 10),
             eq=_reader_eq,
         )
+
+    def test_type_contract(self):
+        assert_type_contract(Reader.pure, Reader)
 
 
 class TestRun:

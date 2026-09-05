@@ -79,7 +79,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
     __slots__ = ("_run",)
 
-    def __init__(self, run: Callable) -> None:
+    def __init__(self, run: Callable[[_Ctx], _M]) -> None:
         self._run = run
 
     def run(self, ctx):
@@ -109,7 +109,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def or_else(self, f: Callable) -> ReaderT[_Ctx, _M, _A]:
+    def or_else(self, f: Callable[..., ReaderT]) -> ReaderT[_Ctx, _M, _A]:
         """Recover from failure via inner monad's or_else."""
 
         def inner(ctx):
@@ -170,12 +170,24 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         return self.bind(lambda _: next_step)
 
     @classmethod
-    def pure(cls, value, monad) -> ReaderT:
+    def pure(cls, value: _A, monad: type) -> ReaderT:
         """Lift a plain value into ReaderT via monad.pure."""
         return cls(lambda _: _pure(monad, value))
 
     @classmethod
-    def lift_f(cls, m) -> ReaderT:
+    def from_reader(cls, reader_fn: Callable[[_Ctx], _A], monad: type) -> ReaderT:
+        """Lift a pure Reader (Ctx → A) into ReaderT.
+
+        Use when you have the inner reader function but not the outer monad.
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> ReaderT.from_reader(lambda ctx: ctx["name"], Either).run({"name": "Alice"})
+        Right('Alice')
+        """
+        return cls(lambda ctx: _pure(monad, reader_fn(ctx)))
+
+    @classmethod
+    def lift_f(cls, m: _M) -> ReaderT:
         """Lift M[A] into ReaderT (ignoring context).
 
         Haskell equivalent: ``lift :: m a -> ReaderT r m a``

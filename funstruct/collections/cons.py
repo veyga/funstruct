@@ -194,7 +194,7 @@ class CList(Monad, Generic[A]):
         """
         return self.fold_left(Nil(), lambda acc, h: Cons(h, acc))
 
-    def map(self, f: Callable) -> CList:
+    def map(self, f: Callable[[A], B]) -> CList[B]:
         """Apply a function to each element of the list, producing a new list
         with the results.
 

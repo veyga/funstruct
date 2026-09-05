@@ -48,9 +48,8 @@ if TYPE_CHECKING:
     from funstruct.collections.cons import CList
 
 A = TypeVar("A")
-
-
 B = TypeVar("B")
+C = TypeVar("C")
 
 
 class Option(Monad, Generic[A]):
@@ -184,7 +183,7 @@ class Some(Option[A]):
     def filter(self, f: Callable[[A], bool]) -> Option[A]:
         return self if f(self.value) else Nothing()
 
-    def fold(self, on_nothing: Callable, on_some: Callable):
+    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
         return on_some(self.value)
 
     def __eq__(self, other: object) -> bool:
@@ -215,7 +214,7 @@ class Nothing(Option):
     def is_some(self) -> bool:
         return False
 
-    def bind(self, f: Callable) -> Option:
+    def bind(self, f: Callable[[A], Option[B]]) -> Option[B]:
         return self
 
     def get_or_else(self, default: A) -> A:
@@ -224,10 +223,10 @@ class Nothing(Option):
     def or_else(self, fallback: Callable[[], Option[A]]) -> Option[A]:
         return fallback()
 
-    def filter(self, f: Callable) -> Option:
+    def filter(self, f: Callable[[A], bool]) -> Option:
         return self
 
-    def fold(self, on_nothing: Callable, on_some: Callable):
+    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
         return on_nothing()
 
     def __eq__(self, other: object) -> bool:

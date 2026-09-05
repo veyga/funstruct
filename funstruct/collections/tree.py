@@ -43,6 +43,7 @@ from funstruct.typeclasses._functor import Functor
 
 A = TypeVar("A")
 B = TypeVar("B")
+C = TypeVar("C")
 
 
 class Tree(Functor, Generic[A]):
@@ -65,7 +66,7 @@ class Tree(Functor, Generic[A]):
     def depth(self) -> int: ...
 
     @abstractmethod
-    def fold(self, on_leaf: Callable, on_branch: Callable): ...
+    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C: ...
 
     @abstractmethod
     def to_list(self) -> CList[A]: ...
@@ -88,7 +89,7 @@ class Leaf(Tree[A]):
     def depth(self) -> int:
         return 0
 
-    def fold(self, on_leaf: Callable, on_branch: Callable):
+    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
         return on_leaf(self.value)
 
     def to_list(self) -> CList[A]:
@@ -124,7 +125,7 @@ class Branch(Tree[A]):
     def depth(self) -> int:
         return 1 + max(self.left.depth, self.right.depth)
 
-    def fold(self, on_leaf: Callable, on_branch: Callable):
+    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
         return on_branch(
             self.value,
             self.left.fold(on_leaf, on_branch),

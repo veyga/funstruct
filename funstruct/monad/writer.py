@@ -37,7 +37,7 @@ class Writer(Monad, Generic[_W, _A]):
         object.__setattr__(self, "value", value)
         object.__setattr__(self, "output", output)
 
-    def bind(self, f: Callable) -> Writer:
+    def bind(self, f: Callable[[_A], Writer[_W, _B]]) -> Writer[_W, _B]:
         """Chain: run f on the value, combine outputs via monoid."""
         result = f(self.value)
         return self.__class__(

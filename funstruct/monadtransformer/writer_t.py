@@ -96,7 +96,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_wt)
 
-    def or_else(self, f: Callable) -> WriterT:
+    def or_else(self, f: Callable[..., WriterT]) -> WriterT:
         """Recover from failure via inner monad's or_else."""
         cls = self.__class__
         return cls(self._run.or_else(lambda err: f(err).run()))
@@ -116,7 +116,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         return cls(monad.pure((value, cls._monoid.empty)))
 
     @classmethod
-    def tell(cls, output, monad: type) -> WriterT:
+    def tell(cls, output: _W, monad: type) -> WriterT:
         """Produce output with no meaningful value.
 
         >>> from funstruct.monad.either import Either, Right
@@ -130,7 +130,23 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         return cls(monad.pure((None, output)))
 
     @classmethod
-    def lift_f(cls, fa) -> WriterT:
+    def from_writer(cls, value: _A, output: _W, monad: type) -> WriterT:
+        """Lift a value + output pair into WriterT.
+
+        Use when you have the inner writer value but not the outer monad.
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.typeclasses import Monoid
+        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LT(WriterT):
+        ...     _monoid = list_m
+        >>> LT.from_writer(42, ["init"], Either).run()
+        Right((42, ['init']))
+        """
+        return cls(monad.pure((value, output)))
+
+    @classmethod
+    def lift_f(cls, fa: _F) -> WriterT:
         """Lift F[A] into WriterT — output is empty.
 
         Haskell equivalent: ``lift :: m a -> WriterT w m a``

@@ -69,7 +69,7 @@ class Monad(Applicative[_A]):
         """
         return self.bind(lambda f: other.map(f))
 
-    def map2(self, other: Monad[_B], f: Callable) -> Monad:
+    def map2(self, other: Monad[_B], f: Callable[[_A, _B], object]) -> Monad:
         """Combine two monadic values with a function.
 
         map2(fa, fb, f) = fa.bind(a => fb.map(b => f(a, b)))

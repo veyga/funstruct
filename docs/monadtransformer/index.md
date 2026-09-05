@@ -4,7 +4,24 @@
 
 Transformers combine two monads into one, so you can write a flat pipeline
 instead of nested pattern matching. Use `lift_f` to bring an inner monad
-value into the transformer.
+value into the transformer, and `.run()` to unwrap at the boundary.
+
+```python
+# Without transformer — nested pattern matching at every step:
+result = fetch_user(id)  # Either[Err, Option[User]]
+match result:
+    case Left(e): ...       # handle error
+    case Right(Nothing()): ...  # handle absence
+    case Right(Some(user)): ... # finally, the value
+
+# With OptionT — one flat pipeline:
+pipeline = (
+    OptionT(fetch_user(id))
+    .bind(lambda user: OptionT(get_email(user)))
+    .map(lambda email: email.upper())
+)
+pipeline.run()  # Either[Err, Option[str]]
+```
 
 - [ReaderT](reader_t.md) — shared environment + inner monad
 - [StateT](state_t.md) — threaded state + inner monad

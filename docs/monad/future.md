@@ -2,6 +2,22 @@
 
 ::: funstruct.monad.future
 
+## Awaiting
+
+`Future` and `AsyncResult` are directly awaitable — no `.run()` needed:
+
+```python
+result = await Future.pure(42)         # 42
+result = await AsyncResult.pure(42)    # Ok(42)
+```
+
+This is different from monad transformers (`OptionT`, `EitherT`, etc.) which
+require `.run()` to unwrap the transformer layer before awaiting:
+
+```python
+result = await option_t.run()  # Future[Option[A]] → Option[A]
+```
+
 ## Do-notation with Future
 
 `Future.do` uses a regular generator (**not `async def`**). The driver loop

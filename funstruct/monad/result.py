@@ -58,6 +58,10 @@ class Result(Either[Exception, _A], Generic[_A]):
     def pure(cls, value: _A) -> Result[_A]:
         return Ok(value)
 
+    @classmethod
+    def from_exception(cls, error: Exception) -> Result:
+        return Err(error)
+
     @abstractmethod
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
     @abstractmethod
@@ -71,7 +75,7 @@ class Ok(Right):
     """Success case of Result."""
 
     @classmethod
-    def pure(cls, value):
+    def pure(cls, value: _A) -> Ok:
         return Ok(value)
 
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
