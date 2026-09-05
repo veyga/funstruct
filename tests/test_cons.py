@@ -854,6 +854,30 @@ class TestStaticConstructors:
         assert Nil().length() == 0
 
 
+class TestFill:
+    def test_fill_zero(self):
+        assert CList.fill(0, 1) == Nil()
+
+    def test_fill_one(self):
+        assert CList.fill(1, 42) == Cons(42)
+
+    def test_fill_multiple(self):
+        assert CList.fill(3, 1) == CList.from_iterable([1, 1, 1])
+
+    def test_fill_negative(self):
+        assert CList.fill(-1, 1) == Nil()
+
+    def test_bind_with_fill(self):
+        xs = CList.from_iterable([1, 2, 3])
+        result = xs.bind(lambda n: CList.fill(n, n))
+        assert result == CList.from_iterable([1, 2, 2, 3, 3, 3])
+
+    def test_map_fill_then_flatten(self):
+        xs = CList.from_iterable([1, 2, 3])
+        result = xs.map(lambda n: CList.fill(n, n)).flatten()
+        assert result == CList.from_iterable([1, 2, 2, 3, 3, 3])
+
+
 class TestDoNotation:
     """CList do-notation — limited by Python generators being single-use.
 

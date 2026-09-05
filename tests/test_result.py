@@ -39,6 +39,34 @@ class TestTry:
         assert my_func.__name__ == "my_func"
 
 
+class TestDo:
+    def test_success(self):
+        def pipeline():
+            x = yield Ok(1)
+            y = yield Ok(x + 10)
+            return x + y
+
+        assert Result.do(pipeline) == Ok(12)
+
+    def test_short_circuits(self):
+        def pipeline():
+            x = yield Ok(1)
+            y = yield Err(ValueError("boom"))
+            return x + y
+
+        result = Result.do(pipeline)
+        assert result.is_left
+
+    def test_multiple_binds(self):
+        def pipeline():
+            a = yield Ok(1)
+            b = yield Ok(2)
+            c = yield Ok(3)
+            return a + b + c
+
+        assert Result.do(pipeline) == Ok(6)
+
+
 class TestAliases:
     def test_ok_extends_right(self):
         from funstruct.monad.either import Right

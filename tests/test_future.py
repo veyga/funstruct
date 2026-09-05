@@ -212,6 +212,30 @@ class TestPipeline:
         assert run(pipeline) == Right("CACHED")
 
 
+class TestFutureDo:
+    def _run_future(self, future):
+        return asyncio.run(future._awaitable())
+
+    def test_success(self):
+        @Future.do
+        def pipeline():
+            x = yield Future.pure(1)
+            y = yield Future.pure(x + 10)
+            return x + y
+
+        assert self._run_future(pipeline) == 12
+
+    def test_multiple_binds(self):
+        @Future.do
+        def pipeline():
+            a = yield Future.pure(10)
+            b = yield Future.pure(20)
+            c = yield Future.pure(30)
+            return a + b + c
+
+        assert self._run_future(pipeline) == 60
+
+
 class TestTryAsyncWithSyncFunctions:
     """TryAsync accepts sync functions, wrapping them in AsyncResult."""
 

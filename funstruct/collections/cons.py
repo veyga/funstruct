@@ -373,6 +373,25 @@ class CList(Monad, Generic[A]):
 
         return _go(xs, len(xs) - 1, Nil())
 
+    @classmethod
+    def fill(cls, n: int, value: A) -> CList:
+        """Create a list of `n` copies of `value`.
+
+        >>> CList.fill(3, 1).to_list()
+        [1, 1, 1]
+        >>> CList.fill(0, 'x')
+        Nil()
+        """
+        from funstruct.util.tailrec import tail_call, tco
+
+        @tco
+        def _go(remaining, acc):
+            if remaining <= 0:
+                return acc
+            return tail_call(_go)(remaining - 1, Cons(value, acc))
+
+        return _go(n, Nil())
+
     @staticmethod
     def from_iterable(iterable: Iterable[A]) -> CList:
         """Create a new list from an iterable of elements.

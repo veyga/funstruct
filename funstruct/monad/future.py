@@ -56,6 +56,32 @@ class Future(Generic[A]):
 
         return Future(_inner())
 
+    @classmethod
+    def do(cls, gen_fn: Callable) -> Future:
+        """Do-notation for Future. Each yield awaits a Future.
+
+        The generator must be a regular function (not async def) — the
+        driver loop handles awaiting. Use yield instead of await.
+
+        >>> @Future.do
+        ... def pipeline():
+        ...     x = yield Future.pure(1)
+        ...     y = yield Future.pure(x + 10)
+        ...     return x + y
+        """
+
+        async def _run():
+            gen = gen_fn()
+            try:
+                monadic_val = next(gen)
+                while True:
+                    value = await monadic_val
+                    monadic_val = gen.send(value)
+            except StopIteration as e:
+                return e.value
+
+        return cls(_run())
+
     def then(self, next_future: Future[B]) -> Future[B]:
         """Sequence: run self, discard value, run next."""
         return self.bind(lambda _: next_future)
