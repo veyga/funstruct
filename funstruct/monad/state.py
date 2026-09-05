@@ -58,7 +58,7 @@ class State(Monad, Generic[_A]):
 
         return State(inner)
 
-    __rshift__ = bind
+
 
     def then(self, next_state: "State[_B]") -> "State[_B]":
         """Sequence: run self, discard value, run next."""
