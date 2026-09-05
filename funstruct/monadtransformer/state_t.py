@@ -98,10 +98,6 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         """
         return StateT(lambda s: self._run(s).bind(lambda sa: other._run(sa[1])))
 
-    def then(self, next_state: "StateT[_F, _B]") -> "StateT[_F, _B]":
-        """Sequence: run self, discard value, run next."""
-        return self.bind(lambda _: next_state)
-
     # Constructors — monad class passed explicitly, StateT knows nothing about it
 
     @classmethod

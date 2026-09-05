@@ -21,6 +21,7 @@ from funstruct.typeclasses._monoid import Monoid
 
 _W = TypeVar("_W")
 _A = TypeVar("_A")
+_B = TypeVar("_B")
 
 
 class Writer(Monad, Generic[_W, _A]):

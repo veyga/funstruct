@@ -162,13 +162,6 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         return cls(_run)
 
-    def then(
-        self,
-        next_step: ReaderT[_Ctx, _M, _B],
-    ) -> ReaderT[_Ctx, _M, _B]:
-        """Sequence: run self, discard value, run next."""
-        return self.bind(lambda _: next_step)
-
     @classmethod
     def pure(cls, value: _A, monad: type) -> ReaderT:
         """Lift a plain value into ReaderT via monad.pure."""

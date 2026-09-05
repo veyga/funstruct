@@ -144,10 +144,6 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
         """Kleisli composition: value from self becomes input for other's run."""
         return self.bind(lambda _: other)
 
-    def then(self, next_t: OptionT[_F, _B]) -> OptionT[_F, _B]:
-        """Sequence: run self, discard value, run next."""
-        return self.bind(lambda _: next_t)
-
     @classmethod
     def do(cls, gen_fn, *args, **kwargs) -> OptionT:
         """Do-notation via generators. Short-circuits on Nothing.

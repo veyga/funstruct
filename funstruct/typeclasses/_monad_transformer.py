@@ -2,8 +2,8 @@
 
 MonadTransformer[F, A] — F is the inner monad, A is the value type.
 
-A monad transformer is not really a typeclass, but for the ergonomics
-of this library, we treat it as such
+**A monad transformer is not really a typeclass, but for the ergonomics
+of this library, we treat it as such**
 
 The problem transformers solve:
 
@@ -72,39 +72,71 @@ Raw Monad vs Transformer — when to use which:
 
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
+from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad import Monad
+_F = TypeVar("_F")
+_A = TypeVar("_A")
+_B = TypeVar("_B")
 
-_F = TypeVar("_F")  # The inner monad (must support .bind/.map/.pure)
-_A = TypeVar("_A")  # The value type
 
+class MonadTransformer(ABC, Generic[_F, _A]):
+    """Base for monad transformers — separate from the Monad hierarchy.
 
-class MonadTransformer(Monad, Generic[_F, _A]):
-    """Base for monad transformers.
+    In Scala/Haskell, transformers are not a typeclass — they're data types
+    with separate Monad instances. This base provides the shared interface
+    and derived methods without inheriting from Monad.
 
-    Mathematically, a monad transformer is a type constructor (Monad -> Monad).
-    Haskell equivalent: `class MonadTrans t where lift :: Monad m => m a -> t m a`.
-    In funstruct this is `lift_f` to distinguish from function-lifting combinators.
-    Python lacks higher-kinded types, so this class is a pragmatic marker.
+    Haskell equivalent: ``class MonadTrans t where lift :: Monad m => m a -> t m a``
+    In funstruct this is ``lift_f``.
 
     Type parameters:
-        _F: The inner monad type. Must support .bind(), .map(),
-            .pure(). Duck-typed at runtime.
+        _F: The inner monad type (must support .bind(), .map(), .pure()).
         _A: The value type produced by the transformer.
     """
 
-    @classmethod
     @abstractmethod
-    def lift_f(cls, inner: _F) -> MonadTransformer[_F, _A]:
-        """Lift an inner monad value into the transformer."""
-        ...
+    def bind(self, f: Callable) -> MonadTransformer: ...
 
     @abstractmethod
-    def and_then(self, other) -> MonadTransformer[_F, _A]:
-        """Kleisli composition: output of self becomes input of other."""
-        ...
+    def map(self, f: Callable) -> MonadTransformer: ...
+
+    @classmethod
+    @abstractmethod
+    def pure(cls, value, monad: type) -> MonadTransformer: ...
+
+    @classmethod
+    @abstractmethod
+    def lift_f(cls, inner: _F) -> MonadTransformer: ...
+
+    @classmethod
+    @abstractmethod
+    def do(cls, gen_fn: Callable, *args, **kwargs) -> MonadTransformer: ...
+
+    def ap(self, other: MonadTransformer) -> MonadTransformer:
+        """Derived from bind + map."""
+        return self.bind(lambda f: other.map(f))
+
+    def map2(self, other: MonadTransformer, f: Callable) -> MonadTransformer:
+        """Combine two values with a function."""
+        return self.bind(lambda a: other.map(lambda b: f(a, b)))
+
+    def then(self, other: MonadTransformer) -> MonadTransformer:
+        """Sequence: run self, discard value, run next."""
+        return self.bind(lambda _: other)
+
+    def product(self, other: MonadTransformer) -> MonadTransformer:
+        """Combine two values into a tuple."""
+        return self.map(lambda a: lambda b: (a, b)).ap(other)
+
+    def __mul__(self, other: MonadTransformer) -> MonadTransformer:
+        """Alias for product."""
+        return self.product(other)
+
+    def __rshift__(self, f: Callable) -> MonadTransformer:
+        """Alias for bind."""
+        return self.bind(f)
 
 
 __all__ = [
