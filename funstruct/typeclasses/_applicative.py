@@ -22,7 +22,7 @@ When to use Applicative (not Monad):
 
 Business examples:
     - Validated: validate name + email + age independently, accumulate errors
-    - Parallel fetches: fetch(user_id).product(fetch(prefs_id)) → (User, Prefs)
+    - Parallel fetches: fetch(user_id) * fetch(prefs_id) → (User, Prefs)
     - Schema parsing: parse each column independently, report all failures
 """
 
@@ -65,7 +65,7 @@ class Applicative(Functor[_A]):
         """
         return self.map(lambda a: lambda b: (a, b)).ap(other)
 
-    def __add__(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
+    def __mul__(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
         """Alias for product."""
         return self.product(other)
 

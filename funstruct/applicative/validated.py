@@ -6,9 +6,9 @@ Examples:
     Valid(value=42)
     >>> Validated.cond(False, 42, "err")
     Invalid(errors=Cons('err', Nil()))
-    >>> Valid(1) + Valid(2)
+    >>> Valid(1) * Valid(2)
     Valid(value=(1, 2))
-    >>> Invalid("a:") + Invalid("b")
+    >>> Invalid("a:") * Invalid("b")
     Invalid(errors='a:b')
 """
 
@@ -50,7 +50,7 @@ class Validated(Applicative):
         """
         ...
 
-    def __add__(self, other) -> Validated:
+    def __mul__(self, other) -> Validated:
         return self.product(other)
 
     @property

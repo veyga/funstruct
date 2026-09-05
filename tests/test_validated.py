@@ -129,11 +129,11 @@ class TestValidatedCond:
             "less than",
         ]
 
-    def test_real_world_multiple_failures_add(self):
+    def test_real_world_multiple_failures_mul(self):
         result = (
             Validated.cond("wrong" == "value", None, "bad auth")
-            + Validated.cond("unknown" in ["a", "b"], None, "no member")
-            + Validated.cond(5 < 2, None, "less than")
+            * Validated.cond("unknown" in ["a", "b"], None, "no member")
+            * Validated.cond(5 < 2, None, "less than")
         )
         assert not result.is_valid
         assert result.fold(lambda errs: errs, lambda _: []) == [
@@ -143,37 +143,37 @@ class TestValidatedCond:
         ]
 
 
-class TestAddOperator:
-    def test_valid_plus_valid(self):
-        result = Valid(1) + Valid(2)
+class TestMulOperator:
+    def test_valid_mul_valid(self):
+        result = Valid(1) * Valid(2)
         assert result == Valid((1, 2))
 
-    def test_valid_plus_invalid(self):
-        result = Valid(1) + Invalid(["err"])
+    def test_valid_mul_invalid(self):
+        result = Valid(1) * Invalid(["err"])
         assert result == Invalid(["err"])
 
-    def test_invalid_plus_valid(self):
-        result = Invalid(["err"]) + Valid(1)
+    def test_invalid_mul_valid(self):
+        result = Invalid(["err"]) * Valid(1)
         assert result == Invalid(["err"])
 
-    def test_invalid_plus_invalid_accumulates(self):
-        result = Invalid(["a"]) + Invalid(["b"])
+    def test_invalid_mul_invalid_accumulates(self):
+        result = Invalid(["a"]) * Invalid(["b"])
         assert result == Invalid(["a", "b"])
 
     def test_chain_three_valids(self):
-        result = Valid(1) + Valid(2) + Valid(3)
+        result = Valid(1) * Valid(2) * Valid(3)
         assert result.is_valid
 
     def test_chain_accumulates_all_errors(self):
-        result = Invalid(["a"]) + Invalid(["b"]) + Invalid(["c"])
+        result = Invalid(["a"]) * Invalid(["b"]) * Invalid(["c"])
         assert result == Invalid(["a", "b", "c"])
 
-    def test_cond_chain_with_add(self):
-        result = Validated.cond(True, None, "x") + Validated.cond(True, None, "y")
+    def test_cond_chain_with_mul(self):
+        result = Validated.cond(True, None, "x") * Validated.cond(True, None, "y")
         assert result.is_valid
 
-    def test_cond_chain_failures_with_add(self):
-        result = Validated.cond(False, None, "first") + Validated.cond(
+    def test_cond_chain_failures_with_mul(self):
+        result = Validated.cond(False, None, "first") * Validated.cond(
             False, None, "second"
         )
         assert result.fold(lambda errs: errs, lambda _: []) == [
@@ -181,10 +181,10 @@ class TestAddOperator:
             "second",
         ]
 
-    def test_add_is_same_as_product(self):
+    def test_mul_is_same_as_product(self):
         a = Valid(1)
         b = Invalid(["err"])
-        assert (a + b) == a.product(b)
+        assert (a * b) == a.product(b)
 
 
 class TestSemigroup:
@@ -202,7 +202,7 @@ class TestSemigroup:
 
     def test_int_semigroup_valid(self):
         """int is a Semigroup over addition — count errors."""
-        validated = Valid(1) + Invalid(2) + Invalid(3)
+        validated = Valid(1) * Invalid(2) * Invalid(3)
         assert validated == Invalid(5)
 
     def test_default_uses_cons_list(self):
@@ -249,7 +249,7 @@ class TestSemigroup:
                 "b wrong",
             )
 
-        validated = a(dct) + b(dct)
+        validated = a(dct) * b(dct)
         if invalids:
             assert validated.fold(
                 on_invalid=lambda errs: errs == invalids,
@@ -348,7 +348,7 @@ class TestToResult:
 
         result = (
             Validated.cond(False, None, "bad auth")
-            + Validated.cond(False, None, "no access")
+            * Validated.cond(False, None, "no access")
         ).to_result_or(ValueError)
 
         match result:

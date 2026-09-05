@@ -79,7 +79,7 @@ class Applicative(Functor):
     def pure(cls, value) -> Applicative: ...
     def ap(self, other) -> Applicative: ...      # self: F[A→B], other: F[A] → F[B]
     def product(self, other) -> Applicative: ...  # F[A], F[B] → F[(A, B)]
-    def __add__ = product  # alias
+    def __mul__ = product  # * alias
 
 class Monad(Applicative):
     def bind(self, f) -> Monad: ...

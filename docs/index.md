@@ -28,12 +28,12 @@ Semigroup              Functor
 F[A] ---( f: A -> B )---> F[B]
 ```
 
-**Applicative** — combine independent computations
+**Applicative** — apply a function in context to a value in context
 
 ```
-F[A] ─┐
-       ├──> F[(A, B)]
-F[B] ─┘
+F[A → B] ─┐
+           ├──ap──> F[B]
+F[A] ──────┘
 ```
 
 **Monad** — sequence computations that produce new contexts
@@ -75,8 +75,9 @@ class Functor(ABC):
 
 class Applicative(Functor):
     def pure(cls, value) -> Applicative: ...
-    def ap(self, other) -> Applicative: ...
-    def __add__ = ap  # alias
+    def ap(self, other) -> Applicative: ...      # F[A→B].ap(F[A]) → F[B]
+    def product(self, other) -> Applicative: ...  # F[A] * F[B] → F[(A, B)]
+    def __mul__ = product  # * alias
 
 class Monad(Applicative):
     def bind(self, f) -> Monad: ...
@@ -94,10 +95,6 @@ int_mul = Monoid(typ=int, combine=lambda a, b: a * b, empty=1)
 ```scala
 trait Semigroup[A] {
   def combine(x: A, y: A): A
-}
-
-trait Monoid[A] extends Semigroup[A] {
-  def empty: A
 }
 
 trait Monoid[A] extends Semigroup[A] {

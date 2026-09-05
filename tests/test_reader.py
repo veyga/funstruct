@@ -93,8 +93,8 @@ class TestOperators:
         r = Reader.pure(1) >> (lambda x: Reader.pure(x + 10))
         assert r.run("ctx") == 11
 
-    def test_add_ap(self):
-        r = Reader.pure(1) + Reader.pure(2)
+    def test_mul_product(self):
+        r = Reader.pure(1) * Reader.pure(2)
         assert r.run("ctx") == (1, 2)
 
 
