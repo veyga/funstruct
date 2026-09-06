@@ -181,7 +181,51 @@ _P = ParamSpec("_P")
 
 
 class AsyncResult(DotNotation, Generic[_A]):
-    """Async computation that produces Result[A] — essentially Future[Result[A]]."""
+    """Async computation that produces Result[A] — essentially Future[Result[A]].
+
+    Create with:
+        AsyncResult.pure(42)                     # Ok(42) wrapped in async
+        AsyncResult.raise_error(ValueError())    # Err wrapped in async
+        AsyncResult.from_result(Ok(42))          # lift sync Result
+        @TryAsync decorator                      # catch exceptions
+
+    Compose (lazy — nothing executes until awaited):
+        result.map(f)                            # transform success value
+        result.bind(f)                           # chain async operations
+        result.left_map(f)                       # transform error value
+        result.handle_error_with(f)              # recover from error
+
+    Execute (one await at the boundary):
+        value = await result                     # Result[A]
+
+    Do-notation — all of these are equivalent::
+
+        # 1. Decorator style (recommended)
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(10)
+            return x + 1
+
+        await pipeline()
+
+        # 2. Manual do — no args
+        await AsyncResult.do(gen_fn)()
+        #     do(gen_fn) → thunk
+        #     thunk()    → AsyncResult
+        #     await      → Result
+
+        # 3. Manual do — with args
+        await AsyncResult.do(gen_fn_with_args)("yo")
+        #     do(gen_fn) → thunk
+        #     thunk(arg) → AsyncResult  ← NOT thunk(arg)() !
+        #     await      → Result
+
+        # 4. WRONG — extra () causes TypeError
+        # await AsyncResult.do(gen_fn)("yo")()  # TypeError: AsyncResult not callable
+
+    Important: @do uses generators (yield), NOT async/await.
+    You cannot decorate an async def with @do.
+    """
 
     def __init__(self, coro: Awaitable[Result[_A]]) -> None:
         self._coro = ReAwaitable(coro) if not isinstance(coro, ReAwaitable) else coro
