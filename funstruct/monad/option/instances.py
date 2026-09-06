@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.alternative import Alternative
 from funstruct.typeclasses.monad import Monad
 from funstruct.monad.option import Nothing, Option, Some
@@ -14,7 +13,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class _OptionMonad(Monad):
+class _OptionMonad(Monad, for_type=Option):
 
     def pure(self, value: _A) -> Option[_A]:
         return Some(value)
@@ -29,7 +28,7 @@ class _OptionMonad(Monad):
                 raise TypeError(f"Expected Option, got {type(fa)}")
 
 
-class _OptionAlternative(Alternative):
+class _OptionAlternative(Alternative, for_type=Option):
 
     def pure(self, value: _A) -> Option[_A]:
         return Some(value)
@@ -58,7 +57,3 @@ class _OptionAlternative(Alternative):
                 return fa
             case Nothing():
                 return fb
-
-
-register(Monad, Option, _OptionMonad())
-register(Alternative, Option, _OptionAlternative())

@@ -6,11 +6,13 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from collections.abc import Callable
 
+from funstruct.typeclasses.mixins.auto_register import AutoRegister
 
-class Foldable(ABC):
+
+class Foldable(AutoRegister):
     """fold_left + fold_right."""
 
     @abstractmethod

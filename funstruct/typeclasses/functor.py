@@ -5,11 +5,13 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from collections.abc import Callable
 
+from funstruct.typeclasses.mixins.auto_register import AutoRegister
 
-class Functor(ABC):
+
+class Functor(AutoRegister):
     """map: F[A] → (A → B) → F[B]"""
 
     @abstractmethod
