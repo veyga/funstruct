@@ -88,9 +88,30 @@ return email.upper()
 get_user(id).bind(get_email).map(str.upper)
 ```
 
-**Separation of data and behavior** — data types (`Option`, `Result`) are
-plain. Behavior (`map`, `bind`, `ap`) lives in typeclass instances, separate
-from the data. This lets you add new behavior without modifying existing types.
+**Separation of data and behavior** — in OOP, classes bundle data and
+methods together. In FP, they're separate: data is inert, behavior is
+defined externally. This means you can add new operations to existing
+types without modifying them.
+
+```python
+# OOP: data + behavior bundled in the class
+class User:
+    def __init__(self, name, age): ...
+    def validate(self): ...     # behavior ON the data
+    def save(self): ...         # more behavior ON the data
+    def to_json(self): ...      # yet more behavior ON the data
+
+# FP: data is plain, behavior is external via typeclasses
+@dataclass(frozen=True)
+class User:
+    name: str
+    age: int
+    # no methods — just data
+
+# Behavior defined separately, works across ANY type with an instance
+jsonify(user)                              # via JSONWrite[User]
+summon(Monad, Result).map(Ok(user), f)     # via Monad[Result]
+```
 
 **Algebraic data types (ADTs)** — types with a fixed set of variants:
 `Option = Some | Nothing`, `Result = Ok | Err`, `Either = Right | Left`.
@@ -130,7 +151,7 @@ Three distinct class hierarchies, connected by instances:
   Only implement primitives (pure + bind); derived ops (map, ap) come from
   the typeclass hierarchy.
 
-![funstruct typeclass hierarchy](docs/typeclasses.svg)
+![funstruct typeclass hierarchy](typeclasses.svg)
 
 #### Diagrams
 

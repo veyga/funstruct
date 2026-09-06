@@ -67,5 +67,5 @@ diagram:
   uv run python scripts/generate_diagram.py
   open docs/typeclasses.svg
 
-# docs-build:
-#   uv run mkdocs build
+docs-build:
+  uv run mkdocs build

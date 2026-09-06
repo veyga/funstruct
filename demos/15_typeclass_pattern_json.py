@@ -1,17 +1,27 @@
 """The typeclass pattern — explained with JSON serialization.
 
-This is the canonical example of how typeclasses work:
+Typeclasses are ad-hoc polymorphism: we add behavior to types we don't
+own, without modifying them. The behavior isn't ON the type — instead,
+we provide a mechanism for the runtime to LOOK UP the behavior based
+on the type.
+
+    str   → _StringJSONWrite    (registered via for_type=str)
+    int   → _IntJSONWrite       (registered via for_type=int)
+    list  → _ListJSONWrite      (composes — summons the element's instance)
+    User  → DataclassJSONWrite  (derives — walks dataclass fields)
+
+The generic function `jsonify(x)` calls `summon(JSONWrite, type(x))` —
+it doesn't know about str or User. The registry resolves the right
+instance at runtime, just like Haskell's compiler resolves typeclasses
+at compile time, or Scala's `given`/`using` mechanism.
+
+The five steps:
 
     1. Define the typeclass (JSONWrite — the interface)
     2. Create instances for primitives (str, int, bool, None)
     3. Create COMPOSABLE instances (list — uses the element's instance)
     4. Create DERIVED instances (dataclass — uses field instances)
     5. Write a generic function (jsonify — works for ANY type with an instance)
-
-The key insight: jsonify doesn't know about Person, or str, or list.
-It just asks "does this type have a JSONWrite instance?" and uses it.
-New types get JSON support by registering an instance — no modification
-to jsonify or to the type itself.
 
 Translated from Scala (scala-advanced-part-2/module09/05-type-classes.sc).
 
@@ -69,20 +79,25 @@ def jsonify(item) -> str:
 
 class _StringJSONWrite(JSONWrite, for_type=str):
     """Scala: given JSONWrite[String] with ..."""
+
     def to_json_string(self, item: str) -> str:
         return json.dumps(item)
+
 
 class _IntJSONWrite(JSONWrite, for_type=int):
     def to_json_string(self, item: int) -> str:
         return str(item)
 
+
 class _FloatJSONWrite(JSONWrite, for_type=float):
     def to_json_string(self, item: float) -> str:
         return str(item)
 
+
 class _BoolJSONWrite(JSONWrite, for_type=bool):
     def to_json_string(self, item: bool) -> str:
         return "true" if item else "false"
+
 
 class _NoneJSONWrite(JSONWrite, for_type=type(None)):
     def to_json_string(self, item) -> str:
@@ -100,6 +115,7 @@ class _ListJSONWrite(JSONWrite, for_type=list):
     This is the power of typeclasses: the list instance SUMMONS the element
     instance. List[int] uses IntJSONWrite, List[str] uses StringJSONWrite.
     """
+
     def to_json_string(self, items: list) -> str:
         if not items:
             return "[]"
