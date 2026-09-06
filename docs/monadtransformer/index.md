@@ -1,5 +1,10 @@
 # Monad Transformers
 
+> **Experimental** — the transformer API is alpha and may change. For most
+> use cases, plain monads with `do`-notation and `fold` are sufficient.
+> Reach for transformers only when you need to combine multiple effects
+> in a single pipeline.
+
 ::: funstruct.monadtransformer
 
 Transformers combine two monads into one, so you can write a flat pipeline

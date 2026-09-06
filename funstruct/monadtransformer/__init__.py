@@ -19,8 +19,7 @@ Pattern:
 - ReaderT[F, Ctx, A] = Ctx -> F[A] — adds shared env to F
 - EitherT[F, E, A] = F[Either[E, A]] — adds typed errors to F
 - OptionT[F, A] = F[Option[A]] — adds "might not exist" to F
-
-
+- WriterT[F, W, A] = F[(A, W)] — adds accumulated output to F
 """
 
 from funstruct.monadtransformer.either_t import EitherT as EitherT

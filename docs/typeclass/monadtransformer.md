@@ -1,5 +1,12 @@
 # MonadTransformer
 
+> **Experimental** — this API is alpha and may change.
+
+> **Note:** MonadTransformer is not a typeclass in Haskell or Scala — it's
+> a design pattern. In funstruct, it's implemented as a base class for
+> convenience, using the same mechanism as the real typeclasses (Functor,
+> Applicative, Monad).
+
 ::: funstruct.typeclasses.MonadTransformer
 
 ## Overview

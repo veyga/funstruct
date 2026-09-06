@@ -18,8 +18,6 @@ Semigroup              Functor
  Monoid              Applicative
                            │
                          Monad
-                           │
-                    MonadTransformer
 ```
 
 #### Diagrams
@@ -49,7 +47,7 @@ F[A] ---( f: A -> B )---> F[B]
 **Applicative** — apply a function in context to a value in context
 
 ```
-F[A → B] ─┐
+F[A → B]  ─┐
            ├──ap──> F[B]
 F[A] ──────┘
 ```
@@ -60,35 +58,53 @@ F[A] ──────┘
 F[A] ---( f: A -> F[B] )---> F[B]
 ```
 
+Heavily influenced by [Scalaz](https://github.com/scalaz/scalaz) and
+[Cats](https://typelevel.org/cats/).
+
 ```python
+# Value-level typeclasses (not inherited — instantiated per type)
 @dataclass(frozen=True)
 class Semigroup:
     typ: type
-    combine: Callable  # (A, A) -> A
+    combine: Callable[[A, A], A]
 
 @dataclass(frozen=True)
 class Monoid(Semigroup):
-    typ: type
-    combine: Callable  # (A, A) -> A
-    empty: object      # identity element
+    empty: A  # identity element
 
-class Functor(ABC):
-    def map(self, f) -> Functor: ...
+# Type-level hierarchy (inherited by data types)
+class Functor(ABC, Generic[A]):
+    def map(self, f: Callable[[A], B]) -> Functor[B]: ...          # abstract
 
-class Applicative(Functor):
-    def pure(cls, value) -> Applicative: ...
-    def ap(self, other) -> Applicative: ...      # self: F[A→B], other: F[A] → F[B]
-    def product(self, other) -> Applicative: ...  # F[A], F[B] → F[(A, B)]
-    def __mul__ = product  # * alias
+class Applicative(Functor[A]):
+    def pure(cls, value: A) -> Applicative[A]: ...                  # abstract
+    def ap(self: Applicative[Callable[[A], B]],
+           other: Applicative[A]) -> Applicative[B]: ...            # abstract
+    def map(self, f) -> Applicative[B]: ...                         # derived: pure(f).ap(self)
+    def product(self, other: Applicative[B]) -> Applicative[tuple[A, B]]: ...
+    __mul__ = product                                               # * operator
 
-class Monad(Applicative):
-    def bind(self, f) -> Monad: ...
-    def do(cls, gen_fn, *args, **kwargs) -> Monad: ...
-    def __rshift__ = bind  # >>
+class Monad(Applicative[A]):
+    def bind(self, f: Callable[[A], Monad[B]]) -> Monad[B]: ...    # abstract
+    def do(cls, gen_fn: Callable) -> Callable[..., Monad[A]]: ...  # abstract
+    def map(self, f) -> Monad[B]: ...                               # @final: bind + pure
+    def ap(self, other) -> Monad[B]: ...                            # @final: bind + map
+    def then(self, other: Monad[B]) -> Monad[B]: ...                # derived: bind
+    def map2(self, other, f) -> Monad: ...                          # derived: bind + map
+    __rshift__ = bind                                               # >> operator
 
-class MonadTransformer(Monad, Generic[_F, _A]):
-    def lift_f(cls, inner: _F) -> MonadTransformer: ...
-    def and_then(self, other) -> MonadTransformer: ...
+# Separate hierarchy (experimental) — not a typeclass in Haskell/Scala
+class MonadTransformer(ABC, Generic[F, A]):
+    def bind(self, f) -> MonadTransformer: ...                      # abstract
+    def map(self, f) -> MonadTransformer: ...                       # abstract
+    def pure(cls, value, monad: type) -> MonadTransformer: ...      # abstract
+    def lift_f(cls, inner: F) -> MonadTransformer: ...              # abstract
+    def do(cls, gen_fn) -> Callable[..., MonadTransformer]: ...     # abstract
+    def ap(self, other) -> MonadTransformer: ...                    # derived: bind + map
+    def then(self, other) -> MonadTransformer: ...                  # derived: bind
+    def product(self, other) -> MonadTransformer: ...               # derived: map + ap
+    __mul__ = product                                               # * operator
+    __rshift__ = bind                                               # >> operator
 ```
 
 ```python
@@ -124,28 +140,32 @@ trait Monad[F[_]] extends Applicative[F] {
 
 ### Implementations
 
-| Typeclass        | Implementations                              |
-| ---------------- | -------------------------------------------- |
-| Functor          | Tree, frozendict, + all below                |
-| Applicative      | Validated, + all below                       |
-| Monad            | Option, Either, State, Reader, Writer, CList |
-| MonadTransformer | ReaderT, StateT, EitherT, OptionT, WriterT   |
+| Typeclass        | Implementations                                                           |
+| ---------------- | ------------------------------------------------------------------------- |
+| Functor          | Tree, frozendict, + all below                                             |
+| Applicative      | Validated, + all below                                                    |
+| Monad            | Option, Either, Result, State, Reader, Writer, CList, Future, AsyncResult |
+| MonadTransformer | ReaderT, StateT, EitherT, OptionT, WriterT                                |
 
-| Type                | What it models                              |
-| ------------------- | ------------------------------------------- |
-| `Option[A]`         | Value might not exist                       |
-| `Either[E, A]`      | Value or typed error                        |
-| `Result[A]` (alias) | `Either[Exception, A]` + `@Try` decorator   |
-| `State[S, A]`       | Stateful computation                        |
-| `Reader[Ctx, A]`    | Shared environment                          |
-| `Writer[W, A]`      | Accumulated output                          |
-| `Validated[E, A]`   | Error accumulation (applicative, not monad) |
-| `Future[A]`         | Lazy async computation                      |
-| `CList[A]`          | Persistent singly-linked list               |
-| `Tree[A]`           | Immutable binary tree (functor only)        |
-| `frozendict[K, V]`  | Persistent HAMT dictionary                  |
+| Type               | What it models                                  |
+| ------------------ | ----------------------------------------------- |
+| `Option[A]`        | Value might not exist                           |
+| `Either[E, A]`     | Value or typed error                            |
+| `Result[A]`        | Computation that can fail (`Ok`/`Err`) + `@Try` |
+| `AsyncResult[A]`   | Async computation that can fail + `@TryAsync`   |
+| `State[S, A]`      | Stateful computation                            |
+| `Reader[Ctx, A]`   | Shared environment                              |
+| `Writer[W, A]`     | Accumulated output                              |
+| `Validated[E, A]`  | Error accumulation (applicative, not monad)     |
+| `Future[A]`        | Lazy async computation                          |
+| `CList[A]`         | Persistent singly-linked list                   |
+| `Tree[A]`          | Immutable binary tree (functor only)            |
+| `frozendict[K, V]` | Persistent HAMT dictionary                      |
 
-### Monad Transformers
+### Monad Transformers (experimental)
+
+> The transformer API is alpha and may change. For most use cases, plain
+> monads with `do`-notation and `fold` are sufficient.
 
 A transformer combines effects by wrapping one monad inside another.
 
@@ -222,17 +242,17 @@ Python has no such constraint. Any function can perform side effects at any
 time. An `IO` wrapper in Python would be:
 
 1. **Unenforceable** — nothing stops you from doing I/O outside the wrapper.
-    The type system can't prevent `print()` in a "pure" function.
+   The type system can't prevent `print()` in a "pure" function.
 1. **Purely ceremonial** — it adds a wrapper you must manually construct and
-    unwrap, but provides no guarantee. It's a comment dressed as a type.
+   unwrap, but provides no guarantee. It's a comment dressed as a type.
 1. **Redundant with async** — Python's `async/await` already separates
-    "description of a computation" from "execution of that computation,"
-    which is most of what `IO` provides in Haskell.
+   "description of a computation" from "execution of that computation,"
+   which is most of what `IO` provides in Haskell.
 
 Instead, funstruct provides:
 
-- **`Either[E, A]`** — for operations that might fail (the error is a value)
-- **`Future[E, A]`** — for async operations that might fail (lazy, composable)
+- **`Either[E, A]`** / **`Result[A]`** — for operations that might fail
+- **`Future[A]`** / **`AsyncResult[A]`** — for async operations (with or without error handling)
 - **`@Try` / `@TryAsync`** — for wrapping exception-throwing code at boundaries
 
 These give you the composition benefits of monadic pipelines where they
