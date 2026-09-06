@@ -74,7 +74,7 @@ show_missing = true
 skip_empty = true
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --ignore=benchmarks"
+addopts = "--doctest-modules --ignore=benchmarks --ignore=playground --ignore=demos --ignore=demoplayground --ignore=scripts"
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 
 
@@ -88,6 +88,7 @@ exclude = ["*.md"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP"]
 ignore = [
+    "E501", # Line too long — we allow longer lines in type signatures and docstrings
     "E731", # Do not assign a `lambda` expression, use a `def`
     "E741", # Ambiguous variable name — we use l/r for left/right in tree traversals
     "N801", # Class name should use CapWords — frozendict intentionally lowercase

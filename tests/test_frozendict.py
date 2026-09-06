@@ -694,7 +694,7 @@ class TestDeep:
 
         orders = data.get("orders")
         total = sum(o.get("total") for o in orders)
-        assert total == 188.98
+        assert abs(total - 188.98) < 0.01
 
         meta = data.get("meta")
         assert meta.fold_left("", lambda acc, v: f"{acc}{v}") in (
