@@ -236,3 +236,64 @@ class TestTruthiness:
     def test_left_is_also_truthy(self):
         assert bool(Left("err")) is True
         assert bool(Left(None)) is True
+
+
+class TestEitherInstances:
+    """Tests exercising typeclass instances via summon (covers instances.py)."""
+
+    def test_monad_pure(self):
+        from funstruct.typeclasses import Monad, summon
+        assert summon(Monad, Either).pure(42) == Right(42)
+
+    def test_monad_bind_right(self):
+        from funstruct.typeclasses import Monad, summon
+        assert summon(Monad, Either).bind(Right(1), lambda x: Right(x + 1)) == Right(2)
+
+    def test_monad_bind_left(self):
+        from funstruct.typeclasses import Monad, summon
+        assert summon(Monad, Either).bind(Left("err"), lambda x: Right(x + 1)) == Left("err")
+
+    def test_monad_map_derived(self):
+        from funstruct.typeclasses import Monad, summon
+        assert summon(Monad, Either).map(Right(10), lambda x: x * 2) == Right(20)
+
+    def test_raise_error(self):
+        from funstruct.typeclasses import MonadError, summon
+        assert summon(MonadError, Either).raise_error("oops") == Left("oops")
+
+    def test_handle_error_with_left(self):
+        from funstruct.typeclasses import MonadError, summon
+        result = summon(MonadError, Either).handle_error_with(
+            Left("err"), lambda e: Right(f"recovered: {e}")
+        )
+        assert result == Right("recovered: err")
+
+    def test_handle_error_with_right_passthrough(self):
+        from funstruct.typeclasses import MonadError, summon
+        assert summon(MonadError, Either).handle_error_with(Right(42), lambda e: Right(0)) == Right(42)
+
+    def test_bifunctor_bimap_right(self):
+        from funstruct.typeclasses import Bifunctor, summon
+        assert summon(Bifunctor, Either).bimap(Right(10), str.upper, lambda x: x * 2) == Right(20)
+
+    def test_bifunctor_bimap_left(self):
+        from funstruct.typeclasses import Bifunctor, summon
+        assert summon(Bifunctor, Either).bimap(Left("err"), str.upper, lambda x: x * 2) == Left("ERR")
+
+    def test_bifunctor_left_map_derived_right(self):
+        from funstruct.typeclasses import Bifunctor, summon
+        assert summon(Bifunctor, Either).left_map(Right(10), str.upper) == Right(10)
+
+    def test_bifunctor_left_map_derived_left(self):
+        from funstruct.typeclasses import Bifunctor, summon
+        assert summon(Bifunctor, Either).left_map(Left("err"), str.upper) == Left("ERR")
+
+    def test_dot_vs_summon_bimap(self):
+        from funstruct.typeclasses import Bifunctor, summon
+        f, g = str, lambda x: x * 2
+        assert Right(10).bimap(f, g) == summon(Bifunctor, Either).bimap(Right(10), f, g)
+
+    def test_dot_vs_summon_map(self):
+        from funstruct.typeclasses import Monad, summon
+        f = lambda x: x + 1
+        assert Right(10).map(f) == summon(Monad, Either).map(Right(10), f)

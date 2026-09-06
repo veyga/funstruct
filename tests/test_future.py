@@ -604,3 +604,60 @@ class TestAsyncResultBifunctor:
         err = ValueError("err")
         err_result = run(AsyncResult.raise_error(err).bimap(lambda x: x, lambda x: x))
         assert err_result == Err(err)
+
+
+class TestAsyncResultInstances:
+    """Tests exercising AsyncResult typeclass instances via summon."""
+
+    def _run(self, ar):
+        return asyncio.run(ar._awaitable())
+
+    def test_pure_via_summon(self):
+        from funstruct.typeclasses import Monad, summon
+        F = summon(Monad, AsyncResult)
+        assert self._run(F.pure(42)) == Ok(42)
+
+    def test_bind_via_summon(self):
+        from funstruct.typeclasses import Monad, summon
+        F = summon(Monad, AsyncResult)
+        result = self._run(F.bind(AsyncResult.pure(10), lambda x: AsyncResult.pure(x + 1)))
+        assert result == Ok(11)
+
+    def test_map_derived_via_summon(self):
+        from funstruct.typeclasses import Monad, summon
+        F = summon(Monad, AsyncResult)
+        result = self._run(F.map(AsyncResult.pure(10), lambda x: x * 2))
+        assert result == Ok(20)
+
+    def test_raise_error_via_summon(self):
+        from funstruct.typeclasses import MonadError, summon
+        F = summon(MonadError, AsyncResult)
+        result = self._run(F.raise_error(ValueError("x")))
+        assert isinstance(result, Err)
+
+    def test_handle_error_with_via_summon(self):
+        from funstruct.typeclasses import MonadError, summon
+        F = summon(MonadError, AsyncResult)
+        result = self._run(
+            F.handle_error_with(
+                AsyncResult.raise_error(ValueError("x")),
+                lambda e: AsyncResult.pure("recovered"),
+            )
+        )
+        assert result == Ok("recovered")
+
+    def test_handle_error_with_ok_passthrough_via_summon(self):
+        from funstruct.typeclasses import MonadError, summon
+        F = summon(MonadError, AsyncResult)
+        result = self._run(
+            F.handle_error_with(AsyncResult.pure(42), lambda e: AsyncResult.pure(0))
+        )
+        assert result == Ok(42)
+
+    def test_dot_vs_summon_equivalence(self):
+        from funstruct.typeclasses import Monad, summon
+        F = summon(Monad, AsyncResult)
+        f = lambda x: x + 1
+        dot_result = self._run(AsyncResult.pure(10).map(f))
+        summon_result = self._run(F.map(AsyncResult.pure(10), f))
+        assert dot_result == summon_result == Ok(11)
