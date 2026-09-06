@@ -9,10 +9,10 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 
-from funstruct.typeclasses.mixins.auto_register import AutoRegister
+from funstruct.typeclasses.typeclass import BaseTypeclass
 
 
-class Bifunctor(AutoRegister):
+class Bifunctor(BaseTypeclass):
     """bimap + left_map."""
 
     @abstractmethod

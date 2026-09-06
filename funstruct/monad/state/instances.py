@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, TypeVar
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.monad import Monad
 from funstruct.monad.state import State
 
@@ -13,7 +12,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class _StateMonad(Monad):
+class _StateMonad(Monad, for_type=State):
 
     def pure(self, value: _A) -> State[_A]:
         return State(lambda s: (s, value))
@@ -23,6 +22,3 @@ class _StateMonad(Monad):
             new_s, a = fa._run(s)
             return f(a).run(new_s)
         return State(inner)
-
-
-register(Monad, State, _StateMonad())

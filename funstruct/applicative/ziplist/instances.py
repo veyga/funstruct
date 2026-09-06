@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.applicative.ziplist import ZipList
 
@@ -13,7 +12,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class _ZipListApplicative(Applicative):
+class _ZipListApplicative(Applicative, for_type=ZipList):
 
     def pure(self, value: _A) -> ZipList[_A]:
         return ZipList([value])
@@ -34,6 +33,3 @@ class _ZipListApplicative(Applicative):
 
     def product(self, fa: ZipList[_A], fb: ZipList[_B]) -> ZipList[tuple[_A, _B]]:
         return self.map2(fa, fb, lambda a, b: (a, b))
-
-
-register(Applicative, ZipList, _ZipListApplicative())

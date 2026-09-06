@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.bifunctor import Bifunctor
 from funstruct.typeclasses.monad_error import MonadError
 from funstruct.monad.either import Either, Left, Right
@@ -15,7 +14,7 @@ _B = TypeVar("_B")
 _E = TypeVar("_E")
 
 
-class _EitherMonadError(MonadError):
+class _EitherMonadError(MonadError, for_type=Either):
 
     def pure(self, value: _A) -> Either[_E, _A]:
         return Right(value)
@@ -42,7 +41,7 @@ class _EitherMonadError(MonadError):
                 return fa
 
 
-class _EitherBifunctor(Bifunctor):
+class _EitherBifunctor(Bifunctor, for_type=Either):
 
     def bimap(
         self,
@@ -57,5 +56,3 @@ class _EitherBifunctor(Bifunctor):
                 return Left(f(error))
 
 
-register(MonadError, Either, _EitherMonadError())
-register(Bifunctor, Either, _EitherBifunctor())

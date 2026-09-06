@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar, cast
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.bifunctor import Bifunctor
 from funstruct.applicative.validated import Invalid, Valid, Validated
@@ -16,7 +15,7 @@ _C = TypeVar("_C")
 _E = TypeVar("_E")
 
 
-class _ValidatedApplicative(Applicative):
+class _ValidatedApplicative(Applicative, for_type=Validated):
 
     def pure(self, value: _A) -> Valid[_A]:
         return Valid(value)
@@ -58,7 +57,7 @@ class _ValidatedApplicative(Applicative):
                 raise TypeError(f"Expected Validated, got {type(fa)}, {type(fb)}")
 
 
-class _ValidatedBifunctor(Bifunctor):
+class _ValidatedBifunctor(Bifunctor, for_type=Validated):
 
     def bimap(
         self,
@@ -73,7 +72,3 @@ class _ValidatedBifunctor(Bifunctor):
                 return Invalid(f(errors))
             case _:
                 raise TypeError(f"Expected Validated, got {type(fa)}")
-
-
-register(Applicative, Validated, _ValidatedApplicative())
-register(Bifunctor, Validated, _ValidatedBifunctor())

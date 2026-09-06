@@ -12,6 +12,7 @@ from funstruct.typeclasses.monoid import Monoid
 from funstruct.typeclasses.utils.registry import register, summon, tc_of
 from funstruct.typeclasses.semigroup import Semigroup
 from funstruct.typeclasses.traversable import Traversable
+from funstruct.typeclasses.typeclass import BaseTypeclass
 
 __all__ = [
     "Alternative",
@@ -25,6 +26,7 @@ __all__ = [
     "Monoid",
     "Semigroup",
     "Traversable",
+    "BaseTypeclass",
     "register",
     "summon",
     "tc_of",

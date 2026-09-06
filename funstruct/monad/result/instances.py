@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.bifunctor import Bifunctor
 from funstruct.typeclasses.monad_error import MonadError
 from funstruct.monad.result import AsyncResult, Err, Ok, Result
@@ -14,7 +13,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class _ResultMonadError(MonadError):
+class _ResultMonadError(MonadError, for_type=Result):
 
     def pure(self, value: _A) -> Result[_A]:
         return Ok(value)
@@ -41,7 +40,7 @@ class _ResultMonadError(MonadError):
                 return fa
 
 
-class _ResultBifunctor(Bifunctor):
+class _ResultBifunctor(Bifunctor, for_type=Result):
 
     def bimap(
         self,
@@ -56,7 +55,7 @@ class _ResultBifunctor(Bifunctor):
                 return Err(f(error))
 
 
-class _AsyncResultMonadError(MonadError):
+class _AsyncResultMonadError(MonadError, for_type=AsyncResult):
 
     def pure(self, value: _A) -> AsyncResult[_A]:
         return AsyncResult.pure(value)
@@ -73,8 +72,3 @@ class _AsyncResultMonadError(MonadError):
         self, fa: AsyncResult[_A], f: Callable[[Exception], AsyncResult[_A]]
     ) -> AsyncResult[_A]:
         return fa.handle_error_with(f)
-
-
-register(MonadError, Result, _ResultMonadError())
-register(Bifunctor, Result, _ResultBifunctor())
-register(MonadError, AsyncResult, _AsyncResultMonadError())

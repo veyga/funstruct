@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.monad import Monad
 from funstruct.monad.reader import Reader
 
@@ -14,7 +13,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class _ReaderMonad(Monad):
+class _ReaderMonad(Monad, for_type=Reader):
 
     def pure(self, value: _A) -> Reader[_Ctx, _A]:
         return Reader(lambda _: value)
@@ -25,6 +24,3 @@ class _ReaderMonad(Monad):
         f: Callable[[_A], Reader[_Ctx, _B]],
     ) -> Reader[_Ctx, _B]:
         return Reader(lambda ctx: f(fa._run(ctx)).run(ctx))
-
-
-register(Monad, Reader, _ReaderMonad())

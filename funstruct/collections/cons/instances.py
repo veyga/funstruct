@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.alternative import Alternative
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.monad import Monad
@@ -16,7 +15,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class _CListMonad(Monad):
+class _CListMonad(Monad, for_type=CList):
 
     def pure(self, value: _A) -> CList[_A]:
         return Cons(value)
@@ -25,7 +24,7 @@ class _CListMonad(Monad):
         return fa.fold_right(Nil(), lambda a, acc: f(a).append(acc))
 
 
-class _CListTraversable(Traversable):
+class _CListTraversable(Traversable, for_type=CList):
 
     def fold_left(self, fa: CList[_A], acc: _B, f: Callable[[_B, _A], _B]) -> _B:
         return fa.fold_left(acc, f)
@@ -45,7 +44,7 @@ class _CListTraversable(Traversable):
         )
 
 
-class _CListAlternative(Alternative):
+class _CListAlternative(Alternative, for_type=CList):
 
     def pure(self, value: _A) -> CList[_A]:
         return Cons(value)
@@ -66,8 +65,3 @@ class _CListAlternative(Alternative):
 
     def or_else(self, fa: CList[_A], fb: CList[_A]) -> CList[_A]:
         return fa.append(fb)
-
-
-register(Monad, CList, _CListMonad())
-register(Traversable, CList, _CListTraversable())
-register(Alternative, CList, _CListAlternative())
