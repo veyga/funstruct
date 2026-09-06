@@ -163,6 +163,30 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return cls(lambda s: _pure(monad, (s, s)))
 
     @classmethod
+    def set(cls, state, monad: type) -> "StateT":
+        """Replace the state entirely, produce None.
+
+        Cats: ``StateT.set``
+
+        >>> from funstruct.monad.option import Option, Some
+        >>> StateT.set(99, Option).run(0)
+        Some((99, None))
+        """
+        return cls(lambda _: _pure(monad, (state, None)))
+
+    @classmethod
+    def inspect(cls, f: Callable, monad: type) -> "StateT":
+        """Get a function of the state as the value, without modifying state.
+
+        Cats: ``StateT.inspect``
+
+        >>> from funstruct.monad.option import Option, Some
+        >>> StateT.inspect(lambda s: s * 2, Option).run(5)
+        Some((5, 10))
+        """
+        return cls(lambda s: _pure(monad, (s, f(s))))
+
+    @classmethod
     def modify(cls, f: Callable[..., object], monad: type) -> "StateT":
         """Modify state, produce None.
 

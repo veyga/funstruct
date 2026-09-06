@@ -291,3 +291,27 @@ class TestWithOption:
             return x + y
 
         assert pipeline().run(0) == Nothing()
+
+
+class TestLocal:
+    def test_local_transforms_context(self):
+        r = ReaderT(lambda ctx: Right(ctx["name"]))
+        result = r.local(lambda outer: {"name": outer}).run("Alice")
+        assert result == Right("Alice")
+
+    def test_local_narrows_context(self):
+        r = ReaderT(lambda port: Right(f":{port}"))
+        wider = r.local(lambda cfg: cfg["port"])
+        assert wider.run({"port": 8080}) == Right(":8080")
+
+
+class TestAsk:
+    def test_ask_returns_context(self):
+        result = ReaderT.ask(Either).run("hello")
+        assert result == Right("hello")
+
+    def test_ask_with_bind(self):
+        pipeline = ReaderT.ask(Either).bind(
+            lambda ctx: ReaderT(lambda _: Right(ctx.upper()))
+        )
+        assert pipeline.run("hello") == Right("HELLO")

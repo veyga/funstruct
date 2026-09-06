@@ -252,3 +252,15 @@ class TestAndThen:
         step2 = LogT(Right((99, ["second"])))
         result = step1.and_then(step2).run()
         assert result == Left("err")
+
+
+class TestListen:
+    def test_listen_exposes_output(self):
+        result = LogT(Right((42, ["log"]))).listen().run()
+        assert result == Right(((42, ["log"]), ["log"]))
+
+
+class TestWritten:
+    def test_written_extracts_output(self):
+        result = LogT(Right((42, ["log"]))).written()
+        assert result == Right(["log"])

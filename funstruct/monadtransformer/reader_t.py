@@ -115,7 +115,31 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    # ap inherited from Monad (derived from bind + map)
+    def local(self, f: Callable) -> ReaderT:
+        """Transform the environment before running.
+
+        Cats: ``Kleisli.local``
+
+        >>> from funstruct.monad.either import Right
+        >>> r = ReaderT(lambda ctx: Right(ctx["name"]))
+        >>> r.local(lambda outer: {"name": outer}).run("Alice")
+        Right('Alice')
+        """
+        return ReaderT(lambda ctx: self._run(f(ctx)))
+
+    @classmethod
+    def ask(cls, monad: type) -> ReaderT:
+        """Get the environment as the value.
+
+        Cats: ``Kleisli.ask``
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> ReaderT.ask(Either).run(42)
+        Right(42)
+        """
+        return cls(lambda ctx: _pure(monad, ctx))
+
+    # ap inherited from MonadTransformer (derived from bind + map)
 
     def and_then(self, other: ReaderT) -> ReaderT:
         """Kleisli composition: output of self becomes input (ctx) of other.

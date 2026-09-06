@@ -101,6 +101,64 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
 
         return EitherT(self._value.bind(_step))
 
+    def left_map(self, f: Callable[[_E], _E]) -> EitherT:
+        """Transform the error value. No-op on Right.
+
+        >>> from funstruct.monad.option import Some
+        >>> from funstruct.monad.either import Left
+        >>> EitherT(Some(Left("err"))).left_map(str.upper).run()
+        Some(Left('ERR'))
+        """
+        return EitherT(self._value.map(lambda either: either.left_map(f)))
+
+    def bimap(self, on_left: Callable, on_right: Callable) -> EitherT:
+        """Transform both sides.
+
+        >>> from funstruct.monad.option import Some
+        >>> from funstruct.monad.either import Right, Left
+        >>> EitherT(Some(Right(5))).bimap(str, lambda x: x * 2).run()
+        Some(Right(10))
+        >>> EitherT(Some(Left("err"))).bimap(str.upper, lambda x: x * 2).run()
+        Some(Left('ERR'))
+        """
+        return EitherT(self._value.map(lambda either: either.bimap(on_left, on_right)))
+
+    def fold(self, on_left: Callable[[_E], _B], on_right: Callable[[_A], _B]) -> _F:
+        """Eliminate the Either inside F, returning F[B].
+
+        >>> from funstruct.monad.option import Some
+        >>> from funstruct.monad.either import Right, Left
+        >>> EitherT(Some(Right(5))).fold(lambda e: 0, lambda x: x * 2)
+        Some(10)
+        >>> EitherT(Some(Left("err"))).fold(lambda e: -1, lambda x: x * 2)
+        Some(-1)
+        """
+        return self._value.map(lambda either: either.fold(on_left, on_right))
+
+    def swap(self) -> EitherT:
+        """Swap Left and Right inside F.
+
+        >>> from funstruct.monad.option import Some
+        >>> from funstruct.monad.either import Right, Left
+        >>> EitherT(Some(Right(1))).swap().run()
+        Some(Left(1))
+        >>> EitherT(Some(Left("err"))).swap().run()
+        Some(Right('err'))
+        """
+        return EitherT(self._value.map(lambda either: either.swap()))
+
+    def get_or_else(self, default: _A) -> _F:
+        """Extract the Right value or return default, inside F.
+
+        >>> from funstruct.monad.option import Some
+        >>> from funstruct.monad.either import Right, Left
+        >>> EitherT(Some(Right(42))).get_or_else(0)
+        Some(42)
+        >>> EitherT(Some(Left("err"))).get_or_else(0)
+        Some(0)
+        """
+        return self._value.map(lambda either: either.get_or_else(default))
+
     def and_then(self, other: EitherT) -> EitherT:
         """Kleisli composition: value from self feeds into other's context."""
         return self.bind(lambda _: other)

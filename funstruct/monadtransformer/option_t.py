@@ -138,6 +138,42 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
 
         return OptionT(self._run.bind(_handle))
 
+    def fold(self, on_nothing: Callable[[], _B], on_some: Callable[[_A], _B]) -> _F:
+        """Eliminate the Option inside F, returning F[B].
+
+        >>> from funstruct.monad.either import Right
+        >>> from funstruct.monad.option import Some, Nothing
+        >>> OptionT(Right(Some(5))).fold(lambda: 0, lambda x: x * 2)
+        Right(10)
+        >>> OptionT(Right(Nothing())).fold(lambda: 0, lambda x: x * 2)
+        Right(0)
+        """
+        return self._run.map(lambda opt: opt.fold(on_nothing, on_some))
+
+    def get_or_else(self, default: _A) -> _F:
+        """Extract the Some value or return default, inside F.
+
+        >>> from funstruct.monad.either import Right
+        >>> from funstruct.monad.option import Some, Nothing
+        >>> OptionT(Right(Some(42))).get_or_else(0)
+        Right(42)
+        >>> OptionT(Right(Nothing())).get_or_else(0)
+        Right(0)
+        """
+        return self._run.map(lambda opt: opt.get_or_else(default))
+
+    def filter(self, f: Callable[[_A], bool]) -> OptionT[_F, _A]:
+        """Filter the value inside Some; becomes Nothing if predicate fails.
+
+        >>> from funstruct.monad.either import Right
+        >>> from funstruct.monad.option import Some, Nothing
+        >>> OptionT(Right(Some(10))).filter(lambda x: x > 5).run()
+        Right(Some(10))
+        >>> OptionT(Right(Some(3))).filter(lambda x: x > 5).run()
+        Right(Nothing())
+        """
+        return OptionT(self._run.map(lambda opt: opt.filter(f)))
+
     def and_then(self, other: OptionT) -> OptionT:
         """Kleisli composition: value from self becomes input for other's run."""
         return self.bind(lambda _: other)

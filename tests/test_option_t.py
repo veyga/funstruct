@@ -242,3 +242,32 @@ class TestBrokenShortCircuit:
             OptionT(Right(Nothing())).bind(lambda x: OptionT(Right(Some(x)))).run()
         )
         assert correct == Right(Nothing())
+
+
+class TestOptionTFold:
+    def test_fold_some(self):
+        result = OptionT(Right(Some(5))).fold(lambda: 0, lambda x: x * 2)
+        assert result == Right(10)
+
+    def test_fold_nothing(self):
+        result = OptionT(Right(Nothing())).fold(lambda: 0, lambda x: x * 2)
+        assert result == Right(0)
+
+
+class TestOptionTGetOrElse:
+    def test_get_or_else_some(self):
+        assert OptionT(Right(Some(42))).get_or_else(0) == Right(42)
+
+    def test_get_or_else_nothing(self):
+        assert OptionT(Right(Nothing())).get_or_else(0) == Right(0)
+
+
+class TestOptionTFilter:
+    def test_filter_passes(self):
+        assert OptionT(Right(Some(10))).filter(lambda x: x > 5).run() == Right(Some(10))
+
+    def test_filter_fails(self):
+        assert OptionT(Right(Some(3))).filter(lambda x: x > 5).run() == Right(Nothing())
+
+    def test_filter_nothing_stays_nothing(self):
+        assert OptionT(Right(Nothing())).filter(lambda x: x > 5).run() == Right(Nothing())

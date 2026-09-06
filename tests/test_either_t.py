@@ -243,3 +243,49 @@ class TestBrokenEitherT:
         # but broken version tries to add 1 to "err"
         with pytest.raises(TypeError):
             BrokenEitherT(Some(Left("err"))).bind(inc).run()
+
+
+class TestLeftMap:
+    def test_left_maps_error(self):
+        result = EitherT(Some(Left("err"))).left_map(str.upper).run()
+        assert result == Some(Left("ERR"))
+
+    def test_left_map_noop_on_right(self):
+        result = EitherT(Some(Right(5))).left_map(str.upper).run()
+        assert result == Some(Right(5))
+
+
+class TestBimap:
+    def test_bimap_right(self):
+        result = EitherT(Some(Right(5))).bimap(str, lambda x: x * 2).run()
+        assert result == Some(Right(10))
+
+    def test_bimap_left(self):
+        result = EitherT(Some(Left("err"))).bimap(str.upper, lambda x: x * 2).run()
+        assert result == Some(Left("ERR"))
+
+
+class TestFold:
+    def test_fold_right(self):
+        result = EitherT(Some(Right(5))).fold(lambda e: 0, lambda x: x * 2)
+        assert result == Some(10)
+
+    def test_fold_left(self):
+        result = EitherT(Some(Left("err"))).fold(lambda e: -1, lambda x: x * 2)
+        assert result == Some(-1)
+
+
+class TestSwap:
+    def test_swap_right_to_left(self):
+        assert EitherT(Some(Right(1))).swap().run() == Some(Left(1))
+
+    def test_swap_left_to_right(self):
+        assert EitherT(Some(Left("err"))).swap().run() == Some(Right("err"))
+
+
+class TestGetOrElse:
+    def test_get_or_else_right(self):
+        assert EitherT(Some(Right(42))).get_or_else(0) == Some(42)
+
+    def test_get_or_else_left(self):
+        assert EitherT(Some(Left("err"))).get_or_else(0) == Some(0)

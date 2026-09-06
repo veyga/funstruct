@@ -193,6 +193,35 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         return _thunk
 
+    def listen(self) -> WriterT:
+        """Expose the output alongside the value: A → (A, W).
+
+        Cats: ``WriterT.listen``
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.typeclasses import Monoid
+        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LT(WriterT):
+        ...     _monoid = list_m
+        >>> LT(Right((42, ["log"]))).listen().run()
+        Right(((42, ['log']), ['log']))
+        """
+        cls = self.__class__
+        return cls(self._run.map(lambda aw: ((aw[0], aw[1]), aw[1])))
+
+    def written(self) -> object:
+        """Extract just the output, discarding the value. Returns F[W].
+
+        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.typeclasses import Monoid
+        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LT(WriterT):
+        ...     _monoid = list_m
+        >>> LT(Right((42, ["log"]))).written()
+        Right(['log'])
+        """
+        return self._run.map(lambda aw: aw[1])
+
     def and_then(self, other: WriterT) -> WriterT:
         """Kleisli composition: value from self feeds into other."""
         cls = self.__class__

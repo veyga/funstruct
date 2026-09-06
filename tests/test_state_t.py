@@ -3,6 +3,7 @@
 from parametrization import Parametrization as P
 
 from funstruct.monad.either import Either, Left, Right
+from funstruct.monad.option import Option, Some, Nothing
 from funstruct.monadtransformer import StateT
 from tests.laws import (
     assert_applicative_laws,
@@ -302,3 +303,23 @@ class TestLift:
     def test_lift_preserves_state(self):
         result = StateT.lift_f(Right("val")).run(99)
         assert result == Right((99, "val"))
+
+
+class TestSet:
+    def test_set_replaces_state(self):
+        result = StateT.set(99, Option).run(0)
+        assert result == Some((99, None))
+
+    def test_set_ignores_current_state(self):
+        result = StateT.set("new", Option).run("old")
+        assert result == Some(("new", None))
+
+
+class TestInspect:
+    def test_inspect_reads_state(self):
+        result = StateT.inspect(lambda s: s * 2, Option).run(5)
+        assert result == Some((5, 10))
+
+    def test_inspect_does_not_modify_state(self):
+        result = StateT.inspect(str, Option).run(42)
+        assert result == Some((42, "42"))
