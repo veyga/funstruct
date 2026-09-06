@@ -107,7 +107,7 @@ class TestAsyncResultFold:
         import asyncio
 
         async def go():
-            return await AsyncResult.from_exception(ValueError("bad")).fold(
+            return await AsyncResult.raise_error(ValueError("bad")).fold(
                 on_err=lambda e: str(e), on_ok=lambda x: x * 2
             )
 
@@ -143,20 +143,20 @@ class TestConstructors:
     def test_result_pure_is_ok_type(self):
         assert type(Result.pure(42)) is Ok
 
-    def test_result_from_exception_is_err_type(self):
+    def test_result_raise_error_is_err_type(self):
         err = ValueError("bad")
-        assert type(Result.from_exception(err)) is Err
+        assert type(Result.raise_error(err)) is Err
 
-    def test_result_from_exception_wraps_exception(self):
+    def test_result_raise_error_wraps_exception(self):
         err = ValueError("bad")
-        result = Result.from_exception(err)
+        result = Result.raise_error(err)
         match result:
             case Err(e):
                 assert e is err
 
-    def test_err_direct_vs_from_exception(self):
+    def test_err_direct_vs_raise_error(self):
         err = ValueError("bad")
-        assert Err(err) == Result.from_exception(err)
+        assert Err(err) == Result.raise_error(err)
 
 
 class TestProperties:

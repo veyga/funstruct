@@ -108,11 +108,11 @@ class TestAsyncResultEquivalence:
         @AsyncResult.do
         def do_version():
             x = yield AsyncResult.pure(1)
-            y = yield AsyncResult.from_exception(ValueError("boom"))
+            y = yield AsyncResult.raise_error(ValueError("boom"))
             return x + y
 
         bind_version = AsyncResult.pure(1).bind(
-            lambda x: AsyncResult.from_exception(ValueError("boom")).map(
+            lambda x: AsyncResult.raise_error(ValueError("boom")).map(
                 lambda y: x + y
             )
         )

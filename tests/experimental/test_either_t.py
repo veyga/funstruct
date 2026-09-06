@@ -107,9 +107,9 @@ class TestPure:
         assert result.run() == Some(Right(42))
 
 
-class TestFromError:
-    def test_from_error_wraps_in_left(self):
-        result = EitherT.from_error("oops", Option)
+class TestRaiseError:
+    def test_raise_error_wraps_in_left(self):
+        result = EitherT.raise_error("oops", Option)
         assert result.run() == Some(Left("oops"))
 
 

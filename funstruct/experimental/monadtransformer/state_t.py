@@ -149,8 +149,8 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
     @classmethod
     def fail(cls, err: _A, monad: type) -> "StateT":
-        """Lift an error. Uses ``monad.from_error``."""
-        return cls(lambda _: monad.from_error(err))
+        """Lift an error. Uses ``monad.raise_error``."""
+        return cls(lambda _: monad.raise_error(err))
 
     @classmethod
     def get(cls, monad: type) -> "StateT":

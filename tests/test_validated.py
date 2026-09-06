@@ -361,3 +361,23 @@ class TestToResult:
                 pass
             case other:
                 raise AssertionError(f"Expected Err(ValueError), got {other}")
+
+
+class TestValidatedBifunctor:
+    def test_valid_bimap_applies_right(self):
+        assert Valid(10).bimap(str.upper, lambda x: x * 2) == Valid(20)
+
+    def test_invalid_bimap_applies_left(self):
+        assert Invalid("err").bimap(str.upper, lambda x: x * 2) == Invalid("ERR")
+
+    def test_valid_left_map_is_identity(self):
+        assert Valid(10).left_map(str.upper) == Valid(10)
+
+    def test_invalid_left_map_transforms_errors(self):
+        assert Invalid("err").left_map(str.upper) == Invalid("ERR")
+
+    def test_bimap_identity_law(self):
+        v = Valid(42)
+        i = Invalid("err")
+        assert v.bimap(lambda x: x, lambda x: x) == v
+        assert i.bimap(lambda x: x, lambda x: x) == i

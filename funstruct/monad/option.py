@@ -42,6 +42,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar, final
 
+from funstruct.typeclasses._alternative import Alternative
 from funstruct.typeclasses._monad import Monad
 
 if TYPE_CHECKING:
@@ -52,7 +53,7 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Option(Monad, Generic[A]):
+class Option(Monad, Alternative, Generic[A]):
     """Option[A]: either Some(value) or Nothing.
 
     Performance characteristics:
@@ -78,6 +79,10 @@ class Option(Monad, Generic[A]):
     @final
     def pure(cls, value: A) -> Option[A]:
         return Some(value)
+
+    @classmethod
+    def empty(cls) -> Option:
+        return Nothing()
 
     @classmethod
     def from_optional(cls, value: A | None) -> Option[A]:
@@ -171,6 +176,9 @@ class Some(Option[A]):
     def handle_error_with(fa: Some, fallback: Callable[[], Option[A]]) -> Option[A]:
         return fa
 
+    def or_else(fa: Some, fb: Option[A]) -> Option[A]:
+        return fa
+
     def filter(fa: Some, f: Callable[[A], bool]) -> Option[A]:
         return fa if f(fa.value) else Nothing()
 
@@ -213,6 +221,9 @@ class Nothing(Option):
 
     def handle_error_with(fa: Nothing, fallback: Callable[[], Option[A]]) -> Option[A]:
         return fallback()
+
+    def or_else(fa: Nothing, fb: Option[A]) -> Option[A]:
+        return fb
 
     def filter(fa: Nothing, f: Callable[[A], bool]) -> Option:
         return fa

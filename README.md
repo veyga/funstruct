@@ -13,11 +13,13 @@ pip install funstruct || uv add funstruct
 ### Type Class Hierarchy
 
 ```
-Semigroup        Foldable    Functor
-    │                \       /    \
- Monoid          Traversable   Applicative
-                                    │
-                                  Monad
+Semigroup     Bifunctor     Foldable      Functor
+    │                        \       /       │
+ Monoid                   Traversable    Applicative
+                                        /         \
+                                   Alternative    Monad
+                                                    │
+                                                MonadError
 ```
 
 #### Diagrams
@@ -92,6 +94,10 @@ class Applicative[A](Functor[A]):
     ) -> Applicative[tuple[A, B]]: ...
     __mul__ = product                                          # * operator
 
+class Alternative[A](Applicative[A]):
+    def empty(cls) -> Alternative[A]: ...                      # abstract
+    def or_else(fa: Alternative[A], fb: Alternative[A]) -> Alternative[A]: ...  # abstract
+
 class Monad[A](Applicative[A]):
     def bind(fa: Monad[A], f) -> Monad[B]: ...                 # abstract
     def do(cls, gen_fn) -> Callable[..., Monad[A]]: ...        # abstract
@@ -103,6 +109,17 @@ class Monad[A](Applicative[A]):
     def then(fa: Monad[A], fb: Monad[B]) -> Monad[B]: ...     # derived: bind
     def map2(fa: Monad[A], fb: Monad[B], f) -> Monad[C]: ...  # derived: bind + map
     __rshift__ = bind                                          # >> operator
+
+class MonadError[A](Monad[A]):
+    def raise_error(cls, error: E) -> MonadError[A]: ...       # abstract
+    def handle_error_with(
+        fa: MonadError[A], f,
+    ) -> MonadError[A]: ...                                    # abstract
+
+# Standalone — maps over two type parameters (not part of Functor)
+class Bifunctor[A, B](ABC):
+    def bimap(fa: Bifunctor[A, B], f, g) -> Bifunctor[C, D]: ...  # abstract
+    def left_map(fa: Bifunctor[A, B], f) -> Bifunctor[C, B]: ...  # derived: bimap(f, id)
 
 # Separate hierarchy (experimental)
 # MT = MonadTransformer for brevity
@@ -130,9 +147,12 @@ class MonadTransformer[F, A](ABC):
 | Typeclass        | Implementations                                                           |
 | ---------------- | ------------------------------------------------------------------------- |
 | Functor          | Tree, frozendict, + all below                                             |
+| Bifunctor        | Either, Result, Validated                                                  |
 | Traversable      | CList, Tree                                                               |
 | Applicative      | Validated, ZipList, + all below                                           |
+| Alternative      | Option, CList                                                              |
 | Monad            | Option, Either, Result, State, Reader, Writer, CList, Future, AsyncResult |
+| MonadError       | Either, Result, AsyncResult                                                |
 | MonadTransformer | ReaderT, StateT, EitherT, OptionT, WriterT                                |
 
 | Type               | What it models                                  |

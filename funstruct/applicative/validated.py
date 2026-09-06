@@ -21,6 +21,7 @@ from typing import Generic, TypeVar
 
 from funstruct.collections.cons import Cons
 from funstruct.typeclasses._applicative import Applicative
+from funstruct.typeclasses._bifunctor import Bifunctor
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -28,7 +29,7 @@ _C = TypeVar("_C")
 _E = TypeVar("_E")
 
 
-class Validated(Applicative):
+class Validated(Applicative, Bifunctor):
     """Base class for Valid/Invalid — provides constructors and supports + operator."""
 
     @abstractmethod
@@ -97,6 +98,12 @@ class Valid(Validated, Generic[_A]):
     def map(fa: Valid, f: Callable[[_A], _B]) -> Valid[_B]:
         return Valid(f(fa.value))
 
+    def bimap(fa: Valid, on_invalid: Callable, on_valid: Callable) -> Validated:
+        return Valid(on_valid(fa.value))
+
+    def left_map(fa: Valid, f: Callable) -> Validated:
+        return fa
+
     def ap(ff: Valid, other) -> Validated:
         match other:
             case Valid(val):
@@ -136,6 +143,12 @@ class Invalid(Validated, Generic[_E]):
         fa: Invalid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]
     ) -> _C:
         return on_invalid(fa.errors)
+
+    def bimap(fa: Invalid, on_invalid: Callable, on_valid: Callable) -> Validated:
+        return Invalid(on_invalid(fa.errors))
+
+    def left_map(fa: Invalid, f: Callable) -> Validated:
+        return Invalid(f(fa.errors))
 
     def ap(ff: Invalid, other) -> Validated:
         match other:

@@ -13,11 +13,13 @@ pip install funstruct || uv add funstruct
 ### Type Class Hierarchy
 
 ```
-Semigroup              Functor
-    │                      │
- Monoid              Applicative
-                        │
-                       Monad
+Semigroup     Bifunctor     Foldable      Functor
+    │                        \       /       │
+ Monoid                   Traversable    Applicative
+                                        /         \
+                                   Alternative    Monad
+                                                    │
+                                                MonadError
 ```
 
 #### Diagrams
@@ -86,9 +88,21 @@ class Applicative[A](Functor[A]):
     ) -> Applicative[tuple[A, B]]: ...
     __mul__ = product                                          # * operator
 
+class Alternative[A](Applicative[A]):
+    def empty(cls) -> Alternative[A]: ...
+    def or_else(fa: Alternative[A], fb: Alternative[A]) -> Alternative[A]: ...
+
 class Monad[A](Applicative[A]):
     def bind(fa: Monad[A], f) -> Monad[B]: ...
     __rshift__ = bind                                          # >> operator
+
+class MonadError[A](Monad[A]):
+    def raise_error(cls, error: E) -> MonadError[A]: ...
+    def handle_error_with(fa: MonadError[A], f) -> MonadError[A]: ...
+
+class Bifunctor[A, B](ABC):
+    def bimap(fa, f, g) -> Bifunctor[C, D]: ...
+    def left_map(fa, f) -> Bifunctor[C, B]: ...                # derived
 ```
 
 ```python

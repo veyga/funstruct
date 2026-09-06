@@ -18,6 +18,7 @@ from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar, final
 
+from funstruct.typeclasses._alternative import Alternative
 from funstruct.typeclasses._monad import Monad
 from funstruct.typeclasses._traversable import Traversable
 
@@ -25,7 +26,7 @@ A = TypeVar("A")
 B = TypeVar("B")
 
 
-class CList(Monad, Traversable, Generic[A]):
+class CList(Monad, Traversable, Alternative, Generic[A]):
     """A Lisp/ML/Scala style singly linked list (cons list).
 
     Performance characteristics:
@@ -197,14 +198,12 @@ class CList(Monad, Traversable, Generic[A]):
         """
         return Cons(a)
 
-    @staticmethod
-    def empty() -> CList:
-        """Create an empty list.
-
-        Returns:
-            An empty list.
-        """
+    @classmethod
+    def empty(cls) -> CList:
         return Nil()
+
+    def or_else(fa: CList, fb: CList) -> CList:
+        return fa.append(fb)
 
     @staticmethod
     def new(*xs: A) -> CList:

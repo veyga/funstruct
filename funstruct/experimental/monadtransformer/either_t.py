@@ -171,7 +171,7 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         return cls(monad.pure(Right(value)))
 
     @classmethod
-    def from_error(cls, error: _E, monad: type) -> EitherT:
+    def raise_error(cls, error: _E, monad: type) -> EitherT:
         """Lift an error into EitherT via monad.pure(Left(error))."""
         return cls(monad.pure(Left(error)))
 

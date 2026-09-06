@@ -76,9 +76,9 @@ class TestPure:
     def test_pure_succeeds(self):
         assert run(AsyncResult.pure(42)) == Ok(42)
 
-    def test_from_exception_fails(self):
+    def test_raise_error_fails(self):
         err = ValueError("oops")
-        result = run(AsyncResult.from_exception(err))
+        result = run(AsyncResult.raise_error(err))
         assert result == Err(err)
 
     def test_from_either_right(self):
@@ -122,7 +122,7 @@ class TestMap:
 
     def test_skips_on_error(self):
         err = RuntimeError("err")
-        result = run(AsyncResult.from_exception(err).map(lambda x: x * 2))
+        result = run(AsyncResult.raise_error(err).map(lambda x: x * 2))
         assert result == Err(err)
 
     def test_chains_maps(self):
@@ -138,14 +138,14 @@ class TestBind:
     def test_short_circuits_on_error(self):
         err = RuntimeError("stop")
         result = run(
-            AsyncResult.from_exception(err).bind(lambda x: AsyncResult.pure(x + 1))
+            AsyncResult.raise_error(err).bind(lambda x: AsyncResult.pure(x + 1))
         )
         assert result == Err(err)
 
     def test_bind_can_fail(self):
         err = RuntimeError("failed")
         result = run(
-            AsyncResult.pure(1).bind(lambda x: AsyncResult.from_exception(err))
+            AsyncResult.pure(1).bind(lambda x: AsyncResult.raise_error(err))
         )
         assert result == Err(err)
 
@@ -161,7 +161,7 @@ class TestBindWithEither:
 
     def test_skips_on_initial_error(self):
         err = RuntimeError("err")
-        result = run(AsyncResult.from_exception(err).bind(lambda x: Right(99)))
+        result = run(AsyncResult.raise_error(err).bind(lambda x: Right(99)))
         assert result == Err(err)
 
 
@@ -190,7 +190,7 @@ class TestBindWithAwaitable:
             return x * 2
 
         err = RuntimeError("err")
-        result = run(AsyncResult.from_exception(err).bind(double))
+        result = run(AsyncResult.raise_error(err).bind(double))
         assert result == Err(err)
 
 
@@ -198,7 +198,7 @@ class TestHandleErrorWith:
     def test_recovers_from_error(self):
         err = ValueError("oops")
         result = run(
-            AsyncResult.from_exception(err).handle_error_with(
+            AsyncResult.raise_error(err).handle_error_with(
                 lambda e: AsyncResult.pure(f"recovered: {e}")
             )
         )
@@ -213,14 +213,14 @@ class TestHandleErrorWith:
     def test_handle_error_with_either(self):
         err = ValueError("oops")
         result = run(
-            AsyncResult.from_exception(err).handle_error_with(lambda e: Right("fixed"))
+            AsyncResult.raise_error(err).handle_error_with(lambda e: Right("fixed"))
         )
         assert result == Right("fixed")
 
     def test_handle_error_with_result(self):
         err = ValueError("oops")
         result = run(
-            AsyncResult.from_exception(err).handle_error_with(lambda e: Ok("fixed"))
+            AsyncResult.raise_error(err).handle_error_with(lambda e: Ok("fixed"))
         )
         assert result == Ok("fixed")
 
@@ -232,7 +232,7 @@ class TestThen:
 
     def test_short_circuits(self):
         err = RuntimeError("stop")
-        result = run(AsyncResult.from_exception(err).then(AsyncResult.pure("never")))
+        result = run(AsyncResult.raise_error(err).then(AsyncResult.pure("never")))
         assert result == Err(err)
 
 
@@ -243,7 +243,7 @@ class TestAp:
 
     def test_short_circuits_err(self):
         err = RuntimeError("err")
-        result = run(AsyncResult.from_exception(err).ap(AsyncResult.pure(2)))
+        result = run(AsyncResult.raise_error(err).ap(AsyncResult.pure(2)))
         assert result == Err(err)
 
 
@@ -306,7 +306,7 @@ class TestPipeline:
 
     def test_pipeline_with_recovery(self):
         pipeline = (
-            AsyncResult.from_exception(TimeoutError("timeout"))
+            AsyncResult.raise_error(TimeoutError("timeout"))
             .handle_error_with(lambda e: AsyncResult.pure("cached"))
             .map(lambda v: v.upper())
         )
@@ -327,7 +327,7 @@ class TestAsyncResultDo:
         @AsyncResult.do
         def pipeline():
             x = yield AsyncResult.pure(1)
-            y = yield AsyncResult.from_exception(ValueError("boom"))
+            y = yield AsyncResult.raise_error(ValueError("boom"))
             return x + y
 
         result = run(pipeline())
@@ -569,3 +569,38 @@ class TestTryAsyncComposition:
         match result:
             case Err(e):
                 assert isinstance(e, TypeError)
+
+
+class TestAsyncResultBifunctor:
+    def test_bimap_on_ok(self):
+        result = run(AsyncResult.pure(10).bimap(str, lambda x: x * 2))
+        assert result == Ok(20)
+
+    def test_bimap_on_err(self):
+        err = ValueError("bad")
+        result = run(AsyncResult.raise_error(err).bimap(lambda e: TypeError(str(e)), lambda x: x * 2))
+        assert isinstance(result, Err)
+        match result:
+            case Err(e):
+                assert isinstance(e, TypeError)
+
+    def test_left_map_on_ok_is_identity(self):
+        result = run(AsyncResult.pure(10).left_map(lambda e: TypeError(str(e))))
+        assert result == Ok(10)
+
+    def test_left_map_on_err_transforms(self):
+        err = ValueError("bad")
+        result = run(AsyncResult.raise_error(err).left_map(lambda e: TypeError("wrapped")))
+        assert isinstance(result, Err)
+        match result:
+            case Err(e):
+                assert isinstance(e, TypeError)
+                assert str(e) == "wrapped"
+
+    def test_bimap_identity_law(self):
+        ok_result = run(AsyncResult.pure(42).bimap(lambda x: x, lambda x: x))
+        assert ok_result == Ok(42)
+
+        err = ValueError("err")
+        err_result = run(AsyncResult.raise_error(err).bimap(lambda x: x, lambda x: x))
+        assert err_result == Err(err)

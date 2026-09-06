@@ -43,7 +43,9 @@ from typing import Any, Generic, ParamSpec, TypeVar, final, overload
 
 from funstruct.monad.either import Either
 from funstruct.monad.future import Future
+from funstruct.typeclasses._bifunctor import Bifunctor
 from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._monad_error import MonadError
 from funstruct.util.created_at import CapturesCreationSiteMixin
 from funstruct.util._reawaitable import ReAwaitable
 
@@ -51,7 +53,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Result(Monad, Generic[_A]):
+class Result(MonadError, Bifunctor, Generic[_A]):
     """Result[A] = Ok(value) | Err(exception).
 
     A monad for computations that can fail with an Exception.
@@ -65,7 +67,7 @@ class Result(Monad, Generic[_A]):
         return Ok(value)
 
     @classmethod
-    def from_exception(cls, error: Exception) -> Result:
+    def raise_error(cls, error: Exception) -> Result:
         return Err(error)
 
     @classmethod
@@ -94,17 +96,6 @@ class Result(Monad, Generic[_A]):
 
     @abstractmethod
     def bind(fa: Result, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
-
-    @abstractmethod
-    def left_map(fa: Result, f: Callable[[Exception], Exception]) -> Result[_A]: ...
-
-    @abstractmethod
-    def handle_error_with(
-        fa: Result, f: Callable[[Exception], Result[_A]]
-    ) -> Result[_A]: ...
-
-    @abstractmethod
-    def bimap(fa: Result, on_err: Callable, on_ok: Callable) -> Result: ...
 
     @abstractmethod
     def get_or_else(fa: Result, default: _A) -> _A: ...
@@ -212,7 +203,7 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
 _P = ParamSpec("_P")
 
 
-class AsyncResult(Monad, Generic[_A]):
+class AsyncResult(MonadError, Bifunctor, Generic[_A]):
     """Async computation that produces Result[A] — essentially Future[Result[A]].
 
     AsyncResult is syntactic sugar for composing async operations that can
@@ -224,7 +215,7 @@ class AsyncResult(Monad, Generic[_A]):
 
     Create with:
         AsyncResult.pure(42)                     # Ok(42) wrapped in async
-        AsyncResult.from_exception(ValueError()) # Err wrapped in async
+        AsyncResult.raise_error(ValueError())     # Err wrapped in async
         AsyncResult.from_result(Ok(42))          # lift sync Result
         @TryAsync decorator                      # catch exceptions
 
@@ -281,6 +272,21 @@ class AsyncResult(Monad, Generic[_A]):
 
         return AsyncResult(_inner())
 
+    def bimap(
+        fa: AsyncResult, on_err: Callable[[Exception], Exception], on_ok: Callable
+    ) -> AsyncResult:
+        async def _inner():
+            result = await fa._coro
+            match result:
+                case Ok(value):
+                    return Ok(on_ok(value))
+                case Err(error):
+                    return Err(on_err(error))
+                case _:
+                    return result
+
+        return AsyncResult(_inner())
+
     def handle_error_with(
         fa: AsyncResult, f: Callable[[Exception], Any]
     ) -> AsyncResult:
@@ -305,7 +311,7 @@ class AsyncResult(Monad, Generic[_A]):
         return cls(_inner())
 
     @classmethod
-    def from_exception(cls, error: Exception) -> AsyncResult:
+    def raise_error(cls, error: Exception) -> AsyncResult:
         """Lift an exception into Err."""
 
         async def _inner():

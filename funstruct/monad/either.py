@@ -37,7 +37,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar, final
 
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._bifunctor import Bifunctor
+from funstruct.typeclasses._monad_error import MonadError
 from funstruct.util.created_at import CapturesCreationSiteMixin
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Either(Monad, Generic[E, A]):
+class Either(MonadError, Bifunctor, Generic[E, A]):
     """Either[E, A]: Right(value) or Left(error).
 
     Right-biased monad. bind/map/>> operate on the Right value
@@ -66,7 +67,7 @@ class Either(Monad, Generic[E, A]):
         return Right(value)
 
     @classmethod
-    def from_error(cls, error: E) -> Either[E, A]:
+    def raise_error(cls, error: E) -> Either[E, A]:
         """Lift an error into Left."""
         return Left(error)
 
@@ -127,30 +128,6 @@ class Either(Monad, Generic[E, A]):
         Applies f to each element, short-circuits on first Left.
         """
         return cls.sequence(values.map(f))
-
-    @abstractmethod
-    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
-        """Transform the error without recovering. No-op on Right.
-
-        Cats: ``leftMap``
-        """
-        ...
-
-    @abstractmethod
-    def handle_error_with(self, f: Callable[[E], Either]) -> Either:
-        """Recover from error — f can succeed (Right) or re-fail (Left). No-op on Right.
-
-        Cats: ``handleErrorWith``
-        """
-        ...
-
-    @abstractmethod
-    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
-        """Transform both sides.
-
-        Cats: ``bimap``
-        """
-        ...
 
     @abstractmethod
     def get_or_else(self, default: A) -> A:
