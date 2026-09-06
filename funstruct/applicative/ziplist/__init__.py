@@ -20,7 +20,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Iterator
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 
 _A = TypeVar("_A")
 

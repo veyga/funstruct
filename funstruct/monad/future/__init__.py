@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable, Generator
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 from funstruct.util._reawaitable import ReAwaitable
 
 A = TypeVar("A")

@@ -36,7 +36,7 @@ class DotNotation:
                 f"'{type(self).__name__}' has no _type_constructor set"
             )
 
-        from funstruct.typeclasses._registry import _registry
+        from funstruct.typeclasses.utils.registry import _registry
 
         for (typeclass, t), instance in _registry.items():
             if t is tc and hasattr(instance, name):

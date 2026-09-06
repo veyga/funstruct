@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses._registry import register
-from funstruct.typeclasses._typeclasses import Monad
+from funstruct.typeclasses.registry import register
+from funstruct.typeclasses.monad import Monad
 from funstruct.monad.writer import (
     CListWriter,
     IntWriter,

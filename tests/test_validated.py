@@ -381,3 +381,101 @@ class TestValidatedBifunctor:
         i = Invalid("err")
         assert v.bimap(lambda x: x, lambda x: x) == v
         assert i.bimap(lambda x: x, lambda x: x) == i
+
+
+# ── Instance tests via summon ────────────────────────────────────────
+
+from funstruct.typeclasses import Applicative, summon
+from funstruct.typeclasses.bifunctor import Bifunctor
+
+
+class TestValidatedApplicativeInstance:
+    def test_pure_via_summon(self):
+        assert summon(Applicative, Validated).pure(42) == Valid(42)
+
+    @P.autodetect_parameters()
+    @P.case(
+        name="valid_valid",
+        ff=Valid(lambda x: x + 1),
+        fa=Valid(10),
+        expected_type=Valid,
+    )
+    @P.case(
+        name="invalid_valid",
+        ff=Invalid("err"),
+        fa=Valid(10),
+        expected_type=Invalid,
+    )
+    @P.case(
+        name="valid_invalid",
+        ff=Valid(lambda x: x + 1),
+        fa=Invalid("err"),
+        expected_type=Invalid,
+    )
+    @P.case(
+        name="invalid_invalid_accumulates",
+        ff=Invalid("a:"),
+        fa=Invalid("b"),
+        expected_type=Invalid,
+    )
+    def test_ap_via_summon(self, ff, fa, expected_type):
+        result = summon(Applicative, Validated).ap(ff, fa)
+        assert isinstance(result, expected_type)
+
+    def test_ap_valid_valid_value(self):
+        F = summon(Applicative, Validated)
+        assert F.ap(Valid(lambda x: x * 2), Valid(21)) == Valid(42)
+
+    def test_ap_invalid_invalid_accumulates_errors(self):
+        F = summon(Applicative, Validated)
+        result = F.ap(Invalid("a:"), Invalid("b"))
+        assert result == Invalid("a:b")
+
+    @P.autodetect_parameters()
+    @P.case(name="map_valid", fa=Valid(10), expected=Valid(20))
+    @P.case(name="map_invalid", fa=Invalid("err"), expected=Invalid("err"))
+    def test_map_via_summon(self, fa, expected):
+        F = summon(Applicative, Validated)
+        result = F.map(fa, lambda x: x * 2)
+        if isinstance(expected, Valid):
+            assert result == expected
+        else:
+            assert isinstance(result, Invalid)
+
+    def test_product_both_valid(self):
+        F = summon(Applicative, Validated)
+        assert F.product(Valid(1), Valid(2)) == Valid((1, 2))
+
+    def test_product_first_invalid(self):
+        F = summon(Applicative, Validated)
+        assert isinstance(F.product(Invalid("a"), Valid(2)), Invalid)
+
+    def test_product_second_invalid(self):
+        F = summon(Applicative, Validated)
+        assert isinstance(F.product(Valid(1), Invalid("b")), Invalid)
+
+    def test_product_both_invalid_accumulates(self):
+        F = summon(Applicative, Validated)
+        result = F.product(Invalid("a:"), Invalid("b"))
+        assert isinstance(result, Invalid)
+        assert result.errors == "a:b"
+
+    def test_dot_vs_summon_map(self):
+        f = lambda x: x + 1
+        assert Valid(10).map(f) == summon(Applicative, Validated).map(Valid(10), f)
+
+
+class TestValidatedBifunctorInstance:
+    @P.autodetect_parameters()
+    @P.case(name="valid", fa=Valid(10), expected=Valid(20))
+    @P.case(name="invalid", fa=Invalid("err"), expected=Invalid("ERR"))
+    def test_bimap_via_summon(self, fa, expected):
+        F = summon(Bifunctor, Validated)
+        assert F.bimap(fa, str.upper, lambda x: x * 2) == expected
+
+    @P.autodetect_parameters()
+    @P.case(name="valid_identity", fa=Valid(10), expected=Valid(10))
+    @P.case(name="invalid_transforms", fa=Invalid("err"), expected=Invalid("ERR"))
+    def test_left_map_via_summon(self, fa, expected):
+        F = summon(Bifunctor, Validated)
+        assert F.left_map(fa, str.upper) == expected

@@ -26,7 +26,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import final
 
-from funstruct.typeclasses._semigroup import Semigroup
+from funstruct.typeclasses.semigroup import Semigroup
 
 
 @final

@@ -36,7 +36,7 @@ from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 
 K = TypeVar("K")
 V = TypeVar("V")

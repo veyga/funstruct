@@ -1,13 +1,44 @@
-"""Typeclass instance registry + summon.
+"""Typeclass instance registry — utilities for working with the typeclass system.
 
-Register typeclass instances for type constructors. Resolve via summon.
-Derived typeclasses are resolved automatically via the hierarchy.
+This module provides the runtime machinery for typeclass resolution.
+Most users never need to call these directly — dot syntax handles
+everything automatically.
 
-    register(Monad, Option, OptionMonad())
+When to use each function:
 
-    summon(Monad, Option)       → OptionMonad()
-    summon(Functor, Option)     → OptionMonad()  (derived: Monad <: Functor)
-    summon(MonadError, Option)  → TypeError      (Option has no MonadError)
+    register(typeclass, type_constructor, instance)
+        WHO: Library authors, advanced users creating custom types
+        WHEN: You've created a new data type and want it to work with
+              the typeclass system (map, bind, summon, etc.)
+        Example:
+            class _MyMonad(Monad):
+                def pure(self, value): ...
+                def bind(self, fa, f): ...
+            register(Monad, MyType, _MyMonad())
+
+    summon(typeclass, type_constructor) -> instance
+        WHO: Generic/effect-polymorphic program authors
+        WHEN: Writing functions that work across multiple effect types
+              (tagless final style). The caller summons once, the function
+              uses the instance.
+        Example:
+            def double(F: Monad, fa):
+                return F.map(fa, lambda x: x * 2)
+            double(summon(Monad, Option), Some(21))
+
+    tc_of(value) -> type
+        WHO: Advanced users writing fully generic functions
+        WHEN: You receive any monadic value and need to resolve its
+              type constructor without knowing the concrete type.
+        Example:
+            def double(fa):
+                F = summon(Monad, tc_of(fa))
+                return F.map(fa, lambda x: x * 2)
+
+When NOT to use these:
+    - For everyday code: just use dot syntax (Some(10).map(f))
+    - Inside typeclass instance methods: the instance already knows its type
+    - For type checking: these resolve at runtime, not compile time
 """
 
 from __future__ import annotations
@@ -28,6 +59,7 @@ def summon(typeclass: type, type_constructor: type) -> object:
         1. Exact match in registry
         2. Walk registered instances — if a registered instance's typeclass
            is a subclass of the requested typeclass, return it
+           (e.g. Monad registered → Functor requested → same instance)
     """
     key = (typeclass, type_constructor)
     if key in _registry:

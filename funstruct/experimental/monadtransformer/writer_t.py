@@ -45,7 +45,7 @@ from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
-from funstruct.typeclasses._monoid import Monoid
+from funstruct.typeclasses.monoid import Monoid
 
 _F = TypeVar("_F")
 _W = TypeVar("_W")
@@ -100,7 +100,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         """Lift a value with empty output.
 
         >>> from funstruct.monad.either import Either, Right
-        >>> from funstruct.typeclasses._monoid import Monoid
+        >>> from funstruct.typeclasses.monoid import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LT(WriterT):
         ...     _monoid = list_m
@@ -114,7 +114,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         """Produce output with no meaningful value.
 
         >>> from funstruct.monad.either import Either, Right
-        >>> from funstruct.typeclasses._monoid import Monoid
+        >>> from funstruct.typeclasses.monoid import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LT(WriterT):
         ...     _monoid = list_m

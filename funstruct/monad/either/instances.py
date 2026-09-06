@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses._registry import register
-from funstruct.typeclasses._typeclasses import Bifunctor, MonadError
+from funstruct.typeclasses.registry import register
+from funstruct.typeclasses.bifunctor import Bifunctor
+from funstruct.typeclasses.monad_error import MonadError
 from funstruct.monad.either import Either, Left, Right
 
 _A = TypeVar("_A")

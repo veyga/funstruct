@@ -5,8 +5,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses._registry import register
-from funstruct.typeclasses._typeclasses import Alternative, Applicative, Monad, Traversable
+from funstruct.typeclasses.registry import register
+from funstruct.typeclasses.alternative import Alternative
+from funstruct.typeclasses.applicative import Applicative
+from funstruct.typeclasses.monad import Monad
+from funstruct.typeclasses.traversable import Traversable
 from funstruct.collections.cons import CList, Cons, Nil
 
 _A = TypeVar("_A")

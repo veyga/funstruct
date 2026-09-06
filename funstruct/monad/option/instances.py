@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses._registry import register
-from funstruct.typeclasses._typeclasses import Alternative, Monad
+from funstruct.typeclasses.registry import register
+from funstruct.typeclasses.alternative import Alternative
+from funstruct.typeclasses.monad import Monad
 from funstruct.monad.option import Nothing, Option, Some
 
 _A = TypeVar("_A")

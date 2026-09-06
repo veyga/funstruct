@@ -361,9 +361,10 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 
 ## Roadmap
 
+- **Native collections (Rust/PyO3)** — Rust-backed CList, frozendict, etc.
 - **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax. Eliminates `TypeVar` boilerplate and `Callable[[A, B], C]` throughout.
 - **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`). Demonstrate composing parsers with `bind`/`do`.
 - **Typeclass derivation** — potentially something like mypy plugins (not likely).
-- **Stream** — infinite streams, lazy
-- **FreeMonad** - implementation
-- **EffectsSystem** - utilizing an effects system over monad transformer stacks
+- **Free monad** — build program ASTs, interpret with different backends.
+- **Effects system** — algebraic effects as an alternative to monad transformer stacks.
+- **Stream** — infinite streams, lazy evaluation.

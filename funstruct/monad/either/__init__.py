@@ -36,7 +36,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 from funstruct.util.created_at import CapturesCreationSiteMixin
 
 if TYPE_CHECKING:

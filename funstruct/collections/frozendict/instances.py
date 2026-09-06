@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses._registry import register
-from funstruct.typeclasses._typeclasses import Foldable, Functor
+from funstruct.typeclasses.registry import register
+from funstruct.typeclasses.foldable import Foldable
+from funstruct.typeclasses.functor import Functor
 from funstruct.collections.frozendict import frozendict
 
 K = TypeVar("K")

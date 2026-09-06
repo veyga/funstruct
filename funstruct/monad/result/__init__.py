@@ -42,7 +42,7 @@ from typing import Any, Generic, ParamSpec, TypeVar, overload
 
 from funstruct.monad.either import Either
 from funstruct.monad.future import Future
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 from funstruct.util.created_at import CapturesCreationSiteMixin
 from funstruct.util._reawaitable import ReAwaitable
 

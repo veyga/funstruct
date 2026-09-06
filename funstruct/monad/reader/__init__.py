@@ -22,7 +22,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 
 _Ctx = TypeVar("_Ctx")
 _A = TypeVar("_A")

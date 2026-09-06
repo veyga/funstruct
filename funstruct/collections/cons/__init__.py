@@ -18,7 +18,7 @@ from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 
 A = TypeVar("A")
 B = TypeVar("B")

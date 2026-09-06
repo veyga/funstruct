@@ -39,7 +39,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Cons
-from funstruct.typeclasses._dot_notation import DotNotation
+from funstruct.typeclasses.mixins.dot_notation import DotNotation
 
 A = TypeVar("A")
 B = TypeVar("B")
