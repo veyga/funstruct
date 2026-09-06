@@ -382,7 +382,7 @@ CList._type_constructor = CList
 Cons._type_constructor = CList
 Nil._type_constructor = CList
 
-import funstruct.collections.cons_instances  # noqa: E402, F401
+import funstruct.collections.cons.instances  # noqa: E402, F401
 
 __all__ = [
     "CList",

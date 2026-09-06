@@ -218,7 +218,7 @@ Right._type_constructor = Either
 Left._type_constructor = Either
 
 
-import funstruct.monad.either_instances  # noqa: E402, F401
+import funstruct.monad.either.instances  # noqa: E402, F401
 
 __all__ = [
     "Either",

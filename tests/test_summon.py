@@ -17,6 +17,7 @@ from funstruct.typeclasses import (
     Monad,
     MonadError,
     summon,
+    tc_of,
 )
 from funstruct.monad.option import Option, Some, Nothing
 from funstruct.monad.either import Either, Right, Left
@@ -165,3 +166,79 @@ class TestDotSyntaxEquivalence:
 
     def test_product_operator(self):
         assert Some(1) * Some(2) == Some((1, 2))
+
+
+class TestTcOf:
+    """tc_of resolves the type constructor from a value — Haskell-style."""
+
+    def test_some_resolves_to_option(self):
+        assert tc_of(Some(42)) is Option
+
+    def test_nothing_resolves_to_option(self):
+        assert tc_of(Nothing()) is Option
+
+    def test_ok_resolves_to_result(self):
+        assert tc_of(Ok(1)) is Result
+
+    def test_err_resolves_to_result(self):
+        assert tc_of(Err(ValueError("x"))) is Result
+
+    def test_right_resolves_to_either(self):
+        assert tc_of(Right(1)) is Either
+
+    def test_left_resolves_to_either(self):
+        assert tc_of(Left("e")) is Either
+
+    def test_cons_resolves_to_clist(self):
+        assert tc_of(Cons(1)) is CList
+
+    def test_unknown_type_raises(self):
+        with pytest.raises(TypeError, match="No _type_constructor"):
+            tc_of(42)
+
+
+class TestHaskellStyleGenericFunctions:
+    """Write generic functions that auto-resolve typeclasses from values.
+
+    No @using, no given, no implicits. Just summon + tc_of.
+    Same as Haskell's automatic typeclass resolution, at runtime.
+    """
+
+    def test_generic_double(self):
+        def double(fa):
+            F = summon(Monad, tc_of(fa))
+            return F.map(fa, lambda x: x * 2)
+
+        assert double(Some(21)) == Some(42)
+        assert double(Ok(21)) == Ok(42)
+        assert double(Right(21)) == Right(42)
+
+    def test_generic_increment(self):
+        def increment(fa):
+            F = summon(Monad, tc_of(fa))
+            return F.bind(fa, lambda x: F.pure(x + 1))
+
+        assert increment(Some(41)) == Some(42)
+        assert increment(Ok(41)) == Ok(42)
+
+    def test_generic_safe_divide(self):
+        def safe_divide(fa, b):
+            F = summon(MonadError, tc_of(fa))
+            return F.bind(fa, lambda a: (
+                F.raise_error(ValueError("div by zero")) if b == 0
+                else F.pure(a / b)
+            ))
+
+        assert safe_divide(Ok(10), 2) == Ok(5.0)
+        assert isinstance(safe_divide(Ok(10), 0), Err)
+        assert safe_divide(Right(10), 2) == Right(5.0)
+        assert isinstance(safe_divide(Right(10), 0), Left)
+
+    def test_generic_pipeline(self):
+        def pipeline(fa):
+            F = summon(Monad, tc_of(fa))
+            doubled = F.bind(fa, lambda x: F.pure(x * 2))
+            return F.map(doubled, lambda y: y + 1)
+
+        assert pipeline(Some(5)) == Some(11)
+        assert pipeline(Ok(5)) == Ok(11)

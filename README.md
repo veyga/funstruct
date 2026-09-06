@@ -1,12 +1,58 @@
 # funstruct
 
 A zero-dependency functional programming library for Python.
+Typeclasses, monads, and algebraic data types — influenced by
+[Scalaz](https://github.com/scalaz/scalaz) and
+[Cats](https://typelevel.org/cats/).
 
 ## Install
 
 ```bash
 pip install funstruct || uv add funstruct
 ```
+
+## Two ways to use funstruct
+
+**Dot syntax** — the default, for everyday code:
+
+```python
+from funstruct.monad.option import Some, Nothing
+from funstruct.monad.result import Ok, Err
+
+Some(10).map(lambda x: x * 2).bind(lambda x: Some(x + 1))  # Some(21)
+Ok(10).map(str)                                              # Ok('10')
+Nothing().map(lambda x: x + 1)                               # Nothing()
+```
+
+**Typeclass instances** — for generic, effect-polymorphic programs:
+
+```python
+from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.monad.option import Option, Some
+from funstruct.monad.result import Result, Ok, Err
+
+# F: Monad is the constraint — like Haskell's (Functor f =>)
+def double(F: Monad, fa):
+    return F.map(fa, lambda x: x * 2)
+
+double(summon(Monad, Option), Some(21))  # Some(42)
+double(summon(Monad, Result), Ok(21))    # Ok(42)
+
+# F: MonadError adds raise_error + handle_error_with
+def safe_divide(F: MonadError, a, b):
+    if b == 0:
+        return F.raise_error(ValueError("division by zero"))
+    return F.pure(a / b)
+
+safe_divide(summon(MonadError, Result), 10, 2)  # Ok(5.0)
+safe_divide(summon(MonadError, Result), 10, 0)  # Err(ValueError(...))
+```
+
+Data types are plain — they don't inherit from typeclasses. Typeclass
+instances are separate classes that implement the operations. `summon`
+resolves the right instance from a registry. Dot syntax is sugar on
+top — `Some(10).map(f)` delegates to `summon(Monad, Option).map(Some(10), f)`
+internally.
 
 ## Functional Primer
 

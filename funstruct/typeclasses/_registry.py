@@ -43,6 +43,33 @@ def summon(typeclass: type, type_constructor: type) -> object:
     )
 
 
+def tc_of(value) -> type:
+    """Get the type constructor for a value. Haskell-style automatic resolution.
+
+    Every funstruct data type sets _type_constructor on its class:
+        Some(42)  → Option
+        Ok(10)    → Result
+        Cons(1)   → CList
+        Left("e") → Either
+
+    Use this in generic functions for automatic typeclass resolution:
+
+        def double(fa):
+            F = summon(Monad, tc_of(fa))
+            return F.map(fa, lambda x: x * 2)
+
+        double(Some(21))  # resolves automatically → Some(42)
+        double(Ok(21))    # resolves automatically → Ok(42)
+    """
+    tc = getattr(type(value), "_type_constructor", None)
+    if tc is None:
+        raise TypeError(
+            f"No _type_constructor on {type(value).__name__}. "
+            f"Is it a funstruct data type?"
+        )
+    return tc
+
+
 def _clear_registry():
     _registry.clear()
 
@@ -50,4 +77,5 @@ def _clear_registry():
 __all__ = [
     "register",
     "summon",
+    "tc_of",
 ]

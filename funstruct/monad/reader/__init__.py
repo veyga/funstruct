@@ -82,7 +82,7 @@ class Reader(DotNotation, Generic[_Ctx, _A]):
 
 Reader._type_constructor = Reader
 
-import funstruct.monad.reader_instances  # noqa: E402, F401
+import funstruct.monad.reader.instances  # noqa: E402, F401
 
 __all__ = [
     "Reader",

@@ -109,7 +109,7 @@ CListWriter._type_constructor = CListWriter
 StrWriter._type_constructor = StrWriter
 IntWriter._type_constructor = IntWriter
 
-import funstruct.monad.writer_instances  # noqa: E402, F401
+import funstruct.monad.writer.instances  # noqa: E402, F401
 
 __all__ = [
     "Writer",

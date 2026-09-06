@@ -342,7 +342,7 @@ def TryAsync(
     return wrapper
 
 
-import funstruct.monad.result_instances  # noqa: E402, F401
+import funstruct.monad.result.instances  # noqa: E402, F401
 
 __all__ = [
     "Result",

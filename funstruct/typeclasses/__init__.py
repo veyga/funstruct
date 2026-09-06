@@ -2,7 +2,7 @@
 
 from funstruct.typeclasses._dot_notation import DotNotation
 from funstruct.typeclasses._monoid import Monoid
-from funstruct.typeclasses._registry import register, summon
+from funstruct.typeclasses._registry import register, summon, tc_of
 from funstruct.typeclasses._semigroup import Semigroup
 from funstruct.typeclasses._typeclasses import (
     Alternative,
@@ -29,4 +29,5 @@ __all__ = [
     "Traversable",
     "register",
     "summon",
+    "tc_of",
 ]

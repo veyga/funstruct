@@ -72,7 +72,7 @@ class Future(DotNotation, Generic[A]):
 
 Future._type_constructor = Future
 
-import funstruct.monad.future_instances  # noqa: E402, F401
+import funstruct.monad.future.instances  # noqa: E402, F401
 
 __all__ = [
     "Future",

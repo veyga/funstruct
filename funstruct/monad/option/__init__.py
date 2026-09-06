@@ -217,7 +217,7 @@ Some._type_constructor = Option
 Nothing._type_constructor = Option
 
 
-import funstruct.monad.option_instances  # noqa: E402, F401 — register typeclass instances
+import funstruct.monad.option.instances  # noqa: E402, F401 — register typeclass instances
 
 __all__ = [
     "Option",

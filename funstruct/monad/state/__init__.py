@@ -103,7 +103,7 @@ class State(DotNotation, Generic[_A]):
 
 State._type_constructor = State
 
-import funstruct.monad.state_instances  # noqa: E402, F401
+import funstruct.monad.state.instances  # noqa: E402, F401
 
 __all__ = [
     "State",
