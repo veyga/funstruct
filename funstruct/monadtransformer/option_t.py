@@ -28,9 +28,9 @@ Examples:
     ... ).run()
     Right(Nothing())
 
-    or_else — recover from Nothing (not from Left):
+    handle_error_with — recover from Nothing (not from Left):
 
-    >>> OptionT(Right(Nothing())).or_else(
+    >>> OptionT(Right(Nothing())).handle_error_with(
     ...     lambda: OptionT(Right(Some(99)))
     ... ).run()
     Right(Some(99))
@@ -64,8 +64,6 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     Haskell: ``MaybeT m a``
     Scala:   ``OptionT[F[_], A]``
     """
-
-    __slots__ = ("_run",)
 
     def __init__(self, run) -> None:
         self._run = run
@@ -116,16 +114,16 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
 
         return OptionT(self._run.map(_map_opt))
 
-    def or_else(self, f: Callable[[], OptionT[_F, _A]]) -> OptionT[_F, _A]:
+    def handle_error_with(self, f: Callable[[], OptionT[_F, _A]]) -> OptionT[_F, _A]:
         """Recover from Nothing: if inner is Nothing, use fallback.
 
         >>> from funstruct.monad.either import Right
         >>> from funstruct.monad.option import Some, Nothing
-        >>> OptionT(Right(Nothing())).or_else(
+        >>> OptionT(Right(Nothing())).handle_error_with(
         ...     lambda: OptionT(Right(Some(99)))
         ... ).run()
         Right(Some(99))
-        >>> OptionT(Right(Some(1))).or_else(
+        >>> OptionT(Right(Some(1))).handle_error_with(
         ...     lambda: OptionT(Right(Some(99)))
         ... ).run()
         Right(Some(1))

@@ -25,8 +25,6 @@ class Future(Monad, Generic[A]):
     For error-aware async, use AsyncResult[A] from funstruct.monad.result.
     """
 
-    __slots__ = ("_coro",)
-
     def __init__(self, coro: Awaitable[A]) -> None:
         self._coro = coro
 

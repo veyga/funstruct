@@ -32,8 +32,6 @@ class Writer(Monad, Generic[_W, _A]):
 
     _monoid: Monoid
 
-    __slots__ = ("value", "output")
-
     def __init__(self, value: _A, output: _W) -> None:
         object.__setattr__(self, "value", value)
         object.__setattr__(self, "output", output)

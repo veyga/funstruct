@@ -69,20 +69,20 @@ class TestMap:
         assert step.map(lambda x: x * 3).run(7) == Left("err")
 
 
-class TestOrElse:
-    def test_or_else_recovers_from_failure(self):
+class TestHandleErrorWith:
+    def test_handle_error_with_recovers_from_failure(self):
         failing = ReaderT(lambda ctx: Left("oops"))
-        recovered = failing.or_else(lambda err: ReaderT(lambda ctx: Right("recovered")))
+        recovered = failing.handle_error_with(lambda err: ReaderT(lambda ctx: Right("recovered")))
         assert recovered.run(0) == Right("recovered")
 
-    def test_or_else_skips_on_success(self):
+    def test_handle_error_with_skips_on_success(self):
         ok = ReaderT(lambda ctx: Right("ok"))
-        result = ok.or_else(lambda err: ReaderT(lambda ctx: Right("nope")))
+        result = ok.handle_error_with(lambda err: ReaderT(lambda ctx: Right("nope")))
         assert result.run(0) == Right("ok")
 
-    def test_or_else_receives_context(self):
+    def test_handle_error_with_receives_context(self):
         failing = ReaderT(lambda ctx: Left("err"))
-        recovered = failing.or_else(
+        recovered = failing.handle_error_with(
             lambda err: ReaderT(lambda ctx: Right(f"{err}+{ctx}"))
         )
         assert recovered.run("ctx") == Right("err+ctx")
@@ -148,10 +148,10 @@ class TestWithStateT:
         pipeline = inc.then(inc).then(get)
         assert pipeline.run("ctx").run(0) == Right((2, 2))
 
-    def test_or_else_with_state_t(self):
+    def test_handle_error_with_with_state_t(self):
         failing = ReaderT.lift_f(StateT(lambda s: Left(ValueError("expired"))))
         recover = ReaderT(lambda ctx: StateT(lambda s: Right((s, f"recovered-{ctx}"))))
-        pipeline = failing.or_else(lambda err: recover)
+        pipeline = failing.handle_error_with(lambda err: recover)
         assert pipeline.run("myctx").run(0) == Right((0, "recovered-myctx"))
 
 

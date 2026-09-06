@@ -217,8 +217,6 @@ _EMPTY = _Empty()
 class frozendict(Generic[K, V]):
     """An immutable, persistent dictionary backed by a HAMT."""
 
-    __slots__ = ("__root", "__size", "__hash_cache")
-
     def __init__(self, *args, **kwargs) -> None:
         match args:
             case (frozendict() as other, *_):

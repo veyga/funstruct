@@ -70,7 +70,7 @@ class Option(Monad, Generic[A]):
     def get_or_else(self, default: A) -> A: ...
 
     @abstractmethod
-    def or_else(self, fallback: Callable[[], Option[A]]) -> Option[A]: ...
+    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]: ...
 
     @classmethod
     def pure(cls, value: A) -> Option[A]:
@@ -140,22 +140,6 @@ class Option(Monad, Generic[A]):
 
         return _thunk
 
-    def to_result(self, error):
-        """Convert to Either — Some(v) → Right(v), Nothing → Left(error).
-
-        >>> Some(1).to_result("missing")
-        Right(1)
-        >>> Nothing().to_result("missing")
-        Left('missing')
-        """
-        from funstruct.monad.either import Left, Right
-
-        match self:
-            case Some(v):
-                return Right(v)
-            case _:
-                return Left(error)
-
     @property
     @abstractmethod
     def is_some(self) -> bool: ...
@@ -181,7 +165,7 @@ class Some(Option[A]):
     def get_or_else(self, default: A) -> A:
         return self.value
 
-    def or_else(self, fallback: Callable[[], Option[A]]) -> Option[A]:
+    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
         return self
 
     def filter(self, f: Callable[[A], bool]) -> Option[A]:
@@ -224,7 +208,7 @@ class Nothing(Option):
     def get_or_else(self, default: A) -> A:
         return default
 
-    def or_else(self, fallback: Callable[[], Option[A]]) -> Option[A]:
+    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
         return fallback()
 
     def filter(self, f: Callable[[A], bool]) -> Option:

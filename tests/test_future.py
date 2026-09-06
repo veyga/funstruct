@@ -142,23 +142,23 @@ class TestBindWithAwaitable:
         assert result == Left(err)
 
 
-class TestOrElse:
+class TestHandleErrorWith:
     def test_recovers_from_error(self):
         err = ValueError("oops")
         result = run(
-            AsyncResult.from_exception(err).or_else(
+            AsyncResult.from_exception(err).handle_error_with(
                 lambda e: AsyncResult.pure(f"recovered: {e}")
             )
         )
         assert result == Right("recovered: oops")
 
     def test_skips_on_success(self):
-        result = run(AsyncResult.pure(42).or_else(lambda e: AsyncResult.pure(0)))
+        result = run(AsyncResult.pure(42).handle_error_with(lambda e: AsyncResult.pure(0)))
         assert result == Right(42)
 
-    def test_or_else_with_either(self):
+    def test_handle_error_with_with_either(self):
         err = ValueError("oops")
-        result = run(AsyncResult.from_exception(err).or_else(lambda e: Right("fixed")))
+        result = run(AsyncResult.from_exception(err).handle_error_with(lambda e: Right("fixed")))
         assert result == Right("fixed")
 
 
@@ -244,7 +244,7 @@ class TestPipeline:
     def test_pipeline_with_recovery(self):
         pipeline = (
             AsyncResult.from_exception(TimeoutError("timeout"))
-            .or_else(lambda e: AsyncResult.pure("cached"))
+            .handle_error_with(lambda e: AsyncResult.pure("cached"))
             .map(lambda v: v.upper())
         )
         assert run(pipeline) == Right("CACHED")
@@ -288,20 +288,20 @@ class TestAsyncResultDo:
 
         assert run(AsyncResult.do(pipeline)(5)) == Ok(15)
 
-    def test_accepts_sync_either(self):
+    def test_accepts_lifted_either(self):
         @AsyncResult.do
         def pipeline():
             x = yield AsyncResult.pure(1)
-            y = yield Right(10)
+            y = yield AsyncResult.from_either(Right(10))
             return x + y
 
         assert run(pipeline()) == Ok(11)
 
-    def test_short_circuits_on_sync_left(self):
+    def test_short_circuits_on_lifted_left(self):
         @AsyncResult.do
         def pipeline():
             x = yield AsyncResult.pure(1)
-            y = yield Left("sync error")
+            y = yield AsyncResult.from_either(Left("sync error"))
             return x + y
 
         assert run(pipeline()) == Left("sync error")
@@ -495,12 +495,12 @@ class TestTryAsyncComposition:
         result = run(parse("10").map(lambda x: x * 2))
         assert result == Ok(20)
 
-    def test_alt_after_sync_error(self):
+    def test_left_map_after_sync_error(self):
         @TryAsync
         def parse(raw):
             return int(raw)
 
-        result = run(parse("bad").alt(lambda e: TypeError("parse failed")))
+        result = run(parse("bad").left_map(lambda e: TypeError("parse failed")))
         assert isinstance(result, Err)
         match result:
             case Err(e):

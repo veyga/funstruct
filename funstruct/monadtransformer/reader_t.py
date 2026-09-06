@@ -77,8 +77,6 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
     bind/map/lash — ReaderT just threads the context to both sides.
     """
 
-    __slots__ = ("_run",)
-
     def __init__(self, run: Callable[[_Ctx], _M]) -> None:
         self._run = run
 
@@ -109,11 +107,11 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def or_else(self, f: Callable[..., ReaderT]) -> ReaderT[_Ctx, _M, _A]:
-        """Recover from failure via inner monad's or_else."""
+    def handle_error_with(self, f: Callable[..., ReaderT]) -> ReaderT[_Ctx, _M, _A]:
+        """Recover from failure via inner monad's handle_error_with."""
 
         def inner(ctx):
-            return self._run(ctx).or_else(lambda err: f(err).run(ctx))
+            return self._run(ctx).handle_error_with(lambda err: f(err).run(ctx))
 
         return ReaderT(inner)
 

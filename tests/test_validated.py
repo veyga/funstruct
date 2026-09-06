@@ -278,78 +278,75 @@ class TestToResult:
     all produce Ok. Validation status determines the case, not the value.
     """
 
-    def test_valid_to_result(self):
-        from funstruct.monad.result import Ok
+    def test_valid_fold_to_ok(self):
+        from funstruct.monad.result import Ok, Err
 
-        assert Valid(42).to_result() == Ok(42)
+        assert Valid(42).fold(Err, Ok) == Ok(42)
 
-    def test_valid_to_result_is_ok(self):
-        from funstruct.monad.result import Ok
+    def test_valid_fold_is_ok(self):
+        from funstruct.monad.result import Ok, Err
 
-        result = Valid(42).to_result()
-        assert isinstance(result, Ok)
+        result = Valid(42).fold(Err, Ok)
+        assert type(result) is Ok
 
     def test_valid_falsey_values_still_ok(self):
-        from funstruct.monad.result import Ok
+        from funstruct.monad.result import Ok, Err
 
-        assert Valid(0).to_result() == Ok(0)
-        assert Valid(None).to_result() == Ok(None)
-        assert Valid(False).to_result() == Ok(False)
-        assert Valid("").to_result() == Ok("")
-        assert Valid([]).to_result() == Ok([])
+        assert Valid(0).fold(Err, Ok) == Ok(0)
+        assert Valid(None).fold(Err, Ok) == Ok(None)
+        assert Valid(False).fold(Err, Ok) == Ok(False)
+        assert Valid("").fold(Err, Ok) == Ok("")
+        assert Valid([]).fold(Err, Ok) == Ok([])
 
-    def test_invalid_to_result(self):
-        from funstruct.monad.result import Err
+    def test_invalid_fold_to_err(self):
+        from funstruct.monad.result import Err, Ok
 
-        assert Invalid(["err"]).to_result() == Err(["err"])
+        assert Invalid(["err"]).fold(Err, Ok) == Err(["err"])
 
-    def test_invalid_to_result_is_err(self):
-        from funstruct.monad.result import Err
+    def test_invalid_fold_is_err(self):
+        from funstruct.monad.result import Err, Ok
 
-        result = Invalid(["err"]).to_result()
-        assert isinstance(result, Err)
+        result = Invalid(["err"]).fold(Err, Ok)
+        assert type(result) is Err
 
-    def test_valid_to_result_or(self):
-        from funstruct.monad.result import Ok
+    def test_valid_fold_then_left_map(self):
+        from funstruct.monad.result import Ok, Err
 
-        assert Valid(1).to_result_or(ValueError) == Ok(1)
+        result = Valid(1).fold(Err, Ok).left_map(lambda errs: ValueError(str(errs)))
+        assert result == Ok(1)
 
-    def test_valid_to_result_or_is_ok(self):
-        from funstruct.monad.result import Ok
+    def test_invalid_fold_then_left_map(self):
+        from funstruct.monad.result import Err, Ok
 
-        result = Valid(1).to_result_or(ValueError)
-        assert isinstance(result, Ok)
-
-    def test_invalid_to_result_or(self):
-        from funstruct.monad.result import Err
-
-        result = Invalid(["a", "b"]).to_result_or(ValueError)
-        assert isinstance(result, Err)
+        result = Invalid(["a", "b"]).fold(Err, Ok).left_map(
+            lambda errs: ValueError("; ".join(str(e) for e in errs))
+        )
+        assert type(result) is Err
         match result:
             case Err(e):
-                assert isinstance(e, ValueError)
+                assert type(e) is ValueError
                 assert "a; b" in str(e)
 
-    def test_invalid_to_result_or_custom_combine(self):
-        from funstruct.monad.result import Err
+    def test_invalid_fold_then_left_map_custom(self):
+        from funstruct.monad.result import Err, Ok
 
-        result = Invalid([1, 2, 3]).to_result_or(
-            TypeError, combine=lambda errs: str(sum(errs))
+        result = Invalid([1, 2, 3]).fold(Err, Ok).left_map(
+            lambda errs: TypeError(str(sum(errs)))
         )
-        assert isinstance(result, Err)
+        assert type(result) is Err
         match result:
             case Err(e):
-                assert isinstance(e, TypeError)
+                assert type(e) is TypeError
                 assert "6" in str(e)
 
-    def test_invalid_to_result_or_pattern_match(self):
+    def test_invalid_fold_left_map_pattern_match(self):
         """Err pattern-matches in case statements — the mint test scenario."""
-        from funstruct.monad.result import Err
+        from funstruct.monad.result import Err, Ok
 
         result = (
             Validated.cond(False, None, "bad auth")
             * Validated.cond(False, None, "no access")
-        ).to_result_or(ValueError)
+        ).fold(Err, Ok).left_map(lambda errs: ValueError("; ".join(str(e) for e in errs)))
 
         match result:
             case Err(ValueError()):

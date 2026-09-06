@@ -67,8 +67,6 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
     _monoid: Monoid
 
-    __slots__ = ("_run",)
-
     def __init__(self, run) -> None:
         self._run = run
 
@@ -92,10 +90,10 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         return cls(self._run.bind(_step))
 
-    def or_else(self, f: Callable[..., WriterT]) -> WriterT:
-        """Recover from failure via inner monad's or_else."""
+    def handle_error_with(self, f: Callable[..., WriterT]) -> WriterT:
+        """Recover from failure via inner monad's handle_error_with."""
         cls = self.__class__
-        return cls(self._run.or_else(lambda err: f(err).run()))
+        return cls(self._run.handle_error_with(lambda err: f(err).run()))
 
     @classmethod
     def pure(cls, value, monad: type) -> WriterT:

@@ -81,19 +81,19 @@ class TestBind:
         assert result.run() == Some(Left("failed at 5"))
 
 
-class TestOrElse:
+class TestHandleErrorWith:
     def test_recovers_from_left(self):
-        result = EitherT(Some(Left("err"))).or_else(
+        result = EitherT(Some(Left("err"))).handle_error_with(
             lambda e: EitherT(Some(Right(f"recovered: {e}")))
         )
         assert result.run() == Some(Right("recovered: err"))
 
     def test_skips_right(self):
-        result = EitherT(Some(Right(42))).or_else(lambda e: EitherT(Some(Right(0))))
+        result = EitherT(Some(Right(42))).handle_error_with(lambda e: EitherT(Some(Right(0))))
         assert result.run() == Some(Right(42))
 
     def test_nothing_propagates(self):
-        result = EitherT(Nothing()).or_else(lambda e: EitherT(Some(Right("recovered"))))
+        result = EitherT(Nothing()).handle_error_with(lambda e: EitherT(Some(Right("recovered"))))
         assert result.run() == Nothing()
 
 

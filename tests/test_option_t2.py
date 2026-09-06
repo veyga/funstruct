@@ -111,10 +111,10 @@ class TestBind:
         assert result == Right(Some(3))
 
 
-class TestOrElse:
+class TestHandleErrorWith:
     def test_recovers_from_nothing(self):
         result = (
-            OptionT(Right(Nothing())).or_else(lambda: OptionT(Right(Some(99)))).run()
+            OptionT(Right(Nothing())).handle_error_with(lambda: OptionT(Right(Some(99)))).run()
         )
         assert result == Right(Some(99))
 
@@ -126,7 +126,7 @@ class TestOrElse:
             called = True
             return OptionT(Right(Some(99)))
 
-        result = OptionT(Right(Some(1))).or_else(fallback).run()
+        result = OptionT(Right(Some(1))).handle_error_with(fallback).run()
 
         assert result == Right(Some(1))
         assert not called
@@ -140,7 +140,7 @@ class TestOrElse:
             called = True
             return OptionT(Right(Some(99)))
 
-        result = OptionT(Left("err")).or_else(fallback).run()
+        result = OptionT(Left("err")).handle_error_with(fallback).run()
 
         assert result == Left("err")
         assert not called
@@ -148,7 +148,7 @@ class TestOrElse:
     def test_propagates_fallback_failure(self):
         result = (
             OptionT(Right(Nothing()))
-            .or_else(lambda: OptionT(Left("fallback failed")))
+            .handle_error_with(lambda: OptionT(Left("fallback failed")))
             .run()
         )
         assert result == Left("fallback failed")

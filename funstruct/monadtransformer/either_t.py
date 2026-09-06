@@ -24,9 +24,9 @@ Examples:
     >>> EitherT(Some(Left("stop"))).bind(inc).run()
     Some(Left('stop'))
 
-    or_else — recover from Left:
+    handle_error_with — recover from Left:
 
-    >>> EitherT(Some(Left("err"))).or_else(
+    >>> EitherT(Some(Left("err"))).handle_error_with(
     ...     lambda e: EitherT(Some(Right(f"recovered: {e}")))
     ... ).run()
     Some(Right('recovered: err'))
@@ -66,8 +66,6 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
     Scala:   ``EitherT[F[_], E, A]``
     """
 
-    __slots__ = ("_value",)
-
     def __init__(self, value) -> None:
         self._value = value
 
@@ -91,7 +89,7 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
 
         return EitherT(self._value.bind(_step))
 
-    def or_else(self, f: Callable[[_E], EitherT[_F, _E, _A]]) -> EitherT[_F, _E, _A]:
+    def handle_error_with(self, f: Callable[[_E], EitherT[_F, _E, _A]]) -> EitherT[_F, _E, _A]:
         """Recover from Left: f receives the error, returns a new EitherT."""
 
         def _step(either):

@@ -1,4 +1,4 @@
-from funstruct.monad.result import Err, Ok, Result, Try
+from funstruct.monad.result import AsyncResult, Err, Ok, Result, Try
 from tests.laws import assert_type_contract
 
 
@@ -71,6 +71,45 @@ class TestDo:
             return a + b + c
 
         assert Result.do(pipeline)() == Ok(6)
+
+
+class TestFold:
+    def test_ok_fold(self):
+        result = Ok(42).fold(on_err=lambda e: 0, on_ok=lambda x: x * 2)
+        assert result == 84
+
+    def test_err_fold(self):
+        result = Err(ValueError("bad")).fold(on_err=lambda e: str(e), on_ok=lambda x: x * 2)
+        assert result == "bad"
+
+    def test_fold_positional_err_first(self):
+        ok = Ok("hello").fold(lambda e: -1, len)
+        assert ok == 5
+
+        err = Err(ValueError("x")).fold(lambda e: -1, len)
+        assert err == -1
+
+
+class TestAsyncResultFold:
+    def test_ok_fold(self):
+        import asyncio
+
+        async def go():
+            return await AsyncResult.pure(42).fold(
+                on_err=lambda e: 0, on_ok=lambda x: x * 2
+            )
+
+        assert asyncio.run(go()) == 84
+
+    def test_err_fold(self):
+        import asyncio
+
+        async def go():
+            return await AsyncResult.from_exception(ValueError("bad")).fold(
+                on_err=lambda e: str(e), on_ok=lambda x: x * 2
+            )
+
+        assert asyncio.run(go()) == "bad"
 
 
 class TestConstructors:

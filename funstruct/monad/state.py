@@ -29,8 +29,6 @@ class State(Monad, Generic[_A]):
     Scala:   ``State[S, A]``
     """
 
-    __slots__ = ("_run",)
-
     def __init__(self, run: Callable[[Any], tuple[Any, _A]]) -> None:
         self._run = run
 
@@ -59,10 +57,6 @@ class State(Monad, Generic[_A]):
         return State(inner)
 
 
-
-    def then(self, next_state: "State[_B]") -> "State[_B]":
-        """Sequence: run self, discard value, run next."""
-        return self.bind(lambda _: next_state)
 
     @classmethod
     def do(cls, gen_fn) -> Callable[..., "State"]:

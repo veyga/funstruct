@@ -39,8 +39,6 @@ class Reader(Monad, Generic[_Ctx, _A]):
     A computation that reads from a shared environment.
     """
 
-    __slots__ = ("_run",)
-
     def __init__(self, run: Callable[[_Ctx], _A]) -> None:
         self._run = run
 

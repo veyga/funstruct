@@ -25,8 +25,8 @@ class TestRight:
     def test_product_left(self):
         assert Right(1).product(Left("err")) == Left("err")
 
-    def test_or_else(self):
-        assert Right(1).or_else(lambda e: Right(99)) == Right(1)
+    def test_handle_error_with(self):
+        assert Right(1).handle_error_with(lambda e: Right(99)) == Right(1)
 
     def test_get_or_else(self):
         assert Right(1).get_or_else(99) == 1
@@ -64,11 +64,11 @@ class TestLeft:
     def test_product(self):
         assert Left("err").product(Right(1)) == Left("err")
 
-    def test_or_else(self):
-        assert Left("err").or_else(lambda e: Right("recovered")) == Right("recovered")
+    def test_handle_error_with(self):
+        assert Left("err").handle_error_with(lambda e: Right("recovered")) == Right("recovered")
 
-    def test_or_else_to_left(self):
-        assert Left("err").or_else(lambda e: Left("still bad")) == Left("still bad")
+    def test_handle_error_with_to_left(self):
+        assert Left("err").handle_error_with(lambda e: Left("still bad")) == Left("still bad")
 
     def test_get_or_else(self):
         assert Left("err").get_or_else(99) == 99
@@ -83,24 +83,38 @@ class TestLeft:
         assert Left("err").is_left is True
         assert Left("err").is_right is False
 
-    def test_alt_transforms_error(self):
-        assert Left("err").alt(str.upper) == Left("ERR")
+    def test_left_map_transforms_error(self):
+        assert Left("err").left_map(str.upper) == Left("ERR")
 
-    def test_alt_preserves_error_type(self):
-        result = Left(ValueError("x")).alt(lambda e: TypeError(str(e)))
+    def test_left_map_preserves_error_type(self):
+        result = Left(ValueError("x")).left_map(lambda e: TypeError(str(e)))
         match result:
             case Left(e):
                 assert type(e) is TypeError
 
 
-class TestAlt:
+class TestLeftMap:
     """alt transforms the error without recovering."""
 
     def test_right_alt_is_noop(self):
-        assert Right(1).alt(str.upper) == Right(1)
+        assert Right(1).left_map(str.upper) == Right(1)
 
     def test_left_alt_transforms_error(self):
-        assert Left("err").alt(lambda e: f"wrapped: {e}") == Left("wrapped: err")
+        assert Left("err").left_map(lambda e: f"wrapped: {e}") == Left("wrapped: err")
+
+
+class TestBimap:
+    def test_right_maps_right(self):
+        assert Right(5).bimap(str, lambda x: x * 2) == Right(10)
+
+    def test_left_maps_left(self):
+        assert Left("err").bimap(str.upper, lambda x: x * 2) == Left("ERR")
+
+    def test_right_ignores_on_left(self):
+        assert Right(1).bimap(lambda e: e, lambda x: x + 10) == Right(11)
+
+    def test_left_ignores_on_right(self):
+        assert Left("x").bimap(lambda e: e.upper(), lambda x: x) == Left("X")
 
 
 class TestDo:

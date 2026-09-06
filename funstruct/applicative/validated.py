@@ -17,10 +17,6 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from funstruct.monad.result import Result
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import Cons
@@ -62,12 +58,6 @@ class Validated(Applicative):
     def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
         """Eliminate the Validated — apply on_invalid or on_valid."""
         ...
-
-    @abstractmethod
-    def to_result(self) -> Result: ...
-
-    @abstractmethod
-    def to_result_or(self, exc_cls, combine=None) -> Result: ...
 
     @classmethod
     def pure(cls, value) -> Validated:
@@ -133,17 +123,6 @@ class Valid(Validated, Generic[_A]):
             case _:
                 return other
 
-    def to_result(self):
-        """Convert to Ok(value)."""
-        from funstruct.monad.result import Ok
-
-        return Ok(self.value)
-
-    def to_result_or(self, exc_cls):
-        """Convert to Ok(value) — exc_cls unused on Valid."""
-        from funstruct.monad.result import Ok
-
-        return Ok(self.value)
 
 
 @dataclass(frozen=True)
@@ -182,19 +161,6 @@ class Invalid(Validated, Generic[_E]):
             case _:
                 return self
 
-    def to_result(self):
-        """Convert to Err(errors)."""
-        from funstruct.monad.result import Err
-
-        return Err(self.errors)
-
-    def to_result_or(
-        self, exc_cls, combine=lambda errs: "; ".join(str(e) for e in errs)
-    ):
-        """Convert to Err(exc_cls(combined_errors))."""
-        from funstruct.monad.result import Err
-
-        return Err(exc_cls(combine(self.errors)))
 
 
 __all__ = [

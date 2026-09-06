@@ -34,8 +34,8 @@ class TestSome:
     def test_get_or_else(self):
         assert Some(42).get_or_else(0) == 42
 
-    def test_or_else(self):
-        assert Some(1).or_else(lambda: Some(99)) == Some(1)
+    def test_handle_error_with(self):
+        assert Some(1).handle_error_with(lambda: Some(99)) == Some(1)
 
     def test_filter_passes(self):
         assert Some(10).filter(lambda x: x > 5) == Some(10)
@@ -84,8 +84,8 @@ class TestNothing:
     def test_get_or_else(self):
         assert Nothing().get_or_else(99) == 99
 
-    def test_or_else(self):
-        assert Nothing().or_else(lambda: Some(42)) == Some(42)
+    def test_handle_error_with(self):
+        assert Nothing().handle_error_with(lambda: Some(42)) == Some(42)
 
     def test_filter(self):
         assert Nothing().filter(lambda x: True) == Nothing()

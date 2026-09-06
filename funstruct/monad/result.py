@@ -16,9 +16,9 @@ Examples:
     >>> Ok(10).bind(lambda x: Ok(x * 2))
     Ok(20)
 
-    or_else — recover from Err:
+    handle_error_with — recover from Err:
 
-    >>> Err("bad").or_else(lambda e: Ok("default"))
+    >>> Err("bad").handle_error_with(lambda e: Ok("default"))
     Ok('default')
 
     @Try decorator:
@@ -63,12 +63,16 @@ class Result(Either[Exception, _A], Generic[_A]):
     def from_exception(cls, error: Exception) -> Result:
         return Err(error)
 
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        """Eliminate the Result — apply on_err or on_ok."""
+        return super().fold(on_left=on_err, on_right=on_ok)
+
     @abstractmethod
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
     @abstractmethod
-    def alt(self, f: Callable[[Exception], Exception]) -> Result[_A]: ...
+    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]: ...
     @abstractmethod
-    def or_else(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]: ...
+    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]: ...
 
 
 @dataclass(frozen=True, eq=False)
@@ -82,10 +86,13 @@ class Ok(Right):
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return f(self.value)
 
-    def alt(self, f: Callable[[Exception], Exception]) -> Result[_A]:
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        return on_ok(self.value)
+
+    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
         return self
 
-    def or_else(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
         return self
 
     def __repr__(self) -> str:
@@ -96,13 +103,16 @@ class Ok(Right):
 class Err(Left):
     """Error case of Result."""
 
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        return on_err(self.error)
+
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return self
 
-    def alt(self, f: Callable[[Exception], Exception]) -> Result[_A]:
+    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
         return Err(f(self.error))
 
-    def or_else(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
         return f(self.error)
 
     def __repr__(self) -> str:
@@ -116,11 +126,9 @@ class AsyncResult(Monad, Generic[_A]):
     """Lazy async computation that produces Result[A] (Ok or Err) when awaited.
 
     AsyncResult[User] = async computation → Ok(user) or Err(exception).
-    Compose with .bind(), .map(), .alt(), .or_else() — no await needed.
+    Compose with .bind(), .map(), .left_map(), .handle_error_with() — no await needed.
     Execute once at the boundary with await.
     """
-
-    __slots__ = ("_coro",)
 
     def __init__(self, coro: Awaitable[Result[_A]]) -> None:
         self._coro = coro
@@ -135,32 +143,29 @@ class AsyncResult(Monad, Generic[_A]):
     async def _awaitable(self) -> Result[_A]:
         return await self._coro
 
-    def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
-        """Chain: f receives value. Short-circuits on Err.
+    @staticmethod
+    async def _resolve(value: Any) -> Result:
+        """Resolve a mixed return type into a Result."""
+        if inspect.isawaitable(value):
+            value = await value
+        if isinstance(value, Either):
+            return value
+        return Ok(value)
 
-        Handles all return types from f:
-        - AsyncResult[B] → awaited, produces Result
-        - Either[E, B] / Result[B] → used directly
-        - Awaitable[B] → awaited, plain value wrapped in Ok
-        - Plain B → wrapped in Ok
-        """
+    def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
+        """Chain: f receives value. Short-circuits on Err."""
 
         async def _inner():
             result = await self._coro
             match result:
                 case Right(value):
-                    inner = f(value)
-                    if inspect.isawaitable(inner):
-                        inner = await inner
-                    if isinstance(inner, Either):
-                        return inner
-                    return Ok(inner)
+                    return await AsyncResult._resolve(f(value))
                 case _:
                     return result
 
         return AsyncResult(_inner())
 
-    def alt(self, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
+    def left_map(self, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
         """Transform the error without recovering."""
 
         async def _inner():
@@ -173,26 +178,14 @@ class AsyncResult(Monad, Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def or_else(self, f: Callable[[Exception], Any]) -> AsyncResult:
-        """Recover from error: f receives error. Short-circuits on success.
-
-        Handles all return types from f:
-        - AsyncResult[A] → awaited, produces Result
-        - Either[E, A] / Result[A] → used directly
-        - Awaitable[A] → awaited, plain value wrapped in Ok
-        - Plain A → wrapped in Ok
-        """
+    def handle_error_with(self, f: Callable[[Exception], Any]) -> AsyncResult:
+        """Recover from error: f receives error. Short-circuits on success."""
 
         async def _inner():
             result = await self._coro
             match result:
                 case Left(error):
-                    inner = f(error)
-                    if inspect.isawaitable(inner):
-                        inner = await inner
-                    if isinstance(inner, Either):
-                        return inner
-                    return Ok(inner)
+                    return await AsyncResult._resolve(f(error))
                 case _:
                     return result
 
@@ -225,12 +218,24 @@ class AsyncResult(Monad, Generic[_A]):
 
         return cls(_inner())
 
+    async def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        """Await and eliminate — apply on_err or on_ok.
+
+        Usage: ``value = await async_result.fold(handle_err, handle_ok)``
+        """
+        result = await self._coro
+        match result:
+            case Right(value):
+                return on_ok(value)
+            case Left(error):
+                return on_err(error)
+
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., AsyncResult]:
         """Do-notation for AsyncResult. Short-circuits on Err. Returns a callable.
 
-        Each yield can be an AsyncResult (awaited) or a sync Either
-        (used directly). Right values are sent back, Left short-circuits.
+        Every yielded value must be an AsyncResult. Use
+        ``AsyncResult.from_either()`` to lift sync Either/Result values.
 
         >>> @AsyncResult.do
         ... def pipeline():
@@ -245,10 +250,7 @@ class AsyncResult(Monad, Generic[_A]):
                 try:
                     monadic_val = next(gen)
                     while True:
-                        if isinstance(monadic_val, Either):
-                            result = monadic_val
-                        else:
-                            result = await monadic_val
+                        result = await monadic_val
                         match result:
                             case Right(value):
                                 monadic_val = gen.send(value)
@@ -299,7 +301,7 @@ def TryAsync(
 
     Accepts both sync and async functions. Returns AsyncResult[A] — a
     lazy computation. Await at the boundary to get Result[A] (Ok or Err).
-    Compose with .bind(), .map(), .alt() without awaiting.
+    Compose with .bind(), .map(), .left_map() without awaiting.
 
     Usage::
 

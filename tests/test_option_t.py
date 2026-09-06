@@ -52,20 +52,20 @@ class TestBind:
         assert result == Right(Some(3))
 
 
-class TestOrElse:
+class TestHandleErrorWith:
     def test_recovers_from_nothing(self):
         result = (
-            OptionT(Right(Nothing())).or_else(lambda: OptionT(Right(Some(99)))).run()
+            OptionT(Right(Nothing())).handle_error_with(lambda: OptionT(Right(Some(99)))).run()
         )
         assert result == Right(Some(99))
 
     def test_skips_on_some(self):
-        result = OptionT(Right(Some(1))).or_else(lambda: OptionT(Right(Some(99)))).run()
+        result = OptionT(Right(Some(1))).handle_error_with(lambda: OptionT(Right(Some(99)))).run()
         assert result == Right(Some(1))
 
     def test_does_not_recover_left(self):
         """or_else only handles Nothing, not outer monad failure."""
-        result = OptionT(Left("err")).or_else(lambda: OptionT(Right(Some(99)))).run()
+        result = OptionT(Left("err")).handle_error_with(lambda: OptionT(Right(Some(99)))).run()
         assert result == Left("err")
 
 

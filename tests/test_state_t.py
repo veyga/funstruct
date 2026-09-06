@@ -116,39 +116,39 @@ class TestBind:
         assert pipeline.run(Nil()) == Right((CList.from_iterable([3, 2, 1]), 3))
 
 
-class TestOrElse:
-    def test_or_else_recovers_from_failure(self):
+class TestHandleErrorWith:
+    def test_handle_error_with_recovers_from_failure(self):
         failing = StateT(lambda _: Left("oops"))
-        recovered = failing.or_else(lambda _: StateT.pure("recovered", Either))
+        recovered = failing.handle_error_with(lambda _: StateT.pure("recovered", Either))
         assert recovered.run(0) == Right((0, "recovered"))
 
-    def test_or_else_skips_on_success(self):
+    def test_handle_error_with_skips_on_success(self):
         s = StateT.pure("ok", Either)
-        result = s.or_else(lambda e: StateT.pure("should not happen", Either))
+        result = s.handle_error_with(lambda e: StateT.pure("should not happen", Either))
         assert result.run(0) == Right((0, "ok"))
 
-    def test_or_else_uses_state_before_or_elseed_computation(self):
-        """or_else reverts to the state at the start of the or_elseed computation."""
+    def test_handle_error_with_uses_state_before_recovered_computation(self):
+        """handle_error_with reverts to the state at the start of the recovered computation."""
         mutate_then_fail = StateT(lambda _: Left("err"))
-        # or_else wraps the whole .then(fail) — recovery gets the original state
+        # handle_error_with wraps the whole .then(fail) — recovery gets the original state
         recovered = (
             StateT(lambda s: Right((s + 1, "a")))
             .then(mutate_then_fail)
-            .or_else(lambda e: StateT.get(Either))
+            .handle_error_with(lambda e: StateT.get(Either))
         )
         assert recovered.run(0) == Right((0, 0))
 
-    def test_or_else_preserves_state_from_successful_prefix_with_separate_or_else(
+    def test_handle_error_with_preserves_state_from_successful_prefix(
         self,
     ):
-        """To keep prior state, or_else only the failing step."""
+        """To keep prior state, handle_error_with only the failing step."""
         mutate = StateT(lambda s: Right((s + 1, "a")))
         failing = StateT(lambda s: Left("err"))
-        # or_else only wraps the failing step
-        recovered = mutate.then(failing.or_else(lambda e: StateT.get(Either)))
+        # handle_error_with only wraps the failing step
+        recovered = mutate.then(failing.handle_error_with(lambda e: StateT.get(Either)))
         assert recovered.run(0) == Right((1, 1))
 
-    def test_or_else_selective_recovery(self):
+    def test_handle_error_with_selective_recovery(self):
         """Only recover from specific error types."""
 
         class Recoverable(Exception):
@@ -158,7 +158,7 @@ class TestOrElse:
             pass
 
         failing = StateT(lambda _: Left(Recoverable()))
-        pipeline = failing.or_else(
+        pipeline = failing.handle_error_with(
             lambda err: (
                 StateT.pure("fixed", Either)
                 if isinstance(err, Recoverable)
@@ -168,7 +168,7 @@ class TestOrElse:
         assert pipeline.run(0) == Right((0, "fixed"))
 
         fatal = StateT(lambda _: Left(Fatal()))
-        pipeline2 = fatal.or_else(
+        pipeline2 = fatal.handle_error_with(
             lambda err: (
                 StateT.pure("fixed", Either)
                 if isinstance(err, Recoverable)

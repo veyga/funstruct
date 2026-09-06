@@ -34,14 +34,12 @@ class StateT(MonadTransformer, Generic[_F, _A]):
     """Generic state transformer: ``S -> F[(S, A)]``.
 
     ``F`` is the wrapping monad (Result, FutureResult, Maybe, etc.).
-    Composition uses duck-typed ``.bind()`` / ``.map()`` / ``.or_else()``
+    Composition uses duck-typed ``.bind()`` / ``.map()`` / ``.handle_error_with()``
     on whatever ``F`` returns — one implementation for all monads.
 
     Haskell: ``StateT m s a``
     Scala:   ``StateT[F[_], S, A]``
     """
-
-    __slots__ = ("_run",)
 
     def __init__(self, run: Callable[..., _F]) -> None:
         self._run = run
@@ -79,15 +77,15 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
         return StateT(inner)
 
-    def or_else(self, f: Callable[..., "StateT"]) -> "StateT":
+    def handle_error_with(self, f: Callable[..., "StateT"]) -> "StateT":
         """Recover from failure.
 
         ``f`` receives the error, returns a recovery StateT.
-        Only works when ``F`` supports ``.or_else()``.
+        Only works when ``F`` supports ``.handle_error_with()``.
         """
 
         def inner(s):
-            return self._run(s).or_else(lambda err: f(err).run(s))
+            return self._run(s).handle_error_with(lambda err: f(err).run(s))
 
         return StateT(inner)
 

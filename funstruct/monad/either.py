@@ -13,11 +13,11 @@ Examples:
     >>> Left("err").bind(lambda x: Right(x * 2))
     Left('err')
 
-    or_else — recover from Left:
+    handle_error_with — recover from Left:
 
-    >>> Left("err").or_else(lambda e: Right("default"))
+    >>> Left("err").handle_error_with(lambda e: Right("default"))
     Right('default')
-    >>> Right(10).or_else(lambda e: Right("default"))
+    >>> Right(10).handle_error_with(lambda e: Right("default"))
     Right(10)
 
     do-notation:
@@ -126,30 +126,28 @@ class Either(Monad, Generic[E, A]):
         """
         return cls.sequence(values.map(f))
 
-    def to_option(self):
-        """Convert to Option — Right(v) → Some(v), Left(_) → Nothing.
-
-        >>> Right(1).to_option()
-        Some(1)
-        >>> Left("err").to_option()
-        Nothing()
-        """
-        from funstruct.monad.option import Nothing, Some
-
-        match self:
-            case Right(v):
-                return Some(v)
-            case _:
-                return Nothing()
-
     @abstractmethod
-    def alt(self, f: Callable[[E], E]) -> Either[E, A]:
-        """Transform the error without recovering. No-op on Right."""
+    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
+        """Transform the error without recovering. No-op on Right.
+
+        Cats: ``leftMap``
+        """
         ...
 
     @abstractmethod
-    def or_else(self, f: Callable[[E], Either]) -> Either:
-        """Handle error — f can recover (Right) or re-fail (Left). No-op on Right."""
+    def handle_error_with(self, f: Callable[[E], Either]) -> Either:
+        """Recover from error — f can succeed (Right) or re-fail (Left). No-op on Right.
+
+        Cats: ``handleErrorWith``
+        """
+        ...
+
+    @abstractmethod
+    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+        """Transform both sides.
+
+        Cats: ``bimap``
+        """
         ...
 
     @abstractmethod
@@ -189,13 +187,17 @@ class Right(Either[E, A]):
     def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
         return f(self.value)
 
-    def alt(self, f: Callable[[E], E]) -> Either[E, A]:
+    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
         """No-op on Right — already succeeded."""
         return self
 
-    def or_else(self, f: Callable[[E], Either]) -> Either[E, A]:
+    def handle_error_with(self, f: Callable[[E], Either]) -> Either[E, A]:
         """No-op on Right — already succeeded."""
         return self
+
+    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+        """Apply on_right to the value."""
+        return Right(on_right(self.value))
 
     def get_or_else(self, default: A) -> A:
         """Return the value (ignores default on Right)."""
@@ -233,23 +235,27 @@ class Left(Either[E, A]):
     def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
         return self
 
-    def alt(self, f: Callable[[E], E]) -> Either[E, A]:
+    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
         """Transform the error without recovering.
 
-        >>> Left("oops").alt(lambda e: e.upper())
+        >>> Left("oops").left_map(lambda e: e.upper())
         Left('OOPS')
         """
         return Left(f(self.error))
 
-    def or_else(self, f: Callable[[E], Either]) -> Either:
-        """Handle error: f receives the error, returns a new Either.
+    def handle_error_with(self, f: Callable[[E], Either]) -> Either:
+        """Recover from error: f receives the error, returns a new Either.
 
-        >>> Left("oops").or_else(lambda e: Right(f"recovered: {e}"))
+        >>> Left("oops").handle_error_with(lambda e: Right(f"recovered: {e}"))
         Right('recovered: oops')
-        >>> Left("oops").or_else(lambda e: Left(f"still bad: {e}"))
+        >>> Left("oops").handle_error_with(lambda e: Left(f"still bad: {e}"))
         Left('still bad: oops')
         """
         return f(self.error)
+
+    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+        """Apply on_left to the error."""
+        return Left(on_left(self.error))
 
     def get_or_else(self, default: A) -> A:
         """Return default (error is discarded)."""
