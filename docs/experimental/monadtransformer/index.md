@@ -11,6 +11,8 @@ Transformers combine two monads into one, so you can write a flat pipeline
 instead of nested pattern matching. Use `lift_f` to bring an inner monad
 value into the transformer, and `.run()` to unwrap at the boundary.
 
+# TODO this example is garbage
+# use the script files to demonstrate why we need transformers
 ```python
 # Without transformer — nested pattern matching at every step:
 result = fetch_user(id)  # Either[Err, Option[User]]

@@ -13,6 +13,7 @@ Examples:
 
 """
 
+import inspect
 from collections.abc import Awaitable, Generator
 from typing import TypeVar
 
@@ -32,8 +33,6 @@ class ReAwaitable:
         self._cache = _SENTINEL
 
     def __del__(self):
-        import inspect
-
         if self._cache is _SENTINEL and inspect.iscoroutine(self._coro):
             self._coro.close()
 
