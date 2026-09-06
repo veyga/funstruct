@@ -21,7 +21,7 @@ class TestTry:
             return a / b
 
         result = divide(10, 0)
-        assert result.is_left
+        assert result.is_err
         match result:
             case Err(e):
                 assert type(e) is ZeroDivisionError
@@ -32,7 +32,7 @@ class TestTry:
             return int(s)
 
         result = parse("abc")
-        assert result.is_left
+        assert result.is_err
         match result:
             case Err(e):
                 assert type(e) is ValueError
@@ -61,7 +61,7 @@ class TestDo:
             return x + y
 
         result = Result.do(pipeline)()
-        assert result.is_left
+        assert result.is_err
 
     def test_multiple_binds(self):
         def pipeline():
@@ -141,24 +141,64 @@ class TestConstructors:
         assert Err(err) == Result.from_exception(err)
 
 
-class TestAliases:
-    def test_ok_extends_right(self):
-        from funstruct.monad.either import Right
+class TestProperties:
+    def test_ok_is_ok(self):
+        assert Ok(42).is_ok is True
+        assert Ok(42).is_err is False
 
-        assert issubclass(Ok, Right)
-
-    def test_err_extends_left(self):
-        from funstruct.monad.either import Left
-
-        assert issubclass(Err, Left)
-
-    def test_result_extends_either(self):
-        from funstruct.monad.either import Either
-
-        assert issubclass(Result, Either)
+    def test_err_is_err(self):
+        assert Err("bad").is_ok is False
+        assert Err("bad").is_err is True
 
     def test_ok_repr(self):
         assert repr(Ok(42)) == "Ok(42)"
 
     def test_err_repr(self):
         assert repr(Err("bad")) == "Err('bad')"
+
+
+class TestLeftMap:
+    def test_ok_unchanged(self):
+        assert Ok(42).left_map(lambda e: str(e)) == Ok(42)
+
+    def test_err_transforms(self):
+        result = Err(ValueError("bad")).left_map(lambda e: TypeError(str(e)))
+        match result:
+            case Err(e):
+                assert type(e) is TypeError
+
+
+class TestHandleErrorWith:
+    def test_ok_unchanged(self):
+        assert Ok(42).handle_error_with(lambda e: Ok(0)) == Ok(42)
+
+    def test_err_recovers(self):
+        result = Err(ValueError("bad")).handle_error_with(lambda e: Ok("recovered"))
+        assert result == Ok("recovered")
+
+
+class TestBimap:
+    def test_ok_maps_right(self):
+        assert Ok(5).bimap(str, lambda x: x * 2) == Ok(10)
+
+    def test_err_maps_left(self):
+        result = Err("err").bimap(str.upper, lambda x: x * 2)
+        assert result == Err("ERR")
+
+
+class TestGetOrElse:
+    def test_ok_returns_value(self):
+        assert Ok(42).get_or_else(0) == 42
+
+    def test_err_returns_default(self):
+        assert Err("bad").get_or_else(0) == 0
+
+
+class TestSwap:
+    def test_ok_to_err(self):
+        result = Ok(42).swap()
+        assert result == Err(42)
+
+    def test_err_to_ok(self):
+        result = Err("bad").swap()
+        assert result == Ok("bad")

@@ -1,11 +1,11 @@
-"""Result — Either with domain-oriented naming.
+"""Result — a monad for computations that can fail with an Exception.
 
-Result[E, A] = Ok(a) | Err(e). Same type as Either, clearer names.
-AsyncResult[A] = Future[Exception, A]. Async counterpart of Result.
+Result[A] = Ok(value) | Err(exception).
+AsyncResult[A] = async computation producing Result[A].
 
 Decorators:
-    @Try       : (args) -> Result[A]       = Either[Exception, A]
-    @TryAsync  : (args) -> AsyncResult[A]  = Future[Exception, A]
+    @Try       : (args) -> Result[A]
+    @TryAsync  : (args) -> AsyncResult[A]
 
 Examples:
     >>> from funstruct.monad.result import Result, Ok, Err, Try
@@ -41,18 +41,20 @@ from dataclasses import dataclass
 from functools import wraps
 from typing import Any, Generic, ParamSpec, TypeVar, overload
 
-from funstruct.monad.either import Either, Left, Right
+from funstruct.monad.either import Either
+from funstruct.monad.future import Future
 from funstruct.typeclasses._monad import Monad
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Result(Either[Exception, _A], Generic[_A]):
+class Result(Monad, Generic[_A]):
     """Result[A] = Ok(value) | Err(exception).
 
-    Single type parameter — E is fixed to Exception.
-    Same as Either[Exception, A] but with 1 param for cleaner annotations.
+    A monad for computations that can fail with an Exception.
+    Standalone type — not an alias for Either. Uses domain-specific
+    naming: Ok/Err instead of Right/Left, is_ok/is_err.
     """
 
     @classmethod
@@ -63,25 +65,80 @@ class Result(Either[Exception, _A], Generic[_A]):
     def from_exception(cls, error: Exception) -> Result:
         return Err(error)
 
+    @classmethod
+    def do(cls, gen_fn: Callable) -> Callable[..., Result]:
+        """Do-notation. Short-circuits on Err. Returns a callable."""
+
+        def _thunk(*args, **kwargs):
+            gen = gen_fn(*args, **kwargs)
+            try:
+                monadic_val = next(gen)
+                while True:
+                    match monadic_val:
+                        case Err():
+                            return monadic_val
+                        case Ok(value):
+                            monadic_val = gen.send(value)
+            except StopIteration as e:
+                return Ok(e.value)
+
+        return _thunk
+
+    @abstractmethod
     def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
         """Eliminate the Result — apply on_err or on_ok."""
-        return super().fold(on_left=on_err, on_right=on_ok)
+        ...
 
     @abstractmethod
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
+
     @abstractmethod
-    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]: ...
+    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
+        """Transform the error value. No-op on Ok."""
+        ...
+
     @abstractmethod
-    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]: ...
+    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+        """Recover from error. No-op on Ok."""
+        ...
+
+    @abstractmethod
+    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
+        """Transform both sides."""
+        ...
+
+    @abstractmethod
+    def get_or_else(self, default: _A) -> _A:
+        """Extract the value, or return default if Err."""
+        ...
+
+    @abstractmethod
+    def swap(self) -> Result:
+        """Swap Ok and Err."""
+        ...
+
+    @property
+    @abstractmethod
+    def is_ok(self) -> bool: ...
+
+    @property
+    def is_err(self) -> bool:
+        return not self.is_ok
 
 
 @dataclass(frozen=True, eq=False)
-class Ok(Right):
+class Ok(Result[_A]):
     """Success case of Result."""
+
+    value: _A
 
     @classmethod
     def pure(cls, value: _A) -> Ok:
         return Ok(value)
+
+    @property
+    def is_ok(self) -> bool:
+        return True
 
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return f(self.value)
@@ -95,25 +152,63 @@ class Ok(Right):
     def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
         return self
 
+    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
+        return Ok(on_ok(self.value))
+
+    def get_or_else(self, default: _A) -> _A:
+        return self.value
+
+    def swap(self) -> Result:
+        return Err(self.value)
+
+    def __eq__(self, other: object) -> bool:
+        match other:
+            case Ok(val):
+                return self.value == val
+            case _:
+                return False
+
     def __repr__(self) -> str:
         return f"Ok({repr(self.value)})"
 
 
 @dataclass(frozen=True, eq=False)
-class Err(Left):
+class Err(Result[_A]):
     """Error case of Result."""
 
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
-        return on_err(self.error)
+    error: Exception
+
+    @property
+    def is_ok(self) -> bool:
+        return False
 
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return self
+
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        return on_err(self.error)
 
     def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
         return Err(f(self.error))
 
     def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
         return f(self.error)
+
+    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
+        return Err(on_err(self.error))
+
+    def get_or_else(self, default: _A) -> _A:
+        return default
+
+    def swap(self) -> Result:
+        return Ok(self.error)
+
+    def __eq__(self, other: object) -> bool:
+        match other:
+            case Err(err):
+                return self.error == err
+            case _:
+                return False
 
     def __repr__(self) -> str:
         return f"Err({repr(self.error)})"
@@ -123,11 +218,30 @@ _P = ParamSpec("_P")
 
 
 class AsyncResult(Monad, Generic[_A]):
-    """Lazy async computation that produces Result[A] (Ok or Err) when awaited.
+    """Async computation that produces Result[A] — essentially Future[Result[A]].
 
-    AsyncResult[User] = async computation → Ok(user) or Err(exception).
-    Compose with .bind(), .map(), .left_map(), .handle_error_with() — no await needed.
-    Execute once at the boundary with await.
+    AsyncResult is syntactic sugar for composing async operations that can
+    fail. Instead of manually awaiting and pattern-matching at each step,
+    chain with .bind(), .map(), .left_map() — one await at the boundary.
+
+    Equivalent to Scala's ``EitherT[Future, Exception, A]`` but with a
+    simpler API designed for Python's async/await.
+
+    Create with:
+        AsyncResult.pure(42)                     # Ok(42) wrapped in async
+        AsyncResult.from_exception(ValueError()) # Err wrapped in async
+        AsyncResult.from_result(Ok(42))          # lift sync Result
+        @TryAsync decorator                      # catch exceptions
+
+    Compose (lazy — nothing executes until awaited):
+        result.map(f)                            # transform success value
+        result.bind(f)                           # chain async operations
+        result.left_map(f)                       # transform error value
+        result.handle_error_with(f)              # recover from error
+
+    Execute (one await at the boundary):
+        value = await result                     # Result[A]
+        value = await result.fold(on_err, on_ok) # _B
     """
 
     def __init__(self, coro: Awaitable[Result[_A]]) -> None:
@@ -148,7 +262,7 @@ class AsyncResult(Monad, Generic[_A]):
         """Resolve a mixed return type into a Result."""
         if inspect.isawaitable(value):
             value = await value
-        if isinstance(value, Either):
+        if isinstance(value, (Either, Result)):
             return value
         return Ok(value)
 
@@ -158,7 +272,7 @@ class AsyncResult(Monad, Generic[_A]):
         async def _inner():
             result = await self._coro
             match result:
-                case Right(value):
+                case Ok(value):
                     return await AsyncResult._resolve(f(value))
                 case _:
                     return result
@@ -171,7 +285,7 @@ class AsyncResult(Monad, Generic[_A]):
         async def _inner():
             result = await self._coro
             match result:
-                case Left(error):
+                case Err(error):
                     return Err(f(error))
                 case _:
                     return result
@@ -184,7 +298,7 @@ class AsyncResult(Monad, Generic[_A]):
         async def _inner():
             result = await self._coro
             match result:
-                case Left(error):
+                case Err(error):
                     return await AsyncResult._resolve(f(error))
                 case _:
                     return result
@@ -210,32 +324,41 @@ class AsyncResult(Monad, Generic[_A]):
         return cls(_inner())
 
     @classmethod
+    def from_result(cls, result: Result) -> AsyncResult:
+        """Lift a sync Result into AsyncResult."""
+
+        async def _inner():
+            return result
+
+        return cls(_inner())
+
+    @classmethod
     def from_either(cls, either: Either) -> AsyncResult:
-        """Lift a sync Either/Result into AsyncResult."""
+        """Lift a sync Either into AsyncResult."""
 
         async def _inner():
             return either
 
         return cls(_inner())
 
-    async def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
-        """Await and eliminate — apply on_err or on_ok.
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> Future[_B]:
+        """Eliminate — apply on_err or on_ok. Returns a Future to await.
 
         Usage: ``value = await async_result.fold(handle_err, handle_ok)``
         """
-        result = await self._coro
-        match result:
-            case Right(value):
-                return on_ok(value)
-            case Left(error):
-                return on_err(error)
+
+        async def _inner():
+            result = await self._coro
+            return result.fold(on_err=on_err, on_ok=on_ok)
+
+        return Future(_inner())
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., AsyncResult]:
         """Do-notation for AsyncResult. Short-circuits on Err. Returns a callable.
 
         Every yielded value must be an AsyncResult. Use
-        ``AsyncResult.from_either()`` to lift sync Either/Result values.
+        ``AsyncResult.from_result()`` to lift sync Result values.
 
         >>> @AsyncResult.do
         ... def pipeline():
@@ -252,7 +375,7 @@ class AsyncResult(Monad, Generic[_A]):
                     while True:
                         result = await monadic_val
                         match result:
-                            case Right(value):
+                            case Ok(value):
                                 monadic_val = gen.send(value)
                             case _:
                                 return result
