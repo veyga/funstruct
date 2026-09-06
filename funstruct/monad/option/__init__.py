@@ -41,8 +41,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 if TYPE_CHECKING:
     from funstruct.collections.cons import CList
@@ -52,7 +51,7 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Option(TypeConstructor, DotNotation, Generic[A]):
+class Option(DataType, Generic[A]):
     """Option[A]: either Some(value) or Nothing."""
 
     @classmethod

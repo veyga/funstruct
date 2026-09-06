@@ -39,15 +39,14 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Cons
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 A = TypeVar("A")
 B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Tree(TypeConstructor, DotNotation, Generic[A]):
+class Tree(DataType, Generic[A]):
     """Binary tree where every node holds a value."""
 
     @property

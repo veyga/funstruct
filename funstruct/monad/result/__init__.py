@@ -42,8 +42,7 @@ from typing import Any, Generic, ParamSpec, TypeVar, overload
 
 from funstruct.monad.either import Either
 from funstruct.monad.future import Future
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.util.created_at import CapturesCreationSiteMixin
 from funstruct.util._reawaitable import ReAwaitable
 
@@ -51,7 +50,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Result(TypeConstructor, DotNotation, Generic[_A]):
+class Result(DataType, Generic[_A]):
     """Result[A] = Ok(value) | Err(exception)."""
 
     @classmethod
@@ -183,7 +182,7 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
 _P = ParamSpec("_P")
 
 
-class AsyncResult(TypeConstructor, DotNotation, Generic[_A]):
+class AsyncResult(DataType, Generic[_A]):
     """Async computation that produces Result[A] — essentially Future[Result[A]].
 
     Create with:

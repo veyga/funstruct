@@ -36,8 +36,7 @@ from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -213,7 +212,7 @@ def _make_branch(k1, v1, h1, k2, v2, h2, shift):
 _EMPTY = _Empty()
 
 
-class frozendict(TypeConstructor, DotNotation, Generic[K, V]):
+class frozendict(DataType, Generic[K, V]):
     """An immutable, persistent dictionary backed by a HAMT."""
 
     def __init__(self, *args, shallow: bool = False, **kwargs) -> None:

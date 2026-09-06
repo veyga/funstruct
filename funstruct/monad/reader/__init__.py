@@ -22,15 +22,14 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 _Ctx = TypeVar("_Ctx")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Reader(TypeConstructor, DotNotation, Generic[_Ctx, _A]):
+class Reader(DataType, Generic[_Ctx, _A]):
     """Reader: Ctx -> A."""
 
     def __init__(self, run: Callable[[_Ctx], _A]) -> None:

@@ -16,8 +16,7 @@ from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Nil
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.typeclasses.monoid import Monoid
 
 _W = TypeVar("_W")
@@ -25,7 +24,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Writer(TypeConstructor, DotNotation, Generic[_W, _A]):
+class Writer(DataType, Generic[_W, _A]):
     """Writer: (A, W) with output combined via a class-level Monoid."""
 
     _monoid: Monoid

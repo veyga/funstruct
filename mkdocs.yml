@@ -22,6 +22,8 @@ nav:
       - The Typeclass Pattern: guides/typeclass_pattern.md
       - Railway Oriented Programming: guides/railway_oriented_programming.md
       - Tagless Final Style: guides/tagless_final.md
+      - Do-Notation: guides/do_notation.md
+      - Async Operations: guides/async.md
       - Evaluation Strategy: guides/evaluation_strategy.md
       - Anti-Patterns: guides/antipatterns.md
   - Typeclasses:

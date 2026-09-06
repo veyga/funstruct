@@ -16,14 +16,13 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class State(TypeConstructor, DotNotation, Generic[_A]):
+class State(DataType, Generic[_A]):
     """Pure State monad: ``S -> (S, A)``."""
 
     def __init__(self, run: Callable[[Any], tuple[Any, _A]]) -> None:

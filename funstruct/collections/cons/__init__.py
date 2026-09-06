@@ -18,14 +18,13 @@ from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 A = TypeVar("A")
 B = TypeVar("B")
 
 
-class CList(TypeConstructor, DotNotation, Generic[A]):
+class CList(DataType, Generic[A]):
     """A Lisp/ML/Scala style singly linked list (cons list).
 
     Performance characteristics:

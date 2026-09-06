@@ -20,13 +20,12 @@ from __future__ import annotations
 from collections.abc import Iterable, Iterator
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 _A = TypeVar("_A")
 
 
-class ZipList(TypeConstructor, DotNotation, Generic[_A]):
+class ZipList(DataType, Generic[_A]):
     """List with element-wise applicative."""
 
     def __init__(self, values: Iterable[_A]) -> None:

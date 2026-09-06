@@ -20,8 +20,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import Cons
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
-from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.mixins.data_type import DataType
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -29,8 +28,8 @@ _C = TypeVar("_C")
 _E = TypeVar("_E")
 
 
-class Validated(TypeConstructor, DotNotation):
-    """Base class for Valid/Invalid."""
+class Validated(DataType, Generic[_E, _A]):
+    """Base class for Valid/Invalid. Bifunctor over error and value types."""
 
     @property
     @abstractmethod

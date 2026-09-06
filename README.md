@@ -56,49 +56,41 @@ internally.
 
 ## Functional Primer
 
-### Typeclasses
+### Architecture
 
-Typeclasses define capabilities. Data types implement them via instances.
+Three distinct class hierarchies, connected by instances:
+
+```text
+  BaseTypeclass                    DataType
+  (abstract capabilities)          (concrete data)
+  ─────────────────                ────────────────
+  Semigroup → Monoid               Option[A]
+  Foldable → Traversable           Either[E, A]
+  Bifunctor                        Result[A], AsyncResult[A]
+  Functor → Applicative            CList[A], Tree[A]
+       ├→ Alternative              frozendict[K, V]
+       └→ Monad → MonadError       State[S, A], Reader[R, A]
+                                   Writer[W, A], Future[A]
+                                   Validated[E, A], ZipList[A]
+
+  INSTANCES (connect them)
+  ────────────────────────
+  _OptionMonad(Monad, for_type=Option)         — auto-registered
+  _ResultMonadError(MonadError, for_type=Result)
+  _CListAlternative(Alternative, for_type=CList)
+  _EitherBifunctor(Bifunctor, for_type=Either)
+  ...
+```
+
+- **`BaseTypeclass`** — root of all typeclasses. Provides AutoRegister
+  (`for_type=` keyword for automatic instance registration).
+- **`DataType`** — root of all data types. Provides TypeConstructor
+  (auto `_type_constructor` detection) and DotNotation (dot-syntax dispatch).
+- **Instances** — separate classes that implement a typeclass for a data type.
+  Only implement primitives (pure + bind); derived ops (map, ap) come from
+  the typeclass hierarchy.
 
 ![funstruct typeclass hierarchy](docs/typeclasses.svg)
-
-```
-                        ┌─────────────────────────────────────────────────────────┐
-                        │                    TYPECLASSES                          │
-                        │                                                         │
-                        │  Algebraic        Structural        Computational       │
-                        │  ──────────       ──────────        ─────────────       │
-                        │                                                         │
-                        │  Semigroup        Foldable           Functor            │
-                        │      │                │                 │               │
-                        │   Monoid          Traversable      Applicative          │
-                        │                                    /         \          │
-                        │  Bifunctor                  Alternative    Monad        │
-                        │                                              │          │
-                        │                                         MonadError      │
-                        └─────────────────────────────────────────────────────────┘
-
-                        ┌─────────────────────────────────────────────────────────┐
-                        │                     DATA TYPES                          │
-                        │                                                         │
-                        │  Option[A]     Either[E, A]     Result[A]               │
-                        │  CList[A]      Tree[A]          frozendict[K, V]        │
-                        │  Validated[E, A]   ZipList[A]   Future[A]               │
-                        │  State[S, A]   Reader[R, A]     Writer[W, A]            │
-                        │  AsyncResult[A]                                         │
-                        └─────────────────────────────────────────────────────────┘
-
-                        ┌─────────────────────────────────────────────────────────┐
-                        │                     INSTANCES                           │
-                        │           (connect typeclasses to data types)           │
-                        │                                                         │
-                        │  Monad[Option]       MonadError[Result]                 │
-                        │  Monad[Either]       MonadError[Either]                 │
-                        │  Alternative[Option] Bifunctor[Either]                  │
-                        │  Traversable[CList]  Functor[Tree]                     │
-                        │  Foldable[frozendict]  ...                             │
-                        └─────────────────────────────────────────────────────────┘
-```
 
 #### Diagrams
 
