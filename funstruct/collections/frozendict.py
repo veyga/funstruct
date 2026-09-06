@@ -366,6 +366,30 @@ class frozendict(Functor[V], Foldable, Generic[K, V]):
         return dict(self.__root.items_iter())
 
     @classmethod
+    def deep(cls, d: dict) -> frozendict:
+        """Recursively convert nested dicts into frozendicts.
+
+        Lists of dicts are also converted. Non-dict values pass through.
+
+        >>> frozendict.deep({"a": {"b": 1}}).get("a").get("b")
+        1
+        """
+        root = _EMPTY
+        size = 0
+        for k, v in d.items():
+            if isinstance(v, dict):
+                v = cls.deep(v)
+            elif isinstance(v, list):
+                v = [cls.deep(item) if isinstance(item, dict) else item for item in v]
+            root = root.put(k, v, hash(k), 0)
+            size += 1
+        new_fd = object.__new__(frozendict)
+        object.__setattr__(new_fd, "_frozendict__root", root)
+        object.__setattr__(new_fd, "_frozendict__size", size)
+        object.__setattr__(new_fd, "_frozendict__hash_cache", None)
+        return new_fd
+
+    @classmethod
     def fromkeys(cls, *args, **kwargs) -> frozendict:
         return cls(dict.fromkeys(*args, **kwargs))
 

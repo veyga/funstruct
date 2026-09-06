@@ -647,3 +647,112 @@ class TestFoldable:
     def test_fold_left_string_concat(self):
         fd = frozendict({"x": "hello"})
         assert fd.fold_left("", lambda acc, v: acc + v) == "hello"
+
+
+class TestDeep:
+    def test_deep_converts_nested_dicts(self):
+        fd = frozendict.deep({"a": {"b": 1}})
+        assert isinstance(fd.get("a"), frozendict)
+        assert fd.get("a").get("b") == 1
+
+    def test_deep_converts_three_levels(self):
+        fd = frozendict.deep({"x": {"y": {"z": 42}}})
+        assert fd.get("x").get("y").get("z") == 42
+
+    def test_deep_leaves_non_dicts_alone(self):
+        fd = frozendict.deep({"name": "alice", "age": 30})
+        assert fd.get("name") == "alice"
+        assert fd.get("age") == 30
+
+    def test_deep_converts_dicts_inside_lists(self):
+        fd = frozendict.deep({"users": [{"name": "alice"}, {"name": "bob"}]})
+        users = fd.get("users")
+        assert isinstance(users, list)
+        assert isinstance(users[0], frozendict)
+        assert users[0].get("name") == "alice"
+        assert users[1].get("name") == "bob"
+
+    def test_deep_fold_over_json_blob(self):
+        """Simulate wrapping an API response and folding over it."""
+        api_response = {
+            "status": "ok",
+            "data": {
+                "orders": [
+                    {"id": 1, "total": 49.99},
+                    {"id": 2, "total": 129.00},
+                    {"id": 3, "total": 9.99},
+                ],
+                "meta": {"count": 3, "currency": "USD"},
+            },
+        }
+        fd = frozendict.deep(api_response)
+
+        assert fd.get("status") == "ok"
+        data = fd.get("data")
+        assert isinstance(data, frozendict)
+        assert data.get("meta").get("currency") == "USD"
+
+        orders = data.get("orders")
+        total = sum(o.get("total") for o in orders)
+        assert total == 188.98
+
+        meta = data.get("meta")
+        assert meta.fold_left("", lambda acc, v: f"{acc}{v}") in (
+            "3USD", "USD3",  # order is not guaranteed in HAMT
+        )
+
+    def test_fold_over_nested_structure(self):
+        """Nested frozendict: org chart with departments → teams → headcount.
+
+        Build a nested frozendict, map over inner values, then fold
+        to compute totals — exercises Functor + Foldable together.
+        """
+        org = frozendict({
+            "engineering": frozendict({
+                "backend": frozendict({"headcount": 12, "budget": 500_000}),
+                "frontend": frozendict({"headcount": 8, "budget": 350_000}),
+                "infra": frozendict({"headcount": 5, "budget": 200_000}),
+            }),
+            "product": frozendict({
+                "design": frozendict({"headcount": 4, "budget": 150_000}),
+                "research": frozendict({"headcount": 3, "budget": 120_000}),
+            }),
+        })
+
+        # fold_left: total headcount across all departments and teams
+        total_headcount = org.fold_left(0, lambda acc, dept: (
+            dept.fold_left(acc, lambda inner_acc, team: (
+                team.get("headcount") + inner_acc
+            ))
+        ))
+        assert total_headcount == 32  # 12 + 8 + 5 + 4 + 3
+
+        # fold_right: total budget across all departments and teams
+        total_budget = org.fold_right(0, lambda dept, acc: (
+            dept.fold_right(acc, lambda team, inner_acc: (
+                team.get("budget") + inner_acc
+            ))
+        ))
+        assert total_budget == 1_320_000  # 500k + 350k + 200k + 150k + 120k
+
+        # map + fold: give every team a 10% budget raise, then total
+        raised = org.map(lambda dept: dept.map(lambda team: (
+            team.put("budget", int(team.get("budget") * 1.1))
+        )))
+        raised_budget = raised.fold_left(0, lambda acc, dept: (
+            dept.fold_left(acc, lambda inner_acc, team: (
+                team.get("budget") + inner_acc
+            ))
+        ))
+        assert raised_budget == 1_452_000  # 1_320_000 * 1.1
+
+        # fold_left: collect all team names
+        team_names = org.fold_left([], lambda acc, dept: (
+            dept.fold_left(acc, lambda inner_acc, team: (
+                inner_acc + [f"{team.get('headcount')} people"]
+            ))
+        ))
+        assert len(team_names) == 5
+        assert sorted(team_names) == [
+            "12 people", "3 people", "4 people", "5 people", "8 people",
+        ]

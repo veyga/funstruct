@@ -258,7 +258,12 @@ WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
 
 ## Roadmap
 
+- **Monad transformers** - currently in experimental/
+- **Higher Kinded Type Support** - potentially? maybe using mypy plugin (wonder if worth)
 - **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax. Eliminates `TypeVar` boilerplate and `Callable[[A, B], C]` throughout.
-- **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`). Demonstrate composing parsers with `bind`/`do`, with a JSON parser as the showcase.
-- **Typeclass derivation** — auto-generate `map`, `fold`, `pure` for dataclasses via `@derive(Functor)`. Runtime derivation via decorators, with type checker plugin support (mypy/ty) when available.
-- **ZipList improvements** — infinite streams, lazy evaluation.
+- **Parser combinators**
+- **Typeclass derivation** — utilizing something like mypy plugins
+- **Lens/Optics**
+- **Stream** — infinite streams, lazy
+- **FreeMonad** - implementation
+- **EffectsSystem** - utilizing an effects system over monad transformer stacks
