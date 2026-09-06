@@ -27,6 +27,7 @@ nav:
       - Async Operations: guides/async.md
       - Evaluation Strategy: guides/evaluation_strategy.md
       - Creating a Data Type: guides/creating_a_data_type.md
+      - Trait Patterns: guides/trait_patterns.md
       - Anti-Patterns: guides/antipatterns.md
   - Typeclasses:
       - Overview: typeclass/index.md

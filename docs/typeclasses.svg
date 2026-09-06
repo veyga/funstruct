@@ -15,9 +15,9 @@
   <rect x="490" y="75" width="380" height="230" rx="8" fill="#f5fff0" stroke="#90c890" filter="url(#shadow)"/>
   <text x="680" y="95" text-anchor="middle" font-size="10" fill="#508050" font-weight="bold">COMPUTATIONAL</text>
   <rect x="65" y="108" width="130" height="34" rx="6" fill="#ff99ca" stroke="#e8a0b8"/>
-  <text x="130" y="130" text-anchor="middle" font-weight="bold" fill="#fff">Monoid</text>
+  <text x="130" y="130" text-anchor="middle" font-weight="bold" fill="#fff">Semigroup</text>
   <rect x="65" y="160" width="130" height="34" rx="6" fill="#ff99ca" stroke="#e8a0b8"/>
-  <text x="130" y="182" text-anchor="middle" font-weight="bold" fill="#fff">Semigroup</text>
+  <text x="130" y="182" text-anchor="middle" font-weight="bold" fill="#fff">Monoid</text>
   <rect x="295" y="108" width="130" height="34" rx="6" fill="#cadfff" stroke="#90b0e0"/>
   <text x="360" y="130" text-anchor="middle" font-weight="bold" fill="#4060a0">Bifunctor</text>
   <rect x="295" y="155" width="130" height="34" rx="6" fill="#77afff" stroke="#a0b8e8"/>
@@ -39,7 +39,7 @@
   <line x1="690" y1="194" x2="750" y2="212" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="750" y1="246" x2="750" y2="264" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="360" y1="189" x2="360" y2="202" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="130" y1="194" x2="130" y2="108" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="130" y1="142" x2="130" y2="160" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="30" y="330" width="840" height="130" rx="8" fill="#2a2520" stroke="#d0b090" filter="url(#shadow)"/>
   <text x="450" y="350" text-anchor="middle" font-size="10" fill="#c0a070" font-weight="bold">DATA TYPES</text>
   <rect x="50" y="362" width="108" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>

@@ -66,15 +66,15 @@ def extract_demo(path: Path) -> dict:
     import_block = "\n".join(i for i in imports if i and "typer" not in i and "asyncio" not in i and "sys" not in i)
     runnable = f"{import_block}\n\n{code}" if import_block else code
 
-    # Clean up: remove print statements that reference undefined names
-    # and remove async/await stuff
-    runnable = runnable.replace("asyncio.run(", "# asyncio.run(")
+    # Flag if this demo has async code (can't run directly in Pyodide py-editor)
+    has_async = "async " in runnable or "await " in runnable or "asyncio" in runnable
 
     return {
         "path": str(path),
         "title": title,
         "description": "\n".join(docstring.split("\n")[1:]).strip(),
         "code": runnable.strip(),
+        "async": has_async,
     }
 
 
@@ -116,6 +116,8 @@ def generate_html(demos: list[dict]) -> str:
             desc = demo["description"][:200].replace("\n", " ")
             lines.append(f'<p>{desc}</p>')
         lines.append(f'<div class="demo-source">source: <code>{demo["path"]}</code></div>')
+        if demo["async"]:
+            lines.append('<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python ' + demo["path"] + '</code></p>')
         lines.append(f'<script type="py-editor" config=\'{{"packages":["funstruct"]}}\'>')
         lines.append(demo["code"])
         lines.append('</script>')

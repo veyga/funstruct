@@ -121,8 +121,11 @@ def generate_svg() -> str:
         if tc is BaseTypeclass:
             continue
         groups[classify_typeclass(tc)].append(tc)
-    for g in groups.values():
-        g.sort(key=lambda c: c.__name__)
+    # Custom sort: parents before children
+    algebraic_order = {"Semigroup": 0, "Monoid": 1}
+    groups["algebraic"].sort(key=lambda c: algebraic_order.get(c.__name__, 99))
+    groups["structural"].sort(key=lambda c: c.__name__)
+    groups["computational"].sort(key=lambda c: c.__name__)
 
     # Build hierarchy edges
     edges = []

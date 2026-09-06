@@ -17,16 +17,6 @@ pip install funstruct || uv add funstruct
 
 ![funstruct typeclass hierarchy](typeclasses.svg)
 
-```text
-Semigroup     Bifunctor     Foldable      Functor
-    │                        \       /       │
- Monoid                   Traversable    Applicative
-                                        /         \
-                                   Alternative    Monad
-                                                    │
-                                                MonadError
-```
-
 #### Diagrams
 
 **Functor** — transform the value inside a context

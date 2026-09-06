@@ -30,6 +30,7 @@
 <h2>Demo: AsyncResult pipeline — composing async operations that can fail</h2>
 <p>Shows two equivalent ways to build a pipeline:     1. Bind chains: .bind(lambda x: ...).map(lambda x: ...)     2. >> operator: pipeline >> next_step  Both short-circuit on the first Err.  Run: uv run </p>
 <div class="demo-source">source: <code>demos/01_result_pipeline.py</code></div>
+<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/01_result_pipeline.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
@@ -44,12 +45,13 @@ async def run():
     print("\n=== >> operator ===")
     print(f"  alice age: {await get_age_only('alice')}")
 
-# asyncio.run(run())
+asyncio.run(run())
 </script>
 
 <h2>Demo: do-notation — generator-based monadic sequencing</h2>
 <p>@do turns a generator function into a monadic pipeline. yield extracts the value from each monadic step; short-circuits on failure.  Key rules:     - @Result.do / @Option.do uses generators (def + yie</p>
 <div class="demo-source">source: <code>demos/02_do_notation.py</code></div>
+<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/02_do_notation.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
@@ -71,12 +73,13 @@ async def run():
     print("\n=== Short-circuit on error ===")
     print(f"  {await failing_pipeline()}")
 
-# asyncio.run(run())
+asyncio.run(run())
 </script>
 
 <h2>Demo: tagless final — write once, swap effects</h2>
 <p>Tagless final abstracts over the effect type via a Protocol (algebra). The program is written once against the protocol. Swap the interpreter to change the effect — AsyncResult in prod, plain Result i</p>
 <div class="demo-source">source: <code>demos/03_tagless_final_intro.py</code></div>
+<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/03_tagless_final_intro.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
@@ -90,7 +93,7 @@ async def run_async():
     print(f"  alice: {await get_profile(repo, AsyncResult, 'alice')}")
     print(f"  bob:   {await get_profile(repo, AsyncResult, 'bob')}")
     print(f"  nobody: {await get_profile(repo, AsyncResult, 'nobody')}")
-# asyncio.run(run_async())
+asyncio.run(run_async())
 
 print("\n=== Testing (Result, sync, no IO) ===")
 test_repo = ResultUserRepo()
@@ -101,6 +104,7 @@ print(f"  bob:   {get_profile(test_repo, Result, 'bob')}")
 <h2>Demo: tagless final — swapping database backends</h2>
 <p>The real payoff: business logic (place_order) doesn't know or care whether it's talking to Postgres, an in-memory dict, or a test stub.  Three interpreters, same program:     PostgresOrderRepo  — "rea</p>
 <div class="demo-source">source: <code>demos/04_tagless_final_db.py</code></div>
+<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/04_tagless_final_db.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
@@ -113,7 +117,7 @@ async def run_async():
     print(f"  alice+widget: {await place_order(repo, AsyncResult, 'alice', 'widget')}")
     print(f"  bob+laptop:   {await place_order(repo, AsyncResult, 'bob', 'laptop')}")
     print(f"  nobody+widget: {await place_order(repo, AsyncResult, 'nobody', 'widget')}")
-# asyncio.run(run_async())
+asyncio.run(run_async())
 
 print("\n=== Sync in-memory ===")
 repo = InMemoryOrderRepo()
@@ -638,6 +642,7 @@ print("    - Can't serialize the program")
 <h2>The problem: nested monads are painful to compose</h2>
 <p>When your functions return different monadic types, you end up with nested pattern matching at every step.      get_user(name) -> Future[Option[User]]   # might not exist, async     get_age(user)  -> </p>
 <div class="demo-source">source: <code>demos/transformers/01_the_problem.py</code></div>
+<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/01_the_problem.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from funstruct.monad.option import Option, Some, Nothing
 from funstruct.monad.future import Future
@@ -694,12 +699,13 @@ async def main():
 
 
 if __name__ == "__main__":
-    # asyncio.run(main())
+    asyncio.run(main())
 </script>
 
 <h2>OptionT flattens nested Future[Option[A]] into a single pipeline</h2>
 <p>Instead of nested pattern matching, OptionT lets you write a flat pipeline that short-circuits on Nothing and awaits Futures automatically.  The key operations:     OptionT(future_option)     — wrap a</p>
 <div class="demo-source">source: <code>demos/transformers/02_option_t.py</code></div>
+<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/02_option_t.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from funstruct.monad.option import Option, Some, Nothing
 from funstruct.monad.future import Future
@@ -770,12 +776,13 @@ async def main():
 
 
 if __name__ == "__main__":
-    # asyncio.run(main())
+    asyncio.run(main())
 </script>
 
 <h2>Alternative: skip transformers by using one monad type everywhere</h2>
 <p>Instead of composing Future[Option[A]] with OptionT, make ALL functions return the same type — AsyncResult[A]. Then composition is just .bind().  This is often simpler than transformers for real appli</p>
 <div class="demo-source">source: <code>demos/transformers/03_alternative.py</code></div>
+<p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/03_alternative.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
 from funstruct.playground import User
@@ -841,7 +848,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    # asyncio.run(main())
+    asyncio.run(main())
 </script>
 
 <script type="py" config='{"packages":["funstruct"]}'>
