@@ -60,6 +60,8 @@ internally.
 
 Typeclasses define capabilities. Data types implement them via instances.
 
+![funstruct typeclass hierarchy](docs/typeclasses.svg)
+
 ```
                         ┌─────────────────────────────────────────────────────────┐
                         │                    TYPECLASSES                          │
@@ -398,11 +400,11 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 
 ## Roadmap
 
-- **Functional collections** — persistent queue, deque, red-black tree, finger tree, priority queue.
+- **Functional collections** — persistent queue, deque, red-black tree, persistent stack, heap
 - **Native collections (Rust/PyO3)** — Rust-backed CList, frozendict via `funstruct[native]`. Pure Python fallback stays zero-dependency.
-- **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax.
-- **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`).
 - **Typeclass derivation** — auto-generate Functor/Foldable instances from dataclass structure.
+- **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`).
+- **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax.
 - **Free monad** — build program ASTs, interpret with different backends.
 - **Effects system** — algebraic effects as an alternative to monad transformer stacks.
 - **Stream** — infinite streams, lazy evaluation.

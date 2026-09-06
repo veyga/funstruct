@@ -1,3 +1,3 @@
 # Foldable
 
-::: funstruct.typeclasses.Foldable
+::: funstruct.typeclasses.foldable

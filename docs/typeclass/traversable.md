@@ -1,3 +1,3 @@
 # Traversable
 
-::: funstruct.typeclasses.Traversable
+::: funstruct.typeclasses.traversable

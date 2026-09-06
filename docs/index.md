@@ -1,6 +1,9 @@
 # funstruct
 
-A helpful collection of functional utilities.
+A zero-dependency functional programming library for Python.
+Typeclasses, monads, and algebraic data types — influenced by
+[Scalaz](https://github.com/scalaz/scalaz) and
+[Cats](https://typelevel.org/cats/).
 
 ## Install
 

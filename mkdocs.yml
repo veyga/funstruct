@@ -17,46 +17,52 @@ theme:
 
 nav:
   - Home: index.md
-  - typeclass:
+  - Guides:
+      - The Typeclass Pattern: guides/typeclass_pattern.md
+      - Railway Oriented Programming: guides/railway_oriented_programming.md
+      - Tagless Final Style: guides/tagless_final.md
+  - Typeclasses:
       - Overview: typeclass/index.md
       - Semigroup: typeclass/semigroup.md
       - Monoid: typeclass/monoid.md
-      - Functor: functor/index.md
+      - Functor: typeclass/functor.md
       - Applicative: typeclass/applicative.md
+      - Alternative: typeclass/alternative.md
       - Monad: typeclass/monad.md
+      - MonadError: typeclass/monad_error.md
       - Foldable: typeclass/foldable.md
       - Traversable: typeclass/traversable.md
-  - functor:
-      - Overview: functor/index.md
-  - applicative:
-      - Overview: applicative/index.md
-      - Validated: applicative/validated.md
-      - ZipList: applicative/ziplist.md
-  - monad:
+      - Bifunctor: typeclass/bifunctor.md
+  - Monads:
       - Overview: monad/index.md
-      - Either: monad/either.md
       - Option: monad/option.md
+      - Either: monad/either.md
       - Result: monad/result.md
       - Reader: monad/reader.md
       - Writer: monad/writer.md
       - State: monad/state.md
       - Future: monad/future.md
-  - collections:
+  - Applicatives:
+      - Overview: applicative/index.md
+      - Validated: applicative/validated.md
+      - ZipList: applicative/ziplist.md
+  - Collections:
       - Overview: collections/index.md
-      - Cons: collections/cons.md
+      - CList: collections/cons.md
       - frozendict: collections/frozendict.md
       - Tree: collections/tree.md
-  - util:
+  - Utilities:
       - tailrec: util/tailrec.md
       - CapturesCreationSiteMixin: util/created_at.md
-  - experimental:
-      - monadtransformer:
+  - Experimental:
+      - Monad Transformers:
           - Overview: experimental/monadtransformer/index.md
           - ReaderT: experimental/monadtransformer/reader_t.md
           - StateT: experimental/monadtransformer/state_t.md
           - EitherT: experimental/monadtransformer/either_t.md
           - OptionT: experimental/monadtransformer/option_t.md
           - WriterT: experimental/monadtransformer/writer_t.md
+      - Optics (Lenses): experimental/optics/index.md
 
 extra:
   version:

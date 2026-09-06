@@ -57,5 +57,10 @@ bench *args:
 nox *args:
   uv run nox {{args}}
 
+# generate and open typeclass hierarchy diagram
+diagram:
+  uv run python scripts/generate_diagram.py
+  open docs/typeclasses.svg
+
 # docs-build:
 #   uv run mkdocs build

@@ -22,6 +22,12 @@ repos:
           - mdformat-mkdocs
   - repo: local
     hooks:
+      - id: generate-diagram
+        name: generate typeclass diagram
+        entry: uv run python scripts/generate_diagram.py
+        language: system
+        pass_filenames: false
+        files: ^funstruct/typeclasses/
       - id: typecheck
         name: typecheck
         entry: bash -c "just check"
