@@ -216,8 +216,6 @@ class Nothing(Option):
         return "Nothing()"
 
 
-
-
 import funstruct.monad.option.instances  # noqa: E402, F401 — register typeclass instances
 
 __all__ = [

@@ -35,6 +35,7 @@ class Future(DataType, Generic[A]):
         async def _inner():
             result = await self._coro
             return await f(result)
+
         return Future(_inner())
 
     @classmethod
@@ -47,6 +48,7 @@ class Future(DataType, Generic[A]):
         ...     y = yield Future.pure(x + 10)
         ...     return x + y
         """
+
         def _thunk(*args, **kwargs):
             async def _run():
                 gen = gen_fn(*args, **kwargs)
@@ -57,18 +59,20 @@ class Future(DataType, Generic[A]):
                         monadic_val = gen.send(value)
                 except StopIteration as e:
                     return e.value
+
             return cls(_run())
+
         return _thunk
 
     @classmethod
     def pure(cls, value: A) -> Future[A]:
         async def _inner():
             return value
+
         return cls(_inner())
 
     def __repr__(self) -> str:
         return f"Future({self._coro})"
-
 
 
 import funstruct.monad.future.instances  # noqa: E402, F401

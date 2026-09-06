@@ -54,6 +54,7 @@ def get_nickname(user: User) -> str:
 
 # ── Style 1: @AsyncResult.do decorator (recommended) ────────────────
 
+
 @AsyncResult.do
 def get_profile_decorated():
     user = yield get_user("alice")
@@ -64,16 +65,19 @@ def get_profile_decorated():
 
 # ── Style 2: manual do (pass generator function) ────────────────────
 
+
 def _profile_gen():
     user = yield get_user("alice")
     age = yield get_age(user)
     nickname = yield get_nickname(user)
     return f"{nickname} (age {age})"
 
+
 get_profile_manual = AsyncResult.do(_profile_gen)
 
 
 # ── Style 3: sync do-notation with Result ────────────────────────────
+
 
 @Result.do
 def sync_pipeline():
@@ -85,6 +89,7 @@ def sync_pipeline():
 
 # ── Style 4: mixing sync Result into async do ───────────────────────
 
+
 @AsyncResult.do
 def mixed_pipeline():
     user = yield get_user("alice")
@@ -95,10 +100,11 @@ def mixed_pipeline():
 
 # ── Short-circuit on error ───────────────────────────────────────────
 
+
 @AsyncResult.do
 def failing_pipeline():
     user = yield get_user("nobody")  # fails here
-    age = yield get_age(user)        # never reached
+    age = yield get_age(user)  # never reached
     return f"age: {age}"
 
 

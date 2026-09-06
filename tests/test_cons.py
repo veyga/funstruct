@@ -917,16 +917,22 @@ class TestCListMonadInstance:
 
     def test_bind_via_summon(self):
         F = summon(Monad, CList)
-        assert F.bind(CList.new(1, 2, 3), lambda x: CList.new(x, x)) == CList.new(1, 1, 2, 2, 3, 3)
+        assert F.bind(CList.new(1, 2, 3), lambda x: CList.new(x, x)) == CList.new(
+            1, 1, 2, 2, 3, 3
+        )
 
     def test_bind_nil_via_summon(self):
         assert summon(Monad, CList).bind(Nil(), lambda x: CList.new(x)) == Nil()
 
     def test_map_derived_via_summon(self):
-        assert summon(Monad, CList).map(CList.new(1, 2, 3), lambda x: x * 10) == CList.new(10, 20, 30)
+        assert summon(Monad, CList).map(
+            CList.new(1, 2, 3), lambda x: x * 10
+        ) == CList.new(10, 20, 30)
 
     def test_product_derived_via_summon(self):
-        assert summon(Monad, CList).product(CList.new(1), CList.new(2)) == CList.new((1, 2))
+        assert summon(Monad, CList).product(CList.new(1), CList.new(2)) == CList.new(
+            (1, 2)
+        )
 
     def test_dot_vs_summon_map(self):
         f = lambda x: x + 1
@@ -979,7 +985,9 @@ class TestCListTraversableInstance:
     def test_traverse_short_circuits_on_nothing(self):
         T = summon(Traversable, CList)
         G = summon(Applicative, Option)
-        result = T.traverse(CList.new(1, 0, 3), lambda x: Some(x) if x != 0 else Nothing(), G)
+        result = T.traverse(
+            CList.new(1, 0, 3), lambda x: Some(x) if x != 0 else Nothing(), G
+        )
         assert result == Nothing()
 
     def test_traverse_empty_list(self):
@@ -990,7 +998,9 @@ class TestCListTraversableInstance:
     def test_sequence_via_summon(self):
         T = summon(Traversable, CList)
         G = summon(Applicative, Option)
-        assert T.sequence(CList.new(Some(1), Some(2), Some(3)), G) == Some(CList.new(1, 2, 3))
+        assert T.sequence(CList.new(Some(1), Some(2), Some(3)), G) == Some(
+            CList.new(1, 2, 3)
+        )
 
     def test_sequence_short_circuits(self):
         T = summon(Traversable, CList)
@@ -1011,4 +1021,7 @@ class TestCListTraversableInstance:
     @P.case(name="empty", input=[], expected=[])
     def test_fold_right_via_summon(self, input, expected):
         T = summon(Traversable, CList)
-        assert T.fold_right(CList.from_iterable(input), [], lambda x, acc: [x] + acc) == expected
+        assert (
+            T.fold_right(CList.from_iterable(input), [], lambda x, acc: [x] + acc)
+            == expected
+        )

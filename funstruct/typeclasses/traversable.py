@@ -1,7 +1,7 @@
 """Traversable — map each element to an effect, then collect results.
 
-    traverse: (A → G[B]) → F[A] → G[F[B]]
-    sequence: F[G[A]] → G[F[A]]
+traverse: (A → G[B]) → F[A] → G[F[B]]
+sequence: F[G[A]] → G[F[A]]
 """
 
 from __future__ import annotations

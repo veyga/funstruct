@@ -99,15 +99,13 @@ class TestDoNotationOverhead:
             y = yield Ok(x + 1)
             z = yield Ok(y * 2)
             return z
+
         benchmark(pipeline)
 
     def test_bind_chain_3_steps(self, benchmark):
         def pipeline():
-            return (
-                Ok(10)
-                .bind(lambda x: Ok(x + 1))
-                .bind(lambda y: Ok(y * 2))
-            )
+            return Ok(10).bind(lambda x: Ok(x + 1)).bind(lambda y: Ok(y * 2))
+
         benchmark(pipeline)
 
     def test_do_notation_5_steps(self, benchmark):
@@ -119,6 +117,7 @@ class TestDoNotationOverhead:
             d = yield Ok(c + 1)
             e = yield Ok(d + 1)
             return e
+
         benchmark(pipeline)
 
     def test_bind_chain_5_steps(self, benchmark):
@@ -130,20 +129,24 @@ class TestDoNotationOverhead:
                 .bind(lambda c: Ok(c + 1))
                 .bind(lambda d: Ok(d + 1))
             )
+
         benchmark(pipeline)
 
     def test_do_short_circuit(self, benchmark):
         """do-notation that short-circuits on first Err."""
+
         @Result.do
         def pipeline():
             x = yield Err(ValueError("stop"))
             y = yield Ok(x + 1)
             return y
+
         benchmark(pipeline)
 
     def test_bind_short_circuit(self, benchmark):
         def pipeline():
             return Err(ValueError("stop")).bind(lambda x: Ok(x + 1))
+
         benchmark(pipeline)
 
 

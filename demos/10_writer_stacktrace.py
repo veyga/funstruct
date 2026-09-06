@@ -84,12 +84,7 @@ def main():
 
     # You can also use bind chains
     print("\n=== Bind chain (equivalent) ===\n")
-    result = (
-        lookup_user("bob")
-        .bind(get_email)
-        .bind(normalize)
-        .bind(validate)
-    )
+    result = lookup_user("bob").bind(get_email).bind(normalize).bind(validate)
     print(f"  Value:  {result.value}")
     print(f"  Trace:  {result.output}")
 

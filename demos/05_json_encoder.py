@@ -30,6 +30,7 @@ from funstruct.typeclasses import register, summon
 
 # ── Typeclass (the interface) ────────────────────────────────────────
 
+
 class JsonEncoder(ABC):
     @abstractmethod
     def encode(self, value) -> object: ...
@@ -47,21 +48,26 @@ class IntEncoder(JsonEncoder):
     def encode(self, value: int):
         return value
 
+
 class FloatEncoder(JsonEncoder):
     def encode(self, value: float):
         return value
+
 
 class StrEncoder(JsonEncoder):
     def encode(self, value: str):
         return value
 
+
 class BoolEncoder(JsonEncoder):
     def encode(self, value: bool):
         return value
 
+
 class NoneEncoder(JsonEncoder):
     def encode(self, value):
         return None
+
 
 class ListEncoder(JsonEncoder):
     def encode(self, value: list):
@@ -70,12 +76,10 @@ class ListEncoder(JsonEncoder):
         elem_encoder = summon(JsonEncoder, type(value[0]))
         return [elem_encoder.encode(item) for item in value]
 
+
 class DictEncoder(JsonEncoder):
     def encode(self, value: dict):
-        return {
-            k: summon(JsonEncoder, type(v)).encode(v)
-            for k, v in value.items()
-        }
+        return {k: summon(JsonEncoder, type(v)).encode(v) for k, v in value.items()}
 
 
 register(JsonEncoder, int, IntEncoder())
@@ -109,6 +113,7 @@ class Address:
     city: str
     zip_code: str
 
+
 @dataclass(frozen=True)
 class User:
     name: str
@@ -116,6 +121,7 @@ class User:
     email: str
     address: Address
     tags: list
+
 
 @dataclass(frozen=True)
 class Team:

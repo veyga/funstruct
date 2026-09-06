@@ -32,6 +32,7 @@ class User:
 
 # ── Algebra (the interface) ──────────────────────────────────────────
 
+
 @runtime_checkable
 class UserRepo[F](Protocol):
     def get_user(self, name: str) -> F[User]: ...
@@ -41,6 +42,7 @@ class UserRepo[F](Protocol):
 
 # ── Program (generic in F) ───────────────────────────────────────────
 
+
 def get_profile[F](repo: UserRepo[F], F: type[F], username: str) -> F[str]:
     @F.do
     def run():
@@ -48,10 +50,12 @@ def get_profile[F](repo: UserRepo[F], F: type[F], username: str) -> F[str]:
         age = yield repo.get_age(user)
         nickname = yield repo.get_nickname(user)
         return f"{nickname} (age {age})"
+
     return run()
 
 
 # ── Interpreter 1: AsyncResult (production) ──────────────────────────
+
 
 class AsyncResultUserRepo:
     @TryAsync
@@ -70,6 +74,7 @@ class AsyncResultUserRepo:
 
 
 # ── Interpreter 2: Result (testing) ──────────────────────────────────
+
 
 class ResultUserRepo:
     def get_user(self, name: str) -> Result[User]:
@@ -90,6 +95,7 @@ def main():
         print(f"  alice: {await get_profile(repo, AsyncResult, 'alice')}")
         print(f"  bob:   {await get_profile(repo, AsyncResult, 'bob')}")
         print(f"  nobody: {await get_profile(repo, AsyncResult, 'nobody')}")
+
     asyncio.run(run_async())
 
     print("\n=== Testing (Result, sync, no IO) ===")

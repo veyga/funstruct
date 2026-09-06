@@ -13,7 +13,6 @@ _B = TypeVar("_B")
 
 
 class _FutureMonad(Monad, for_type=Future):
-
     def pure(self, value: _A) -> Future[_A]:
         return Future.pure(value)
 

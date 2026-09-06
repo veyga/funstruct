@@ -1,9 +1,9 @@
 """MonadError — a Monad that can raise and handle typed errors.
 
-    pure(a)                — put a value ON the success rail
-    raise_error(e)         — put a value ON the error rail
-    bind(f)                — continue along the success rail
-    handle_error_with(f)   — recover FROM the error rail
+pure(a)                — put a value ON the success rail
+raise_error(e)         — put a value ON the error rail
+bind(f)                — continue along the success rail
+handle_error_with(f)   — recover FROM the error rail
 """
 
 from __future__ import annotations

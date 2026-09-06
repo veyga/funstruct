@@ -15,11 +15,12 @@ _E = TypeVar("_E")
 
 
 class _EitherMonadError(MonadError, for_type=Either):
-
     def pure(self, value: _A) -> Either[_E, _A]:
         return Right(value)
 
-    def bind(self, fa: Either[_E, _A], f: Callable[[_A], Either[_E, _B]]) -> Either[_E, _B]:
+    def bind(
+        self, fa: Either[_E, _A], f: Callable[[_A], Either[_E, _B]]
+    ) -> Either[_E, _B]:
         match fa:
             case Right(value):
                 return f(value)
@@ -42,7 +43,6 @@ class _EitherMonadError(MonadError, for_type=Either):
 
 
 class _EitherBifunctor(Bifunctor, for_type=Either):
-
     def bimap(
         self,
         fa: Either[_E, _A],
@@ -54,5 +54,3 @@ class _EitherBifunctor(Bifunctor, for_type=Either):
                 return Right(g(value))
             case Left(error):
                 return Left(f(error))
-
-

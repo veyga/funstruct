@@ -55,6 +55,7 @@ class Reader(DataType, Generic[_Ctx, _A]):
         >>> Reader.do(pipeline)().run({"x": 1, "y": 10})
         11
         """
+
         def _thunk(*args, **kwargs):
             def _run(ctx):
                 gen = gen_fn(*args, **kwargs)
@@ -65,7 +66,9 @@ class Reader(DataType, Generic[_Ctx, _A]):
                         monadic_val = gen.send(result)
                 except StopIteration as e:
                     return e.value
+
             return cls(_run)
+
         return _thunk
 
     @classmethod
@@ -78,7 +81,6 @@ class Reader(DataType, Generic[_Ctx, _A]):
 
     def __repr__(self) -> str:
         return f"Reader({self._run})"
-
 
 
 import funstruct.monad.reader.instances  # noqa: E402, F401

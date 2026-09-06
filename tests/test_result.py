@@ -227,27 +227,33 @@ class TestResultInstances:
 
     def test_monad_pure(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Result).pure(42) == Ok(42)
 
     def test_monad_bind_ok(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Result).bind(Ok(1), lambda x: Ok(x + 1)) == Ok(2)
 
     def test_monad_bind_err(self):
         from funstruct.typeclasses import Monad, summon
+
         err = Err(ValueError("x"))
         assert summon(Monad, Result).bind(err, lambda x: Ok(x + 1)) is err
 
     def test_monad_map_derived(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Result).map(Ok(10), lambda x: x * 2) == Ok(20)
 
     def test_raise_error_via_summon(self):
         from funstruct.typeclasses import MonadError, summon
+
         assert isinstance(summon(MonadError, Result).raise_error(ValueError("x")), Err)
 
     def test_handle_error_with_err(self):
         from funstruct.typeclasses import MonadError, summon
+
         result = summon(MonadError, Result).handle_error_with(
             Err(ValueError("x")), lambda e: Ok("recovered")
         )
@@ -255,19 +261,27 @@ class TestResultInstances:
 
     def test_handle_error_with_ok_passthrough(self):
         from funstruct.typeclasses import MonadError, summon
-        assert summon(MonadError, Result).handle_error_with(Ok(42), lambda e: Ok(0)) == Ok(42)
+
+        assert summon(MonadError, Result).handle_error_with(
+            Ok(42), lambda e: Ok(0)
+        ) == Ok(42)
 
     def test_bifunctor_bimap_ok(self):
         from funstruct.typeclasses import Bifunctor, summon
+
         assert summon(Bifunctor, Result).bimap(Ok(10), str, lambda x: x * 2) == Ok(20)
 
     def test_bifunctor_bimap_err(self):
         from funstruct.typeclasses import Bifunctor, summon
+
         err = ValueError("bad")
-        result = summon(Bifunctor, Result).bimap(Err(err), lambda e: TypeError(str(e)), lambda x: x * 2)
+        result = summon(Bifunctor, Result).bimap(
+            Err(err), lambda e: TypeError(str(e)), lambda x: x * 2
+        )
         assert isinstance(result, Err)
 
     def test_dot_vs_summon_map(self):
         from funstruct.typeclasses import Monad, summon
+
         f = lambda x: x + 1
         assert Ok(10).map(f) == summon(Monad, Result).map(Ok(10), f)

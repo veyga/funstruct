@@ -336,6 +336,7 @@ class Cons(CList[A]):
                     return f"[{', '.join(_fmt(e) for e in elem)}]"
                 case _:
                     return str(elem)
+
         return f"CList([{', '.join(_fmt(e) for e in self)}])"
 
     def append(self, other: CList) -> CList:
@@ -376,7 +377,6 @@ class Cons(CList[A]):
         if i <= 0:
             return Cons(value, self)
         return Cons(self.head, self.tail.insert_at(i - 1, value))
-
 
 
 import funstruct.collections.cons.instances  # noqa: E402, F401

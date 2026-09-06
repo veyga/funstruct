@@ -23,6 +23,7 @@ class BaseTypeclass(AutoRegister):
         - ABC abstract method enforcement
         - AutoRegister: `for_type=X` auto-registers instances
     """
+
     pass
 
 

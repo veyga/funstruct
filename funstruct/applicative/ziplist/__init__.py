@@ -60,7 +60,6 @@ class ZipList(DataType, Generic[_A]):
         return f"ZipList({self._values})"
 
 
-
 import funstruct.applicative.ziplist.instances  # noqa: E402, F401
 
 __all__ = [

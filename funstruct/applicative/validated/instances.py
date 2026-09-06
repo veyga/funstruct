@@ -16,7 +16,6 @@ _E = TypeVar("_E")
 
 
 class _ValidatedApplicative(Applicative, for_type=Validated):
-
     def pure(self, value: _A) -> Valid[_A]:
         return Valid(value)
 
@@ -58,7 +57,6 @@ class _ValidatedApplicative(Applicative, for_type=Validated):
 
 
 class _ValidatedBifunctor(Bifunctor, for_type=Validated):
-
     def bimap(
         self,
         fa: Validated,

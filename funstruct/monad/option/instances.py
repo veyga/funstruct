@@ -14,7 +14,6 @@ _B = TypeVar("_B")
 
 
 class _OptionMonad(Monad, for_type=Option):
-
     def pure(self, value: _A) -> Option[_A]:
         return Some(value)
 
@@ -29,7 +28,6 @@ class _OptionMonad(Monad, for_type=Option):
 
 
 class _OptionAlternative(Alternative, for_type=Option):
-
     def pure(self, value: _A) -> Option[_A]:
         return Some(value)
 

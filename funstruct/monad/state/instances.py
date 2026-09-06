@@ -13,7 +13,6 @@ _B = TypeVar("_B")
 
 
 class _StateMonad(Monad, for_type=State):
-
     def pure(self, value: _A) -> State[_A]:
         return State(lambda s: (s, value))
 
@@ -21,4 +20,5 @@ class _StateMonad(Monad, for_type=State):
         def inner(s: Any) -> tuple[Any, _B]:
             new_s, a = fa._run(s)
             return f(a).run(new_s)
+
         return State(inner)

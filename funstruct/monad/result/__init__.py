@@ -178,7 +178,6 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
         return f"Err({repr(self.error)})"
 
 
-
 _P = ParamSpec("_P")
 
 
@@ -254,6 +253,7 @@ class AsyncResult(DataType, Generic[_A]):
                     return await AsyncResult._resolve(f(value))
                 case _:
                     return result
+
         return AsyncResult(_inner())
 
     def left_map(self, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
@@ -264,9 +264,12 @@ class AsyncResult(DataType, Generic[_A]):
                     return Err(f(error))
                 case _:
                     return result
+
         return AsyncResult(_inner())
 
-    def bimap(self, on_err: Callable[[Exception], Exception], on_ok: Callable) -> AsyncResult:
+    def bimap(
+        self, on_err: Callable[[Exception], Exception], on_ok: Callable
+    ) -> AsyncResult:
         async def _inner():
             result = await self._coro
             match result:
@@ -276,6 +279,7 @@ class AsyncResult(DataType, Generic[_A]):
                     return Err(on_err(error))
                 case _:
                     return result
+
         return AsyncResult(_inner())
 
     def handle_error_with(self, f: Callable[[Exception], Any]) -> AsyncResult:
@@ -286,36 +290,44 @@ class AsyncResult(DataType, Generic[_A]):
                     return await AsyncResult._resolve(f(error))
                 case _:
                     return result
+
         return AsyncResult(_inner())
 
     @classmethod
     def pure(cls, value: _A) -> AsyncResult[_A]:
         async def _inner():
             return Ok(value)
+
         return cls(_inner())
 
     @classmethod
     def raise_error(cls, error: Exception) -> AsyncResult:
         async def _inner():
             return Err(error)
+
         return cls(_inner())
 
     @classmethod
     def from_result(cls, result: Result) -> AsyncResult:
         async def _inner():
             return result
+
         return cls(_inner())
 
     @classmethod
     def from_either(cls, either: Either) -> AsyncResult:
         async def _inner():
             return either
+
         return cls(_inner())
 
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> Future[_B]:
+    def fold(
+        self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
+    ) -> Future[_B]:
         async def _inner():
             result = await self._coro
             return result.fold(on_err=on_err, on_ok=on_ok)
+
         return Future(_inner())
 
     @classmethod
@@ -326,6 +338,7 @@ class AsyncResult(DataType, Generic[_A]):
         # protocol overhead. Consider optimizing the generator loop or providing
         # a bind-chain builder as an alternative for performance-sensitive code.
         """
+
         def _thunk(*args, **kwargs):
             async def _run():
                 gen = gen_fn(*args, **kwargs)
@@ -340,13 +353,13 @@ class AsyncResult(DataType, Generic[_A]):
                                 return result
                 except StopIteration as e:
                     return Ok(e.value)
+
             return cls(_run())
+
         return _thunk
 
     def __repr__(self) -> str:
         return f"AsyncResult({self._coro})"
-
-
 
 
 def Try(
@@ -387,6 +400,7 @@ def TryAsync(
                 return Ok(result)
             except Exception as e:
                 return Err(e)
+
         return AsyncResult(_inner())
 
     return wrapper

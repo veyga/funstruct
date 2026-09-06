@@ -1,7 +1,7 @@
 """Bifunctor — map over both type parameters.
 
-    bimap:    F[A, B] → (A → C) → (B → D) → F[C, D]
-    left_map: F[A, B] → (A → C) → F[C, B]  (derived)
+bimap:    F[A, B] → (A → C) → (B → D) → F[C, D]
+left_map: F[A, B] → (A → C) → F[C, B]  (derived)
 """
 
 from __future__ import annotations

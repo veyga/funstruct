@@ -71,6 +71,7 @@ class Writer(DataType, Generic[_W, _A]):
         >>> ListWriter.do(pipeline)()
         ListWriter(value=12, output=['init', 'step'])
         """
+
         def _thunk(*args, **kwargs):
             gen = gen_fn(*args, **kwargs)
             try:
@@ -83,6 +84,7 @@ class Writer(DataType, Generic[_W, _A]):
                     value = next_w.value
             except StopIteration as e:
                 return cls(e.value, output)
+
         return _thunk
 
     @classmethod
@@ -106,7 +108,6 @@ class Writer(DataType, Generic[_W, _A]):
 
     __match_args__ = ("value", "output")
 
-
     @classmethod
     def for_monoid(cls, monoid: Monoid, name: str | None = None) -> type:
         """Create a Writer subclass for a specific Monoid.
@@ -118,10 +119,14 @@ class Writer(DataType, Generic[_W, _A]):
             CListWriter = Writer.for_monoid(clist_monoid)
         """
         cls_name = name or f"{monoid.typ.__name__.title()}Writer"
-        new_cls = type(cls_name, (cls,), {
-            "_monoid": monoid,
-            "_type_constructor": None,
-        })
+        new_cls = type(
+            cls_name,
+            (cls,),
+            {
+                "_monoid": monoid,
+                "_type_constructor": None,
+            },
+        )
         new_cls._type_constructor = new_cls
         return new_cls
 
@@ -142,7 +147,6 @@ IntWriter = Writer.for_monoid(
     Monoid(typ=int, combine=lambda a, b: a + b, empty=0),
     "IntWriter",
 )
-
 
 
 import funstruct.monad.writer.instances  # noqa: E402, F401

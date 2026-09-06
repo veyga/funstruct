@@ -217,8 +217,6 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
         return f"Left({repr(self.error)})"
 
 
-
-
 import funstruct.monad.either.instances  # noqa: E402, F401
 
 __all__ = [

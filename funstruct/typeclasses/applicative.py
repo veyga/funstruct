@@ -1,7 +1,7 @@
 """Applicative — independent computations combined in context.
 
-    pure: A → F[A]
-    ap:   F[A → B] → F[A] → F[B]
+pure: A → F[A]
+ap:   F[A → B] → F[A] → F[B]
 """
 
 from __future__ import annotations

@@ -14,7 +14,6 @@ _B = TypeVar("_B")
 
 
 class _TreeFunctor(Functor, for_type=Tree):
-
     def map(self, fa: Tree[_A], f: Callable[[_A], _B]) -> Tree[_B]:
         match fa:
             case Leaf(value):
@@ -26,7 +25,6 @@ class _TreeFunctor(Functor, for_type=Tree):
 
 
 class _TreeFoldable(Foldable, for_type=Tree):
-
     def fold_right(self, fa: Tree[_A], acc: _B, f: Callable[[_A, _B], _B]) -> _B:
         match fa:
             case Leaf(value):

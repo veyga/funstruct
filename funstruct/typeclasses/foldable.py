@@ -1,7 +1,7 @@
 """Foldable — reduce a structure to a single value.
 
-    fold_left:  (B, A → B) → F[A] → B
-    fold_right: (A, B → B) → F[A] → B
+fold_left:  (B, A → B) → F[A] → B
+fold_right: (A, B → B) → F[A] → B
 """
 
 from __future__ import annotations

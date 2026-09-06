@@ -27,11 +27,13 @@ from funstruct.typeclasses.utils.registry import register, summon, tc_of
 # Part 1: Define a typeclass (the interface / trait)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class Showable(ABC):
     """Typeclass for types that can be displayed as a human-readable string.
 
     Like Haskell's Show or Rust's Display.
     """
+
     @abstractmethod
     def show(self, value) -> str: ...
 
@@ -41,12 +43,14 @@ class Serializable(ABC):
 
     Like Scala's Encoder or Rust's Serialize.
     """
+
     @abstractmethod
     def to_dict(self, value) -> dict: ...
 
 
 class Deserializable(ABC):
     """Typeclass for types that can be deserialized from a dict."""
+
     @abstractmethod
     def from_dict(self, data: dict) -> object: ...
 
@@ -55,9 +59,11 @@ class Deserializable(ABC):
 # Part 2: Define your custom data types (plain data, no typeclass methods)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 @dataclass(frozen=True)
 class Email:
     value: str
+
 
 @dataclass(frozen=True)
 class Address:
@@ -65,12 +71,14 @@ class Address:
     city: str
     zip_code: str
 
+
 @dataclass(frozen=True)
 class User:
     name: str
     age: int
     email: Email
     address: Address
+
 
 @dataclass(frozen=True)
 class Team:
@@ -84,18 +92,22 @@ class Team:
 
 # --- Showable instances ---
 
+
 class _EmailShowable(Showable):
     def show(self, value: Email) -> str:
         return value.value
+
 
 class _AddressShowable(Showable):
     def show(self, value: Address) -> str:
         return f"{value.street}, {value.city} {value.zip_code}"
 
+
 class _UserShowable(Showable):
     def show(self, value: User) -> str:
         addr = summon(Showable, Address).show(value.address)
         return f"{value.name} (age {value.age}, {value.email.value}, {addr})"
+
 
 class _TeamShowable(Showable):
     def show(self, value: Team) -> str:
@@ -112,13 +124,16 @@ register(Showable, Team, _TeamShowable())
 
 # --- Serializable instances (composable — each type delegates to its fields) ---
 
+
 class _EmailSerializer(Serializable):
     def to_dict(self, value: Email) -> dict:
         return {"email": value.value}
 
+
 class _AddressSerializer(Serializable):
     def to_dict(self, value: Address) -> dict:
         return {"street": value.street, "city": value.city, "zip": value.zip_code}
+
 
 class _UserSerializer(Serializable):
     def to_dict(self, value: User) -> dict:
@@ -128,6 +143,7 @@ class _UserSerializer(Serializable):
             "email": summon(Serializable, Email).to_dict(value.email),
             "address": summon(Serializable, Address).to_dict(value.address),
         }
+
 
 class _TeamSerializer(Serializable):
     def to_dict(self, value: Team) -> dict:
@@ -145,6 +161,7 @@ register(Serializable, Team, _TeamSerializer())
 
 
 # --- Deserializable instances ---
+
 
 class _UserDeserializer(Deserializable):
     def from_dict(self, data: dict) -> User:
@@ -170,6 +187,7 @@ register(Deserializable, User, _UserDeserializer())
 # In Scala:   def show[A: Showable](a: A): String
 # In Rust:    fn show<A: Display>(a: &A) -> String
 # In Python:  type hint is the constraint, summon resolves at runtime
+
 
 def show[A](value: A, S: Showable | None = None) -> str:
     """Generic show — works for any type with a Showable instance.
@@ -212,6 +230,7 @@ def log_and_serialize[A](value: A) -> tuple[str, dict]:
 # Protocol-based trait bound (compile-time checkable with type checkers)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 @runtime_checkable
 class HasShowable(Protocol):
     """Protocol that checks if a type has a Showable instance registered.
@@ -219,12 +238,14 @@ class HasShowable(Protocol):
     This is the closest Python gets to Scala's context bounds.
     Use isinstance(value, HasShowable) to check at runtime.
     """
+
     ...
 
 
 # ═══════════════════════════════════════════════════════════════════════
 # Demo
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def main():
     import json
@@ -250,7 +271,9 @@ def main():
     print(f"  show(alice.email)   = {show(alice.email)}")
     print(f"  show(alice.address) = {show(alice.address)}")
 
-    print("\n=== Part 2: serialize() — generic function, auto-resolves Serializable ===\n")
+    print(
+        "\n=== Part 2: serialize() — generic function, auto-resolves Serializable ===\n"
+    )
     print(f"  serialize(alice) = {json.dumps(serialize(alice), indent=2)}")
 
     print("\n=== Part 3: deserialize() — generic round-trip ===\n")

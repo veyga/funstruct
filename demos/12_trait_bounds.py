@@ -28,14 +28,17 @@ from funstruct.typeclasses.utils.registry import register, summon
 # Part 1: Define the typeclass
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class Ordering(ABC):
     """Typeclass for types that can be compared."""
+
     @abstractmethod
     def compare(self, a, b) -> int: ...
 
 
 class Showable(ABC):
     """Typeclass for types that can be displayed."""
+
     @abstractmethod
     def show(self, value) -> str: ...
 
@@ -44,14 +47,17 @@ class Showable(ABC):
 # Part 2: Data types (plain, no typeclass methods)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 @dataclass(frozen=True)
 class User:
     name: str
     age: int
 
+
 @dataclass(frozen=True)
 class Temperature:
     celsius: float
+
 
 @dataclass(frozen=True)
 class Color:
@@ -64,21 +70,26 @@ class Color:
 # Part 3: Instances (only for types that HAVE the capability)
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class _UserOrdering(Ordering):
     def compare(self, a: User, b: User) -> int:
         return a.age - b.age
+
 
 class _UserShowable(Showable):
     def show(self, u: User) -> str:
         return f"{u.name}({u.age})"
 
+
 class _TempOrdering(Ordering):
     def compare(self, a: Temperature, b: Temperature) -> int:
         return int(a.celsius - b.celsius)
 
+
 class _TempShowable(Showable):
     def show(self, t: Temperature) -> str:
         return f"{t.celsius}°C"
+
 
 # Note: Color has NO Ordering instance. It can't be sorted.
 class _ColorShowable(Showable):
@@ -97,6 +108,7 @@ register(Showable, Color, _ColorShowable())
 # ═══════════════════════════════════════════════════════════════════════
 # Part 4: Generic functions with trait bounds
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def sort_by(items: list, O: Ordering) -> list:
     """Sort using an explicit Ordering instance.
@@ -144,6 +156,7 @@ def show_sorted(items: list) -> list[str]:
 # ═══════════════════════════════════════════════════════════════════════
 # Demo
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def main():
     users = [User("Charlie", 20), User("Alice", 30), User("Bob", 25)]

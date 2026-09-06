@@ -32,6 +32,7 @@ from funstruct.monad.either import Either, Right, Left
 
 # ── Generic functions (the constraint is the type hint) ──────────────
 
+
 def double(F: Monad, fa):
     """F: Monad is the constraint. Works for any Monad."""
     return F.map(fa, lambda x: x * 2)
@@ -50,29 +51,35 @@ def safe_divide(F: MonadError, a: float, b: float):
 
 # ── Algebra (tagless final style) ────────────────────────────────────
 
+
 @dataclass(frozen=True)
 class User:
     name: str
     balance: float
 
+
 class AccountService(Protocol):
     def get_user(self, name: str): ...
     def charge(self, user: User, amount: float): ...
 
+
 def checkout(F: MonadError, svc: AccountService, username: str, amount: float):
     """Generic checkout — works with any MonadError effect."""
-    return (
-        F.bind(svc.get_user(username), lambda user:
+    return F.bind(
+        svc.get_user(username),
+        lambda user: (
             F.raise_error(ValueError(f"insufficient funds: {user.balance} < {amount}"))
             if user.balance < amount
-            else F.bind(svc.charge(user, amount), lambda _:
-                F.pure(f"charged {user.name} ${amount:.2f}")
+            else F.bind(
+                svc.charge(user, amount),
+                lambda _: F.pure(f"charged {user.name} ${amount:.2f}"),
             )
-        )
+        ),
     )
 
 
 # ── Interpreters ─────────────────────────────────────────────────────
+
 
 class ResultAccountService:
     _users = {"alice": User("Alice", 500.0), "bob": User("Bob", 5.0)}
@@ -100,15 +107,22 @@ class EitherAccountService:
 
 # ── Demo ─────────────────────────────────────────────────────────────
 
+
 def main():
     print("=== Generic functions (F: Monad is the constraint) ===\n")
 
     print("  double with Option:")
-    print(f"    double(summon(Monad, Option), Some(21))  = {double(summon(Monad, Option), Some(21))}")
-    print(f"    double(summon(Monad, Option), Nothing()) = {double(summon(Monad, Option), Nothing())}")
+    print(
+        f"    double(summon(Monad, Option), Some(21))  = {double(summon(Monad, Option), Some(21))}"
+    )
+    print(
+        f"    double(summon(Monad, Option), Nothing()) = {double(summon(Monad, Option), Nothing())}"
+    )
 
     print("\n  double with Result:")
-    print(f"    double(summon(Monad, Result), Ok(21))    = {double(summon(Monad, Result), Ok(21))}")
+    print(
+        f"    double(summon(Monad, Result), Ok(21))    = {double(summon(Monad, Result), Ok(21))}"
+    )
 
     print("\n  Same function, three different effects:")
     for name, T in [("Option", Option), ("Result", Result), ("Either", Either)]:
@@ -140,9 +154,15 @@ def main():
     print(f"  equal? {dot == explicit}")
 
     print("\n=== Summary ===\n")
-    print("  Dot syntax:     Some(10).map(f)           — for everyday use (like Haskell)")
-    print("  Typeclass inst: F.map(fa, f)              — for generic programs (tagless final)")
-    print("  F: Monad        is the constraint          — the type hint IS the trait bound")
+    print(
+        "  Dot syntax:     Some(10).map(f)           — for everyday use (like Haskell)"
+    )
+    print(
+        "  Typeclass inst: F.map(fa, f)              — for generic programs (tagless final)"
+    )
+    print(
+        "  F: Monad        is the constraint          — the type hint IS the trait bound"
+    )
     print("  summon(Monad, Option) provides the F       — the caller resolves, once")
 
 

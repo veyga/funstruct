@@ -18,6 +18,7 @@ from funstruct.monad.state import State
 
 # ── Example 1: Counter (state = int) ────────────────────────────────
 
+
 def next_id() -> State:
     """Generate the next ID, incrementing the counter."""
     return State(lambda s: (s + 1, s))
@@ -33,6 +34,7 @@ def allocate_three():
 
 
 # ── Example 2: Stack machine (state = list) ─────────────────────────
+
 
 def push(value) -> State:
     return State(lambda stack: ([value] + stack, None))
@@ -58,6 +60,7 @@ def stack_program():
 
 
 # ── Example 3: Symbol table (state = dict) ───────────────────────────
+
 
 def assign(name: str, value) -> State:
     return State(lambda env: ({**env, name: value}, None))
@@ -99,10 +102,7 @@ def main():
 
     # Compose with bind
     print("\n=== Bind chain ===\n")
-    result = (
-        next_id()
-        .bind(lambda a: next_id().map(lambda b: (a, b)))
-    )
+    result = next_id().bind(lambda a: next_id().map(lambda b: (a, b)))
     state, pair = result.run(0)
     print(f"  Two IDs: {pair}, counter = {state}")
 

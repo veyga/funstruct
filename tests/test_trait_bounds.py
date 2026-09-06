@@ -36,17 +36,21 @@ from funstruct.typeclasses.utils.registry import register
 
 # ── Custom typeclasses for testing ──────────────────────────────────
 
+
 class Ordering(ABC):
     @abstractmethod
     def compare(self, a, b) -> int: ...
+
 
 class Printable(ABC):
     @abstractmethod
     def to_string(self, value) -> str: ...
 
+
 @dataclass(frozen=True)
 class Temperature:
     celsius: float
+
 
 @dataclass(frozen=True)
 class Color:
@@ -54,13 +58,16 @@ class Color:
     g: int
     b: int
 
+
 class _TempOrdering(Ordering):
     def compare(self, a, b):
         return int(a.celsius - b.celsius)
 
+
 class _TempPrintable(Printable):
     def to_string(self, t):
         return f"{t.celsius}°C"
+
 
 register(Ordering, Temperature, _TempOrdering())
 register(Printable, Temperature, _TempPrintable())
@@ -115,12 +122,14 @@ class TestBoundNotMet:
     def test_completely_unregistered_type(self):
         class Foo:
             pass
+
         with pytest.raises(TypeError, match="No instance of Monad for Foo"):
             summon(Monad, Foo)
 
     def test_unregistered_typeclass(self):
         class MyTypeclass(ABC):
             pass
+
         with pytest.raises(TypeError, match="No instance of MyTypeclass for Option"):
             summon(MyTypeclass, Option)
 
@@ -153,18 +162,25 @@ class TestMultipleBounds:
         P = summon(Printable, Temperature)
         temps = [Temperature(100), Temperature(0), Temperature(37)]
         import functools
+
         sorted_temps = sorted(temps, key=functools.cmp_to_key(O.compare))
         result = [P.to_string(t) for t in sorted_temps]
         assert result == ["0°C", "37°C", "100°C"]
 
     def test_one_bound_met_other_not(self):
         summon(Printable, Temperature)  # this works
-        summon(Ordering, Temperature)   # this works too
+        summon(Ordering, Temperature)  # this works too
 
         # Color has Printable but NOT Ordering
-        register(Printable, Color, type('_', (Printable,), {
-            'to_string': lambda self, c: f"rgb({c.r},{c.g},{c.b})"
-        })())
+        register(
+            Printable,
+            Color,
+            type(
+                "_",
+                (Printable,),
+                {"to_string": lambda self, c: f"rgb({c.r},{c.g},{c.b})"},
+            )(),
+        )
 
         summon(Printable, Color)  # works
         with pytest.raises(TypeError, match="No instance of Ordering for Color"):

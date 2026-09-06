@@ -36,6 +36,7 @@ class DataType(TypeConstructor, DotNotation):
         - >> operator (bind)
         - * operator (product)
     """
+
     _type_constructor = None  # reset — DataType itself is not a type constructor
 
 

@@ -1,6 +1,6 @@
 """Monad — sequential computation where each step depends on the previous.
 
-    bind: F[A] → (A → F[B]) → F[B]
+bind: F[A] → (A → F[B]) → F[B]
 """
 
 from __future__ import annotations

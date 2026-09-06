@@ -43,11 +43,10 @@ def get_nickname(user: User) -> str:
 
 # Style 1: bind chain
 def get_profile_bind(username: str) -> AsyncResult[str]:
-    return (
-        get_user(username)
-        .bind(lambda user: get_age(user)
-        .bind(lambda age: get_nickname(user)
-        .map(lambda nick: f"{nick} (age {age})")))
+    return get_user(username).bind(
+        lambda user: get_age(user).bind(
+            lambda age: get_nickname(user).map(lambda nick: f"{nick} (age {age})")
+        )
     )
 
 

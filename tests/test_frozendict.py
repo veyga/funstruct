@@ -698,7 +698,8 @@ class TestDeep:
 
         meta = data.get("meta")
         assert meta.fold_left("", lambda acc, v: f"{acc}{v}") in (
-            "3USD", "USD3",  # order is not guaranteed in HAMT
+            "3USD",
+            "USD3",  # order is not guaranteed in HAMT
         )
 
     def test_fold_over_nested_structure(self):
@@ -707,54 +708,71 @@ class TestDeep:
         Build a nested frozendict, map over inner values, then fold
         to compute totals — exercises Functor + Foldable together.
         """
-        org = frozendict({
-            "engineering": frozendict({
-                "backend": frozendict({"headcount": 12, "budget": 500_000}),
-                "frontend": frozendict({"headcount": 8, "budget": 350_000}),
-                "infra": frozendict({"headcount": 5, "budget": 200_000}),
-            }),
-            "product": frozendict({
-                "design": frozendict({"headcount": 4, "budget": 150_000}),
-                "research": frozendict({"headcount": 3, "budget": 120_000}),
-            }),
-        })
+        org = frozendict(
+            {
+                "engineering": frozendict(
+                    {
+                        "backend": frozendict({"headcount": 12, "budget": 500_000}),
+                        "frontend": frozendict({"headcount": 8, "budget": 350_000}),
+                        "infra": frozendict({"headcount": 5, "budget": 200_000}),
+                    }
+                ),
+                "product": frozendict(
+                    {
+                        "design": frozendict({"headcount": 4, "budget": 150_000}),
+                        "research": frozendict({"headcount": 3, "budget": 120_000}),
+                    }
+                ),
+            }
+        )
 
         # fold_left: total headcount across all departments and teams
-        total_headcount = org.fold_left(0, lambda acc, dept: (
-            dept.fold_left(acc, lambda inner_acc, team: (
-                team.get("headcount") + inner_acc
-            ))
-        ))
+        total_headcount = org.fold_left(
+            0,
+            lambda acc, dept: dept.fold_left(
+                acc, lambda inner_acc, team: team.get("headcount") + inner_acc
+            ),
+        )
         assert total_headcount == 32  # 12 + 8 + 5 + 4 + 3
 
         # fold_right: total budget across all departments and teams
-        total_budget = org.fold_right(0, lambda dept, acc: (
-            dept.fold_right(acc, lambda team, inner_acc: (
-                team.get("budget") + inner_acc
-            ))
-        ))
+        total_budget = org.fold_right(
+            0,
+            lambda dept, acc: dept.fold_right(
+                acc, lambda team, inner_acc: team.get("budget") + inner_acc
+            ),
+        )
         assert total_budget == 1_320_000  # 500k + 350k + 200k + 150k + 120k
 
         # map + fold: give every team a 10% budget raise, then total
-        raised = org.map(lambda dept: dept.map(lambda team: (
-            team.put("budget", int(team.get("budget") * 1.1))
-        )))
-        raised_budget = raised.fold_left(0, lambda acc, dept: (
-            dept.fold_left(acc, lambda inner_acc, team: (
-                team.get("budget") + inner_acc
-            ))
-        ))
+        raised = org.map(
+            lambda dept: dept.map(
+                lambda team: team.put("budget", int(team.get("budget") * 1.1))
+            )
+        )
+        raised_budget = raised.fold_left(
+            0,
+            lambda acc, dept: dept.fold_left(
+                acc, lambda inner_acc, team: team.get("budget") + inner_acc
+            ),
+        )
         assert raised_budget == 1_452_000  # 1_320_000 * 1.1
 
         # fold_left: collect all team names
-        team_names = org.fold_left([], lambda acc, dept: (
-            dept.fold_left(acc, lambda inner_acc, team: (
-                inner_acc + [f"{team.get('headcount')} people"]
-            ))
-        ))
+        team_names = org.fold_left(
+            [],
+            lambda acc, dept: dept.fold_left(
+                acc,
+                lambda inner_acc, team: inner_acc + [f"{team.get('headcount')} people"],
+            ),
+        )
         assert len(team_names) == 5
         assert sorted(team_names) == [
-            "12 people", "3 people", "4 people", "5 people", "8 people",
+            "12 people",
+            "3 people",
+            "4 people",
+            "5 people",
+            "8 people",
         ]
 
 
@@ -788,12 +806,14 @@ class TestToDict:
 class TestJsonRoundTrip:
     def test_dumps_via_to_dict(self):
         import json
+
         fd = frozendict({"a": 1, "b": "hello"})
         s = json.dumps(fd.to_dict())
         assert json.loads(s) == {"a": 1, "b": "hello"}
 
     def test_loads_deep_freezes(self):
         import json
+
         s = '{"x": 1, "y": {"z": 2}}'
         fd = frozendict(json.loads(s))
         assert fd["x"] == 1
@@ -802,6 +822,7 @@ class TestJsonRoundTrip:
 
     def test_full_round_trip(self):
         import json
+
         original = {"users": [{"name": "alice"}, {"name": "bob"}], "count": 2}
         fd = frozendict(original)
         s = json.dumps(fd.to_dict())
@@ -811,10 +832,13 @@ class TestJsonRoundTrip:
 
     def test_nested_round_trip(self):
         import json
-        fd = frozendict({
-            "config": {"db": {"host": "localhost", "port": 5432}},
-            "tags": ["prod", "us-east"],
-        })
+
+        fd = frozendict(
+            {
+                "config": {"db": {"host": "localhost", "port": 5432}},
+                "tags": ["prod", "us-east"],
+            }
+        )
         d = fd.to_dict()
         s = json.dumps(d)
         fd2 = frozendict(json.loads(s))

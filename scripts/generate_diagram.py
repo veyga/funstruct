@@ -38,7 +38,8 @@ def discover_typeclasses() -> dict[type, list[type]]:
 
     def walk(cls):
         children = [
-            c for c in cls.__subclasses__()
+            c
+            for c in cls.__subclasses__()
             if c.__module__.startswith("funstruct.typeclasses")
         ]
         if children:
@@ -86,9 +87,27 @@ def classify_typeclass(cls) -> str:
 
 
 COLORS = {
-    "algebraic": {"bg": "#fff0f5", "border": "#e8a0b8", "box": "#ff99ca", "text": "#fff", "label": "#c06080"},
-    "structural": {"bg": "#f0f5ff", "border": "#a0b8e8", "box": "#77afff", "text": "#fff", "label": "#6080c0"},
-    "computational": {"bg": "#f5fff0", "border": "#90c890", "box": "#7acc7a", "text": "#fff", "label": "#508050"},
+    "algebraic": {
+        "bg": "#fff0f5",
+        "border": "#e8a0b8",
+        "box": "#ff99ca",
+        "text": "#fff",
+        "label": "#c06080",
+    },
+    "structural": {
+        "bg": "#f0f5ff",
+        "border": "#a0b8e8",
+        "box": "#77afff",
+        "text": "#fff",
+        "label": "#6080c0",
+    },
+    "computational": {
+        "bg": "#f5fff0",
+        "border": "#90c890",
+        "box": "#7acc7a",
+        "text": "#fff",
+        "label": "#508050",
+    },
 }
 
 SPECIAL_COLORS = {
@@ -112,11 +131,16 @@ def generate_svg() -> str:
     # Add Semigroup/Monoid (value-level typeclasses, not BaseTypeclass subclasses)
     from funstruct.typeclasses.semigroup import Semigroup
     from funstruct.typeclasses.monoid import Monoid
+
     all_tcs.add(Semigroup)
     all_tcs.add(Monoid)
 
     # Group typeclasses
-    groups: dict[str, list[type]] = {"algebraic": [], "structural": [], "computational": []}
+    groups: dict[str, list[type]] = {
+        "algebraic": [],
+        "structural": [],
+        "computational": [],
+    }
     for tc in all_tcs:
         if tc is BaseTypeclass:
             continue
@@ -136,16 +160,26 @@ def generate_svg() -> str:
     edges.append(("Semigroup", "Monoid"))
 
     lines = []
-    lines.append('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="\'SF Mono\', monospace" font-size="13">')
-    lines.append('  <defs>')
-    lines.append('    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">')
+    lines.append(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="\'SF Mono\', monospace" font-size="13">'
+    )
+    lines.append("  <defs>")
+    lines.append(
+        '    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+    )
     lines.append('      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>')
-    lines.append('    </marker>')
-    lines.append('    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.1"/></filter>')
-    lines.append('  </defs>')
+    lines.append("    </marker>")
+    lines.append(
+        '    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.1"/></filter>'
+    )
+    lines.append("  </defs>")
     lines.append('  <rect width="900" height="620" fill="#1a1a2e" rx="8"/>')
-    lines.append(f'  <text x="450" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#e0e2e4">funstruct — typeclass hierarchy</text>')
-    lines.append(f'  <text x="450" y="52" text-anchor="middle" font-size="11" fill="#666">auto-generated from code • {len(all_tcs)-1} typeclasses • {len(data_types)} data types • {len(instances)} instances</text>')
+    lines.append(
+        f'  <text x="450" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#e0e2e4">funstruct — typeclass hierarchy</text>'
+    )
+    lines.append(
+        f'  <text x="450" y="52" text-anchor="middle" font-size="11" fill="#666">auto-generated from code • {len(all_tcs) - 1} typeclasses • {len(data_types)} data types • {len(instances)} instances</text>'
+    )
 
     # Typeclass boxes — positioned manually per group for good layout
     tc_positions = {}
@@ -154,16 +188,24 @@ def generate_svg() -> str:
         x, y = 65, 108 + i * 52
         tc_positions[tc.__name__] = (130, y + 17)
         c = SPECIAL_COLORS.get(tc.__name__, COLORS["algebraic"])
-        lines.append(f'  <rect x="{x}" y="{y}" width="130" height="34" rx="6" fill="{c.get("box", COLORS["algebraic"]["box"])}" stroke="{c.get("border", COLORS["algebraic"]["border"])}"/>')
-        lines.append(f'  <text x="{x+65}" y="{y+22}" text-anchor="middle" font-weight="bold" fill="{c.get("text", "#fff")}">{tc.__name__}</text>')
+        lines.append(
+            f'  <rect x="{x}" y="{y}" width="130" height="34" rx="6" fill="{c.get("box", COLORS["algebraic"]["box"])}" stroke="{c.get("border", COLORS["algebraic"]["border"])}"/>'
+        )
+        lines.append(
+            f'  <text x="{x + 65}" y="{y + 22}" text-anchor="middle" font-weight="bold" fill="{c.get("text", "#fff")}">{tc.__name__}</text>'
+        )
 
     # Structural
     for i, tc in enumerate(groups["structural"]):
         x, y = 295, 108 + i * 47
         tc_positions[tc.__name__] = (360, y + 17)
         c = SPECIAL_COLORS.get(tc.__name__, COLORS["structural"])
-        lines.append(f'  <rect x="{x}" y="{y}" width="130" height="34" rx="6" fill="{c.get("box", COLORS["structural"]["box"])}" stroke="{c.get("border", COLORS["structural"]["border"])}"/>')
-        lines.append(f'  <text x="{x+65}" y="{y+22}" text-anchor="middle" font-weight="bold" fill="{c.get("text", "#fff")}">{tc.__name__}</text>')
+        lines.append(
+            f'  <rect x="{x}" y="{y}" width="130" height="34" rx="6" fill="{c.get("box", COLORS["structural"]["box"])}" stroke="{c.get("border", COLORS["structural"]["border"])}"/>'
+        )
+        lines.append(
+            f'  <text x="{x + 65}" y="{y + 22}" text-anchor="middle" font-weight="bold" fill="{c.get("text", "#fff")}">{tc.__name__}</text>'
+        )
 
     # Computational
     comp_layout = {
@@ -178,27 +220,55 @@ def generate_svg() -> str:
         x, y = pos
         tc_positions[tc.__name__] = (x + 65, y + 17)
         c = SPECIAL_COLORS.get(tc.__name__, COLORS["computational"])
-        lines.append(f'  <rect x="{x}" y="{y}" width="130" height="34" rx="6" fill="{c.get("box", COLORS["computational"]["box"])}" stroke="{c.get("border", COLORS["computational"]["border"])}"/>')
-        lines.append(f'  <text x="{x+65}" y="{y+22}" text-anchor="middle" font-weight="bold" fill="{c.get("text", "#fff")}">{tc.__name__}</text>')
+        lines.append(
+            f'  <rect x="{x}" y="{y}" width="130" height="34" rx="6" fill="{c.get("box", COLORS["computational"]["box"])}" stroke="{c.get("border", COLORS["computational"]["border"])}"/>'
+        )
+        lines.append(
+            f'  <text x="{x + 65}" y="{y + 22}" text-anchor="middle" font-weight="bold" fill="{c.get("text", "#fff")}">{tc.__name__}</text>'
+        )
 
     # Group backgrounds
-    lines.insert(10, f'  <rect x="30" y="75" width="200" height="{52*len(groups["algebraic"])+60}" rx="8" fill="{COLORS["algebraic"]["bg"]}" stroke="{COLORS["algebraic"]["border"]}" filter="url(#shadow)"/>')
-    lines.insert(11, f'  <text x="130" y="95" text-anchor="middle" font-size="10" fill="{COLORS["algebraic"]["label"]}" font-weight="bold">ALGEBRAIC</text>')
-    lines.insert(12, f'  <rect x="260" y="75" width="200" height="{47*len(groups["structural"])+60}" rx="8" fill="{COLORS["structural"]["bg"]}" stroke="{COLORS["structural"]["border"]}" filter="url(#shadow)"/>')
-    lines.insert(13, f'  <text x="360" y="95" text-anchor="middle" font-size="10" fill="{COLORS["structural"]["label"]}" font-weight="bold">STRUCTURAL</text>')
-    lines.insert(14, f'  <rect x="490" y="75" width="380" height="230" rx="8" fill="{COLORS["computational"]["bg"]}" stroke="{COLORS["computational"]["border"]}" filter="url(#shadow)"/>')
-    lines.insert(15, f'  <text x="680" y="95" text-anchor="middle" font-size="10" fill="{COLORS["computational"]["label"]}" font-weight="bold">COMPUTATIONAL</text>')
+    lines.insert(
+        10,
+        f'  <rect x="30" y="75" width="200" height="{52 * len(groups["algebraic"]) + 60}" rx="8" fill="{COLORS["algebraic"]["bg"]}" stroke="{COLORS["algebraic"]["border"]}" filter="url(#shadow)"/>',
+    )
+    lines.insert(
+        11,
+        f'  <text x="130" y="95" text-anchor="middle" font-size="10" fill="{COLORS["algebraic"]["label"]}" font-weight="bold">ALGEBRAIC</text>',
+    )
+    lines.insert(
+        12,
+        f'  <rect x="260" y="75" width="200" height="{47 * len(groups["structural"]) + 60}" rx="8" fill="{COLORS["structural"]["bg"]}" stroke="{COLORS["structural"]["border"]}" filter="url(#shadow)"/>',
+    )
+    lines.insert(
+        13,
+        f'  <text x="360" y="95" text-anchor="middle" font-size="10" fill="{COLORS["structural"]["label"]}" font-weight="bold">STRUCTURAL</text>',
+    )
+    lines.insert(
+        14,
+        f'  <rect x="490" y="75" width="380" height="230" rx="8" fill="{COLORS["computational"]["bg"]}" stroke="{COLORS["computational"]["border"]}" filter="url(#shadow)"/>',
+    )
+    lines.insert(
+        15,
+        f'  <text x="680" y="95" text-anchor="middle" font-size="10" fill="{COLORS["computational"]["label"]}" font-weight="bold">COMPUTATIONAL</text>',
+    )
 
     # Edges
     for parent_name, child_name in edges:
         if parent_name in tc_positions and child_name in tc_positions:
             px, py = tc_positions[parent_name]
             cx, cy = tc_positions[child_name]
-            lines.append(f'  <line x1="{px}" y1="{py+17}" x2="{cx}" y2="{cy-17}" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>')
+            lines.append(
+                f'  <line x1="{px}" y1="{py + 17}" x2="{cx}" y2="{cy - 17}" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>'
+            )
 
     # Data types section
-    lines.append(f'  <rect x="30" y="330" width="840" height="130" rx="8" fill="#2a2520" stroke="#d0b090" filter="url(#shadow)"/>')
-    lines.append(f'  <text x="450" y="350" text-anchor="middle" font-size="10" fill="#c0a070" font-weight="bold">DATA TYPES</text>')
+    lines.append(
+        f'  <rect x="30" y="330" width="840" height="130" rx="8" fill="#2a2520" stroke="#d0b090" filter="url(#shadow)"/>'
+    )
+    lines.append(
+        f'  <text x="450" y="350" text-anchor="middle" font-size="10" fill="#c0a070" font-weight="bold">DATA TYPES</text>'
+    )
 
     col_width = 110
     cols = 7
@@ -209,24 +279,36 @@ def generate_svg() -> str:
         y = 362 + row * 36
         name = dt.__name__
         w = max(90, len(name) * 8 + 20)
-        lines.append(f'  <rect x="{x}" y="{y}" width="{w}" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>')
-        lines.append(f'  <text x="{x + w//2}" y="{y+19}" text-anchor="middle" font-size="11" fill="#e0c8a0">{name}</text>')
+        lines.append(
+            f'  <rect x="{x}" y="{y}" width="{w}" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>'
+        )
+        lines.append(
+            f'  <text x="{x + w // 2}" y="{y + 19}" text-anchor="middle" font-size="11" fill="#e0c8a0">{name}</text>'
+        )
 
     # Instances section
-    lines.append(f'  <rect x="30" y="475" width="840" height="130" rx="8" fill="#202025" stroke="#b0b0b0" filter="url(#shadow)"/>')
-    lines.append(f'  <text x="450" y="495" text-anchor="middle" font-size="10" fill="#9090a0" font-weight="bold">INSTANCES ({len(instances)} registered)</text>')
+    lines.append(
+        f'  <rect x="30" y="475" width="840" height="130" rx="8" fill="#202025" stroke="#b0b0b0" filter="url(#shadow)"/>'
+    )
+    lines.append(
+        f'  <text x="450" y="495" text-anchor="middle" font-size="10" fill="#9090a0" font-weight="bold">INSTANCES ({len(instances)} registered)</text>'
+    )
 
     y_off = 518
     per_line = 6
     for i in range(0, len(instances), per_line):
-        chunk = instances[i:i+per_line]
+        chunk = instances[i : i + per_line]
         text = "  ".join(f"{tc}[{dt}]" for tc, dt in chunk)
-        lines.append(f'  <text x="55" y="{y_off}" font-size="11" fill="#9090a0">{text}</text>')
+        lines.append(
+            f'  <text x="55" y="{y_off}" font-size="11" fill="#9090a0">{text}</text>'
+        )
         y_off += 20
 
-    lines.append(f'  <text x="780" y="600" text-anchor="end" font-size="9" fill="#aaa">funstruct v2 • auto-generated</text>')
-    lines.append('</svg>')
-    return '\n'.join(lines)
+    lines.append(
+        f'  <text x="780" y="600" text-anchor="end" font-size="9" fill="#aaa">funstruct v2 • auto-generated</text>'
+    )
+    lines.append("</svg>")
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

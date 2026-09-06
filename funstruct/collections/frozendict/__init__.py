@@ -52,12 +52,16 @@ _MASK = _WIDTH - 1
 class _Empty:
     def get(self, key, hash_val, shift):
         return None
+
     def put(self, key, value, hash_val, shift):
         return _Leaf(key, value)
+
     def remove(self, key, hash_val, shift):
         return self
+
     def items_iter(self):
         return iter(())
+
     def __len__(self):
         return 0
 
@@ -107,7 +111,10 @@ class _Collision:
         if hash_val != self.hash_val:
             node = _Branch(_EMPTY, 0, ())
             node = node.put(
-                self.entries[0][0], self.entries[0][1], self.hash_val, shift,
+                self.entries[0][0],
+                self.entries[0][1],
+                self.hash_val,
+                shift,
             )
             for k, v in self.entries[1:]:
                 node = node.put(k, v, self.hash_val, shift)
@@ -240,7 +247,9 @@ class frozendict(DataType, Generic[K, V]):
                     if idx >= len(items):
                         return root
                     k, v = items[idx]
-                    return tail_call(_build)(idx + 1, root.put(k, v if shallow else _freeze(v), hash(k), 0))
+                    return tail_call(_build)(
+                        idx + 1, root.put(k, v if shallow else _freeze(v), hash(k), 0)
+                    )
 
                 object.__setattr__(self, "_frozendict__root", _build(0, _EMPTY))
                 object.__setattr__(self, "_frozendict__size", len(items))
@@ -367,6 +376,7 @@ class frozendict(DataType, Generic[K, V]):
         >>> frozendict({"a": {"b": 1}}).to_dict()
         {'a': {'b': 1}}
         """
+
         def _thaw(v):
             match v:
                 case frozendict():
@@ -375,6 +385,7 @@ class frozendict(DataType, Generic[K, V]):
                     return [_thaw(item) for item in v]
                 case _:
                     return v
+
         return {k: _thaw(v) for k, v in self.__root.items_iter()}
 
     @classmethod
@@ -391,7 +402,6 @@ class frozendict(DataType, Generic[K, V]):
 
     def __bool__(self) -> bool:
         return self.__size > 0
-
 
 
 import funstruct.collections.frozendict.instances  # noqa: E402, F401

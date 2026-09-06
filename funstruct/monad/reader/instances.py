@@ -14,7 +14,6 @@ _B = TypeVar("_B")
 
 
 class _ReaderMonad(Monad, for_type=Reader):
-
     def pure(self, value: _A) -> Reader[_Ctx, _A]:
         return Reader(lambda _: value)
 

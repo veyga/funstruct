@@ -23,24 +23,26 @@ from funstruct.experimental.optics import Lens, at
 
 
 def main():
-    config = frozendict({
-        "app": {
-            "name": "myservice",
-            "db": {
-                "host": "localhost",
-                "port": 5432,
-                "pool_size": 10,
+    config = frozendict(
+        {
+            "app": {
+                "name": "myservice",
+                "db": {
+                    "host": "localhost",
+                    "port": 5432,
+                    "pool_size": 10,
+                },
+                "cache": {
+                    "ttl": 300,
+                    "backend": "redis",
+                },
             },
-            "cache": {
-                "ttl": 300,
-                "backend": "redis",
+            "deploy": {
+                "region": "us-east-1",
+                "replicas": 3,
             },
-        },
-        "deploy": {
-            "region": "us-east-1",
-            "replicas": 3,
-        },
-    })
+        }
+    )
 
     print("=== Lenses: composable getters/setters ===\n")
 
@@ -91,6 +93,7 @@ def main():
 
     # JSON round-trip with lenses
     import json
+
     print(f"\n  JSON round-trip:")
     s = json.dumps(prod_config.to_dict(), indent=2)
     print(f"    {s[:60]}...")

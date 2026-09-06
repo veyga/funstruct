@@ -40,9 +40,11 @@ class State(DataType, Generic[_A]):
         """>>> State.pure(1).bind(lambda x: State.pure(x + 10)).run(0)
         (0, 11)
         """
+
         def inner(s):
             new_s, a = self._run(s)
             return f(a).run(new_s)
+
         return State(inner)
 
     @classmethod
@@ -56,6 +58,7 @@ class State(DataType, Generic[_A]):
         >>> State.do(pipeline)().run(0)
         (2, 1)
         """
+
         def _thunk(*args, **kwargs):
             def _run(s):
                 gen = gen_fn(*args, **kwargs)
@@ -67,7 +70,9 @@ class State(DataType, Generic[_A]):
                         monadic_val = gen.send(result)
                 except StopIteration as e:
                     return (s, e.value)
+
             return cls(_run)
+
         return _thunk
 
     @classmethod
@@ -99,7 +104,6 @@ class State(DataType, Generic[_A]):
 
     def __repr__(self) -> str:
         return f"State({self._run})"
-
 
 
 import funstruct.monad.state.instances  # noqa: E402, F401

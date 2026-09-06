@@ -213,58 +213,79 @@ class TestOptionInstances:
 
     def test_monad_pure(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Option).pure(42) == Some(42)
 
     def test_monad_bind_some(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Option).bind(Some(1), lambda x: Some(x + 1)) == Some(2)
 
     def test_monad_bind_nothing(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Option).bind(Nothing(), lambda x: Some(x + 1)) == Nothing()
 
     def test_monad_map_derived(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Option).map(Some(10), lambda x: x * 2) == Some(20)
 
     def test_monad_product_derived(self):
         from funstruct.typeclasses import Monad, summon
+
         assert summon(Monad, Option).product(Some(1), Some(2)) == Some((1, 2))
 
     def test_alternative_empty(self):
         from funstruct.typeclasses import Alternative, summon
+
         assert summon(Alternative, Option).empty() == Nothing()
 
     def test_alternative_or_else_some_returns_first(self):
         from funstruct.typeclasses import Alternative, summon
+
         assert summon(Alternative, Option).or_else(Some(1), Some(2)) == Some(1)
 
     def test_alternative_or_else_nothing_returns_fallback(self):
         from funstruct.typeclasses import Alternative, summon
+
         assert summon(Alternative, Option).or_else(Nothing(), Some(2)) == Some(2)
 
     def test_alternative_ap_some_some(self):
         from funstruct.typeclasses import Alternative, summon
-        assert summon(Alternative, Option).ap(Some(lambda x: x + 1), Some(10)) == Some(11)
+
+        assert summon(Alternative, Option).ap(Some(lambda x: x + 1), Some(10)) == Some(
+            11
+        )
 
     def test_alternative_ap_nothing_some(self):
         from funstruct.typeclasses import Alternative, summon
+
         assert summon(Alternative, Option).ap(Nothing(), Some(10)) == Nothing()
 
     def test_alternative_ap_some_nothing(self):
         from funstruct.typeclasses import Alternative, summon
-        assert summon(Alternative, Option).ap(Some(lambda x: x + 1), Nothing()) == Nothing()
+
+        assert (
+            summon(Alternative, Option).ap(Some(lambda x: x + 1), Nothing())
+            == Nothing()
+        )
 
     def test_dot_vs_summon_map(self):
         from funstruct.typeclasses import Monad, summon
+
         f = lambda x: x + 1
         assert Some(10).map(f) == summon(Monad, Option).map(Some(10), f)
 
     def test_dot_vs_summon_bind(self):
         from funstruct.typeclasses import Monad, summon
+
         f = lambda x: Some(x + 1)
         assert Some(10).bind(f) == summon(Monad, Option).bind(Some(10), f)
 
     def test_dot_vs_summon_or_else(self):
         from funstruct.typeclasses import Alternative, summon
-        assert Nothing().or_else(Some(5)) == summon(Alternative, Option).or_else(Nothing(), Some(5))
+
+        assert Nothing().or_else(Some(5)) == summon(Alternative, Option).or_else(
+            Nothing(), Some(5)
+        )

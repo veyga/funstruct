@@ -109,10 +109,13 @@ class TestTaglessFinalWithService:
 
     def test_checkout_success(self):
         def checkout(F: MonadError, get_balance, amount):
-            return F.bind(get_balance, lambda bal:
-                F.raise_error(ValueError("insufficient"))
-                if bal < amount
-                else F.pure(bal - amount)
+            return F.bind(
+                get_balance,
+                lambda bal: (
+                    F.raise_error(ValueError("insufficient"))
+                    if bal < amount
+                    else F.pure(bal - amount)
+                ),
             )
 
         F = summon(MonadError, Result)
@@ -120,10 +123,13 @@ class TestTaglessFinalWithService:
 
     def test_checkout_insufficient_funds(self):
         def checkout(F: MonadError, get_balance, amount):
-            return F.bind(get_balance, lambda bal:
-                F.raise_error(ValueError("insufficient"))
-                if bal < amount
-                else F.pure(bal - amount)
+            return F.bind(
+                get_balance,
+                lambda bal: (
+                    F.raise_error(ValueError("insufficient"))
+                    if bal < amount
+                    else F.pure(bal - amount)
+                ),
             )
 
         F = summon(MonadError, Result)
@@ -132,10 +138,13 @@ class TestTaglessFinalWithService:
 
     def test_checkout_user_not_found(self):
         def checkout(F: MonadError, get_balance, amount):
-            return F.bind(get_balance, lambda bal:
-                F.raise_error(ValueError("insufficient"))
-                if bal < amount
-                else F.pure(bal - amount)
+            return F.bind(
+                get_balance,
+                lambda bal: (
+                    F.raise_error(ValueError("insufficient"))
+                    if bal < amount
+                    else F.pure(bal - amount)
+                ),
             )
 
         F = summon(MonadError, Result)
@@ -144,10 +153,13 @@ class TestTaglessFinalWithService:
 
     def test_same_program_either(self):
         def checkout(F: MonadError, get_balance, amount):
-            return F.bind(get_balance, lambda bal:
-                F.raise_error(ValueError("insufficient"))
-                if bal < amount
-                else F.pure(bal - amount)
+            return F.bind(
+                get_balance,
+                lambda bal: (
+                    F.raise_error(ValueError("insufficient"))
+                    if bal < amount
+                    else F.pure(bal - amount)
+                ),
             )
 
         F = summon(MonadError, Either)

@@ -29,8 +29,10 @@ from dataclasses import dataclass
 # DSL 1: Arithmetic expressions
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class Arith(ABC):
     """The algebra — defines what operations exist in the DSL."""
+
     @abstractmethod
     def lit(self, n: int): ...
     @abstractmethod
@@ -48,34 +50,60 @@ def math_program(E: Arith):
 
 class Evaluate(Arith):
     """Interpreter 1: compute the result."""
-    def lit(self, n): return n
-    def add(self, a, b): return a + b
-    def mul(self, a, b): return a * b
-    def neg(self, a): return -a
+
+    def lit(self, n):
+        return n
+
+    def add(self, a, b):
+        return a + b
+
+    def mul(self, a, b):
+        return a * b
+
+    def neg(self, a):
+        return -a
 
 
 class PrettyPrint(Arith):
     """Interpreter 2: produce a string representation."""
-    def lit(self, n): return str(n)
-    def add(self, a, b): return f"({a} + {b})"
-    def mul(self, a, b): return f"({a} * {b})"
-    def neg(self, a): return f"(-{a})"
+
+    def lit(self, n):
+        return str(n)
+
+    def add(self, a, b):
+        return f"({a} + {b})"
+
+    def mul(self, a, b):
+        return f"({a} * {b})"
+
+    def neg(self, a):
+        return f"(-{a})"
 
 
 class CountOps(Arith):
     """Interpreter 3: count the number of operations."""
-    def lit(self, n): return 0
-    def add(self, a, b): return 1 + a + b
-    def mul(self, a, b): return 1 + a + b
-    def neg(self, a): return 1 + a
+
+    def lit(self, n):
+        return 0
+
+    def add(self, a, b):
+        return 1 + a + b
+
+    def mul(self, a, b):
+        return 1 + a + b
+
+    def neg(self, a):
+        return 1 + a
 
 
 # ═══════════════════════════════════════════════════════════════════════
 # DSL 2: Query builder
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class Query(ABC):
     """DSL for building database queries."""
+
     @abstractmethod
     def table(self, name: str): ...
     @abstractmethod
@@ -91,7 +119,8 @@ def find_active_users(Q: Query):
     return Q.limit(
         Q.select(
             Q.where(Q.table("users"), "active = true"),
-            "name", "email",
+            "name",
+            "email",
         ),
         10,
     )
@@ -99,26 +128,44 @@ def find_active_users(Q: Query):
 
 class ToSQL(Query):
     """Interpreter: generate SQL string."""
-    def table(self, name): return f"SELECT * FROM {name}"
-    def where(self, q, cond): return f"{q} WHERE {cond}"
-    def select(self, q, *cols): return q.replace("SELECT *", f"SELECT {', '.join(cols)}")
-    def limit(self, q, n): return f"{q} LIMIT {n}"
+
+    def table(self, name):
+        return f"SELECT * FROM {name}"
+
+    def where(self, q, cond):
+        return f"{q} WHERE {cond}"
+
+    def select(self, q, *cols):
+        return q.replace("SELECT *", f"SELECT {', '.join(cols)}")
+
+    def limit(self, q, n):
+        return f"{q} LIMIT {n}"
 
 
 class DryRun(Query):
     """Interpreter: describe what would happen."""
-    def table(self, name): return [f"scan table '{name}'"]
-    def where(self, q, cond): return q + [f"filter: {cond}"]
-    def select(self, q, *cols): return q + [f"project: {', '.join(cols)}"]
-    def limit(self, q, n): return q + [f"take first {n}"]
+
+    def table(self, name):
+        return [f"scan table '{name}'"]
+
+    def where(self, q, cond):
+        return q + [f"filter: {cond}"]
+
+    def select(self, q, *cols):
+        return q + [f"project: {', '.join(cols)}"]
+
+    def limit(self, q, n):
+        return q + [f"take first {n}"]
 
 
 # ═══════════════════════════════════════════════════════════════════════
 # DSL 3: Workflow / pipeline
 # ═══════════════════════════════════════════════════════════════════════
 
+
 class Workflow(ABC):
     """DSL for defining multi-step workflows."""
+
     @abstractmethod
     def step(self, name: str, fn): ...
     @abstractmethod
@@ -143,24 +190,36 @@ def deploy_pipeline(W: Workflow):
 
 class Execute(Workflow):
     """Interpreter: actually run the workflow."""
+
     def step(self, name, fn):
         result = fn()
         print(f"    [{name}] → {result}")
         return result
-    def sequence(self, a, b): return b
-    def on_error(self, workflow, handler): return workflow
+
+    def sequence(self, a, b):
+        return b
+
+    def on_error(self, workflow, handler):
+        return workflow
 
 
 class PlanOnly(Workflow):
     """Interpreter: just show the plan, don't execute."""
-    def step(self, name, fn): return f"step({name})"
-    def sequence(self, a, b): return f"{a} → {b}"
-    def on_error(self, w, handler): return f"{w} [on_error: rollback]"
+
+    def step(self, name, fn):
+        return f"step({name})"
+
+    def sequence(self, a, b):
+        return f"{a} → {b}"
+
+    def on_error(self, w, handler):
+        return f"{w} [on_error: rollback]"
 
 
 # ═══════════════════════════════════════════════════════════════════════
 # Demo
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def main():
     print("=== DSL 1: Arithmetic expressions ===\n")

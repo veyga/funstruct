@@ -186,7 +186,6 @@ class Branch(Tree[A]):
         return f"Branch({repr(self.value)}, {repr(self.left)}, {repr(self.right)})"
 
 
-
 import funstruct.collections.tree.instances  # noqa: E402, F401
 
 __all__ = ["Tree", "Leaf", "Branch"]

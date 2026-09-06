@@ -1,6 +1,6 @@
 """Functor — map a function over a value in context.
 
-    F[A] → (A → B) → F[B]
+F[A] → (A → B) → F[B]
 """
 
 from __future__ import annotations

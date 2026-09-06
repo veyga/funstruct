@@ -13,7 +13,6 @@ _B = TypeVar("_B")
 
 
 class _ZipListApplicative(Applicative, for_type=ZipList):
-
     def pure(self, value: _A) -> ZipList[_A]:
         return ZipList([value])
 

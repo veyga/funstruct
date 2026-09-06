@@ -106,7 +106,6 @@ class Invalid(Validated, Generic[_E]):
         return on_invalid(self.errors)
 
 
-
 import funstruct.applicative.validated.instances  # noqa: E402, F401
 
 __all__ = [

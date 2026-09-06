@@ -14,7 +14,6 @@ _B = TypeVar("_B")
 
 
 class _ResultMonadError(MonadError, for_type=Result):
-
     def pure(self, value: _A) -> Result[_A]:
         return Ok(value)
 
@@ -41,7 +40,6 @@ class _ResultMonadError(MonadError, for_type=Result):
 
 
 class _ResultBifunctor(Bifunctor, for_type=Result):
-
     def bimap(
         self,
         fa: Result[_A],
@@ -56,7 +54,6 @@ class _ResultBifunctor(Bifunctor, for_type=Result):
 
 
 class _AsyncResultMonadError(MonadError, for_type=AsyncResult):
-
     def pure(self, value: _A) -> AsyncResult[_A]:
         return AsyncResult.pure(value)
 

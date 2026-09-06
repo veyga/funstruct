@@ -22,17 +22,20 @@ from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
 
 # ── Domain ───────────────────────────────────────────────────────────
 
+
 @dataclass(frozen=True)
 class Customer:
     id: str
     name: str
     credit: float
 
+
 @dataclass(frozen=True)
 class Product:
     id: str
     name: str
     price: float
+
 
 @dataclass(frozen=True)
 class Order:
@@ -43,6 +46,7 @@ class Order:
 
 # ── Algebra ──────────────────────────────────────────────────────────
 
+
 class OrderRepo[F](Protocol):
     def find_customer(self, customer_id: str) -> F[Customer]: ...
     def find_product(self, product_id: str) -> F[Product]: ...
@@ -51,22 +55,29 @@ class OrderRepo[F](Protocol):
 
 # ── Program (generic in F) ───────────────────────────────────────────
 
-def place_order[F](repo: OrderRepo[F], F: type[F], customer_id: str, product_id: str) -> F[Order]:
+
+def place_order[F](
+    repo: OrderRepo[F], F: type[F], customer_id: str, product_id: str
+) -> F[Order]:
     @F.do
     def run():
         customer = yield repo.find_customer(customer_id)
         product = yield repo.find_product(product_id)
         if customer.credit < product.price:
-            yield F.raise_error(ValueError(
-                f"{customer.name} has ${customer.credit:.2f}, needs ${product.price:.2f}"
-            ))
+            yield F.raise_error(
+                ValueError(
+                    f"{customer.name} has ${customer.credit:.2f}, needs ${product.price:.2f}"
+                )
+            )
         order = Order(customer=customer, product=product, total=product.price)
         saved = yield repo.save_order(order)
         return saved
+
     return run()
 
 
 # ── Interpreter 1: "Postgres" (async) ────────────────────────────────
+
 
 class PostgresOrderRepo:
     _customers = {
@@ -100,6 +111,7 @@ class PostgresOrderRepo:
 
 # ── Interpreter 2: In-memory (sync) ──────────────────────────────────
 
+
 class InMemoryOrderRepo:
     def __init__(self):
         self.orders: list[Order] = []
@@ -123,22 +135,33 @@ class InMemoryOrderRepo:
 
 # ── Interpreter 3: Always fails ──────────────────────────────────────
 
+
 class FailingOrderRepo:
     def find_customer(self, customer_id: str) -> Result[Customer]:
         return Err(ConnectionError("database is down"))
+
     def find_product(self, product_id: str) -> Result[Product]:
         return Err(ConnectionError("database is down"))
+
     def save_order(self, order: Order) -> Result[Order]:
         return Err(ConnectionError("database is down"))
 
 
 def main():
     print("=== Async 'Postgres' ===")
+
     async def run_async():
         repo = PostgresOrderRepo()
-        print(f"  alice+widget: {await place_order(repo, AsyncResult, 'alice', 'widget')}")
-        print(f"  bob+laptop:   {await place_order(repo, AsyncResult, 'bob', 'laptop')}")
-        print(f"  nobody+widget: {await place_order(repo, AsyncResult, 'nobody', 'widget')}")
+        print(
+            f"  alice+widget: {await place_order(repo, AsyncResult, 'alice', 'widget')}"
+        )
+        print(
+            f"  bob+laptop:   {await place_order(repo, AsyncResult, 'bob', 'laptop')}"
+        )
+        print(
+            f"  nobody+widget: {await place_order(repo, AsyncResult, 'nobody', 'widget')}"
+        )
+
     asyncio.run(run_async())
 
     print("\n=== Sync in-memory ===")
@@ -148,7 +171,9 @@ def main():
     print(f"  saved orders: {len(repo.orders)}")
 
     print("\n=== Failing (DB down) ===")
-    print(f"  alice+widget: {place_order(FailingOrderRepo(), Result, 'alice', 'widget')}")
+    print(
+        f"  alice+widget: {place_order(FailingOrderRepo(), Result, 'alice', 'widget')}"
+    )
 
 
 if __name__ == "__main__":

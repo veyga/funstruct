@@ -54,11 +54,10 @@ def get_profile():
 
 def get_profile_bind() -> AsyncResult[str]:
     """Same thing with explicit bind chains."""
-    return (
-        get_user("me")
-        .bind(lambda user: get_age(user)
-        .bind(lambda age: get_nick(user)
-        .map(lambda nick: f"{nick}{age}")))
+    return get_user("me").bind(
+        lambda user: get_age(user).bind(
+            lambda age: get_nick(user).map(lambda nick: f"{nick}{age}")
+        )
     )
 
 

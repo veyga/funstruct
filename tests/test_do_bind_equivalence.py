@@ -112,9 +112,7 @@ class TestAsyncResultEquivalence:
             return x + y
 
         bind_version = AsyncResult.pure(1).bind(
-            lambda x: AsyncResult.raise_error(ValueError("boom")).map(
-                lambda y: x + y
-            )
+            lambda x: AsyncResult.raise_error(ValueError("boom")).map(lambda y: x + y)
         )
 
         do_result = self._run(do_version())
@@ -189,6 +187,7 @@ class TestDoNotationLimitations:
 
     def test_async_do_awaits_properly(self):
         """@AsyncResult.do handles async values correctly."""
+
         @AsyncResult.do
         def async_pipeline():
             x = yield AsyncResult.pure(10)
@@ -200,6 +199,7 @@ class TestDoNotationLimitations:
 
     def test_mixing_sync_result_into_async_do(self):
         """Use AsyncResult.from_result() to lift sync Result into async do."""
+
         @AsyncResult.do
         def pipeline():
             x = yield AsyncResult.from_result(Ok(10))

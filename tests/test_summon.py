@@ -224,10 +224,14 @@ class TestHaskellStyleGenericFunctions:
     def test_generic_safe_divide(self):
         def safe_divide(fa, b):
             F = summon(MonadError, tc_of(fa))
-            return F.bind(fa, lambda a: (
-                F.raise_error(ValueError("div by zero")) if b == 0
-                else F.pure(a / b)
-            ))
+            return F.bind(
+                fa,
+                lambda a: (
+                    F.raise_error(ValueError("div by zero"))
+                    if b == 0
+                    else F.pure(a / b)
+                ),
+            )
 
         assert safe_divide(Ok(10), 2) == Ok(5.0)
         assert isinstance(safe_divide(Ok(10), 0), Err)

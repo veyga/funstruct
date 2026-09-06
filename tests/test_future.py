@@ -144,9 +144,7 @@ class TestBind:
 
     def test_bind_can_fail(self):
         err = RuntimeError("failed")
-        result = run(
-            AsyncResult.pure(1).bind(lambda x: AsyncResult.raise_error(err))
-        )
+        result = run(AsyncResult.pure(1).bind(lambda x: AsyncResult.raise_error(err)))
         assert result == Err(err)
 
 
@@ -578,7 +576,11 @@ class TestAsyncResultBifunctor:
 
     def test_bimap_on_err(self):
         err = ValueError("bad")
-        result = run(AsyncResult.raise_error(err).bimap(lambda e: TypeError(str(e)), lambda x: x * 2))
+        result = run(
+            AsyncResult.raise_error(err).bimap(
+                lambda e: TypeError(str(e)), lambda x: x * 2
+            )
+        )
         assert isinstance(result, Err)
         match result:
             case Err(e):
@@ -590,7 +592,9 @@ class TestAsyncResultBifunctor:
 
     def test_left_map_on_err_transforms(self):
         err = ValueError("bad")
-        result = run(AsyncResult.raise_error(err).left_map(lambda e: TypeError("wrapped")))
+        result = run(
+            AsyncResult.raise_error(err).left_map(lambda e: TypeError("wrapped"))
+        )
         assert isinstance(result, Err)
         match result:
             case Err(e):
@@ -614,29 +618,36 @@ class TestAsyncResultInstances:
 
     def test_pure_via_summon(self):
         from funstruct.typeclasses import Monad, summon
+
         F = summon(Monad, AsyncResult)
         assert self._run(F.pure(42)) == Ok(42)
 
     def test_bind_via_summon(self):
         from funstruct.typeclasses import Monad, summon
+
         F = summon(Monad, AsyncResult)
-        result = self._run(F.bind(AsyncResult.pure(10), lambda x: AsyncResult.pure(x + 1)))
+        result = self._run(
+            F.bind(AsyncResult.pure(10), lambda x: AsyncResult.pure(x + 1))
+        )
         assert result == Ok(11)
 
     def test_map_derived_via_summon(self):
         from funstruct.typeclasses import Monad, summon
+
         F = summon(Monad, AsyncResult)
         result = self._run(F.map(AsyncResult.pure(10), lambda x: x * 2))
         assert result == Ok(20)
 
     def test_raise_error_via_summon(self):
         from funstruct.typeclasses import MonadError, summon
+
         F = summon(MonadError, AsyncResult)
         result = self._run(F.raise_error(ValueError("x")))
         assert isinstance(result, Err)
 
     def test_handle_error_with_via_summon(self):
         from funstruct.typeclasses import MonadError, summon
+
         F = summon(MonadError, AsyncResult)
         result = self._run(
             F.handle_error_with(
@@ -648,6 +659,7 @@ class TestAsyncResultInstances:
 
     def test_handle_error_with_ok_passthrough_via_summon(self):
         from funstruct.typeclasses import MonadError, summon
+
         F = summon(MonadError, AsyncResult)
         result = self._run(
             F.handle_error_with(AsyncResult.pure(42), lambda e: AsyncResult.pure(0))
@@ -656,6 +668,7 @@ class TestAsyncResultInstances:
 
     def test_dot_vs_summon_equivalence(self):
         from funstruct.typeclasses import Monad, summon
+
         F = summon(Monad, AsyncResult)
         f = lambda x: x + 1
         dot_result = self._run(AsyncResult.pure(10).map(f))

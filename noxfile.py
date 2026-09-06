@@ -29,12 +29,18 @@ def typecheck_compat(session):
     """Type-check core library against Python 3.10 (minimum supported)."""
     session.install(".", "--group", "dev")
     session.run(
-        "ty", "check",
-        "--python-version", "3.10",
-        "--exclude", "funstruct/playground/",
-        "--exclude", "tests/",
-        "--exclude", "docs/",
-        "--exclude", "benchmarks/",
+        "ty",
+        "check",
+        "--python-version",
+        "3.10",
+        "--exclude",
+        "funstruct/playground/",
+        "--exclude",
+        "tests/",
+        "--exclude",
+        "docs/",
+        "--exclude",
+        "benchmarks/",
     )
 
 

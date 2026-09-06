@@ -24,7 +24,10 @@ class TypeConstructor:
 
         # If the class explicitly declares _type_constructor = None in its
         # own __dict__, it's an abstract intermediary (e.g. DataType) — skip.
-        if "_type_constructor" in cls.__dict__ and cls.__dict__["_type_constructor"] is None:
+        if (
+            "_type_constructor" in cls.__dict__
+            and cls.__dict__["_type_constructor"] is None
+        ):
             return
 
         # Walk MRO to find an inherited _type_constructor from a concrete parent

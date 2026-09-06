@@ -16,7 +16,6 @@ _B = TypeVar("_B")
 
 
 class _CListMonad(Monad, for_type=CList):
-
     def pure(self, value: _A) -> CList[_A]:
         return Cons(value)
 
@@ -25,7 +24,6 @@ class _CListMonad(Monad, for_type=CList):
 
 
 class _CListTraversable(Traversable, for_type=CList):
-
     def fold_left(self, fa: CList[_A], acc: _B, f: Callable[[_B, _A], _B]) -> _B:
         return fa.fold_left(acc, f)
 
@@ -45,7 +43,6 @@ class _CListTraversable(Traversable, for_type=CList):
 
 
 class _CListAlternative(Alternative, for_type=CList):
-
     def pure(self, value: _A) -> CList[_A]:
         return Cons(value)
 
