@@ -56,16 +56,46 @@ internally.
 
 ## Functional Primer
 
-### Type Class Hierarchy
+### Typeclasses
+
+Typeclasses define capabilities. Data types implement them via instances.
 
 ```
-Semigroup     Bifunctor     Foldable      Functor
-    │                        \       /       │
- Monoid                   Traversable    Applicative
-                                        /         \
-                                   Alternative    Monad
-                                                    │
-                                                MonadError
+                        ┌─────────────────────────────────────────────────────────┐
+                        │                    TYPECLASSES                          │
+                        │                                                         │
+                        │  Algebraic        Structural        Computational       │
+                        │  ──────────       ──────────        ─────────────       │
+                        │                                                         │
+                        │  Semigroup        Foldable           Functor            │
+                        │      │                │                 │               │
+                        │   Monoid          Traversable      Applicative          │
+                        │                                    /         \          │
+                        │  Bifunctor                  Alternative    Monad        │
+                        │                                              │          │
+                        │                                         MonadError      │
+                        └─────────────────────────────────────────────────────────┘
+
+                        ┌─────────────────────────────────────────────────────────┐
+                        │                     DATA TYPES                          │
+                        │                                                         │
+                        │  Option[A]     Either[E, A]     Result[A]               │
+                        │  CList[A]      Tree[A]          frozendict[K, V]        │
+                        │  Validated[E, A]   ZipList[A]   Future[A]               │
+                        │  State[S, A]   Reader[R, A]     Writer[W, A]            │
+                        │  AsyncResult[A]                                         │
+                        └─────────────────────────────────────────────────────────┘
+
+                        ┌─────────────────────────────────────────────────────────┐
+                        │                     INSTANCES                           │
+                        │           (connect typeclasses to data types)           │
+                        │                                                         │
+                        │  Monad[Option]       MonadError[Result]                 │
+                        │  Monad[Either]       MonadError[Either]                 │
+                        │  Alternative[Option] Bifunctor[Either]                  │
+                        │  Traversable[CList]  Functor[Tree]                     │
+                        │  Foldable[frozendict]  ...                             │
+                        └─────────────────────────────────────────────────────────┘
 ```
 
 #### Diagrams
@@ -188,18 +218,25 @@ class MonadTransformer[F, A](ABC):
     __rshift__ = bind                                          # >> operator
 ```
 
-### Implementations
+### Instances (which data types implement which typeclasses)
 
-| Typeclass        | Implementations                                                           |
-| ---------------- | ------------------------------------------------------------------------- |
-| Functor          | Tree, frozendict, + all below                                             |
-| Bifunctor        | Either, Result, Validated                                                  |
-| Traversable      | CList, Tree                                                               |
-| Applicative      | Validated, ZipList, + all below                                           |
-| Alternative      | Option, CList                                                              |
-| Monad            | Option, Either, Result, State, Reader, Writer, CList, Future, AsyncResult |
-| MonadError       | Either, Result, AsyncResult                                                |
-| MonadTransformer | ReaderT, StateT, EitherT, OptionT, WriterT                                |
+| Data Type          | Typeclasses                                                |
+| ------------------ | ---------------------------------------------------------- |
+| `Option[A]`        | Monad, Alternative                                         |
+| `Either[E, A]`     | MonadError, Bifunctor                                      |
+| `Result[A]`        | MonadError, Bifunctor                                      |
+| `AsyncResult[A]`   | MonadError, Bifunctor                                      |
+| `CList[A]`         | Monad, Traversable, Alternative                            |
+| `Tree[A]`          | Functor, Foldable                                          |
+| `frozendict[K, V]` | Functor, Foldable                                          |
+| `Validated[E, A]`  | Applicative, Bifunctor                                     |
+| `ZipList[A]`       | Applicative                                                |
+| `State[S, A]`      | Monad                                                      |
+| `Reader[R, A]`     | Monad                                                      |
+| `Writer[W, A]`     | Monad                                                      |
+| `Future[A]`        | Monad                                                      |
+
+### Data Types
 
 | Type               | What it models                                  |
 | ------------------ | ----------------------------------------------- |
