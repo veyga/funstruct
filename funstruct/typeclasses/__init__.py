@@ -9,6 +9,8 @@ from funstruct.typeclasses._monad import Monad
 from funstruct.typeclasses._monad_error import MonadError
 from funstruct.typeclasses._monoid import Monoid
 from funstruct.typeclasses._semigroup import Semigroup
+from funstruct.typeclasses._summon import register as register
+from funstruct.typeclasses._summon import summon as summon
 from funstruct.typeclasses._traversable import Traversable
 
 __all__ = [
@@ -22,4 +24,6 @@ __all__ = [
     "Monoid",
     "Semigroup",
     "Traversable",
+    "register",
+    "summon",
 ]
