@@ -23,8 +23,6 @@ knows where it was created::
     err = validate_auth(bad_req)
     err.created_at
     # CreatedAt(filename='auth.py', lineno=4, funcname='validate_auth')
-    str(err.created_at)
-    # 'auth.py:4 in validate_auth'
 
 Use in error handlers to log the error origin instead of the handler's
 location::
@@ -59,9 +57,6 @@ class CreatedAt:
     filename: str
     lineno: int
     funcname: str
-
-    def __str__(self) -> str:
-        return f"{self.filename}:{self.lineno} in {self.funcname}"
 
 
 def capture_created_at(depth: int = 3) -> CreatedAt:
