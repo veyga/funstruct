@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.applicative import Applicative
 from funstruct.applicative.ziplist import ZipList
+from funstruct.typeclasses.applicative import Applicative
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")

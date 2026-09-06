@@ -47,8 +47,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.monad.either import Either, Left, Right
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
+from funstruct.monad.either import Either, Left, Right
 
 _F = TypeVar("_F")
 _E = TypeVar("_E")

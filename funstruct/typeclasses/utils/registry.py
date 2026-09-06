@@ -43,7 +43,6 @@ When NOT to use these:
 
 from __future__ import annotations
 
-
 _registry: dict[tuple[type, type], object] = {}
 
 

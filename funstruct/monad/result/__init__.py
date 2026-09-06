@@ -43,8 +43,8 @@ from typing import Any, Generic, ParamSpec, TypeVar, overload
 from funstruct.monad.either import Either
 from funstruct.monad.future import Future
 from funstruct.typeclasses.mixins.data_type import DataType
-from funstruct.util.created_at import CapturesCreationSiteMixin
 from funstruct.util._reawaitable import ReAwaitable
+from funstruct.util.created_at import CapturesCreationSiteMixin
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")

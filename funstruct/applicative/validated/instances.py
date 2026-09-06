@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar, cast
 
+from funstruct.applicative.validated import Invalid, Valid, Validated
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.bifunctor import Bifunctor
-from funstruct.applicative.validated import Invalid, Valid, Validated
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")

@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
+from funstruct.collections.tree import Branch, Leaf, Tree
 from funstruct.typeclasses.foldable import Foldable
 from funstruct.typeclasses.functor import Functor
-from funstruct.collections.tree import Branch, Leaf, Tree
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")

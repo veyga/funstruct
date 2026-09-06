@@ -46,8 +46,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.monad.option import Nothing, Option, Some
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
+from funstruct.monad.option import Nothing, Option, Some
 
 _F = TypeVar("_F")
 _A = TypeVar("_A")

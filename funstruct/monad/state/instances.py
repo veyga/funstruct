@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, TypeVar
 
-from funstruct.typeclasses.monad import Monad
 from funstruct.monad.state import State
+from funstruct.typeclasses.monad import Monad
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")

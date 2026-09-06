@@ -5,8 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.utils.registry import register
-from funstruct.typeclasses.monad import Monad
 from funstruct.monad.writer import (
     CListWriter,
     IntWriter,
@@ -14,6 +12,8 @@ from funstruct.monad.writer import (
     StrWriter,
     Writer,
 )
+from funstruct.typeclasses.monad import Monad
+from funstruct.typeclasses.utils.registry import register
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
