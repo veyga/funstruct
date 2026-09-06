@@ -1,0 +1,3 @@
+# Traversable
+
+::: funstruct.typeclasses.Traversable

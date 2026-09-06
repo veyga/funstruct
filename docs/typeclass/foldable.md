@@ -1,0 +1,3 @@
+# Foldable
+
+::: funstruct.typeclasses.Foldable

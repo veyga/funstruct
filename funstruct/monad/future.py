@@ -10,7 +10,7 @@ from collections.abc import Awaitable, Callable, Generator
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
-from funstruct.util.reawaitable import ReAwaitable
+from funstruct.util._reawaitable import ReAwaitable
 
 A = TypeVar("A")
 B = TypeVar("B")

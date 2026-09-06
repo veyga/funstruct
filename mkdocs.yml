@@ -24,12 +24,14 @@ nav:
       - Functor: functor/index.md
       - Applicative: typeclass/applicative.md
       - Monad: typeclass/monad.md
-      - MonadTransformer: typeclass/monadtransformer.md
+      - Foldable: typeclass/foldable.md
+      - Traversable: typeclass/traversable.md
   - functor:
       - Overview: functor/index.md
   - applicative:
       - Overview: applicative/index.md
       - Validated: applicative/validated.md
+      - ZipList: applicative/ziplist.md
   - monad:
       - Overview: monad/index.md
       - Either: monad/either.md
@@ -39,13 +41,6 @@ nav:
       - Writer: monad/writer.md
       - State: monad/state.md
       - Future: monad/future.md
-  - monadtransformer:
-      - Overview: monadtransformer/index.md
-      - ReaderT: monadtransformer/reader_t.md
-      - StateT: monadtransformer/state_t.md
-      - EitherT: monadtransformer/either_t.md
-      - OptionT: monadtransformer/option_t.md
-      - WriterT: monadtransformer/writer_t.md
   - collections:
       - Overview: collections/index.md
       - Cons: collections/cons.md
@@ -54,6 +49,14 @@ nav:
   - util:
       - tailrec: util/tailrec.md
       - CapturesCreationSiteMixin: util/created_at.md
+  - experimental:
+      - monadtransformer:
+          - Overview: experimental/monadtransformer/index.md
+          - ReaderT: experimental/monadtransformer/reader_t.md
+          - StateT: experimental/monadtransformer/state_t.md
+          - EitherT: experimental/monadtransformer/either_t.md
+          - OptionT: experimental/monadtransformer/option_t.md
+          - WriterT: experimental/monadtransformer/writer_t.md
 
 extra:
   version:

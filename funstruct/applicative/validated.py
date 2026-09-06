@@ -111,7 +111,10 @@ class Valid(Validated, Generic[_A]):
         """Apply: self contains a function, apply it to other's value."""
         match other:
             case Valid(val):
-                return Valid(self.value(val))
+                from typing import cast
+                from collections.abc import Callable
+                fn = cast(Callable, self.value)
+                return Valid(fn(val))
             case _:
                 return other
 

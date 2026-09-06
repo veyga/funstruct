@@ -5,7 +5,7 @@ Without caching, awaiting a coroutine twice raises RuntimeError.
 
 Examples:
     >>> import asyncio
-    >>> from funstruct.util.reawaitable import ReAwaitable
+    >>> from funstruct.util._reawaitable import ReAwaitable
 
     >>> async def main():
     ...     r = ReAwaitable(asyncio.coroutine(lambda: 42)())
@@ -32,7 +32,9 @@ class ReAwaitable:
         self._cache = _SENTINEL
 
     def __del__(self):
-        if self._cache is _SENTINEL and hasattr(self._coro, "close"):
+        import inspect
+
+        if self._cache is _SENTINEL and inspect.iscoroutine(self._coro):
             self._coro.close()
 
     def __await__(self) -> Generator[None, None, _A]:

@@ -45,7 +45,7 @@ from funstruct.monad.either import Either
 from funstruct.monad.future import Future
 from funstruct.typeclasses._monad import Monad
 from funstruct.util.created_at import CapturesCreationSiteMixin
-from funstruct.util.reawaitable import ReAwaitable
+from funstruct.util._reawaitable import ReAwaitable
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
