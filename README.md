@@ -284,14 +284,40 @@ OptionT[F, A]       =  F[Option[A]]        (absence + F's effects)
 WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
 ```
 
+### Optics (Lenses)
+
+```python
+from funstruct.experimental.optics import Lens, at
+from funstruct.collections.frozendict import frozendict
+```
+
+Lenses let you read and update deeply nested immutable structures
+without manually rebuilding the path at every level.
+
+```python
+config = frozendict({
+    "app": {
+        "users": {
+            "alice": {"email": "alice@old.com", "role": "admin"},
+        },
+        "settings": {"version": 2},
+    },
+})
+
+email_lens = at("app") >> at("users") >> at("alice") >> at("email")
+email_lens.get(config)                          # "alice@old.com"
+email_lens.set(config, "alice@new.com")         # rebuilds the path
+email_lens.modify(config, str.upper)            # "ALICE@OLD.COM"
+
+version_lens = at("app") >> at("settings") >> at("version")
+version_lens.modify(config, lambda v: v + 1)    # bumps to 3
+```
+
 ## Roadmap
 
-- **Monad transformers** - currently in experimental/
-- **Higher Kinded Type Support** - potentially? maybe using mypy plugin (wonder if worth)
 - **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax. Eliminates `TypeVar` boilerplate and `Callable[[A, B], C]` throughout.
-- **Parser combinators**
-- **Typeclass derivation** — potentially something like mypy plugins (not likely)
-- **Lens/Optics**
+- **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`). Demonstrate composing parsers with `bind`/`do`.
+- **Typeclass derivation** — potentially something like mypy plugins (not likely).
 - **Stream** — infinite streams, lazy
 - **FreeMonad** - implementation
 - **EffectsSystem** - utilizing an effects system over monad transformer stacks
