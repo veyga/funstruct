@@ -59,8 +59,12 @@ rules.invalid-return-type = "ignore"
 # Same covariant narrowing issue at call sites.
 rules.invalid-argument-type = "ignore"
 
+[tool.ty.src]
+# playground/tests/docs use 3.12+ syntax; exclude from the 3.10 check.
+exclude = ["funstruct/playground/", "tests/", "docs/", "benchmarks/"]
+
 [tool.ty.environment]
-root = ["."]
+python-version = "3.14"
 
 [tool.coverage.run]
 source = ["funstruct"]
