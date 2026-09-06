@@ -24,6 +24,8 @@ Ok(10).map(str)                                              # Ok('10')
 Nothing().map(lambda x: x + 1)                               # Nothing()
 ```
 
+**** dot notation is syntatic sugar over the following...
+
 **Typeclass instances** — for generic, effect-polymorphic programs:
 
 ```python
@@ -31,7 +33,8 @@ from funstruct.typeclasses import Monad, MonadError, summon
 from funstruct.monad.option import Option, Some
 from funstruct.monad.result import Result, Ok, Err
 
-# F: Monad is the constraint — like Haskell's (Functor f =>)
+# F: Monad    = the typeclass instance (constraint / trait bound)
+# fa: F[A]    = a value in the monadic context (Some(21), Ok(21), etc.)
 def double(F: Monad, fa):
     return F.map(fa, lambda x: x * 2)
 
@@ -39,7 +42,7 @@ double(summon(Monad, Option), Some(21))  # Some(42)
 double(summon(Monad, Result), Ok(21))    # Ok(42)
 
 # F: MonadError adds raise_error + handle_error_with
-def safe_divide(F: MonadError, a, b):
+def safe_divide(F: MonadError, a: float, b: float):
     if b == 0:
         return F.raise_error(ValueError("division by zero"))
     return F.pure(a / b)
@@ -55,6 +58,43 @@ top — `Some(10).map(f)` delegates to `summon(Monad, Option).map(Some(10), f)`
 internally.
 
 ## Functional Primer
+
+### Principles
+
+**Immutability** — all funstruct data types are immutable. `Some(10).map(f)`
+returns a NEW `Some(20)`, never modifies the original. `frozendict.put(k, v)`
+returns a new dict. This eliminates shared-state bugs and makes code predictable.
+
+**Pure functions** — functions that always return the same output for the
+same input, with no side effects. `map`, `bind`, `fold` are pure.
+Side effects (`@Try`, `@TryAsync`, `AsyncResult`) are pushed to boundaries.
+Python can't enforce this, so it remains a recommendation. See below about IO
+type.
+
+**Composition over control flow** — instead of `if/else` chains and
+`try/except` blocks, compose operations with `map`, `bind`, and `do`.
+
+```python
+# Imperative (control flow)
+user = get_user(id)
+if user is None:
+    return None
+email = get_email(user)
+if email is None:
+    return None
+return email.upper()
+
+# Functional (composition)
+get_user(id).bind(get_email).map(str.upper)
+```
+
+**Separation of data and behavior** — data types (`Option`, `Result`) are
+plain. Behavior (`map`, `bind`, `ap`) lives in typeclass instances, separate
+from the data. This lets you add new behavior without modifying existing types.
+
+**Algebraic data types (ADTs)** — types with a fixed set of variants:
+`Option = Some | Nothing`, `Result = Ok | Err`, `Either = Right | Left`.
+Pattern matching exhaustively handles all cases.
 
 ### Architecture
 
@@ -150,41 +190,44 @@ class Monoid[A](Semigroup[A]):
     empty: A
 
 # ── Typeclass hierarchy (instance classes) ──
+# F is the type constructor (Option, Result, etc.)
+# A, B are value types; E is the error type
 
-class Functor(BaseTypeclass):
-    def map(self, fa, f): ...                                  # abstract
+# pseudo-code type signatures; see exact impls
+class Functor[F](BaseTypeclass):
+    def map(self, fa: F[A], f: Callable[[A], B]) -> F[B]: ...
 
-class Applicative(Functor):
-    def pure(self, value): ...                                 # abstract
-    def ap(self, ff, fa): ...                                  # abstract
-    def map(self, fa, f): ...                                  # derived: ap(pure(f), fa)
-    def map2(self, fa, fb, f): ...                             # derived: map + ap
-    def product(self, fa, fb): ...                             # derived: map + ap
+class Applicative[F](Functor[F]):
+    def pure(self, value: A) -> F[A]: ...
+    def ap(self, ff: F[Callable[[A], B]], fa: F[A]) -> F[B]: ...
+    def map(self, fa: F[A], f: Callable[[A], B]) -> F[B]: ...          # derived
+    def map2(self, fa: F[A], fb: F[B], f: Callable[[A, B], C]) -> F[C]: ...
+    def product(self, fa: F[A], fb: F[B]) -> F[tuple[A, B]]: ...
 
-class Alternative(Applicative):
-    def empty(self): ...                                       # abstract
-    def or_else(self, fa, fb): ...                             # abstract
+class Alternative[F](Applicative[F]):
+    def empty(self) -> F[A]: ...
+    def or_else(self, fa: F[A], fb: F[A]) -> F[A]: ...
 
-class Monad(Applicative):
-    def bind(self, fa, f): ...                                 # abstract
-    def map(self, fa, f): ...                                  # derived: bind + pure
-    def ap(self, ff, fa): ...                                  # derived: bind + map
+class Monad[F](Applicative[F]):
+    def bind(self, fa: F[A], f: Callable[[A], F[B]]) -> F[B]: ...
+    def map(self, fa: F[A], f: Callable[[A], B]) -> F[B]: ...          # derived
+    def ap(self, ff: F[Callable[[A], B]], fa: F[A]) -> F[B]: ...       # derived
 
-class MonadError(Monad):
-    def raise_error(self, error): ...                          # abstract
-    def handle_error_with(self, fa, f): ...                    # abstract
+class MonadError[F, E](Monad[F]):
+    def raise_error(self, error: E) -> F[A]: ...
+    def handle_error_with(self, fa: F[A], f: Callable[[E], F[A]]) -> F[A]: ...
 
-class Bifunctor(BaseTypeclass):
-    def bimap(self, fa, f, g): ...                             # abstract
-    def left_map(self, fa, f): ...                             # derived: bimap(f, id)
+class Bifunctor[F](BaseTypeclass):
+    def bimap(self, fa: F[A, B], f: Callable[[A], C], g: Callable[[B], D]) -> F[C, D]: ...
+    def left_map(self, fa: F[A, B], f: Callable[[A], C]) -> F[C, B]: ...  # derived
 
-class Foldable(BaseTypeclass):
-    def fold_left(self, fa, acc, f): ...                       # abstract
-    def fold_right(self, fa, acc, f): ...                      # abstract
+class Foldable[F](BaseTypeclass):
+    def fold_left(self, fa: F[A], acc: B, f: Callable[[B, A], B]) -> B: ...
+    def fold_right(self, fa: F[A], acc: B, f: Callable[[A, B], B]) -> B: ...
 
-class Traversable(Foldable):
-    def traverse(self, fa, f, G: Applicative): ...             # abstract
-    def sequence(self, fga, G: Applicative): ...               # derived
+class Traversable[F](Foldable[F]):
+    def traverse(self, fa: F[A], f: Callable[[A], G[B]], G: Applicative) -> G[F[B]]: ...
+    def sequence(self, fga: F[G[A]], G: Applicative) -> G[F[A]]: ...   # derived
 
 # ── Data types (extend DataType, not typeclasses) ──
 
@@ -195,8 +238,9 @@ class Result(DataType, Generic[A]):    ...  # Ok(value) | Err(exception)
 # ── Instances (connect typeclasses to data types) ──
 
 class _OptionMonad(Monad, for_type=Option):
-    def pure(self, value): return Some(value)
-    def bind(self, fa, f):
+    def pure(self, value: A) -> Option[A]:
+        return Some(value)
+    def bind(self, fa: Option[A], f: Callable[[A], Option[B]]) -> Option[B]:
         match fa:
             case Some(v): return f(v)
             case Nothing(): return fa
@@ -205,29 +249,29 @@ class _OptionMonad(Monad, for_type=Option):
 # ── Experimental (monad transformers) ──
 
 class MonadTransformer(ABC):
-    def bind(self, fa, f): ...                                 # abstract
-    def map(self, fa, f): ...                                  # abstract
-    def pure(cls, value, monad: type): ...                     # abstract
-    def lift_f(cls, inner): ...                                # abstract
+    def bind(self, fa: MT[F, A], f: Callable[[A], MT[F, B]]) -> MT[F, B]: ...
+    def map(self, fa: MT[F, A], f: Callable[[A], B]) -> MT[F, B]: ...
+    def pure(cls, value: A, monad: type[F]) -> MT[F, A]: ...
+    def lift_f(cls, inner: F[A]) -> MT[F, A]: ...
 ```
 
 ### Instances (which data types implement which typeclasses)
 
-| Data Type          | Typeclasses                                                |
-| ------------------ | ---------------------------------------------------------- |
-| `Option[A]`        | Monad, Alternative                                         |
-| `Either[E, A]`     | MonadError, Bifunctor                                      |
-| `Result[A]`        | MonadError, Bifunctor                                      |
-| `AsyncResult[A]`   | MonadError, Bifunctor                                      |
-| `CList[A]`         | Monad, Traversable, Alternative                            |
-| `Tree[A]`          | Functor, Foldable                                          |
-| `frozendict[K, V]` | Functor, Foldable                                          |
-| `Validated[E, A]`  | Applicative, Bifunctor                                     |
-| `ZipList[A]`       | Applicative                                                |
-| `State[S, A]`      | Monad                                                      |
-| `Reader[R, A]`     | Monad                                                      |
-| `Writer[W, A]`     | Monad                                                      |
-| `Future[A]`        | Monad                                                      |
+| Data Type          | Typeclasses                     |
+| ------------------ | ------------------------------- |
+| `Option[A]`        | Monad, Alternative              |
+| `Either[E, A]`     | MonadError, Bifunctor           |
+| `Result[A]`        | MonadError, Bifunctor           |
+| `AsyncResult[A]`   | MonadError, Bifunctor           |
+| `CList[A]`         | Monad, Traversable, Alternative |
+| `Tree[A]`          | Functor, Foldable               |
+| `frozendict[K, V]` | Functor, Foldable               |
+| `Validated[E, A]`  | Applicative, Bifunctor          |
+| `ZipList[A]`       | Applicative                     |
+| `State[S, A]`      | Monad                           |
+| `Reader[R, A]`     | Monad                           |
+| `Writer[W, A]`     | Monad                           |
+| `Future[A]`        | Monad                           |
 
 ### Data Types
 
@@ -405,7 +449,7 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 - **Interactive demos** — browser-runnable examples via PyScript/Pyodide. Edit and run funstruct code directly in the docs.
 - **Documentation site** — expanded static site (Astro/Next.js/etc) with guides, interactive demos, and API reference.
 - **Functional collections** — persistent queue, deque, red-black tree, persistent stack, heap
-- **Native collections (Rust/PyO3)** — Rust-backed CList, frozendict via `funstruct[native]`. 
+- **Native collections (Rust/PyO3)** — Rust-backed CList, frozendict via `funstruct[native]`.
 - **Typeclass derivation** — auto-generate Functor/Foldable instances from dataclass structure.
 - **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`).
 - **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax.
