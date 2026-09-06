@@ -18,9 +18,11 @@ theme:
 nav:
   - Home: index.md
   - Guides:
+      - What is a Monad?: guides/monads.md
       - The Typeclass Pattern: guides/typeclass_pattern.md
       - Railway Oriented Programming: guides/railway_oriented_programming.md
       - Tagless Final Style: guides/tagless_final.md
+      - Evaluation Strategy: guides/evaluation_strategy.md
   - Typeclasses:
       - Overview: typeclass/index.md
       - Semigroup: typeclass/semigroup.md

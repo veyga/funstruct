@@ -5,7 +5,7 @@
 Railway oriented programming (ROP) models computations as a track
 with two rails:
 
-```
+```text
  ───── success rail ─────────────────────────────────────→ Ok(value)
  ───── error rail   ─────────────────────────────────────→ Err(error)
 ```
@@ -61,7 +61,7 @@ propagates to the caller. No nesting, no manual checks.
 funstruct's `Result` (and `Either`, `Option`) provide four operations
 that correspond to the railway metaphor:
 
-```
+```text
 pure(a)                — put a value ON the success rail
 raise_error(e)         — put a value ON the error rail
 bind(f)                — continue along the success rail (or skip if on error rail)

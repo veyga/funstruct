@@ -4,7 +4,7 @@
 
 Every typeclass usage has exactly four parts:
 
-```
+```text
 1. The typeclass    — the interface (what capability exists)
 2. The data type    — the thing that has the capability
 3. The instance     — the implementation (how this type does it)

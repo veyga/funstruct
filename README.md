@@ -316,33 +316,29 @@ These give you the composition benefits of monadic pipelines where they
 matter (error handling, async sequencing) without pretending Python is
 something it isn't.
 
-## Why no higher-kinded types?
+## Higher-kinded types
 
-In Haskell and Scala, higher-kinded types (HKTs) let you abstract over type
-constructors — writing one generic `sequence` that works for any
-`Traversable` + `Applicative` combination, or a single `Monad` interface
-that a type checker can verify at call sites.
+In Haskell and Scala, higher-kinded types (HKTs) let you abstract over
+type constructors — writing one generic `sequence` that works for any
+`Traversable` + `Applicative` combination.
 
-Python's type system does not support HKTs, and there is no indication it
-will. Other Python FP libraries have attempted to encode them using Protocol
-and TypeVar tricks, but the result is fragile, confuses type checkers, and
-makes the library harder to use than the patterns it's trying to simplify.
+Python's type system does not support HKTs natively. funstruct achieves
+the same effect at runtime through the typeclass instance pattern:
 
-funstruct takes a different approach: typeclasses are base classes, and
-concrete types inherit from them (`Option` extends `Monad`, `Either`
-extends `MonadError + Bifunctor`). This means:
+- **Type constructors** are represented by the class itself (`Option`,
+  `Result`, `Either`). Each data type sets `_type_constructor` so
+  variants resolve to their base: `tc_of(Some(42))` → `Option`.
+- **Typeclass resolution** via `summon(Monad, Option)` returns the
+  registered instance, just like Scala's `summon[Monad[Option]]`.
+- **Generic functions** use the instance directly:
+  `def double(F: Monad, fa): return F.map(fa, lambda x: x * 2)`
+- **Dot syntax** delegates to summon internally:
+  `Some(10).map(f)` → `summon(Functor, Option).map(Some(10), f)`
 
-- Each type provides its own `sequence`, `traverse`, and `do` rather than
-  one polymorphic function that works for all types.
-- Tagless final programs (see `playground/mt8.py`, `mt9.py`) are
-  structurally typed — the type checker won't verify that `F` satisfies
-  `MonadError` at the protocol level.
-
-The tradeoff is a small amount of method duplication across types, in
-exchange for a library that works with standard Python tooling. This library
-does not aim to be "Pythonic" — it intentionally adopts FP conventions like
-`fa`/`ff`/`fb` parameters and Cats-style naming — but it also does not
-break the rules of the language or require compiler plugins.
+This gives funstruct Haskell-style typeclass resolution and Scala-style
+tagless final — without HKT encoding tricks, metaclass magic, or
+compiler plugins. The tradeoff: trait bounds are enforced at runtime
+(via `summon`), not at compile time.
 
 ## Experimental
 
@@ -408,3 +404,4 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 - **Free monad** — build program ASTs, interpret with different backends.
 - **Effects system** — algebraic effects as an alternative to monad transformer stacks.
 - **Stream** — infinite streams, lazy evaluation.
+- **Pydantic integration** — more native integration with BaseModel, frozendict, lens, validated, etc

@@ -106,7 +106,7 @@ Same program, different meanings. No AST to walk — the operations
 
 > First, construct a description of the computation. Later, interpret it.
 
-```
+```text
 program → AST → interpreter → result
 ```
 
@@ -115,7 +115,7 @@ program → AST → interpreter → result
 > Write the computation directly against an abstract interface.
 > The implementation provides its meaning.
 
-```
+```text
 program → abstract algebra → chosen implementation → result
 ```
 
@@ -177,7 +177,7 @@ safe_divide(summon(MonadError, Result), 10, 0)  # Err(ValueError(...))
 
 ## The two styles in funstruct
 
-```
+```text
 Functional programming
 ├── Initial / data-oriented FP
 │   └── ADTs + pattern matching + interpreters
