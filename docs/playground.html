@@ -639,6 +639,65 @@ print("    - Can't inspect or optimize the 'program' (it's just function calls)"
 print("    - Can't serialize the program")
 </script>
 
+<h2>The typeclass pattern — explained with JSON serialization</h2>
+<p>This is the canonical example of how typeclasses work:      1. Define the typeclass (JSONWrite — the interface)     2. Create instances for primitives (str, int, bool, None)     3. Create COMPOSABLE i</p>
+<div class="demo-source">source: <code>demos/15_typeclass_pattern_json.py</code></div>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from __future__ import annotations
+import json
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, fields
+from funstruct.typeclasses.utils.registry import register, summon
+
+print("=== The typeclass pattern: JSON serialization ===\n")
+
+# Primitives
+print("Primitives:")
+print(f'  jsonify("hello")  = {jsonify("hello")}')
+print(f'  jsonify(42)       = {jsonify(42)}')
+print(f'  jsonify(3.14)     = {jsonify(3.14)}')
+print(f'  jsonify(True)     = {jsonify(True)}')
+print(f'  jsonify(None)     = {jsonify(None)}')
+
+# Composed — list uses element instance
+print("\nComposed (list summons element instance):")
+print(f"  jsonify([1,2,3])         = {jsonify([1, 2, 3])}")
+print(f'  jsonify(["a","b","c"])   = {jsonify(["a", "b", "c"])}')
+
+# Derived — dataclass uses field instances
+person = Person("Alice", 30)
+print(f"\nDerived (dataclass uses field instances):")
+print(f"  jsonify(Person)    = {jsonify(person)}")
+
+address = Address("123 Main St", "NYC", "10001")
+print(f"  jsonify(Address)   = {jsonify(address)}")
+
+# Nested — Employee has Person AND Address fields
+emp = Employee(person, address, 120000.0)
+print(f"\nNested (Employee → Person + Address):")
+print(f"  jsonify(Employee)  = {jsonify(emp)}")
+
+# List of dataclasses — composition all the way down
+people = [Person("Alice", 30), Person("Bob", 25)]
+print(f"\nList of dataclasses:")
+print(f"  jsonify([Person])  = {jsonify(people)}")
+
+# Error — no instance
+print("\nTrait bound not met:")
+try:
+    jsonify({"key": "value"})
+except TypeError as e:
+    print(f"  jsonify(dict) → TypeError: {e}")
+
+print("\n=== How it works ===")
+print("  1. JSONWrite          = the typeclass (interface)")
+print("  2. _StringJSONWrite   = instance for str")
+print("  3. _ListJSONWrite     = COMPOSABLE instance (summons element instance)")
+print("  4. DataclassJSONWrite = DERIVED instance (summons field instances)")
+print("  5. jsonify(x)         = generic function (summons instance for type(x))")
+print("  6. Person             = plain dataclass (no JSON knowledge)")
+</script>
+
 <h2>The problem: nested monads are painful to compose</h2>
 <p>When your functions return different monadic types, you end up with nested pattern matching at every step.      get_user(name) -> Future[Option[User]]   # might not exist, async     get_age(user)  -> </p>
 <div class="demo-source">source: <code>demos/transformers/01_the_problem.py</code></div>
