@@ -75,6 +75,10 @@ class Applicative(Functor[_A]):
         """
         ...
 
+    def map2(self, other: Applicative[_B], f: Callable[[_A, _B], object]) -> Applicative:
+        """Combine two values with a function. Derived from map + ap."""
+        return self.map(lambda a: lambda b: f(a, b)).ap(other)
+
     def product(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
         """Combine two independent values into a tuple.
 
