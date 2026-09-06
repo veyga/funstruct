@@ -17,7 +17,7 @@ theme:
 
 nav:
   - Home: index.md
-  # Playground: run `just playground` (standalone PyScript page, not part of mkdocs)
+  - Playground: playground.html
   - Guides:
       - What is a Monad?: guides/monads.md
       - The Typeclass Pattern: guides/typeclass_pattern.md

@@ -5,15 +5,19 @@
     </marker>
     <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.1"/></filter>
   </defs>
-  <rect width="900" height="620" fill="#fafafa" rx="8"/>
-  <text x="450" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">funstruct — typeclass hierarchy</text>
-  <text x="450" y="52" text-anchor="middle" font-size="11" fill="#888">auto-generated from code • 8 typeclasses • 17 data types • 25 instances</text>
-  <rect x="30" y="75" width="200" height="60" rx="8" fill="#fff0f5" stroke="#e8a0b8" filter="url(#shadow)"/>
+  <rect width="900" height="620" fill="#1a1a2e" rx="8"/>
+  <text x="450" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#e0e2e4">funstruct — typeclass hierarchy</text>
+  <text x="450" y="52" text-anchor="middle" font-size="11" fill="#666">auto-generated from code • 10 typeclasses • 17 data types • 25 instances</text>
+  <rect x="30" y="75" width="200" height="164" rx="8" fill="#fff0f5" stroke="#e8a0b8" filter="url(#shadow)"/>
   <text x="130" y="95" text-anchor="middle" font-size="10" fill="#c06080" font-weight="bold">ALGEBRAIC</text>
   <rect x="260" y="75" width="200" height="201" rx="8" fill="#f0f5ff" stroke="#a0b8e8" filter="url(#shadow)"/>
   <text x="360" y="95" text-anchor="middle" font-size="10" fill="#6080c0" font-weight="bold">STRUCTURAL</text>
   <rect x="490" y="75" width="380" height="230" rx="8" fill="#f5fff0" stroke="#90c890" filter="url(#shadow)"/>
   <text x="680" y="95" text-anchor="middle" font-size="10" fill="#508050" font-weight="bold">COMPUTATIONAL</text>
+  <rect x="65" y="108" width="130" height="34" rx="6" fill="#ff99ca" stroke="#e8a0b8"/>
+  <text x="130" y="130" text-anchor="middle" font-weight="bold" fill="#fff">Monoid</text>
+  <rect x="65" y="160" width="130" height="34" rx="6" fill="#ff99ca" stroke="#e8a0b8"/>
+  <text x="130" y="182" text-anchor="middle" font-weight="bold" fill="#fff">Semigroup</text>
   <rect x="295" y="108" width="130" height="34" rx="6" fill="#cadfff" stroke="#90b0e0"/>
   <text x="360" y="130" text-anchor="middle" font-weight="bold" fill="#4060a0">Bifunctor</text>
   <rect x="295" y="155" width="130" height="34" rx="6" fill="#77afff" stroke="#a0b8e8"/>
@@ -35,48 +39,49 @@
   <line x1="690" y1="194" x2="750" y2="212" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="750" y1="246" x2="750" y2="264" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="360" y1="189" x2="360" y2="202" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <rect x="30" y="330" width="840" height="130" rx="8" fill="#fff8f0" stroke="#d0b090" filter="url(#shadow)"/>
-  <text x="450" y="350" text-anchor="middle" font-size="10" fill="#a08060" font-weight="bold">DATA TYPES</text>
-  <rect x="50" y="362" width="108" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="104" y="381" text-anchor="middle" font-size="11" fill="#805030">AsyncResult</text>
-  <rect x="170" y="362" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="215" y="381" text-anchor="middle" font-size="11" fill="#805030">CList</text>
-  <rect x="280" y="362" width="108" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="334" y="381" text-anchor="middle" font-size="11" fill="#805030">CListWriter</text>
-  <rect x="390" y="362" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="435" y="381" text-anchor="middle" font-size="11" fill="#805030">Either</text>
-  <rect x="500" y="362" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="545" y="381" text-anchor="middle" font-size="11" fill="#805030">Future</text>
-  <rect x="610" y="362" width="92" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="656" y="381" text-anchor="middle" font-size="11" fill="#805030">IntWriter</text>
-  <rect x="720" y="362" width="100" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="770" y="381" text-anchor="middle" font-size="11" fill="#805030">ListWriter</text>
-  <rect x="50" y="398" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="95" y="417" text-anchor="middle" font-size="11" fill="#805030">Option</text>
-  <rect x="170" y="398" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="215" y="417" text-anchor="middle" font-size="11" fill="#805030">Reader</text>
-  <rect x="280" y="398" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="325" y="417" text-anchor="middle" font-size="11" fill="#805030">Result</text>
-  <rect x="390" y="398" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="435" y="417" text-anchor="middle" font-size="11" fill="#805030">State</text>
-  <rect x="500" y="398" width="92" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="546" y="417" text-anchor="middle" font-size="11" fill="#805030">StrWriter</text>
-  <rect x="610" y="398" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="655" y="417" text-anchor="middle" font-size="11" fill="#805030">Tree</text>
-  <rect x="720" y="398" width="92" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="766" y="417" text-anchor="middle" font-size="11" fill="#805030">Validated</text>
-  <rect x="50" y="434" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="95" y="453" text-anchor="middle" font-size="11" fill="#805030">Writer</text>
-  <rect x="170" y="434" width="90" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="215" y="453" text-anchor="middle" font-size="11" fill="#805030">ZipList</text>
-  <rect x="280" y="434" width="100" height="28" rx="5" fill="#ffe8d0" stroke="#d0a070"/>
-  <text x="330" y="453" text-anchor="middle" font-size="11" fill="#805030">frozendict</text>
-  <rect x="30" y="475" width="840" height="130" rx="8" fill="#f0f0f0" stroke="#b0b0b0" filter="url(#shadow)"/>
-  <text x="450" y="495" text-anchor="middle" font-size="10" fill="#707070" font-weight="bold">INSTANCES (25 registered)</text>
-  <text x="55" y="518" font-size="11" fill="#505050">Alternative[CList]  Alternative[Option]  Applicative[Validated]  Applicative[ZipList]  Bifunctor[Either]  Bifunctor[Result]</text>
-  <text x="55" y="538" font-size="11" fill="#505050">Bifunctor[Validated]  Foldable[Tree]  Foldable[frozendict]  Functor[Tree]  Functor[frozendict]  Monad[CList]</text>
-  <text x="55" y="558" font-size="11" fill="#505050">Monad[CListWriter]  Monad[Future]  Monad[IntWriter]  Monad[ListWriter]  Monad[Option]  Monad[Reader]</text>
-  <text x="55" y="578" font-size="11" fill="#505050">Monad[State]  Monad[StrWriter]  Monad[Writer]  MonadError[AsyncResult]  MonadError[Either]  MonadError[Result]</text>
-  <text x="55" y="598" font-size="11" fill="#505050">Traversable[CList]</text>
+  <line x1="130" y1="194" x2="130" y2="108" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="30" y="330" width="840" height="130" rx="8" fill="#2a2520" stroke="#d0b090" filter="url(#shadow)"/>
+  <text x="450" y="350" text-anchor="middle" font-size="10" fill="#c0a070" font-weight="bold">DATA TYPES</text>
+  <rect x="50" y="362" width="108" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="104" y="381" text-anchor="middle" font-size="11" fill="#e0c8a0">AsyncResult</text>
+  <rect x="170" y="362" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="215" y="381" text-anchor="middle" font-size="11" fill="#e0c8a0">CList</text>
+  <rect x="280" y="362" width="108" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="334" y="381" text-anchor="middle" font-size="11" fill="#e0c8a0">CListWriter</text>
+  <rect x="390" y="362" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="435" y="381" text-anchor="middle" font-size="11" fill="#e0c8a0">Either</text>
+  <rect x="500" y="362" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="545" y="381" text-anchor="middle" font-size="11" fill="#e0c8a0">Future</text>
+  <rect x="610" y="362" width="92" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="656" y="381" text-anchor="middle" font-size="11" fill="#e0c8a0">IntWriter</text>
+  <rect x="720" y="362" width="100" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="770" y="381" text-anchor="middle" font-size="11" fill="#e0c8a0">ListWriter</text>
+  <rect x="50" y="398" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="95" y="417" text-anchor="middle" font-size="11" fill="#e0c8a0">Option</text>
+  <rect x="170" y="398" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="215" y="417" text-anchor="middle" font-size="11" fill="#e0c8a0">Reader</text>
+  <rect x="280" y="398" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="325" y="417" text-anchor="middle" font-size="11" fill="#e0c8a0">Result</text>
+  <rect x="390" y="398" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="435" y="417" text-anchor="middle" font-size="11" fill="#e0c8a0">State</text>
+  <rect x="500" y="398" width="92" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="546" y="417" text-anchor="middle" font-size="11" fill="#e0c8a0">StrWriter</text>
+  <rect x="610" y="398" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="655" y="417" text-anchor="middle" font-size="11" fill="#e0c8a0">Tree</text>
+  <rect x="720" y="398" width="92" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="766" y="417" text-anchor="middle" font-size="11" fill="#e0c8a0">Validated</text>
+  <rect x="50" y="434" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="95" y="453" text-anchor="middle" font-size="11" fill="#e0c8a0">Writer</text>
+  <rect x="170" y="434" width="90" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="215" y="453" text-anchor="middle" font-size="11" fill="#e0c8a0">ZipList</text>
+  <rect x="280" y="434" width="100" height="28" rx="5" fill="#3d3020" stroke="#d0a070"/>
+  <text x="330" y="453" text-anchor="middle" font-size="11" fill="#e0c8a0">frozendict</text>
+  <rect x="30" y="475" width="840" height="130" rx="8" fill="#202025" stroke="#b0b0b0" filter="url(#shadow)"/>
+  <text x="450" y="495" text-anchor="middle" font-size="10" fill="#9090a0" font-weight="bold">INSTANCES (25 registered)</text>
+  <text x="55" y="518" font-size="11" fill="#9090a0">Alternative[CList]  Alternative[Option]  Applicative[Validated]  Applicative[ZipList]  Bifunctor[Either]  Bifunctor[Result]</text>
+  <text x="55" y="538" font-size="11" fill="#9090a0">Bifunctor[Validated]  Foldable[Tree]  Foldable[frozendict]  Functor[Tree]  Functor[frozendict]  Monad[CList]</text>
+  <text x="55" y="558" font-size="11" fill="#9090a0">Monad[CListWriter]  Monad[Future]  Monad[IntWriter]  Monad[ListWriter]  Monad[Option]  Monad[Reader]</text>
+  <text x="55" y="578" font-size="11" fill="#9090a0">Monad[State]  Monad[StrWriter]  Monad[Writer]  MonadError[AsyncResult]  MonadError[Either]  MonadError[Result]</text>
+  <text x="55" y="598" font-size="11" fill="#9090a0">Traversable[CList]</text>
   <text x="780" y="600" text-anchor="end" font-size="9" fill="#aaa">funstruct v2 • auto-generated</text>
 </svg>
