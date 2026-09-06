@@ -1,0 +1,3020 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Fun & functional structures for Python">
+      
+      
+      
+      
+      
+        <link rel="next" href="playground.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>funstruct</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#funstruct" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="funstruct" class="md-header__button md-logo" aria-label="funstruct" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            funstruct
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="funstruct" class="md-nav__button md-logo" aria-label="funstruct" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    funstruct
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functional-primer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Primer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functional Primer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagrams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrams
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instances-which-data-types-implement-which-typeclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instances (which data types implement which typeclasses)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#laws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Laws
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syntax-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-no-io-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why no IO type?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#higher-kinded-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Higher-kinded types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#experimental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Experimental
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Experimental">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monad-transformers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monad Transformers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optics-lenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optics (Lenses)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roadmap
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="playground.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Playground
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/monads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What is a Monad?
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/typeclass_pattern_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typeclass Pattern (JSON)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/typeclass_pattern_ordering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typeclass Pattern (Ordering)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/generic_programming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generic Programming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/railway_oriented_programming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Railway Oriented Programming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/tagless_final/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tagless Final Style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/do_notation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Notation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/async/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Async Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/evaluation_strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/creating_a_data_type/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating a Data Type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/antipatterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anti-Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typeclasses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Typeclasses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/semigroup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semigroup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/monoid/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monoid
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/functor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/applicative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applicative
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/alternative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alternative
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/monad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/monad_error/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MonadError
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/foldable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foldable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/traversable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traversable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="typeclass/bifunctor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bifunctor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monads
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Monads
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/option/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Option
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/either/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Either
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/result/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/reader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/writer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monad/future/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applicatives
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Applicatives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="applicative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="applicative/validated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validated
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="applicative/ziplist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ZipList
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collections
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Collections
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="collections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="collections/cons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CList
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="collections/frozendict/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    frozendict
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="collections/tree/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tree
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Utilities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="util/tailrec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tailrec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="util/created_at/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CapturesCreationSiteMixin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Experimental
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Experimental
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monad Transformers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Monad Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experimental/monadtransformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experimental/monadtransformer/reader_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ReaderT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experimental/monadtransformer/state_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    StateT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experimental/monadtransformer/either_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EitherT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experimental/monadtransformer/option_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OptionT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experimental/monadtransformer/writer_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WriterT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experimental/optics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optics (Lenses)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functional-primer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Primer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functional Primer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagrams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrams
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instances-which-data-types-implement-which-typeclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instances (which data types implement which typeclasses)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#laws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Laws
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syntax-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-no-io-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why no IO type?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#higher-kinded-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Higher-kinded types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#experimental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Experimental
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Experimental">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monad-transformers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monad Transformers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optics-lenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optics (Lenses)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roadmap
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="funstruct">funstruct</h1>
+<p>A functional programming library for Python.
+Typeclasses, collections, monads, algebraic data types, etc.</p>
+<p>Heavily influenced by the Haskell and Scala languages, as well
+<a href="https://github.com/scalaz/scalaz">Scalaz</a> and
+<a href="https://typelevel.org/cats/">Cats</a>.</p>
+<h2 id="install">Install</h2>
+<pre><code class="language-bash">pip install funstruct || uv add funstruct
+</code></pre>
+<h2 id="functional-primer">Functional Primer</h2>
+<h3 id="principles">Principles</h3>
+<p><strong>Immutability</strong> — all funstruct data types are immutable. <code>Some(10).map(f)</code>
+returns a NEW <code>Some(20)</code>, never modifies the original. <code>frozendict.put(k, v)</code>
+returns a new dict. This eliminates shared-state bugs and makes code predictable.</p>
+<p><strong>Pure functions</strong> — functions that always return the same output for the
+same input, with no side effects. <code>map</code>, <code>bind</code>, <code>fold</code> are pure.
+Side effects (<code>@Try</code>, <code>@TryAsync</code>, <code>AsyncResult</code>) are pushed to boundaries.
+Python can't enforce this, so it remains a recommendation. See below about IO
+type.</p>
+<p><strong>Composition over control flow</strong> — instead of <code>if/else</code> chains and
+<code>try/except</code> blocks, compose operations with <code>map</code>, <code>bind</code>, and <code>do</code>.</p>
+<pre><code class="language-python"># Imperative (control flow)
+user = get_user(id)
+if user is None:
+    return None
+email = get_email(user)
+if email is None:
+    return None
+return email.upper()
+
+# Functional (composition)
+get_user(id).bind(get_email).map(str.upper)
+</code></pre>
+<p><strong>Separation of data and behavior</strong> — in OOP, classes bundle data and
+methods together. In FP, they're separate: data is inert, behavior is
+defined externally. This means you can add new operations to existing
+types without modifying them.</p>
+<pre><code class="language-python"># OOP: data + behavior bundled in the class
+class User:
+    def __init__(self, name, age): ...
+    def validate(self): ...     # behavior ON the data
+    def save(self): ...         # more behavior ON the data
+    def to_json(self): ...      # yet more behavior ON the data
+
+# FP: data is plain, behavior is external via typeclasses
+@dataclass(frozen=True)
+class User:
+    name: str
+    age: int
+    # no methods — just data
+
+# Behavior defined separately, works across ANY type with an instance
+jsonify(user)                              # via JSONWrite[User]
+summon(Monad, Result).map(Ok(user), f)     # via Monad[Result]
+</code></pre>
+<p><strong>Algebraic data types (ADTs)</strong> — types with a fixed set of variants:
+<code>Option = Some | Nothing</code>, <code>Result = Ok | Err</code>, <code>Either = Right | Left</code>.
+Pattern matching exhaustively handles all cases.</p>
+<h3 id="architecture">Architecture</h3>
+<p>Three distinct class hierarchies, connected by instances:</p>
+<pre><code class="language-text">  BaseTypeclass                    DataType
+  (abstract capabilities)          (concrete data)
+  ─────────────────                ────────────────
+  Semigroup → Monoid               Option[A]
+  Foldable → Traversable           Either[E, A]
+  Bifunctor                        Result[A], AsyncResult[A]
+  Functor → Applicative            CList[A], Tree[A]
+       ├→ Alternative              frozendict[K, V]
+       └→ Monad → MonadError       State[S, A], Reader[R, A]
+                                   Writer[W, A], Future[A]
+                                   Validated[E, A], ZipList[A]
+
+  INSTANCES (connect them)
+  ────────────────────────
+  _OptionMonad(Monad, for_type=Option)         — auto-registered
+  _ResultMonadError(MonadError, for_type=Result)
+  _CListAlternative(Alternative, for_type=CList)
+  _EitherBifunctor(Bifunctor, for_type=Either)
+  ...
+</code></pre>
+<ul>
+<li><strong><code>BaseTypeclass</code></strong> — root of all typeclasses. Provides AutoRegister
+  (<code>for_type=</code> keyword for automatic instance registration).</li>
+<li><strong><code>DataType</code></strong> — root of all data types. Provides TypeConstructor
+  (auto <code>_type_constructor</code> detection) and DotNotation (dot-syntax dispatch).</li>
+<li><strong>Instances</strong> — separate classes that implement a typeclass for a data type.
+  Only implement primitives (pure + bind); derived ops (map, ap) come from
+  the typeclass hierarchy.</li>
+</ul>
+<p><img alt="funstruct typeclass hierarchy" src="typeclasses.svg" /></p>
+<h4 id="diagrams">Diagrams</h4>
+<p><strong>Semigroup</strong> — associative combine (<code>+</code> being the canonical 'combine' operation)</p>
+<pre><code class="language-python">A ─┐
+    ├──( + )──&gt; A
+A ─┘
+</code></pre>
+<p><strong>Monoid</strong> — semigroup with an identity element</p>
+<pre><code>A ─┐
+    ├──( + )──&gt; A       (+ identity = A)
+A ─┘
+</code></pre>
+<p><strong>Functor</strong> — transform the value inside a context</p>
+<pre><code>F[A] ---( f: A -&gt; B )---&gt; F[B]
+</code></pre>
+<p><strong>Applicative</strong> — apply a function in context to a value in context</p>
+<pre><code>F[A → B]  ─┐
+           ├──ap──&gt; F[B]
+F[A] ──────┘
+</code></pre>
+<p><strong>Monad</strong> — sequence computations that produce new contexts</p>
+<pre><code>F[A] ---( f: A -&gt; F[B] )---&gt; F[B]
+</code></pre>
+<p>Heavily influenced by <a href="https://github.com/scalaz/scalaz">Scalaz</a> and
+<a href="https://typelevel.org/cats/">Cats</a>.</p>
+<pre><code class="language-python"># Python 3.12+ syntax for clarity. Library supports ≥3.10.
+# In v2, typeclasses are INSTANCE classes (self = instance, fa = data).
+# Data types extend DataType, NOT typeclasses.
+
+# ── Value-level typeclasses (instantiated per use) ──
+
+@dataclass(frozen=True)
+class Semigroup[A]:
+    typ: type
+    combine: Callable[[A, A], A]
+
+@dataclass(frozen=True)
+class Monoid[A](Semigroup[A]):
+    empty: A
+
+# ── Typeclass hierarchy (instance classes) ──
+# F is the type constructor (Option, Result, etc.)
+# A, B are value types; E is the error type
+
+# pseudo-code type signatures; see exact impls
+class Functor[F](BaseTypeclass):
+    def map(self, fa: F[A], f: Callable[[A], B]) -&gt; F[B]: ...
+
+class Applicative[F](Functor[F]):
+    def pure(self, value: A) -&gt; F[A]: ...
+    def ap(self, ff: F[Callable[[A], B]], fa: F[A]) -&gt; F[B]: ...
+    def map(self, fa: F[A], f: Callable[[A], B]) -&gt; F[B]: ...          # derived
+    def map2(self, fa: F[A], fb: F[B], f: Callable[[A, B], C]) -&gt; F[C]: ...
+    def product(self, fa: F[A], fb: F[B]) -&gt; F[tuple[A, B]]: ...
+
+class Alternative[F](Applicative[F]):
+    def empty(self) -&gt; F[A]: ...
+    def or_else(self, fa: F[A], fb: F[A]) -&gt; F[A]: ...
+
+class Monad[F](Applicative[F]):
+    def bind(self, fa: F[A], f: Callable[[A], F[B]]) -&gt; F[B]: ...
+    def map(self, fa: F[A], f: Callable[[A], B]) -&gt; F[B]: ...          # derived
+    def ap(self, ff: F[Callable[[A], B]], fa: F[A]) -&gt; F[B]: ...       # derived
+
+class MonadError[F, E](Monad[F]):
+    def raise_error(self, error: E) -&gt; F[A]: ...
+    def handle_error_with(self, fa: F[A], f: Callable[[E], F[A]]) -&gt; F[A]: ...
+
+class Bifunctor[F](BaseTypeclass):
+    def bimap(self, fa: F[A, B], f: Callable[[A], C], g: Callable[[B], D]) -&gt; F[C, D]: ...
+    def left_map(self, fa: F[A, B], f: Callable[[A], C]) -&gt; F[C, B]: ...  # derived
+
+class Foldable[F](BaseTypeclass):
+    def fold_left(self, fa: F[A], acc: B, f: Callable[[B, A], B]) -&gt; B: ...
+    def fold_right(self, fa: F[A], acc: B, f: Callable[[A, B], B]) -&gt; B: ...
+
+class Traversable[F](Foldable[F]):
+    def traverse(self, fa: F[A], f: Callable[[A], G[B]], G: Applicative) -&gt; G[F[B]]: ...
+    def sequence(self, fga: F[G[A]], G: Applicative) -&gt; G[F[A]]: ...   # derived
+
+# ── Data types (extend DataType, not typeclasses) ──
+
+class Option(DataType, Generic[A]):    ...  # Some(value) | Nothing()
+class Either(DataType, Generic[E, A]): ...  # Right(value) | Left(error)
+class Result(DataType, Generic[A]):    ...  # Ok(value) | Err(exception)
+
+# ── Instances (connect typeclasses to data types) ──
+
+class _OptionMonad(Monad, for_type=Option):
+    def pure(self, value: A) -&gt; Option[A]:
+        return Some(value)
+    def bind(self, fa: Option[A], f: Callable[[A], Option[B]]) -&gt; Option[B]:
+        match fa:
+            case Some(v): return f(v)
+            case Nothing(): return fa
+# map, ap, product, then, map2 — all inherited from Monad hierarchy
+
+# ── Experimental (monad transformers) ──
+
+class MonadTransformer(ABC):
+    def bind(self, fa: MT[F, A], f: Callable[[A], MT[F, B]]) -&gt; MT[F, B]: ...
+    def map(self, fa: MT[F, A], f: Callable[[A], B]) -&gt; MT[F, B]: ...
+    def pure(cls, value: A, monad: type[F]) -&gt; MT[F, A]: ...
+    def lift_f(cls, inner: F[A]) -&gt; MT[F, A]: ...
+</code></pre>
+<h3 id="instances-which-data-types-implement-which-typeclasses">Instances (which data types implement which typeclasses)</h3>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Typeclasses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Option[A]</code></td>
+<td>Monad, Alternative</td>
+</tr>
+<tr>
+<td><code>Either[E, A]</code></td>
+<td>MonadError, Bifunctor</td>
+</tr>
+<tr>
+<td><code>Result[A]</code></td>
+<td>MonadError, Bifunctor</td>
+</tr>
+<tr>
+<td><code>AsyncResult[A]</code></td>
+<td>MonadError, Bifunctor</td>
+</tr>
+<tr>
+<td><code>CList[A]</code></td>
+<td>Monad, Traversable, Alternative</td>
+</tr>
+<tr>
+<td><code>Tree[A]</code></td>
+<td>Functor, Foldable</td>
+</tr>
+<tr>
+<td><code>frozendict[K, V]</code></td>
+<td>Functor, Foldable</td>
+</tr>
+<tr>
+<td><code>Validated[E, A]</code></td>
+<td>Applicative, Bifunctor</td>
+</tr>
+<tr>
+<td><code>ZipList[A]</code></td>
+<td>Applicative</td>
+</tr>
+<tr>
+<td><code>State[S, A]</code></td>
+<td>Monad</td>
+</tr>
+<tr>
+<td><code>Reader[R, A]</code></td>
+<td>Monad</td>
+</tr>
+<tr>
+<td><code>Writer[W, A]</code></td>
+<td>Monad</td>
+</tr>
+<tr>
+<td><code>Future[A]</code></td>
+<td>Monad</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-types">Data Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>What it models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Option[A]</code></td>
+<td>Value might not exist</td>
+</tr>
+<tr>
+<td><code>Either[E, A]</code></td>
+<td>Value or typed error</td>
+</tr>
+<tr>
+<td><code>Result[A]</code></td>
+<td>Computation that can fail (<code>Ok</code>/<code>Err</code>) + <code>@Try</code></td>
+</tr>
+<tr>
+<td><code>AsyncResult[A]</code></td>
+<td>Async computation that can fail + <code>@TryAsync</code></td>
+</tr>
+<tr>
+<td><code>State[S, A]</code></td>
+<td>Stateful computation</td>
+</tr>
+<tr>
+<td><code>Reader[Ctx, A]</code></td>
+<td>Shared environment</td>
+</tr>
+<tr>
+<td><code>Writer[W, A]</code></td>
+<td>Accumulated output</td>
+</tr>
+<tr>
+<td><code>Validated[E, A]</code></td>
+<td>Error accumulation (applicative, not monad)</td>
+</tr>
+<tr>
+<td><code>Future[A]</code></td>
+<td>Lazy async computation</td>
+</tr>
+<tr>
+<td><code>CList[A]</code></td>
+<td>Persistent singly-linked list</td>
+</tr>
+<tr>
+<td><code>Tree[A]</code></td>
+<td>Immutable binary tree (functor only)</td>
+</tr>
+<tr>
+<td><code>frozendict[K, V]</code></td>
+<td>Persistent HAMT dictionary</td>
+</tr>
+</tbody>
+</table>
+<h3 id="laws">Laws</h3>
+<p>Every implementation must satisfy these mathematical laws:</p>
+<p><strong>Semigroup</strong></p>
+<ul>
+<li>Associativity: <code>(a + b) + c == a + (b + c)</code></li>
+</ul>
+<p><strong>Monoid</strong></p>
+<ul>
+<li>Left identity: <code>empty + a == a</code></li>
+<li>Right identity: <code>a + empty == a</code></li>
+</ul>
+<p><strong>Functor</strong></p>
+<ul>
+<li>Identity: <code>fa.map(id) == fa</code></li>
+<li>Composition: <code>fa.map(f).map(g) == fa.map(g ∘ f)</code></li>
+</ul>
+<p><strong>Applicative</strong></p>
+<ul>
+<li>Identity: <code>pure(id).ap(v) == v</code></li>
+<li>Homomorphism: <code>pure(f).ap(pure(x)) == pure(f(x))</code></li>
+<li>Interchange: <code>u.ap(pure(y)) == pure(λf. f(y)).ap(u)</code></li>
+<li>Composition: <code>pure(∘).ap(u).ap(v).ap(w) == u.ap(v.ap(w))</code></li>
+<li>Type preservation: <code>pure</code>, <code>map</code>, <code>ap</code> return the correct concrete type</li>
+</ul>
+<p><strong>Monad</strong></p>
+<ul>
+<li>Left identity: <code>pure(a).bind(f) == f(a)</code></li>
+<li>Right identity: <code>m.bind(pure) == m</code></li>
+<li>Associativity: <code>m.bind(f).bind(g) == m.bind(λx. f(x).bind(g))</code></li>
+</ul>
+<p><strong>Alternative</strong></p>
+<ul>
+<li>Right identity: <code>fa.or_else(empty) == fa</code></li>
+<li>Left identity: <code>empty.or_else(fa) == fa</code></li>
+<li>Associativity: <code>a.or_else(b).or_else(c) == a.or_else(b.or_else(c))</code></li>
+</ul>
+<p><strong>Bifunctor</strong></p>
+<ul>
+<li>Identity: <code>bimap(id, id) == id</code></li>
+<li>Composition: <code>bimap(f1 ∘ f2, g1 ∘ g2) == bimap(f1, g1) ∘ bimap(f2, g2)</code></li>
+</ul>
+<p><strong>Traversable</strong></p>
+<ul>
+<li>Identity: <code>traverse(fa, pure, G) == pure(fa)</code></li>
+<li>Composition: <code>traverse(fa, f ∘ g, G) == traverse(traverse(fa, g, G), f, H)</code></li>
+</ul>
+<h2 id="syntax-notes">Syntax notes</h2>
+<p><strong>Dot syntax</strong> — the default, for everyday code:</p>
+<pre><code class="language-python">from funstruct.monad.option import Some, Nothing
+from funstruct.monad.result import Ok, Err
+
+Some(10).map(lambda x: x * 2).bind(lambda x: Some(x + 1))  # Some(21)
+Ok(10).map(str)                                              # Ok('10')
+Nothing().map(lambda x: x + 1)                               # Nothing()
+</code></pre>
+<p>**** dot notation is syntatic sugar over the following...</p>
+<p><strong>Typeclass instances</strong> — for generic, effect-polymorphic programs:</p>
+<pre><code class="language-python">from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.monad.option import Option, Some
+from funstruct.monad.result import Result, Ok, Err
+
+# F: Monad    = the typeclass instance (constraint / trait bound)
+# fa: F[A]    = a value in the monadic context (Some(21), Ok(21), etc.)
+def double(F: Monad, fa):
+    return F.map(fa, lambda x: x * 2)
+
+double(summon(Monad, Option), Some(21))  # Some(42)
+double(summon(Monad, Result), Ok(21))    # Ok(42)
+
+# F: MonadError adds raise_error + handle_error_with
+def safe_divide(F: MonadError, a: float, b: float):
+    if b == 0:
+        return F.raise_error(ValueError(&quot;division by zero&quot;))
+    return F.pure(a / b)
+
+safe_divide(summon(MonadError, Result), 10, 2)  # Ok(5.0)
+safe_divide(summon(MonadError, Result), 10, 0)  # Err(ValueError(...))
+</code></pre>
+<p>Data types are plain — they don't inherit from typeclasses. Typeclass
+instances are separate classes that implement the operations. <code>summon</code>
+resolves the right instance from a registry. Dot syntax is sugar on
+top — <code>Some(10).map(f)</code> delegates to <code>summon(Monad, Option).map(Some(10), f)</code>
+internally.</p>
+<h2 id="why-no-io-type">Why no IO type?</h2>
+<p>In Haskell, <code>IO</code> exists because the language is purely functional — there is
+no way to perform side effects without wrapping them in the <code>IO</code> monad. The
+type system enforces purity: if a function doesn't return <code>IO</code>, it cannot
+touch the network, filesystem, or mutable state.</p>
+<p>Python has no such constraint. Any function can perform side effects at any
+time. An <code>IO</code> wrapper in Python would be:</p>
+<ol>
+<li><strong>Unenforceable</strong> — nothing stops you from doing I/O outside the wrapper.
+   The type system can't prevent <code>print()</code> in a "pure" function.</li>
+<li><strong>Purely ceremonial</strong> — it adds a wrapper you must manually construct and
+   unwrap, but provides no guarantee. It's a comment dressed as a type.</li>
+<li><strong>Redundant with async</strong> — Python's <code>async/await</code> already separates
+   "description of a computation" from "execution of that computation,"
+   which is most of what <code>IO</code> provides in Haskell.</li>
+</ol>
+<p>Instead, funstruct provides:</p>
+<ul>
+<li><strong><code>Either[E, A]</code></strong> / <strong><code>Result[A]</code></strong> — for operations that might fail</li>
+<li><strong><code>Future[A]</code></strong> / <strong><code>AsyncResult[A]</code></strong> — for async operations (with or without error handling)</li>
+<li><strong><code>@Try</code> / <code>@TryAsync</code></strong> — for wrapping exception-throwing code at boundaries</li>
+</ul>
+<p>These give you the composition benefits of monadic pipelines where they
+matter (error handling, async sequencing) without pretending Python is
+something it isn't.</p>
+<h2 id="higher-kinded-types">Higher-kinded types</h2>
+<p>In Haskell and Scala, higher-kinded types (HKTs) let you abstract over
+type constructors — writing one generic <code>sequence</code> that works for any
+<code>Traversable</code> + <code>Applicative</code> combination.</p>
+<p>Python's type system does not support HKTs natively. funstruct achieves
+the same effect at runtime through the typeclass instance pattern:</p>
+<ul>
+<li><strong>Type constructors</strong> are represented by the class itself (<code>Option</code>,
+  <code>Result</code>, <code>Either</code>). Each data type sets <code>_type_constructor</code> so
+  variants resolve to their base: <code>tc_of(Some(42))</code> → <code>Option</code>.</li>
+<li><strong>Typeclass resolution</strong> via <code>summon(Monad, Option)</code> returns the
+  registered instance, just like Scala's <code>summon[Monad[Option]]</code>.</li>
+<li><strong>Generic functions</strong> use the instance directly:
+  <code>def double(F: Monad, fa): return F.map(fa, lambda x: x * 2)</code></li>
+<li><strong>Dot syntax</strong> delegates to summon internally:
+  <code>Some(10).map(f)</code> → <code>summon(Functor, Option).map(Some(10), f)</code></li>
+</ul>
+<p>This gives funstruct Haskell-style typeclass resolution and Scala-style
+tagless final — without HKT encoding tricks, metaclass magic, or
+compiler plugins. The tradeoff: trait bounds are enforced at runtime
+(via <code>summon</code>), not at compile time.</p>
+<h2 id="experimental">Experimental</h2>
+<p>Experimental modules live in <code>funstruct.experimental</code>. APIs may change.</p>
+<h3 id="monad-transformers">Monad Transformers</h3>
+<pre><code class="language-python">from funstruct.experimental.monadtransformer import (
+    ReaderT, StateT, EitherT, OptionT, WriterT,
+)
+</code></pre>
+<p>Transformers combine effects by wrapping one monad inside another.
+For most use cases, plain monads with <code>do</code>-notation and <code>fold</code> are
+sufficient. Reach for transformers only when you need to combine
+multiple effects in a single pipeline.</p>
+<pre><code>ReaderT[F, Ctx, A]  =  Ctx -&gt; F[A]         (environment + F's effects)
+StateT[F, S, A]     =  S -&gt; F[(S, A)]      (state + F's effects)
+EitherT[F, E, A]    =  F[Either[E, A]]     (errors + F's effects)
+OptionT[F, A]       =  F[Option[A]]        (absence + F's effects)
+WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
+</code></pre>
+<h3 id="optics-lenses">Optics (Lenses)</h3>
+<pre><code class="language-python">from funstruct.experimental.optics import Lens, at
+from funstruct.collections.frozendict import frozendict
+</code></pre>
+<p>Lenses let you read and update deeply nested immutable structures
+without manually rebuilding the path at every level.</p>
+<pre><code class="language-python">config = frozendict({
+    &quot;app&quot;: {
+        &quot;users&quot;: {
+            &quot;alice&quot;: {&quot;email&quot;: &quot;alice@old.com&quot;, &quot;role&quot;: &quot;admin&quot;},
+        },
+        &quot;settings&quot;: {&quot;version&quot;: 2},
+    },
+})
+
+email_lens = at(&quot;app&quot;) &gt;&gt; at(&quot;users&quot;) &gt;&gt; at(&quot;alice&quot;) &gt;&gt; at(&quot;email&quot;)
+email_lens.get(config)                          # &quot;alice@old.com&quot;
+email_lens.set(config, &quot;alice@new.com&quot;)         # rebuilds the path
+email_lens.modify(config, str.upper)            # &quot;ALICE@OLD.COM&quot;
+
+version_lens = at(&quot;app&quot;) &gt;&gt; at(&quot;settings&quot;) &gt;&gt; at(&quot;version&quot;)
+version_lens.modify(config, lambda v: v + 1)    # bumps to 3
+</code></pre>
+<h2 id="roadmap">Roadmap</h2>
+<ul>
+<li><strong>Interactive demos</strong> — browser-runnable examples via PyScript/Pyodide. Edit and run funstruct code directly in the docs.</li>
+<li><strong>Documentation site</strong> — expanded static site (Astro/Next.js/etc) with guides, interactive demos, and API reference.</li>
+<li><strong>Functional collections</strong> — persistent queue, deque, red-black tree, persistent stack, heap</li>
+<li><strong>Native collections (Rust/PyO3)</strong> — Rust-backed CList, frozendict via <code>funstruct[native]</code>.</li>
+<li><strong>Typeclass derivation</strong> — auto-generate Functor/Foldable instances from dataclass structure.</li>
+<li><strong>Parser combinators</strong> — monadic parser library (<code>funstruct.experimental.parsing</code>).</li>
+<li><strong>Python 3.12+ minimum</strong> — rewrite type signatures using <code>type X[A, B] = ...</code> aliases and <code>class Foo[A]:</code> syntax.</li>
+<li><strong>Free monad</strong> — build program ASTs, interpret with different backends.</li>
+<li><strong>Effects system</strong> — algebraic effects as an alternative to monad transformer stacks.</li>
+<li><strong>Stream</strong> — infinite streams, lazy evaluation.</li>
+<li><strong>Pydantic integration</strong> — more native integration with BaseModel, frozendict, lens, validated, etc</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
