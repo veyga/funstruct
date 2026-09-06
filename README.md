@@ -231,6 +231,34 @@ These give you the composition benefits of monadic pipelines where they
 matter (error handling, async sequencing) without pretending Python is
 something it isn't.
 
+## Why no higher-kinded types?
+
+In Haskell and Scala, higher-kinded types (HKTs) let you abstract over type
+constructors — writing one generic `sequence` that works for any
+`Traversable` + `Applicative` combination, or a single `Monad` interface
+that a type checker can verify at call sites.
+
+Python's type system does not support HKTs, and there is no indication it
+will. Other Python FP libraries have attempted to encode them using Protocol
+and TypeVar tricks, but the result is fragile, confuses type checkers, and
+makes the library harder to use than the patterns it's trying to simplify.
+
+funstruct takes a different approach: typeclasses are base classes, and
+concrete types inherit from them (`Option` extends `Monad`, `Either`
+extends `MonadError + Bifunctor`). This means:
+
+- Each type provides its own `sequence`, `traverse`, and `do` rather than
+  one polymorphic function that works for all types.
+- Tagless final programs (see `playground/mt8.py`, `mt9.py`) are
+  structurally typed — the type checker won't verify that `F` satisfies
+  `MonadError` at the protocol level.
+
+The tradeoff is a small amount of method duplication across types, in
+exchange for a library that works with standard Python tooling. This library
+does not aim to be "Pythonic" — it intentionally adopts FP conventions like
+`fa`/`ff`/`fb` parameters and Cats-style naming — but it also does not
+break the rules of the language or require compiler plugins.
+
 ## Experimental
 
 Experimental modules live in `funstruct.experimental`. APIs may change.
@@ -262,7 +290,7 @@ WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
 - **Higher Kinded Type Support** - potentially? maybe using mypy plugin (wonder if worth)
 - **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax. Eliminates `TypeVar` boilerplate and `Callable[[A, B], C]` throughout.
 - **Parser combinators**
-- **Typeclass derivation** — utilizing something like mypy plugins
+- **Typeclass derivation** — potentially something like mypy plugins (not likely)
 - **Lens/Optics**
 - **Stream** — infinite streams, lazy
 - **FreeMonad** - implementation

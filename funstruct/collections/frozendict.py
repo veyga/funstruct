@@ -1,18 +1,33 @@
 """An immutable, hashable dictionary backed by a hash array mapped trie (HAMT).
 
 This impl does not honor insertion ordering.
+Nested dicts are deep-frozen by default.
 
 Examples:
     >>> from funstruct.collections.frozendict import frozendict
     >>> fd = frozendict({"a": 1, "b": 2})
-    >>> fd.map(lambda x: x * 10).get("a")
-    10
-    >>> fd.map(lambda x: x * 10).get("b")
-    20
-    >>> (fd + frozendict({"c": 3})).get("c")
-    3
-    >>> fd.get("a")
+    >>> fd["a"]
     1
+    >>> fd.map(lambda x: x * 10)["a"]
+    10
+    >>> (fd + frozendict({"c": 3}))["c"]
+    3
+
+    Nested access — dicts are deep-frozen automatically:
+
+    >>> users = frozendict({
+    ...     "alice": {"profile": {"age": 30, "city": "NYC"}},
+    ...     "bob": {"profile": {"age": 25, "city": "LA"}},
+    ... })
+    >>> users["alice"]["profile"]["age"]
+    30
+    >>> users["bob"]["profile"]["city"]
+    'LA'
+
+    Map over nested values:
+
+    >>> users.map(lambda u: u.map(lambda p: p.put("active", True)))["alice"]["profile"]["active"]
+    True
 """
 
 from __future__ import annotations
@@ -229,20 +244,35 @@ class frozendict(Functor[V], Foldable, Generic[K, V]):
     Semigroup via combine/+ (right-biased merge).
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, shallow: bool = False, **kwargs) -> None:
+        def _freeze(v):
+            match v:
+                case dict():
+                    return frozendict(v)
+                case list():
+                    return [_freeze(item) for item in v]
+                case _:
+                    return v
+
         match args:
             case (frozendict() as other, *_):
                 object.__setattr__(self, "_frozendict__root", other.__root)
                 object.__setattr__(self, "_frozendict__size", other.__size)
             case _:
-                root = _EMPTY
-                size = 0
+                from funstruct.util.tailrec import tail_call, tco
+
                 source = dict(*args, **kwargs)
-                for k, v in source.items():
-                    root = root.put(k, v, hash(k), 0)
-                    size += 1
-                object.__setattr__(self, "_frozendict__root", root)
-                object.__setattr__(self, "_frozendict__size", size)
+                items = list(source.items())
+
+                @tco
+                def _build(idx, root):
+                    if idx >= len(items):
+                        return root
+                    k, v = items[idx]
+                    return tail_call(_build)(idx + 1, root.put(k, v if shallow else _freeze(v), hash(k), 0))
+
+                object.__setattr__(self, "_frozendict__root", _build(0, _EMPTY))
+                object.__setattr__(self, "_frozendict__size", len(items))
         object.__setattr__(self, "_frozendict__hash_cache", None)
 
     def __setattr__(self, name, value):
@@ -364,30 +394,6 @@ class frozendict(Functor[V], Foldable, Generic[K, V]):
     @property
     def raw(self) -> dict:
         return dict(self.__root.items_iter())
-
-    @classmethod
-    def deep(cls, d: dict) -> frozendict:
-        """Recursively convert nested dicts into frozendicts.
-
-        Lists of dicts are also converted. Non-dict values pass through.
-
-        >>> frozendict.deep({"a": {"b": 1}}).get("a").get("b")
-        1
-        """
-        root = _EMPTY
-        size = 0
-        for k, v in d.items():
-            if isinstance(v, dict):
-                v = cls.deep(v)
-            elif isinstance(v, list):
-                v = [cls.deep(item) if isinstance(item, dict) else item for item in v]
-            root = root.put(k, v, hash(k), 0)
-            size += 1
-        new_fd = object.__new__(frozendict)
-        object.__setattr__(new_fd, "_frozendict__root", root)
-        object.__setattr__(new_fd, "_frozendict__size", size)
-        object.__setattr__(new_fd, "_frozendict__hash_cache", None)
-        return new_fd
 
     @classmethod
     def fromkeys(cls, *args, **kwargs) -> frozendict:

@@ -651,21 +651,21 @@ class TestFoldable:
 
 class TestDeep:
     def test_deep_converts_nested_dicts(self):
-        fd = frozendict.deep({"a": {"b": 1}})
+        fd = frozendict({"a": {"b": 1}})
         assert isinstance(fd.get("a"), frozendict)
         assert fd.get("a").get("b") == 1
 
     def test_deep_converts_three_levels(self):
-        fd = frozendict.deep({"x": {"y": {"z": 42}}})
+        fd = frozendict({"x": {"y": {"z": 42}}})
         assert fd.get("x").get("y").get("z") == 42
 
     def test_deep_leaves_non_dicts_alone(self):
-        fd = frozendict.deep({"name": "alice", "age": 30})
+        fd = frozendict({"name": "alice", "age": 30})
         assert fd.get("name") == "alice"
         assert fd.get("age") == 30
 
     def test_deep_converts_dicts_inside_lists(self):
-        fd = frozendict.deep({"users": [{"name": "alice"}, {"name": "bob"}]})
+        fd = frozendict({"users": [{"name": "alice"}, {"name": "bob"}]})
         users = fd.get("users")
         assert isinstance(users, list)
         assert isinstance(users[0], frozendict)
@@ -685,7 +685,7 @@ class TestDeep:
                 "meta": {"count": 3, "currency": "USD"},
             },
         }
-        fd = frozendict.deep(api_response)
+        fd = frozendict(api_response)
 
         assert fd.get("status") == "ok"
         data = fd.get("data")
