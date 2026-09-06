@@ -59,3 +59,23 @@ nox *args:
 
 # docs-build:
 #   uv run mkdocs build
+
+#
+# # using playground as a dir for local scripting
+# scripts_root := "$(pwd)/funstruct/playground/__init__.py"
+#
+# # run a typer script
+# typer +script:
+#   python {{scripts_root}} {{script}}
+#
+# # debug a typer script
+# dtyper +script:
+#   python -m debugpy --listen 0.0.0.0:5681 --wait-for-client {{scripts_root}} {{script}}
+
+# run t6
+t6:
+  uv run python -m funstruct.playground.mt6 nickname me
+
+# debug t6
+dt6 *args:
+  PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5681 --wait-for-client funstruct/playground/mt6.py {{args}}

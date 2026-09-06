@@ -1,6 +1,6 @@
 # funstruct
 
-A helpful collection of functional utilities.
+A zero-dependency functional programming library for Python.
 
 ## Install
 

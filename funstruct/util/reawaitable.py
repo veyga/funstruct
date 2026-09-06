@@ -31,6 +31,10 @@ class ReAwaitable:
         self._coro = coro
         self._cache = _SENTINEL
 
+    def __del__(self):
+        if self._cache is _SENTINEL and hasattr(self._coro, "close"):
+            self._coro.close()
+
     def __await__(self) -> Generator[None, None, _A]:
         return self._awaitable().__await__()
 
