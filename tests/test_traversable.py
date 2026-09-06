@@ -31,9 +31,7 @@ class TestCListTraverse:
 
     def test_traverse_option_short_circuits(self):
         xs = CList.from_iterable([1, 2, 3])
-        result = xs.traverse(
-            lambda x: Nothing() if x == 2 else Some(x), Option.pure
-        )
+        result = xs.traverse(lambda x: Nothing() if x == 2 else Some(x), Option.pure)
         assert result == Nothing()
 
 
@@ -77,9 +75,7 @@ class TestTreeTraverse:
 
     def test_branch_traverse_short_circuits(self):
         t = Branch(1, Leaf(2), Leaf(3))
-        result = t.traverse(
-            lambda x: Left("fail") if x == 2 else Right(x), Either.pure
-        )
+        result = t.traverse(lambda x: Left("fail") if x == 2 else Right(x), Either.pure)
         assert result == Left("fail")
 
     def test_deep_tree_traverse(self):

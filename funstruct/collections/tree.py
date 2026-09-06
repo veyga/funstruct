@@ -91,7 +91,9 @@ class Leaf(Tree[A]):
     def depth(self) -> int:
         return 0
 
-    def fold(fa: Leaf, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
+    def fold(
+        fa: Leaf, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]
+    ) -> C:
         return on_leaf(fa.value)
 
     def fold_right(fa: Leaf, acc, f):
@@ -133,7 +135,9 @@ class Branch(Tree[A]):
     def depth(self) -> int:
         return 1 + max(self.left.depth, self.right.depth)
 
-    def fold(fa: Branch, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
+    def fold(
+        fa: Branch, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]
+    ) -> C:
         return on_branch(
             fa.value,
             fa.left.fold(on_leaf, on_branch),
@@ -150,7 +154,9 @@ class Branch(Tree[A]):
         fv = f(fa.value)
         fl = fa.left.traverse(f, pure_fn)
         fr = fa.right.traverse(f, pure_fn)
-        return pure_fn(lambda v: lambda l: lambda r: Branch(v, l, r)).ap(fv).ap(fl).ap(fr)
+        return (
+            pure_fn(lambda v: lambda l: lambda r: Branch(v, l, r)).ap(fv).ap(fl).ap(fr)
+        )
 
     def to_list(fa: Branch) -> CList[A]:
         return fa.left.to_list() + Cons(fa.value, fa.right.to_list())

@@ -59,29 +59,36 @@ A ─┘
 ```
 
 ```python
-@dataclass(frozen=True)
-class Semigroup:
-    typ: type
-    combine: Callable  # (A, A) -> A
+# Signatures shown in Python 3.12+ syntax for clarity.
+# The library supports Python ≥3.10 (uses TypeVar internally).
 
 @dataclass(frozen=True)
-class Monoid(Semigroup):
+class Semigroup[A]:
     typ: type
-    combine: Callable  # (A, A) -> A
-    empty: object      # identity element
+    combine: Callable[[A, A], A]
 
-class Functor(ABC):
-    def map(fa, f) -> Functor: ...
+@dataclass(frozen=True)
+class Monoid[A](Semigroup[A]):
+    empty: A  # identity element
 
-class Applicative(Functor):
-    def pure(cls, value) -> Applicative: ...
-    def ap(ff, fa) -> Applicative: ...            # F[A→B].ap(F[A]) → F[B]
-    def product(fa, fb) -> Applicative: ...       # F[A] * F[B] → F[(A, B)]
-    def __mul__ = product  # * alias
+class Functor[A](ABC):
+    def map(fa: Functor[A], f) -> Functor[B]: ...
 
-class Monad(Applicative):
-    def bind(fa, f) -> Monad: ...
-    def __rshift__ = bind  # >>
+class Applicative[A](Functor[A]):
+    def pure(cls, value: A) -> Applicative[A]: ...             # @final on concrete types
+    def ap(
+        ff: Applicative[Callable[[A], B]],
+        fa: Applicative[A],
+    ) -> Applicative[B]: ...                                   # F[A→B].ap(F[A]) → F[B]
+    def product(
+        fa: Applicative[A],
+        fb: Applicative[B],
+    ) -> Applicative[tuple[A, B]]: ...
+    __mul__ = product                                          # * operator
+
+class Monad[A](Applicative[A]):
+    def bind(fa: Monad[A], f) -> Monad[B]: ...
+    __rshift__ = bind                                          # >> operator
 ```
 
 ```python

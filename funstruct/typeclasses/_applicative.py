@@ -66,9 +66,7 @@ class Applicative(Functor[_A]):
         return fa.__class__.pure(f).ap(fa)
 
     @abstractmethod
-    def ap(
-        ff: Applicative[Callable[[_A], _B]], fa: Applicative[_A]
-    ) -> Applicative[_B]:
+    def ap(ff: Applicative[Callable[[_A], _B]], fa: Applicative[_A]) -> Applicative[_B]:
         """Apply a wrapped function to a wrapped value.
 
         Scala: ``def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]``

@@ -52,13 +52,15 @@ class Foldable(ABC):
 
     def fold_left(fa: Foldable, acc: _B, f: Callable[[_B, _A], _B]) -> _B:
         """Fold from left to right. Default via fold_right."""
-        return fa.fold_right(
-            lambda b: b, lambda a, g: lambda b: g(f(b, a))
-        )(acc)
+        return fa.fold_right(lambda b: b, lambda a, g: lambda b: g(f(b, a)))(acc)
 
     def to_list(fa: Foldable) -> list:
         """Collect all elements into a Python list."""
-        return list(fa) if hasattr(fa, "__iter__") else fa.fold_right([], lambda a, acc: [a] + acc)
+        return (
+            list(fa)
+            if hasattr(fa, "__iter__")
+            else fa.fold_right([], lambda a, acc: [a] + acc)
+        )
 
     def length(fa: Foldable) -> int:
         """Count the number of elements."""

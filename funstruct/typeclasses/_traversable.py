@@ -61,7 +61,9 @@ class Traversable(Foldable, Functor[_A]):
     """
 
     @abstractmethod
-    def traverse(fa: Traversable, f: Callable[[_A], object], pure_fn: Callable) -> object:
+    def traverse(
+        fa: Traversable, f: Callable[[_A], object], pure_fn: Callable
+    ) -> object:
         """Map each element through f, then collect the results.
 
         Scala: ``def traverse[G[_]: Applicative, B](f: A => G[B]): G[F[B]]``

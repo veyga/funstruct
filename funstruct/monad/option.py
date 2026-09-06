@@ -70,7 +70,9 @@ class Option(Monad, Generic[A]):
     def get_or_else(fa: Option, default: A) -> A: ...
 
     @abstractmethod
-    def handle_error_with(fa: Option, fallback: Callable[[], Option[A]]) -> Option[A]: ...
+    def handle_error_with(
+        fa: Option, fallback: Callable[[], Option[A]]
+    ) -> Option[A]: ...
 
     @classmethod
     @final

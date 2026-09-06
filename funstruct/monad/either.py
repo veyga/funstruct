@@ -195,7 +195,9 @@ class Right(Either[E, A]):
     def handle_error_with(fa: Right, f: Callable[[E], Either]) -> Either[E, A]:
         return fa
 
-    def bimap(fa: Right, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+    def bimap(
+        fa: Right, on_left: Callable[[E], E], on_right: Callable[[A], B]
+    ) -> Either:
         return Right(on_right(fa.value))
 
     def get_or_else(fa: Right, default: A) -> A:
@@ -243,7 +245,9 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
         """
         return f(fa.error)
 
-    def bimap(fa: Left, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+    def bimap(
+        fa: Left, on_left: Callable[[E], E], on_right: Callable[[A], B]
+    ) -> Either:
         return Left(on_left(fa.error))
 
     def get_or_else(fa: Left, default: A) -> A:

@@ -88,7 +88,9 @@ class Result(Monad, Generic[_A]):
         return _thunk
 
     @abstractmethod
-    def fold(fa: Result, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B: ...
+    def fold(
+        fa: Result, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
+    ) -> _B: ...
 
     @abstractmethod
     def bind(fa: Result, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
@@ -97,7 +99,9 @@ class Result(Monad, Generic[_A]):
     def left_map(fa: Result, f: Callable[[Exception], Exception]) -> Result[_A]: ...
 
     @abstractmethod
-    def handle_error_with(fa: Result, f: Callable[[Exception], Result[_A]]) -> Result[_A]: ...
+    def handle_error_with(
+        fa: Result, f: Callable[[Exception], Result[_A]]
+    ) -> Result[_A]: ...
 
     @abstractmethod
     def bimap(fa: Result, on_err: Callable, on_ok: Callable) -> Result: ...
@@ -130,7 +134,9 @@ class Ok(Result[_A]):
     def bind(fa: Ok, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return f(fa.value)
 
-    def fold(fa: Ok, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+    def fold(
+        fa: Ok, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
+    ) -> _B:
         return on_ok(fa.value)
 
     def left_map(fa: Ok, f: Callable[[Exception], Exception]) -> Result[_A]:
@@ -172,7 +178,9 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
     def bind(fa: Err, f: Callable[[_A], Result[_B]]) -> Result[_B]:
         return fa
 
-    def fold(fa: Err, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+    def fold(
+        fa: Err, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
+    ) -> _B:
         return on_err(fa.error)
 
     def left_map(fa: Err, f: Callable[[Exception], Exception]) -> Result[_A]:
@@ -260,7 +268,9 @@ class AsyncResult(Monad, Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def left_map(fa: AsyncResult, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
+    def left_map(
+        fa: AsyncResult, f: Callable[[Exception], Exception]
+    ) -> AsyncResult[_A]:
         async def _inner():
             result = await fa._coro
             match result:
@@ -271,7 +281,9 @@ class AsyncResult(Monad, Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def handle_error_with(fa: AsyncResult, f: Callable[[Exception], Any]) -> AsyncResult:
+    def handle_error_with(
+        fa: AsyncResult, f: Callable[[Exception], Any]
+    ) -> AsyncResult:
         async def _inner():
             result = await fa._coro
             match result:

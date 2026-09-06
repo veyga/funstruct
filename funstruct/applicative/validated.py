@@ -45,7 +45,9 @@ class Validated(Applicative):
     def is_valid(self) -> bool: ...
 
     @abstractmethod
-    def fold(fa: Validated, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C: ...
+    def fold(
+        fa: Validated, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]
+    ) -> _C: ...
 
     @classmethod
     def pure(cls, value) -> Validated:
@@ -87,7 +89,9 @@ class Valid(Validated, Generic[_A]):
     def __bool__(self) -> bool:
         return True
 
-    def fold(fa: Valid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+    def fold(
+        fa: Valid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]
+    ) -> _C:
         return on_valid(fa.value)
 
     def map(fa: Valid, f: Callable[[_A], _B]) -> Valid[_B]:
@@ -98,6 +102,7 @@ class Valid(Validated, Generic[_A]):
             case Valid(val):
                 from typing import cast
                 from collections.abc import Callable
+
                 fn = cast(Callable, ff.value)
                 return Valid(fn(val))
             case _:
@@ -127,7 +132,9 @@ class Invalid(Validated, Generic[_E]):
     def __bool__(self) -> bool:
         return False
 
-    def fold(fa: Invalid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+    def fold(
+        fa: Invalid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]
+    ) -> _C:
         return on_invalid(fa.errors)
 
     def ap(ff: Invalid, other) -> Validated:
