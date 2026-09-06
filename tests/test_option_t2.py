@@ -114,7 +114,9 @@ class TestBind:
 class TestHandleErrorWith:
     def test_recovers_from_nothing(self):
         result = (
-            OptionT(Right(Nothing())).handle_error_with(lambda: OptionT(Right(Some(99)))).run()
+            OptionT(Right(Nothing()))
+            .handle_error_with(lambda: OptionT(Right(Some(99))))
+            .run()
         )
         assert result == Right(Some(99))
 

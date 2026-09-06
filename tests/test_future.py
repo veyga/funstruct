@@ -172,17 +172,23 @@ class TestHandleErrorWith:
         assert result == Ok("recovered: oops")
 
     def test_skips_on_success(self):
-        result = run(AsyncResult.pure(42).handle_error_with(lambda e: AsyncResult.pure(0)))
+        result = run(
+            AsyncResult.pure(42).handle_error_with(lambda e: AsyncResult.pure(0))
+        )
         assert result == Ok(42)
 
     def test_handle_error_with_either(self):
         err = ValueError("oops")
-        result = run(AsyncResult.from_exception(err).handle_error_with(lambda e: Right("fixed")))
+        result = run(
+            AsyncResult.from_exception(err).handle_error_with(lambda e: Right("fixed"))
+        )
         assert result == Right("fixed")
 
     def test_handle_error_with_result(self):
         err = ValueError("oops")
-        result = run(AsyncResult.from_exception(err).handle_error_with(lambda e: Ok("fixed")))
+        result = run(
+            AsyncResult.from_exception(err).handle_error_with(lambda e: Ok("fixed"))
+        )
         assert result == Ok("fixed")
 
 

@@ -89,7 +89,9 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
 
         return EitherT(self._value.bind(_step))
 
-    def handle_error_with(self, f: Callable[[_E], EitherT[_F, _E, _A]]) -> EitherT[_F, _E, _A]:
+    def handle_error_with(
+        self, f: Callable[[_E], EitherT[_F, _E, _A]]
+    ) -> EitherT[_F, _E, _A]:
         """Recover from Left: f receives the error, returns a new EitherT."""
 
         def _step(either):

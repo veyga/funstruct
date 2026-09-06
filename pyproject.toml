@@ -75,6 +75,10 @@ doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 
 [tool.ruff]
 line-length = 88
+extend-exclude = ["*.md"]
+
+[tool.ruff.format]
+exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]

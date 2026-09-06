@@ -89,11 +89,15 @@ class TestHandleErrorWith:
         assert result.run() == Some(Right("recovered: err"))
 
     def test_skips_right(self):
-        result = EitherT(Some(Right(42))).handle_error_with(lambda e: EitherT(Some(Right(0))))
+        result = EitherT(Some(Right(42))).handle_error_with(
+            lambda e: EitherT(Some(Right(0)))
+        )
         assert result.run() == Some(Right(42))
 
     def test_nothing_propagates(self):
-        result = EitherT(Nothing()).handle_error_with(lambda e: EitherT(Some(Right("recovered"))))
+        result = EitherT(Nothing()).handle_error_with(
+            lambda e: EitherT(Some(Right("recovered")))
+        )
         assert result.run() == Nothing()
 
 

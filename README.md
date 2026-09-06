@@ -177,29 +177,6 @@ OptionT[F, A]       =  F[Option[A]]        (absence + F's effects)
 WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
 ```
 
-**Why transformers?** Monads don't compose automatically. If you need
-config + errors + logging, you'd manually unwrap 3 nested layers at
-every step. Transformers flatten that into one `bind`:
-
-```python
-# Without transformer — nested pattern matching at every step:
-result = fetch_user(id)  # Either[Err, Option[User]]
-match result:
-    case Left(e):
-        ...  # handle error
-    case Right(Nothing()):
-        ...  # handle absence
-    case Right(Some(user)):
-        ...  # finally, the value
-
-# With OptionT — one flat pipeline:
-pipeline = (
-    OptionT(fetch_user(id))
-    .bind(lambda user: OptionT(get_email(user)))
-    .map(lambda email: email.upper())
-)
-```
-
 ### Laws
 
 Every implementation must satisfy these mathematical laws:

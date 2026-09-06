@@ -79,7 +79,9 @@ class TestFold:
         assert result == 84
 
     def test_err_fold(self):
-        result = Err(ValueError("bad")).fold(on_err=lambda e: str(e), on_ok=lambda x: x * 2)
+        result = Err(ValueError("bad")).fold(
+            on_err=lambda e: str(e), on_ok=lambda x: x * 2
+        )
         assert result == "bad"
 
     def test_fold_positional_err_first(self):

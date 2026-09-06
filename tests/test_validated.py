@@ -318,8 +318,10 @@ class TestToResult:
     def test_invalid_fold_then_left_map(self):
         from funstruct.monad.result import Err, Ok
 
-        result = Invalid(["a", "b"]).fold(Err, Ok).left_map(
-            lambda errs: ValueError("; ".join(str(e) for e in errs))
+        result = (
+            Invalid(["a", "b"])
+            .fold(Err, Ok)
+            .left_map(lambda errs: ValueError("; ".join(str(e) for e in errs)))
         )
         assert type(result) is Err
         match result:
@@ -330,8 +332,10 @@ class TestToResult:
     def test_invalid_fold_then_left_map_custom(self):
         from funstruct.monad.result import Err, Ok
 
-        result = Invalid([1, 2, 3]).fold(Err, Ok).left_map(
-            lambda errs: TypeError(str(sum(errs)))
+        result = (
+            Invalid([1, 2, 3])
+            .fold(Err, Ok)
+            .left_map(lambda errs: TypeError(str(sum(errs))))
         )
         assert type(result) is Err
         match result:
@@ -344,9 +348,13 @@ class TestToResult:
         from funstruct.monad.result import Err, Ok
 
         result = (
-            Validated.cond(False, None, "bad auth")
-            * Validated.cond(False, None, "no access")
-        ).fold(Err, Ok).left_map(lambda errs: ValueError("; ".join(str(e) for e in errs)))
+            (
+                Validated.cond(False, None, "bad auth")
+                * Validated.cond(False, None, "no access")
+            )
+            .fold(Err, Ok)
+            .left_map(lambda errs: ValueError("; ".join(str(e) for e in errs)))
+        )
 
         match result:
             case Err(ValueError()):

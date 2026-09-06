@@ -120,7 +120,9 @@ class TestBind:
 class TestHandleErrorWith:
     def test_handle_error_with_recovers_from_failure(self):
         failing = StateT(lambda _: Left("oops"))
-        recovered = failing.handle_error_with(lambda _: StateT.pure("recovered", Either))
+        recovered = failing.handle_error_with(
+            lambda _: StateT.pure("recovered", Either)
+        )
         assert recovered.run(0) == Right((0, "recovered"))
 
     def test_handle_error_with_skips_on_success(self):

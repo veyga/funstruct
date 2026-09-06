@@ -56,8 +56,6 @@ class State(Monad, Generic[_A]):
 
         return State(inner)
 
-
-
     @classmethod
     def do(cls, gen_fn) -> Callable[..., "State"]:
         """Do-notation via generators. Returns a callable.

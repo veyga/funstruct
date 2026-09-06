@@ -72,7 +72,9 @@ class TestMap:
 class TestHandleErrorWith:
     def test_handle_error_with_recovers_from_failure(self):
         failing = ReaderT(lambda ctx: Left("oops"))
-        recovered = failing.handle_error_with(lambda err: ReaderT(lambda ctx: Right("recovered")))
+        recovered = failing.handle_error_with(
+            lambda err: ReaderT(lambda ctx: Right("recovered"))
+        )
         assert recovered.run(0) == Right("recovered")
 
     def test_handle_error_with_skips_on_success(self):

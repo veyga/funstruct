@@ -65,10 +65,14 @@ class TestLeft:
         assert Left("err").product(Right(1)) == Left("err")
 
     def test_handle_error_with(self):
-        assert Left("err").handle_error_with(lambda e: Right("recovered")) == Right("recovered")
+        assert Left("err").handle_error_with(lambda e: Right("recovered")) == Right(
+            "recovered"
+        )
 
     def test_handle_error_with_to_left(self):
-        assert Left("err").handle_error_with(lambda e: Left("still bad")) == Left("still bad")
+        assert Left("err").handle_error_with(lambda e: Left("still bad")) == Left(
+            "still bad"
+        )
 
     def test_get_or_else(self):
         assert Left("err").get_or_else(99) == 99

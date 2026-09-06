@@ -1,7 +1,11 @@
 """Tests for ZipList — element-wise applicative."""
 
 from funstruct.applicative.ziplist import ZipList
-from tests.laws import assert_functor_laws, assert_applicative_laws, assert_type_contract
+from tests.laws import (
+    assert_functor_laws,
+    assert_applicative_laws,
+    assert_type_contract,
+)
 
 
 class TestZipListLaws:

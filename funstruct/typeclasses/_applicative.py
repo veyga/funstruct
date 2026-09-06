@@ -66,7 +66,9 @@ class Applicative(Functor[_A]):
         return self.__class__.pure(f).ap(self)
 
     @abstractmethod
-    def ap(self: Applicative[Callable[[_A], _B]], other: Applicative[_A]) -> Applicative[_B]:
+    def ap(
+        self: Applicative[Callable[[_A], _B]], other: Applicative[_A]
+    ) -> Applicative[_B]:
         """Apply a wrapped function to a wrapped value.
 
         Scala: ``def ap[A, B](f: F[A => B], a: F[A]): F[B]``
@@ -75,7 +77,9 @@ class Applicative(Functor[_A]):
         """
         ...
 
-    def map2(self, other: Applicative[_B], f: Callable[[_A, _B], object]) -> Applicative:
+    def map2(
+        self, other: Applicative[_B], f: Callable[[_A, _B], object]
+    ) -> Applicative:
         """Combine two values with a function. Derived from map + ap."""
         return self.map(lambda a: lambda b: f(a, b)).ap(other)
 

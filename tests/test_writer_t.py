@@ -125,7 +125,9 @@ class TestHandleErrorWith:
         assert w.run() == Right(("recovered", ["fixed: oops"]))
 
     def test_skips_on_success(self):
-        w = LogT(Right((42, ["ok"]))).handle_error_with(lambda e: LogT(Right(("nope", ["bad"]))))
+        w = LogT(Right((42, ["ok"]))).handle_error_with(
+            lambda e: LogT(Right(("nope", ["bad"])))
+        )
         assert w.run() == Right((42, ["ok"]))
 
 

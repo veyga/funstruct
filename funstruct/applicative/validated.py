@@ -124,7 +124,6 @@ class Valid(Validated, Generic[_A]):
                 return other
 
 
-
 @dataclass(frozen=True)
 class Invalid(Validated, Generic[_E]):
     """Failure case — accumulated errors.
@@ -160,7 +159,6 @@ class Invalid(Validated, Generic[_E]):
                 return Invalid(self.errors + errs)
             case _:
                 return self
-
 
 
 __all__ = [

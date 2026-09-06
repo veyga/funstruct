@@ -341,7 +341,9 @@ class AsyncResult(Monad, Generic[_A]):
 
         return cls(_inner())
 
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> Future[_B]:
+    def fold(
+        self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
+    ) -> Future[_B]:
         """Eliminate — apply on_err or on_ok. Returns a Future to await.
 
         Usage: ``value = await async_result.fold(handle_err, handle_ok)``
