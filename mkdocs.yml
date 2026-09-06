@@ -17,6 +17,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Playground: playground.html
   - Guides:
       - What is a Monad?: guides/monads.md
       - The Typeclass Pattern: guides/typeclass_pattern.md

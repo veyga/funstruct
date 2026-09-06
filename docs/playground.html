@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>funstruct playground</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1b26;
+            color: #c0caf5;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 { color: #bb9af7; }
+        h2 { color: #7aa2f7; margin-top: 2.5rem; }
+        p { color: #9aa5ce; line-height: 1.7; }
+        a { color: #7aa2f7; }
+        code { background: #24283b; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        .example { margin: 1.5rem 0; }
+        .example-label {
+            background: #24283b;
+            padding: 0.5rem 1rem;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.85rem;
+            color: #7aa2f7;
+            border-bottom: 1px solid #414868;
+        }
+        #status {
+            background: #24283b;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .footer {
+            margin-top: 3rem;
+            color: #414868;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .note {
+            background: #24283b;
+            border-left: 3px solid #bb9af7;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #9aa5ce;
+        }
+    </style>
+</head>
+<body>
+
+<h1>funstruct playground</h1>
+<p>Edit and run funstruct code in your browser. Powered by <a href="https://pyodide.org">Pyodide</a> (Python in WebAssembly).</p>
+<p>First run takes ~10 seconds to load Python + funstruct. After that it's instant.</p>
+
+<div id="status">⏳ Loading Python + funstruct from PyPI...</div>
+
+<h2>Option monad</h2>
+<div class="example">
+    <div class="example-label">map, bind, and short-circuiting</div>
+    <script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.option import Option, Some, Nothing
+
+# map transforms the value inside
+print("map:  ", Some(10).map(lambda x: x * 2))
+
+# bind chains operations that might fail
+print("bind: ", Some(10).bind(lambda x: Some(x + 1)))
+
+# Nothing short-circuits automatically
+print("short:", Nothing().map(lambda x: x * 2))
+
+# >> operator is an alias for bind
+print(">>:   ", Some(10) >> (lambda x: Some(x + 1)))
+    </script>
+</div>
+
+<h2>Result monad</h2>
+<div class="example">
+    <div class="example-label">error handling without exceptions</div>
+    <script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.result import Result, Ok, Err, Try
+
+print(Ok(42).map(lambda x: x * 2))
+print(Err(ValueError("oops")).map(lambda x: x * 2))
+
+# @Try wraps exception-throwing code
+@Try
+def safe_div(a, b):
+    return a / b
+
+print(safe_div(10, 2))
+print(safe_div(10, 0))
+
+# handle_error_with recovers from Err
+recovered = Err(ValueError("bad")).handle_error_with(
+    lambda e: Ok("default")
+)
+print("recovered:", recovered)
+    </script>
+</div>
+
+<h2>Either monad</h2>
+<div class="example">
+    <div class="example-label">typed errors (Left) and values (Right)</div>
+    <script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.either import Either, Right, Left
+
+# Right-biased: map/bind operate on Right
+print(Right(10).map(lambda x: x * 2))
+print(Left("error").map(lambda x: x * 2))
+
+# bind chains
+result = (
+    Right(10)
+    .bind(lambda x: Right(x + 1))
+    .bind(lambda x: Right(x * 2))
+)
+print("chained:", result)
+    </script>
+</div>
+
+<h2>frozendict</h2>
+<div class="example">
+    <div class="example-label">immutable dictionary with nested access</div>
+    <script type="py-editor" config='{"packages":["funstruct"]}'>
+import json
+from funstruct.collections.frozendict import frozendict
+
+config = frozendict({
+    "app": {"name": "myservice", "port": 8080},
+    "db": {"host": "localhost", "pool": 10},
+})
+
+# Nested access — inner dicts are auto-frozen
+print(config["app"]["name"])
+print(config["db"]["pool"])
+
+# map over values
+print(config.map(lambda v: str(v)))
+
+# JSON round-trip
+print(json.dumps(config.to_dict(), indent=2))
+    </script>
+</div>
+
+<h2>CList (cons list)</h2>
+<div class="example">
+    <div class="example-label">persistent singly-linked list</div>
+    <script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.collections.cons import CList
+
+xs = CList.new(1, 2, 3, 4, 5)
+print("list:  ", xs)
+print("map:   ", xs.map(lambda x: x * 10))
+print("filter:", xs.filter(lambda x: x > 2))
+print("sum:   ", xs.fold_left(0, lambda acc, x: acc + x))
+print("bind:  ", xs.bind(lambda x: CList.new(x, x)))
+    </script>
+</div>
+
+<script type="py" config='{"packages":["funstruct"]}'>
+from pyscript import document
+el = document.getElementById("status")
+el.innerHTML = "✅ Ready! Edit any code block and click ▶ to run."
+el.style.color = "#9ece6a"
+</script>
+
+<div class="footer">
+    funstruct — functional structures for Python<br>
+    <a href="https://github.com/veyga/funstruct" style="color:#565f89">github</a> ·
+    <a href="https://pypi.org/project/funstruct/" style="color:#565f89">pypi</a>
+</div>
+
+</body>
+</html>
