@@ -615,3 +615,35 @@ class TestBranchRemove:
         assert fd2.get("25") is None
         assert fd2.get("24") == 24
         assert len(fd2) == 49
+
+
+class TestFoldable:
+    def test_fold_left_sums_values(self):
+        fd = frozendict({"a": 1, "b": 2, "c": 3})
+        assert fd.fold_left(0, lambda acc, v: acc + v) == 6
+
+    def test_fold_right_sums_values(self):
+        fd = frozendict({"a": 1, "b": 2, "c": 3})
+        assert fd.fold_right(0, lambda v, acc: v + acc) == 6
+
+    def test_fold_left_collects_values(self):
+        fd = frozendict({"a": 1, "b": 2})
+        result = fd.fold_left([], lambda acc, v: acc + [v])
+        assert sorted(result) == [1, 2]
+
+    def test_fold_right_collects_values(self):
+        fd = frozendict({"a": 1, "b": 2})
+        result = fd.fold_right([], lambda v, acc: [v] + acc)
+        assert sorted(result) == [1, 2]
+
+    def test_fold_left_on_empty(self):
+        fd = frozendict()
+        assert fd.fold_left(42, lambda acc, v: acc + v) == 42
+
+    def test_fold_right_on_empty(self):
+        fd = frozendict()
+        assert fd.fold_right(42, lambda v, acc: v + acc) == 42
+
+    def test_fold_left_string_concat(self):
+        fd = frozendict({"x": "hello"})
+        assert fd.fold_left("", lambda acc, v: acc + v) == "hello"

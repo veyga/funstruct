@@ -1,4 +1,6 @@
-"""An immutable, hashable dictionary (HAMT-backed, NOT insertion-ordered).
+"""An immutable, hashable dictionary backed by a hash array mapped trie (HAMT).
+
+This impl does not honor insertion ordering.
 
 Examples:
     >>> from funstruct.collections.frozendict import frozendict
@@ -19,8 +21,13 @@ from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
+from funstruct.typeclasses._foldable import Foldable
+from funstruct.typeclasses._functor import Functor
+
 K = TypeVar("K")
 V = TypeVar("V")
+V2 = TypeVar("V2")
+B = TypeVar("B")
 
 # 5 bits per level → 32-way branching. This means:
 #   - Depth is log32(n): ~6 levels for 1 billion entries
@@ -214,8 +221,13 @@ def _make_branch(k1, v1, h1, k2, v2, h2, shift):
 _EMPTY = _Empty()
 
 
-class frozendict(Generic[K, V]):
-    """An immutable, persistent dictionary backed by a HAMT."""
+class frozendict(Functor[V], Foldable, Generic[K, V]):
+    """An immutable, persistent dictionary backed by a HAMT.
+
+    Functor over values (map transforms V, keys unchanged).
+    Foldable over values.
+    Semigroup via combine/+ (right-biased merge).
+    """
 
     def __init__(self, *args, **kwargs) -> None:
         match args:
@@ -326,7 +338,7 @@ class frozendict(Generic[K, V]):
         """Semigroup combine (merge). Right-biased on key conflicts."""
         return self.combine(other)
 
-    def map(fa: frozendict, f: Callable[[V], V]) -> frozendict:
+    def map(fa: frozendict[K, V], f: Callable[[V], V2]) -> frozendict[K, V2]:
         root = _EMPTY
         size = 0
         for k, v in fa.__root.items_iter():
@@ -337,6 +349,17 @@ class frozendict(Generic[K, V]):
         object.__setattr__(new_fd, "_frozendict__size", size)
         object.__setattr__(new_fd, "_frozendict__hash_cache", None)
         return new_fd
+
+    def fold_left(fa: frozendict[K, V], acc: B, f: Callable[[B, V], B]) -> B:
+        for _, v in fa.__root.items_iter():
+            acc = f(acc, v)
+        return acc
+
+    def fold_right(fa: frozendict[K, V], acc: B, f: Callable[[V, B], B]) -> B:
+        items = list(fa.__root.items_iter())
+        for _, v in reversed(items):
+            acc = f(v, acc)
+        return acc
 
     @property
     def raw(self) -> dict:
