@@ -1,39 +1,42 @@
 """DotNotation mixin — provides dot-syntax by delegating to summon.
 
-Data types that extend DotNotation get dot-syntax for all registered
-typeclass methods. This is the Python equivalent of Scala's extension
-methods / cats.syntax.
+Independent from TypeConstructor. Requires _type_constructor to be set
+(either manually or via TypeConstructor mixin).
 
     Some(10).map(lambda x: x + 1)  →  summon(Functor, Option).map(Some(10), f)
 
-Both styles work:
-    # Dot syntax (convenient)
-    Some(10).map(lambda x: x + 1)
+Typical usage — combine both mixins:
 
-    # Explicit (tagless final, generic programs)
-    F = summon(Monad, Option)
-    F.map(Some(10), lambda x: x + 1)
+    class Option(TypeConstructor, DotNotation, Generic[A]):
+        ...
 """
 
 from __future__ import annotations
 
 
 class DotNotation:
-    """Mixin that provides dot-syntax for typeclass operations.
+    """Provides dot-syntax for typeclass operations.
 
-    Subclasses must set _type_constructor to their base type.
+    Requires _type_constructor to be set on the class (via TypeConstructor
+    mixin or manually). Dispatches attribute access to registered typeclass
+    instances via summon.
     """
-
-    _type_constructor: type | None = None
 
     def __getattr__(self, name: str):
         if name.startswith("_"):
             raise AttributeError(name)
 
-        tc = self._resolve_type_constructor()
+        tc = getattr(type(self), "_type_constructor", None)
+        if tc is None:
+            for base in type(self).__mro__:
+                tc = getattr(base, "_type_constructor", None)
+                if tc is not None:
+                    break
+
         if tc is None:
             raise AttributeError(
-                f"'{type(self).__name__}' has no _type_constructor set"
+                f"'{type(self).__name__}' has no _type_constructor — "
+                f"add TypeConstructor mixin or set _type_constructor manually"
             )
 
         from funstruct.typeclasses.utils.registry import _registry
@@ -46,15 +49,6 @@ class DotNotation:
         raise AttributeError(
             f"'{type(self).__name__}' has no typeclass method '{name}'"
         )
-
-    def _resolve_type_constructor(self) -> type | None:
-        if type(self)._type_constructor is not None:
-            return type(self)._type_constructor
-        for base in type(self).__mro__:
-            tc = getattr(base, "_type_constructor", None)
-            if tc is not None:
-                return tc
-        return None
 
     def __rshift__(self, f):
         """>> operator delegates to bind via DotNotation."""

@@ -17,12 +17,13 @@ from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class State(DotNotation, Generic[_A]):
+class State(TypeConstructor, DotNotation, Generic[_A]):
     """Pure State monad: ``S -> (S, A)``."""
 
     def __init__(self, run: Callable[[Any], tuple[Any, _A]]) -> None:
@@ -101,7 +102,6 @@ class State(DotNotation, Generic[_A]):
         return f"State({self._run})"
 
 
-State._type_constructor = State
 
 import funstruct.monad.state.instances  # noqa: E402, F401
 

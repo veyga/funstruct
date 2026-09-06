@@ -42,6 +42,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 
 if TYPE_CHECKING:
     from funstruct.collections.cons import CList
@@ -51,7 +52,7 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Option(DotNotation, Generic[A]):
+class Option(TypeConstructor, DotNotation, Generic[A]):
     """Option[A]: either Some(value) or Nothing."""
 
     @classmethod
@@ -216,9 +217,6 @@ class Nothing(Option):
         return "Nothing()"
 
 
-Option._type_constructor = Option
-Some._type_constructor = Option
-Nothing._type_constructor = Option
 
 
 import funstruct.monad.option.instances  # noqa: E402, F401 — register typeclass instances

@@ -21,6 +21,7 @@ from typing import Generic, TypeVar
 
 from funstruct.collections.cons import Cons
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -28,7 +29,7 @@ _C = TypeVar("_C")
 _E = TypeVar("_E")
 
 
-class Validated(DotNotation):
+class Validated(TypeConstructor, DotNotation):
     """Base class for Valid/Invalid."""
 
     @property
@@ -106,9 +107,6 @@ class Invalid(Validated, Generic[_E]):
         return on_invalid(self.errors)
 
 
-Validated._type_constructor = Validated
-Valid._type_constructor = Validated
-Invalid._type_constructor = Validated
 
 import funstruct.applicative.validated.instances  # noqa: E402, F401
 

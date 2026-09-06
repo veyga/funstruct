@@ -10,13 +10,14 @@ from collections.abc import Awaitable, Callable, Generator
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 from funstruct.util._reawaitable import ReAwaitable
 
 A = TypeVar("A")
 B = TypeVar("B")
 
 
-class Future(DotNotation, Generic[A]):
+class Future(TypeConstructor, DotNotation, Generic[A]):
     """Lazy async computation that produces A when awaited."""
 
     def __init__(self, coro: Awaitable[A]) -> None:
@@ -70,7 +71,6 @@ class Future(DotNotation, Generic[A]):
         return f"Future({self._coro})"
 
 
-Future._type_constructor = Future
 
 import funstruct.monad.future.instances  # noqa: E402, F401
 

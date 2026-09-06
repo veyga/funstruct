@@ -17,6 +17,7 @@ from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Nil
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 from funstruct.typeclasses.monoid import Monoid
 
 _W = TypeVar("_W")
@@ -24,7 +25,7 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Writer(DotNotation, Generic[_W, _A]):
+class Writer(TypeConstructor, DotNotation, Generic[_W, _A]):
     """Writer: (A, W) with output combined via a class-level Monoid."""
 
     _monoid: Monoid
@@ -88,26 +89,34 @@ class Writer(DotNotation, Generic[_W, _A]):
 
 
 class ListWriter(Writer):
+    """Writer with list output. Each subclass is its own type constructor."""
     _monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+    _type_constructor = None  # reset — set below after class definition
 
 
 class CListWriter(Writer):
     _monoid = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())
+    _type_constructor = None
 
 
 class StrWriter(Writer):
     _monoid = Monoid(typ=str, combine=lambda a, b: a + b, empty="")
+    _type_constructor = None
 
 
 class IntWriter(Writer):
     _monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
+    _type_constructor = None
 
 
-Writer._type_constructor = Writer
+# Writer subclasses are each their own type constructor (different monoids).
+# Override the auto-detection which would set them all to Writer.
 ListWriter._type_constructor = ListWriter
 CListWriter._type_constructor = CListWriter
 StrWriter._type_constructor = StrWriter
 IntWriter._type_constructor = IntWriter
+
+
 
 import funstruct.monad.writer.instances  # noqa: E402, F401
 

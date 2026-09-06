@@ -4,6 +4,7 @@ from funstruct.typeclasses.alternative import Alternative
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.bifunctor import Bifunctor
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 from funstruct.typeclasses.foldable import Foldable
 from funstruct.typeclasses.functor import Functor
 from funstruct.typeclasses.monad import Monad
@@ -27,6 +28,7 @@ __all__ = [
     "Semigroup",
     "Traversable",
     "BaseTypeclass",
+    "TypeConstructor",
     "register",
     "summon",
     "tc_of",

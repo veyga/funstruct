@@ -40,13 +40,14 @@ from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Cons
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 
 A = TypeVar("A")
 B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Tree(DotNotation, Generic[A]):
+class Tree(TypeConstructor, DotNotation, Generic[A]):
     """Binary tree where every node holds a value."""
 
     @property
@@ -186,9 +187,6 @@ class Branch(Tree[A]):
         return f"Branch({repr(self.value)}, {repr(self.left)}, {repr(self.right)})"
 
 
-Tree._type_constructor = Tree
-Leaf._type_constructor = Tree
-Branch._type_constructor = Tree
 
 import funstruct.collections.tree.instances  # noqa: E402, F401
 

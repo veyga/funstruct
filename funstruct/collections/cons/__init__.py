@@ -19,12 +19,13 @@ from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 
 A = TypeVar("A")
 B = TypeVar("B")
 
 
-class CList(DotNotation, Generic[A]):
+class CList(TypeConstructor, DotNotation, Generic[A]):
     """A Lisp/ML/Scala style singly linked list (cons list).
 
     Performance characteristics:
@@ -378,9 +379,6 @@ class Cons(CList[A]):
         return Cons(self.head, self.tail.insert_at(i - 1, value))
 
 
-CList._type_constructor = CList
-Cons._type_constructor = CList
-Nil._type_constructor = CList
 
 import funstruct.collections.cons.instances  # noqa: E402, F401
 

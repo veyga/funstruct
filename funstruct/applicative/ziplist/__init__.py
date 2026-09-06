@@ -21,11 +21,12 @@ from collections.abc import Iterable, Iterator
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 
 _A = TypeVar("_A")
 
 
-class ZipList(DotNotation, Generic[_A]):
+class ZipList(TypeConstructor, DotNotation, Generic[_A]):
     """List with element-wise applicative."""
 
     def __init__(self, values: Iterable[_A]) -> None:
@@ -60,7 +61,6 @@ class ZipList(DotNotation, Generic[_A]):
         return f"ZipList({self._values})"
 
 
-ZipList._type_constructor = ZipList
 
 import funstruct.applicative.ziplist.instances  # noqa: E402, F401
 

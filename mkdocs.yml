@@ -23,6 +23,7 @@ nav:
       - Railway Oriented Programming: guides/railway_oriented_programming.md
       - Tagless Final Style: guides/tagless_final.md
       - Evaluation Strategy: guides/evaluation_strategy.md
+      - Anti-Patterns: guides/antipatterns.md
   - Typeclasses:
       - Overview: typeclass/index.md
       - Semigroup: typeclass/semigroup.md

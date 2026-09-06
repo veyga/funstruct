@@ -37,6 +37,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 from funstruct.util.created_at import CapturesCreationSiteMixin
 
 if TYPE_CHECKING:
@@ -48,7 +49,7 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Either(DotNotation, Generic[E, A]):
+class Either(TypeConstructor, DotNotation, Generic[E, A]):
     """Either[E, A]: Right(value) or Left(error).
 
     Right-biased monad. bind/map/>> operate on the Right value
@@ -217,9 +218,6 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
         return f"Left({repr(self.error)})"
 
 
-Either._type_constructor = Either
-Right._type_constructor = Either
-Left._type_constructor = Either
 
 
 import funstruct.monad.either.instances  # noqa: E402, F401

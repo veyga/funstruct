@@ -23,13 +23,14 @@ from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
 
 _Ctx = TypeVar("_Ctx")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Reader(DotNotation, Generic[_Ctx, _A]):
+class Reader(TypeConstructor, DotNotation, Generic[_Ctx, _A]):
     """Reader: Ctx -> A."""
 
     def __init__(self, run: Callable[[_Ctx], _A]) -> None:
@@ -80,7 +81,6 @@ class Reader(DotNotation, Generic[_Ctx, _A]):
         return f"Reader({self._run})"
 
 
-Reader._type_constructor = Reader
 
 import funstruct.monad.reader.instances  # noqa: E402, F401
 
