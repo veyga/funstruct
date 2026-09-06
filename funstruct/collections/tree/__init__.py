@@ -1,4 +1,4 @@
-"""Immutable binary tree — a Functor.
+"""Immutable binary tree.
 
 Tree[A] = Leaf(value) | Branch(value, left, right)
 
@@ -49,9 +49,6 @@ C = TypeVar("C")
 class Tree(DotNotation, Generic[A]):
     """Binary tree where every node holds a value."""
 
-    @abstractmethod
-    def map(self, f: Callable[[A], B]) -> Tree[B]: ...
-
     @property
     @abstractmethod
     def size(self) -> int: ...
@@ -61,16 +58,20 @@ class Tree(DotNotation, Generic[A]):
     def depth(self) -> int: ...
 
     @abstractmethod
-    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C: ...
+    def fold(
+        self,
+        on_leaf: Callable[[A], C],
+        on_branch: Callable[[A, C, C], C],
+    ) -> C: ...
 
     @abstractmethod
     def to_list(self) -> CList[A]: ...
 
     @abstractmethod
-    def fold_right(self, acc, f): ...
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B: ...
 
-    def fold_left(self, acc, f):
-        items = []
+    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
+        items: list = []
         self.fold_right(None, lambda a, _: items.append(a))
         for item in items:
             acc = f(acc, item)
@@ -95,9 +96,6 @@ class Leaf(Tree[A]):
 
     value: A
 
-    def map(self, f: Callable[[A], B]) -> Tree[B]:
-        return Leaf(f(self.value))
-
     @property
     def size(self) -> int:
         return 1
@@ -106,10 +104,14 @@ class Leaf(Tree[A]):
     def depth(self) -> int:
         return 0
 
-    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
+    def fold(
+        self,
+        on_leaf: Callable[[A], C],
+        on_branch: Callable[[A, C, C], C],
+    ) -> C:
         return on_leaf(self.value)
 
-    def fold_right(self, acc, f):
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
         return f(self.value, acc)
 
     def traverse(self, f: Callable, pure_fn: Callable) -> object:
@@ -137,9 +139,6 @@ class Branch(Tree[A]):
     left: Tree[A]
     right: Tree[A]
 
-    def map(self, f: Callable[[A], B]) -> Tree[B]:
-        return Branch(f(self.value), self.left.map(f), self.right.map(f))
-
     @property
     def size(self) -> int:
         return 1 + self.left.size + self.right.size
@@ -148,14 +147,18 @@ class Branch(Tree[A]):
     def depth(self) -> int:
         return 1 + max(self.left.depth, self.right.depth)
 
-    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
+    def fold(
+        self,
+        on_leaf: Callable[[A], C],
+        on_branch: Callable[[A, C, C], C],
+    ) -> C:
         return on_branch(
             self.value,
             self.left.fold(on_leaf, on_branch),
             self.right.fold(on_leaf, on_branch),
         )
 
-    def fold_right(self, acc, f):
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
         acc = self.right.fold_right(acc, f)
         acc = f(self.value, acc)
         acc = self.left.fold_right(acc, f)
@@ -186,5 +189,7 @@ class Branch(Tree[A]):
 Tree._type_constructor = Tree
 Leaf._type_constructor = Tree
 Branch._type_constructor = Tree
+
+import funstruct.collections.tree.instances  # noqa: E402, F401
 
 __all__ = ["Tree", "Leaf", "Branch"]

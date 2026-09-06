@@ -2,20 +2,24 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import TypeVar
+
 from funstruct.typeclasses._registry import register
 from funstruct.typeclasses._typeclasses import Monad
 from funstruct.monad.future import Future
 
+_A = TypeVar("_A")
+_B = TypeVar("_B")
 
-class FutureMonad(Monad):
 
-    def pure(self, value):
+class _FutureMonad(Monad):
+
+    def pure(self, value: _A) -> Future[_A]:
         return Future.pure(value)
 
-    def bind(self, fa, f):
+    def bind(self, fa: Future[_A], f: Callable[[_A], Future[_B]]) -> Future[_B]:
         return fa.bind(f)
 
 
-register(Monad, Future, FutureMonad())
-
-__all__ = ["FutureMonad"]
+register(Monad, Future, _FutureMonad())

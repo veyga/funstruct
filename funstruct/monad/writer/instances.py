@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import TypeVar
+
 from funstruct.typeclasses._registry import register
 from funstruct.typeclasses._typeclasses import Monad
 from funstruct.monad.writer import (
@@ -12,15 +15,23 @@ from funstruct.monad.writer import (
     Writer,
 )
 
+_A = TypeVar("_A")
+_B = TypeVar("_B")
+_W = TypeVar("_W")
 
-class WriterMonad(Monad):
-    def __init__(self, writer_cls):
+
+class _WriterMonad(Monad):
+    def __init__(self, writer_cls: type[Writer]) -> None:
         self._cls = writer_cls
 
-    def pure(self, value):
+    def pure(self, value: _A) -> Writer[_W, _A]:
         return self._cls.pure(value)
 
-    def bind(self, fa, f):
+    def bind(
+        self,
+        fa: Writer[_W, _A],
+        f: Callable[[_A], Writer[_W, _B]],
+    ) -> Writer[_W, _B]:
         result = f(fa.value)
         return self._cls(
             result.value,
@@ -28,10 +39,8 @@ class WriterMonad(Monad):
         )
 
 
-register(Monad, Writer, WriterMonad(Writer))
-register(Monad, ListWriter, WriterMonad(ListWriter))
-register(Monad, CListWriter, WriterMonad(CListWriter))
-register(Monad, StrWriter, WriterMonad(StrWriter))
-register(Monad, IntWriter, WriterMonad(IntWriter))
-
-__all__ = ["WriterMonad"]
+register(Monad, Writer, _WriterMonad(Writer))
+register(Monad, ListWriter, _WriterMonad(ListWriter))
+register(Monad, CListWriter, _WriterMonad(CListWriter))
+register(Monad, StrWriter, _WriterMonad(StrWriter))
+register(Monad, IntWriter, _WriterMonad(IntWriter))

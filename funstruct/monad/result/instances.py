@@ -2,17 +2,23 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import TypeVar
+
 from funstruct.typeclasses._registry import register
 from funstruct.typeclasses._typeclasses import Bifunctor, MonadError
 from funstruct.monad.result import AsyncResult, Err, Ok, Result
 
+_A = TypeVar("_A")
+_B = TypeVar("_B")
 
-class ResultMonadError(MonadError):
 
-    def pure(self, value):
+class _ResultMonadError(MonadError):
+
+    def pure(self, value: _A) -> Result[_A]:
         return Ok(value)
 
-    def bind(self, fa, f):
+    def bind(self, fa: Result[_A], f: Callable[[_A], Result[_B]]) -> Result[_B]:
         match fa:
             case Ok(value):
                 return f(value)
@@ -21,10 +27,12 @@ class ResultMonadError(MonadError):
             case _:
                 raise TypeError(f"Expected Result, got {type(fa)}")
 
-    def raise_error(self, error):
+    def raise_error(self, error: Exception) -> Result:
         return Err(error)
 
-    def handle_error_with(self, fa, f):
+    def handle_error_with(
+        self, fa: Result[_A], f: Callable[[Exception], Result[_A]]
+    ) -> Result[_A]:
         match fa:
             case Err(error):
                 return f(error)
@@ -32,9 +40,14 @@ class ResultMonadError(MonadError):
                 return fa
 
 
-class ResultBifunctor(Bifunctor):
+class _ResultBifunctor(Bifunctor):
 
-    def bimap(self, fa, f, g):
+    def bimap(
+        self,
+        fa: Result[_A],
+        f: Callable[[Exception], Exception],
+        g: Callable[[_A], _B],
+    ) -> Result[_B]:
         match fa:
             case Ok(value):
                 return Ok(g(value))
@@ -42,24 +55,25 @@ class ResultBifunctor(Bifunctor):
                 return Err(f(error))
 
 
-class AsyncResultMonadError(MonadError):
+class _AsyncResultMonadError(MonadError):
 
-    def pure(self, value):
+    def pure(self, value: _A) -> AsyncResult[_A]:
         return AsyncResult.pure(value)
 
-    def bind(self, fa, f):
+    def bind(
+        self, fa: AsyncResult[_A], f: Callable[[_A], AsyncResult[_B]]
+    ) -> AsyncResult[_B]:
         return fa.bind(f)
 
-    def raise_error(self, error):
+    def raise_error(self, error: Exception) -> AsyncResult:
         return AsyncResult.raise_error(error)
 
-    def handle_error_with(self, fa, f):
+    def handle_error_with(
+        self, fa: AsyncResult[_A], f: Callable[[Exception], AsyncResult[_A]]
+    ) -> AsyncResult[_A]:
         return fa.handle_error_with(f)
 
 
-register(MonadError, Result, ResultMonadError())
-register(Bifunctor, Result, ResultBifunctor())
-register(MonadError, AsyncResult, AsyncResultMonadError())
-
-
-__all__ = ["ResultMonadError", "ResultBifunctor", "AsyncResultMonadError"]
+register(MonadError, Result, _ResultMonadError())
+register(Bifunctor, Result, _ResultBifunctor())
+register(MonadError, AsyncResult, _AsyncResultMonadError())

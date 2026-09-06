@@ -5,12 +5,8 @@ Examples:
     >>> ZipList([1, 2, 3]).map(lambda x: x * 10)
     ZipList([10, 20, 30])
 
-    >>> ZipList.pure(lambda x: x + 1).ap(ZipList.pure(8))
-    ZipList([9])
-
     >>> ZipList([lambda x: x + 1]).ap(ZipList([9]))
     ZipList([10])
-
 
     >>> ZipList([lambda x: x + 1, lambda x: x * 2]).ap(ZipList([10, 20]))
     ZipList([11, 40])
@@ -21,13 +17,12 @@ Examples:
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Iterable, Iterator
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses._dot_notation import DotNotation
 
 _A = TypeVar("_A")
-_B = TypeVar("_B")
 
 
 class ZipList(DotNotation, Generic[_A]):
@@ -39,24 +34,6 @@ class ZipList(DotNotation, Generic[_A]):
     @classmethod
     def pure(cls, value: _A) -> ZipList[_A]:
         return cls([value])
-
-    def ap(self, fa: ZipList[_A]) -> ZipList[_B]:
-        """>>> ZipList([lambda x: x + 1, lambda x: x * 2]).ap(ZipList([10, 20]))
-        ZipList([11, 40])
-        """
-        return ZipList(f(x) for f, x in zip(self._values, fa._values))
-
-    def map(self, f: Callable[[_A], _B]) -> ZipList[_B]:
-        """>>> ZipList([1, 2, 3]).map(lambda x: x * 10)
-        ZipList([10, 20, 30])
-        """
-        return ZipList(f(x) for x in self._values)
-
-    def map2(self, other: ZipList, f: Callable) -> ZipList:
-        return ZipList(f(a, b) for a, b in zip(self._values, other._values))
-
-    def product(self, other: ZipList) -> ZipList:
-        return self.map2(other, lambda a, b: (a, b))
 
     def __mul__(self, other: ZipList) -> ZipList:
         return self.product(other)
@@ -84,6 +61,8 @@ class ZipList(DotNotation, Generic[_A]):
 
 
 ZipList._type_constructor = ZipList
+
+import funstruct.applicative.ziplist.instances  # noqa: E402, F401
 
 __all__ = [
     "ZipList",

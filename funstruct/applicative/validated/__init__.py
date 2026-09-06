@@ -31,24 +31,22 @@ _E = TypeVar("_E")
 class Validated(DotNotation):
     """Base class for Valid/Invalid."""
 
-    @abstractmethod
-    def ap(self, other) -> Validated: ...
-
-    @abstractmethod
-    def product(self, other) -> Validated: ...
-
-    def __mul__(self, other) -> Validated:
-        return self.product(other)
-
     @property
     @abstractmethod
     def is_valid(self) -> bool: ...
 
     @abstractmethod
-    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C: ...
+    def fold(
+        self,
+        on_invalid: Callable[[_E], _C],
+        on_valid: Callable[[_A], _C],
+    ) -> _C: ...
+
+    def __mul__(self, other: Validated) -> Validated:
+        return self.product(other)
 
     @classmethod
-    def pure(cls, value) -> Validated:
+    def pure(cls, value: _A) -> Validated:
         return Valid(value)
 
     @staticmethod
@@ -79,33 +77,12 @@ class Valid(Validated, Generic[_A]):
     def __bool__(self) -> bool:
         return True
 
-    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+    def fold(
+        self,
+        on_invalid: Callable[[_E], _C],
+        on_valid: Callable[[_A], _C],
+    ) -> _C:
         return on_valid(self.value)
-
-    def map(self, f: Callable[[_A], _B]) -> Valid[_B]:
-        return Valid(f(self.value))
-
-    def bimap(self, on_invalid: Callable, on_valid: Callable) -> Validated:
-        return Valid(on_valid(self.value))
-
-    def left_map(self, f: Callable) -> Validated:
-        return self
-
-    def ap(self, other) -> Validated:
-        match other:
-            case Valid(val):
-                from typing import cast
-                fn = cast(Callable, self.value)
-                return Valid(fn(val))
-            case _:
-                return other
-
-    def product(self, other) -> Validated:
-        match other:
-            case Valid(val):
-                return Valid((self.value, val))
-            case _:
-                return other
 
 
 @dataclass(frozen=True)
@@ -121,36 +98,19 @@ class Invalid(Validated, Generic[_E]):
     def __bool__(self) -> bool:
         return False
 
-    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+    def fold(
+        self,
+        on_invalid: Callable[[_E], _C],
+        on_valid: Callable[[_A], _C],
+    ) -> _C:
         return on_invalid(self.errors)
-
-    def bimap(self, on_invalid: Callable, on_valid: Callable) -> Validated:
-        return Invalid(on_invalid(self.errors))
-
-    def left_map(self, f: Callable) -> Validated:
-        return Invalid(f(self.errors))
-
-    def map(self, f: Callable) -> Validated:
-        return self
-
-    def ap(self, other) -> Validated:
-        match other:
-            case Invalid(errs):
-                return Invalid(self.errors + errs)
-            case _:
-                return self
-
-    def product(self, other) -> Validated:
-        match other:
-            case Invalid(errs):
-                return Invalid(self.errors + errs)
-            case _:
-                return self
 
 
 Validated._type_constructor = Validated
 Valid._type_constructor = Validated
 Invalid._type_constructor = Validated
+
+import funstruct.applicative.validated.instances  # noqa: E402, F401
 
 __all__ = [
     "Validated",

@@ -1,22 +1,25 @@
-"""Typeclass instances for Either.
-
-EitherMonadError: pure + bind + raise_error + handle_error_with.
-map, ap, map2, product derived from the Monad hierarchy.
-"""
+"""Typeclass instances for Either."""
 
 from __future__ import annotations
+
+from collections.abc import Callable
+from typing import TypeVar
 
 from funstruct.typeclasses._registry import register
 from funstruct.typeclasses._typeclasses import Bifunctor, MonadError
 from funstruct.monad.either import Either, Left, Right
 
+_A = TypeVar("_A")
+_B = TypeVar("_B")
+_E = TypeVar("_E")
 
-class EitherMonadError(MonadError):
 
-    def pure(self, value):
+class _EitherMonadError(MonadError):
+
+    def pure(self, value: _A) -> Either[_E, _A]:
         return Right(value)
 
-    def bind(self, fa: Either, f):
+    def bind(self, fa: Either[_E, _A], f: Callable[[_A], Either[_E, _B]]) -> Either[_E, _B]:
         match fa:
             case Right(value):
                 return f(value)
@@ -25,10 +28,12 @@ class EitherMonadError(MonadError):
             case _:
                 raise TypeError(f"Expected Either, got {type(fa)}")
 
-    def raise_error(self, error):
+    def raise_error(self, error: _E) -> Either[_E, _A]:
         return Left(error)
 
-    def handle_error_with(self, fa: Either, f):
+    def handle_error_with(
+        self, fa: Either[_E, _A], f: Callable[[_E], Either[_E, _A]]
+    ) -> Either[_E, _A]:
         match fa:
             case Left(error):
                 return f(error)
@@ -36,9 +41,14 @@ class EitherMonadError(MonadError):
                 return fa
 
 
-class EitherBifunctor(Bifunctor):
+class _EitherBifunctor(Bifunctor):
 
-    def bimap(self, fa: Either, f, g):
+    def bimap(
+        self,
+        fa: Either[_E, _A],
+        f: Callable[[_E], _B],
+        g: Callable[[_A], _B],
+    ) -> Either:
         match fa:
             case Right(value):
                 return Right(g(value))
@@ -46,8 +56,5 @@ class EitherBifunctor(Bifunctor):
                 return Left(f(error))
 
 
-register(MonadError, Either, EitherMonadError())
-register(Bifunctor, Either, EitherBifunctor())
-
-
-__all__ = ["EitherMonadError", "EitherBifunctor"]
+register(MonadError, Either, _EitherMonadError())
+register(Bifunctor, Either, _EitherBifunctor())

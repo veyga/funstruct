@@ -43,41 +43,27 @@ V = TypeVar("V")
 V2 = TypeVar("V2")
 B = TypeVar("B")
 
-# 5 bits per level → 32-way branching. This means:
-#   - Depth is log32(n): ~6 levels for 1 billion entries
-#   - Each lookup/insert traverses at most 6-7 nodes (effectively O(1))
-#   - 32 is the empirical sweet spot (Bagwell/Hickey): high enough branching
-#     to keep the tree shallow, small enough that path-copying on insert
-#     doesn't allocate too much per node. Fits well in CPU cache lines.
 _BITS = 5
-_WIDTH = 1 << _BITS  # 32
+_WIDTH = 1 << _BITS
 _MASK = _WIDTH - 1
 
 
 @dataclass(frozen=True, slots=True)
 class _Empty:
-    """Sentinel for empty HAMT node."""
-
     def get(self, key, hash_val, shift):
         return None
-
     def put(self, key, value, hash_val, shift):
         return _Leaf(key, value)
-
     def remove(self, key, hash_val, shift):
         return self
-
     def items_iter(self):
         return iter(())
-
     def __len__(self):
         return 0
 
 
 @dataclass(frozen=True, slots=True)
 class _Leaf:
-    """Single key-value entry."""
-
     key: object
     value: object
 
@@ -108,8 +94,6 @@ class _Leaf:
 
 @dataclass(frozen=True, slots=True)
 class _Collision:
-    """Multiple entries with the same hash."""
-
     hash_val: int
     entries: tuple
 
@@ -123,10 +107,7 @@ class _Collision:
         if hash_val != self.hash_val:
             node = _Branch(_EMPTY, 0, ())
             node = node.put(
-                self.entries[0][0],
-                self.entries[0][1],
-                self.hash_val,
-                shift,
+                self.entries[0][0], self.entries[0][1], self.hash_val, shift,
             )
             for k, v in self.entries[1:]:
                 node = node.put(k, v, self.hash_val, shift)
@@ -155,8 +136,6 @@ class _Collision:
 
 @dataclass(frozen=True, slots=True)
 class _Branch:
-    """Bitmap-indexed 32-way branch node."""
-
     _empty: _Empty
     _bitmap: int
     _children: tuple
@@ -173,7 +152,6 @@ class _Branch:
         idx = (hash_val >> shift) & _MASK
         bit = 1 << idx
         pos = bin(self._bitmap & (bit - 1)).count("1")
-
         if self._bitmap & bit:
             child = self._children[pos]
             new_child = child.put(key, value, hash_val, shift + _BITS)
@@ -216,7 +194,6 @@ class _Branch:
 
 
 def _make_branch(k1, v1, h1, k2, v2, h2, shift):
-    """Create a branch that distinguishes two keys at the given shift."""
     idx1 = (h1 >> shift) & _MASK
     idx2 = (h2 >> shift) & _MASK
     if idx1 == idx2:
@@ -236,12 +213,7 @@ _EMPTY = _Empty()
 
 
 class frozendict(DotNotation, Generic[K, V]):
-    """An immutable, persistent dictionary backed by a HAMT.
-
-    Functor over values (map transforms V, keys unchanged).
-    Foldable over values.
-    Semigroup via combine/+ (right-biased merge).
-    """
+    """An immutable, persistent dictionary backed by a HAMT."""
 
     def __init__(self, *args, shallow: bool = False, **kwargs) -> None:
         def _freeze(v):
@@ -286,8 +258,8 @@ class frozendict(DotNotation, Generic[K, V]):
             raise KeyError(key)
         return result
 
-    def get(fa: frozendict, key: K) -> V | None:
-        return fa.__root.get(key, hash(key), 0)
+    def get(self, key: K) -> V | None:
+        return self.__root.get(key, hash(key), 0)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -338,39 +310,38 @@ class frozendict(DotNotation, Generic[K, V]):
             object.__setattr__(self, "_frozendict__hash_cache", h)
         return self.__hash_cache
 
-    def put(fa: frozendict, k: K, v: V) -> frozendict:
-        new_root = fa.__root.put(k, v, hash(k), 0)
+    def put(self, k: K, v: V) -> frozendict[K, V]:
+        new_root = self.__root.put(k, v, hash(k), 0)
         new_fd = object.__new__(frozendict)
-        new_size = fa.__size if k in fa else fa.__size + 1
+        new_size = self.__size if k in self else self.__size + 1
         object.__setattr__(new_fd, "_frozendict__root", new_root)
         object.__setattr__(new_fd, "_frozendict__size", new_size)
         object.__setattr__(new_fd, "_frozendict__hash_cache", None)
         return new_fd
 
-    def remove(fa: frozendict, k: K) -> frozendict:
-        if k not in fa:
-            return fa
-        new_root = fa.__root.remove(k, hash(k), 0)
+    def remove(self, k: K) -> frozendict[K, V]:
+        if k not in self:
+            return self
+        new_root = self.__root.remove(k, hash(k), 0)
         new_fd = object.__new__(frozendict)
         object.__setattr__(new_fd, "_frozendict__root", new_root)
-        object.__setattr__(new_fd, "_frozendict__size", fa.__size - 1)
+        object.__setattr__(new_fd, "_frozendict__size", self.__size - 1)
         object.__setattr__(new_fd, "_frozendict__hash_cache", None)
         return new_fd
 
-    def combine(fa: frozendict, other: frozendict) -> frozendict:
-        result = fa
+    def combine(self, other: frozendict[K, V]) -> frozendict[K, V]:
+        result = self
         for k, v in other.__root.items_iter():
             result = result.put(k, v)
         return result
 
-    def __add__(self, other: frozendict) -> frozendict:
-        """Semigroup combine (merge). Right-biased on key conflicts."""
+    def __add__(self, other: frozendict[K, V]) -> frozendict[K, V]:
         return self.combine(other)
 
-    def map(fa: frozendict[K, V], f: Callable[[V], V2]) -> frozendict[K, V2]:
+    def _map_internal(self, f: Callable[[V], V2]) -> frozendict[K, V2]:
         root = _EMPTY
         size = 0
-        for k, v in fa.__root.items_iter():
+        for k, v in self.__root.items_iter():
             root = root.put(k, f(v), hash(k), 0)
             size += 1
         new_fd = object.__new__(frozendict)
@@ -379,13 +350,13 @@ class frozendict(DotNotation, Generic[K, V]):
         object.__setattr__(new_fd, "_frozendict__hash_cache", None)
         return new_fd
 
-    def fold_left(fa: frozendict[K, V], acc: B, f: Callable[[B, V], B]) -> B:
-        for _, v in fa.__root.items_iter():
+    def _fold_left_internal(self, acc: B, f: Callable[[B, V], B]) -> B:
+        for _, v in self.__root.items_iter():
             acc = f(acc, v)
         return acc
 
-    def fold_right(fa: frozendict[K, V], acc: B, f: Callable[[V, B], B]) -> B:
-        items = list(fa.__root.items_iter())
+    def _fold_right_internal(self, acc: B, f: Callable[[V, B], B]) -> B:
+        items = list(self.__root.items_iter())
         for _, v in reversed(items):
             acc = f(v, acc)
         return acc
@@ -409,6 +380,10 @@ class frozendict(DotNotation, Generic[K, V]):
     def __bool__(self) -> bool:
         return self.__size > 0
 
+
+frozendict._type_constructor = frozendict
+
+import funstruct.collections.frozendict.instances  # noqa: E402, F401
 
 __all__ = [
     "frozendict",
