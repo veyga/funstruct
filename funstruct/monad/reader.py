@@ -42,16 +42,14 @@ class Reader(Monad, Generic[_Ctx, _A]):
     def __init__(self, run: Callable[[_Ctx], _A]) -> None:
         self._run = run
 
-    def run(self, ctx):
-        """Execute with the given context."""
-        return self._run(ctx)
+    def run(fa: Reader, ctx):
+        return fa._run(ctx)
 
     def __call__(self, ctx):
         return self.run(ctx)
 
-    def bind(self, f: Callable[[_A], Reader[_Ctx, _B]]) -> Reader[_Ctx, _B]:
-        """Chain: f receives the value, returns a new Reader."""
-        return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
+    def bind(fa: Reader, f: Callable[[_A], Reader[_Ctx, _B]]) -> Reader[_Ctx, _B]:
+        return Reader(lambda ctx: f(fa._run(ctx)).run(ctx))
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., Reader]:

@@ -45,27 +45,20 @@ class ZipList(Applicative, Generic[_A]):
         """Lift a value into a single-element ZipList."""
         return cls([value])
 
-    def ap(self: ZipList[Callable[[_A], _B]], other: ZipList[_A]) -> ZipList[_B]:
-        """Apply functions to values element-wise (zip).
-
-        Stops at the shorter list.
-
-        >>> ZipList([lambda x: x + 1, lambda x: x * 2]).ap(ZipList([10, 20]))
+    def ap(ff: ZipList, fa: ZipList[_A]) -> ZipList[_B]:
+        """>>> ZipList([lambda x: x + 1, lambda x: x * 2]).ap(ZipList([10, 20]))
         ZipList([11, 40])
         """
-        return ZipList(f(x) for f, x in zip(self._values, other._values))
+        return ZipList(f(x) for f, x in zip(ff._values, fa._values))
 
-    def map(self, f: Callable[[_A], _B]) -> ZipList[_B]:
-        """Apply f to each element.
-
-        >>> ZipList([1, 2, 3]).map(lambda x: x * 10)
+    def map(fa: ZipList, f: Callable[[_A], _B]) -> ZipList[_B]:
+        """>>> ZipList([1, 2, 3]).map(lambda x: x * 10)
         ZipList([10, 20, 30])
         """
-        return ZipList(f(x) for x in self._values)
+        return ZipList(f(x) for x in fa._values)
 
-    def to_list(self) -> list[_A]:
-        """Convert to a Python list."""
-        return list(self._values)
+    def to_list(fa: ZipList) -> list[_A]:
+        return list(fa._values)
 
     def __iter__(self) -> Iterator[_A]:
         return iter(self._values)

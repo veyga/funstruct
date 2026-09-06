@@ -74,35 +74,35 @@ class Monoid(Semigroup):
 
 # Type-level hierarchy (inherited by data types)
 class Functor(ABC, Generic[A]):
-    def map(self, f: Callable[[A], B]) -> Functor[B]: ...          # abstract
+    def map(fa, f: Callable[[A], B]) -> Functor[B]: ...            # abstract
 
 class Applicative(Functor[A]):
     def pure(cls, value: A) -> Applicative[A]: ...                  # abstract
-    def ap(self: Applicative[Callable[[A], B]],
-           other: Applicative[A]) -> Applicative[B]: ...            # abstract
-    def map(self, f) -> Applicative[B]: ...                         # derived: pure(f).ap(self)
-    def product(self, other: Applicative[B]) -> Applicative[tuple[A, B]]: ...
+    def ap(ff: Applicative[Callable[[A], B]],
+           fa: Applicative[A]) -> Applicative[B]: ...               # abstract
+    def map(fa, f) -> Applicative[B]: ...                           # derived: pure(f).ap(fa)
+    def product(fa, fb: Applicative[B]) -> Applicative[tuple[A, B]]: ...
     __mul__ = product                                               # * operator
 
 class Monad(Applicative[A]):
-    def bind(self, f: Callable[[A], Monad[B]]) -> Monad[B]: ...    # abstract
+    def bind(fa, f: Callable[[A], Monad[B]]) -> Monad[B]: ...      # abstract
     def do(cls, gen_fn: Callable) -> Callable[..., Monad[A]]: ...  # abstract
-    def map(self, f) -> Monad[B]: ...                               # @final: bind + pure
-    def ap(self, other) -> Monad[B]: ...                            # @final: bind + map
-    def then(self, other: Monad[B]) -> Monad[B]: ...                # derived: bind
-    def map2(self, other, f) -> Monad: ...                          # derived: bind + map
+    def map(fa, f) -> Monad[B]: ...                                 # @final: bind + pure
+    def ap(ff, fa) -> Monad[B]: ...                                 # @final: bind + map
+    def then(fa, fb: Monad[B]) -> Monad[B]: ...                     # derived: bind
+    def map2(fa, fb, f) -> Monad: ...                               # derived: bind + map
     __rshift__ = bind                                               # >> operator
 
 # Separate hierarchy (experimental) — not a typeclass in Haskell/Scala
 class MonadTransformer(ABC, Generic[F, A]):
-    def bind(self, f) -> MonadTransformer: ...                      # abstract
-    def map(self, f) -> MonadTransformer: ...                       # abstract
+    def bind(fa, f) -> MonadTransformer: ...                        # abstract
+    def map(fa, f) -> MonadTransformer: ...                         # abstract
     def pure(cls, value, monad: type) -> MonadTransformer: ...      # abstract
     def lift_f(cls, inner: F) -> MonadTransformer: ...              # abstract
     def do(cls, gen_fn) -> Callable[..., MonadTransformer]: ...     # abstract
-    def ap(self, other) -> MonadTransformer: ...                    # derived: bind + map
-    def then(self, other) -> MonadTransformer: ...                  # derived: bind
-    def product(self, other) -> MonadTransformer: ...               # derived: map + ap
+    def ap(ff, fa) -> MonadTransformer: ...                         # derived: bind + map
+    def then(fa, fb) -> MonadTransformer: ...                       # derived: bind
+    def product(fa, fb) -> MonadTransformer: ...                    # derived: map + ap
     __mul__ = product                                               # * operator
     __rshift__ = bind                                               # >> operator
 ```

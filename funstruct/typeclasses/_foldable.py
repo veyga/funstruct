@@ -34,6 +34,9 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
+# See _functor.py for the fa/ff/fb naming convention.
+
+
 class Foldable(ABC):
     """Container whose elements can be combined into a single value.
 
@@ -43,36 +46,27 @@ class Foldable(ABC):
     """
 
     @abstractmethod
-    def fold_right(self, acc: _B, f: Callable[[_A, _B], _B]) -> _B:
-        """Fold from right to left.
-
-        Args:
-            acc: Initial accumulator value.
-            f: Function taking (element, accumulator) → new accumulator.
-        """
+    def fold_right(fa: Foldable, acc: _B, f: Callable[[_A, _B], _B]) -> _B:
+        """Fold from right to left."""
         ...
 
-    def fold_left(self, acc: _B, f: Callable[[_B, _A], _B]) -> _B:
-        """Fold from left to right.
-
-        Default implementation via fold_right. Override for efficiency
-        (e.g., tail-recursive version on CList).
-        """
-        return self.fold_right(
+    def fold_left(fa: Foldable, acc: _B, f: Callable[[_B, _A], _B]) -> _B:
+        """Fold from left to right. Default via fold_right."""
+        return fa.fold_right(
             lambda b: b, lambda a, g: lambda b: g(f(b, a))
         )(acc)
 
-    def to_list(self) -> list:
+    def to_list(fa: Foldable) -> list:
         """Collect all elements into a Python list."""
-        return list(self) if hasattr(self, "__iter__") else self.fold_right([], lambda a, acc: [a] + acc)
+        return list(fa) if hasattr(fa, "__iter__") else fa.fold_right([], lambda a, acc: [a] + acc)
 
-    def length(self) -> int:
+    def length(fa: Foldable) -> int:
         """Count the number of elements."""
-        return self.fold_right(0, lambda _, acc: acc + 1)
+        return fa.fold_right(0, lambda _, acc: acc + 1)
 
-    def is_empty(self) -> bool:
+    def is_empty(fa: Foldable) -> bool:
         """Check if the container has no elements."""
-        return self.length() == 0
+        return fa.length() == 0
 
 
 __all__ = [

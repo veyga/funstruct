@@ -32,20 +32,10 @@ class Validated(Applicative):
     """Base class for Valid/Invalid — provides constructors and supports + operator."""
 
     @abstractmethod
-    def ap(self, other) -> Validated:
-        """Apply: self contains a function, apply it to other's value.
-
-        Accumulates errors from both sides on Invalid.
-        """
-        ...
+    def ap(ff: Validated, other) -> Validated: ...
 
     @abstractmethod
-    def product(self, other) -> Validated:
-        """Combine two Validated values into a tuple.
-
-        Accumulates errors from both sides on Invalid.
-        """
-        ...
+    def product(fa: Validated, other) -> Validated: ...
 
     def __mul__(self, other) -> Validated:
         return self.product(other)
@@ -55,9 +45,7 @@ class Validated(Applicative):
     def is_valid(self) -> bool: ...
 
     @abstractmethod
-    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
-        """Eliminate the Validated — apply on_invalid or on_valid."""
-        ...
+    def fold(fa: Validated, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C: ...
 
     @classmethod
     def pure(cls, value) -> Validated:
@@ -99,30 +87,26 @@ class Valid(Validated, Generic[_A]):
     def __bool__(self) -> bool:
         return True
 
-    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
-        """Eliminate — applies on_valid to the value."""
-        return on_valid(self.value)
+    def fold(fa: Valid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+        return on_valid(fa.value)
 
-    def map(self, f: Callable[[_A], _B]) -> Valid[_B]:
-        """Transform the success value."""
-        return Valid(f(self.value))
+    def map(fa: Valid, f: Callable[[_A], _B]) -> Valid[_B]:
+        return Valid(f(fa.value))
 
-    def ap(self, other) -> Validated:
-        """Apply: self contains a function, apply it to other's value."""
+    def ap(ff: Valid, other) -> Validated:
         match other:
             case Valid(val):
                 from typing import cast
                 from collections.abc import Callable
-                fn = cast(Callable, self.value)
+                fn = cast(Callable, ff.value)
                 return Valid(fn(val))
             case _:
                 return other
 
-    def product(self, other) -> Validated:
-        """Combine two Valid values into a tuple."""
+    def product(fa: Valid, other) -> Validated:
         match other:
             case Valid(val):
-                return Valid((self.value, val))
+                return Valid((fa.value, val))
             case _:
                 return other
 
@@ -143,25 +127,22 @@ class Invalid(Validated, Generic[_E]):
     def __bool__(self) -> bool:
         return False
 
-    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
-        """Eliminate — applies on_invalid to the errors."""
-        return on_invalid(self.errors)
+    def fold(fa: Invalid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+        return on_invalid(fa.errors)
 
-    def ap(self, other) -> Validated:
-        """Apply — accumulates errors from both sides."""
+    def ap(ff: Invalid, other) -> Validated:
         match other:
             case Invalid(errs):
-                return Invalid(self.errors + errs)
+                return Invalid(ff.errors + errs)
             case _:
-                return self
+                return ff
 
-    def product(self, other) -> Validated:
-        """Combine — accumulates errors from both sides."""
+    def product(fa: Invalid, other) -> Validated:
         match other:
             case Invalid(errs):
-                return Invalid(self.errors + errs)
+                return Invalid(fa.errors + errs)
             case _:
-                return self
+                return fa
 
 
 __all__ = [

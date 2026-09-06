@@ -50,6 +50,9 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
+# See _functor.py for the fa/ff/fb naming convention.
+
+
 class Traversable(Foldable, Functor[_A]):
     """Container that can be traversed with an effectful function.
 
@@ -58,27 +61,21 @@ class Traversable(Foldable, Functor[_A]):
     """
 
     @abstractmethod
-    def traverse(self, f: Callable[[_A], object], pure_fn: Callable) -> object:
+    def traverse(fa: Traversable, f: Callable[[_A], object], pure_fn: Callable) -> object:
         """Map each element through f, then collect the results.
 
-        Args:
-            f: A → F[B] — effectful function applied to each element.
-            pure_fn: the target Applicative's ``pure`` (e.g., ``Either.pure``).
+        Scala: ``def traverse[G[_]: Applicative, B](f: A => G[B]): G[F[B]]``
 
-        Returns:
-            F[T[B]] — the collected results inside the applicative.
+        fa: T[A], f: A → G[B], pure_fn: G.pure → G[T[B]]
         """
         ...
 
-    def sequence(self, pure_fn: Callable) -> object:
+    def sequence(fa: Traversable, pure_fn: Callable) -> object:
         """Flip the nesting: T[F[A]] → F[T[A]].
 
         Derived from traverse with identity.
-
-        Args:
-            pure_fn: the target Applicative's ``pure``.
         """
-        return self.traverse(lambda x: x, pure_fn)
+        return fa.traverse(lambda x: x, pure_fn)
 
 
 __all__ = [

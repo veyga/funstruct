@@ -41,11 +41,9 @@ class Future(Monad, Generic[A]):
     async def _awaitable(self) -> A:
         return await self._coro
 
-    def bind(self, f: Callable[[A], Future[B]]) -> Future[B]:
-        """Chain: f receives the value, returns a new Future."""
-
+    def bind(fa: Future, f: Callable[[A], Future[B]]) -> Future[B]:
         async def _inner():
-            result = await self._coro
+            result = await fa._coro
             return await f(result)
 
         return Future(_inner())

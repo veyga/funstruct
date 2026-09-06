@@ -82,9 +82,10 @@ extend-exclude = ["*.md"]
 exclude = ["*.md"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP"]
+select = ["E", "F", "I", "N", "UP"]
 ignore = [
     "E731", # Do not assign a `lambda` expression, use a `def`
+    "N805", # First argument of a method should be named `self` — we use fa/ff/fb for typeclass ops
 ]
 
 

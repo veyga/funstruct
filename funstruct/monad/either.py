@@ -35,7 +35,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar, final
 
 from funstruct.typeclasses._monad import Monad
 from funstruct.util.created_at import CapturesCreationSiteMixin
@@ -61,6 +61,7 @@ class Either(Monad, Generic[E, A]):
     """
 
     @classmethod
+    @final
     def pure(cls, value: A) -> Either[E, A]:
         return Right(value)
 
@@ -185,32 +186,26 @@ class Right(Either[E, A]):
     def is_right(self) -> bool:
         return True
 
-    def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
-        return f(self.value)
+    def bind(fa: Right, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
+        return f(fa.value)
 
-    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
-        """No-op on Right — already succeeded."""
-        return self
+    def left_map(fa: Right, f: Callable[[E], E]) -> Either[E, A]:
+        return fa
 
-    def handle_error_with(self, f: Callable[[E], Either]) -> Either[E, A]:
-        """No-op on Right — already succeeded."""
-        return self
+    def handle_error_with(fa: Right, f: Callable[[E], Either]) -> Either[E, A]:
+        return fa
 
-    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
-        """Apply on_right to the value."""
-        return Right(on_right(self.value))
+    def bimap(fa: Right, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+        return Right(on_right(fa.value))
 
-    def get_or_else(self, default: A) -> A:
-        """Return the value (ignores default on Right)."""
-        return self.value
+    def get_or_else(fa: Right, default: A) -> A:
+        return fa.value
 
-    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
-        """Apply on_right to the value."""
-        return on_right(self.value)
+    def fold(fa: Right, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
+        return on_right(fa.value)
 
-    def swap(self) -> Either[A, E]:
-        """Swap Right(v) → Left(v)."""
-        return Left(self.value)
+    def swap(fa: Right) -> Either[A, E]:
+        return Left(fa.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -233,42 +228,32 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
     def is_right(self) -> bool:
         return False
 
-    def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
-        return self
+    def bind(fa: Left, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
+        return fa
 
-    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
-        """Transform the error without recovering.
-
-        >>> Left("oops").left_map(lambda e: e.upper())
+    def left_map(fa: Left, f: Callable[[E], E]) -> Either[E, A]:
+        """>>> Left("oops").left_map(lambda e: e.upper())
         Left('OOPS')
         """
-        return Left(f(self.error))
+        return Left(f(fa.error))
 
-    def handle_error_with(self, f: Callable[[E], Either]) -> Either:
-        """Recover from error: f receives the error, returns a new Either.
-
-        >>> Left("oops").handle_error_with(lambda e: Right(f"recovered: {e}"))
+    def handle_error_with(fa: Left, f: Callable[[E], Either]) -> Either:
+        """>>> Left("oops").handle_error_with(lambda e: Right(f"recovered: {e}"))
         Right('recovered: oops')
-        >>> Left("oops").handle_error_with(lambda e: Left(f"still bad: {e}"))
-        Left('still bad: oops')
         """
-        return f(self.error)
+        return f(fa.error)
 
-    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
-        """Apply on_left to the error."""
-        return Left(on_left(self.error))
+    def bimap(fa: Left, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+        return Left(on_left(fa.error))
 
-    def get_or_else(self, default: A) -> A:
-        """Return default (error is discarded)."""
+    def get_or_else(fa: Left, default: A) -> A:
         return default
 
-    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
-        """Apply on_left to the error."""
-        return on_left(self.error)
+    def fold(fa: Left, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
+        return on_left(fa.error)
 
-    def swap(self) -> Either[A, E]:
-        """Swap Left(e) → Right(e)."""
-        return Right(self.error)
+    def swap(fa: Left) -> Either[A, E]:
+        return Right(fa.error)
 
     def __eq__(self, other: object) -> bool:
         match other:

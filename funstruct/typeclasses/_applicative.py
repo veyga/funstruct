@@ -38,6 +38,9 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
+# See _functor.py for the fa/ff/fb naming convention.
+
+
 class Applicative(Functor[_A]):
     """Combine independent computations.
 
@@ -48,51 +51,48 @@ class Applicative(Functor[_A]):
     @classmethod
     @abstractmethod
     def pure(cls, value: _A, *args, **kwargs) -> Applicative[_A]:
-        """
-        Lift a value into the context.
-        typeclass contract: pure always lifts into the success case.
+        """Lift a value into the context.
 
-        Concrete impls implement things from 'from_exception'/etc
-        to lift into the failure case.
+        Scala: ``def pure[A](a: A): F[A]``
         """
         ...
 
-    def map(self, f: Callable[[_A], _B]) -> Applicative[_B]:
-        """Derived from ap + pure: ``pure(f).ap(self)``.
+    def map(fa: Applicative[_A], f: Callable[[_A], _B]) -> Applicative[_B]:
+        """Derived from ap + pure: ``pure(f).ap(fa)``.
 
         Monad overrides this with ``bind + pure`` to break the
         ap ↔ map circularity.
         """
-        return self.__class__.pure(f).ap(self)
+        return fa.__class__.pure(f).ap(fa)
 
     @abstractmethod
     def ap(
-        self: Applicative[Callable[[_A], _B]], other: Applicative[_A]
+        ff: Applicative[Callable[[_A], _B]], fa: Applicative[_A]
     ) -> Applicative[_B]:
         """Apply a wrapped function to a wrapped value.
 
-        Scala: ``def ap[A, B](f: F[A => B], a: F[A]): F[B]``
+        Scala: ``def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]``
 
-        self: F[A → B], other: F[A] → F[B]
+        ff: F[A → B], fa: F[A] → F[B]
         """
         ...
 
     def map2(
-        self, other: Applicative[_B], f: Callable[[_A, _B], object]
+        fa: Applicative[_A], fb: Applicative[_B], f: Callable[[_A, _B], object]
     ) -> Applicative:
         """Combine two values with a function. Derived from map + ap."""
-        return self.map(lambda a: lambda b: f(a, b)).ap(other)
+        return fa.map(lambda a: lambda b: f(a, b)).ap(fb)
 
-    def product(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
+    def product(fa: Applicative[_A], fb: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
         """Combine two independent values into a tuple.
 
-        Derived from map + ap: lift the tupling function, then apply.
+        Derived from map + ap.
         """
-        return self.map(lambda a: lambda b: (a, b)).ap(other)
+        return fa.map(lambda a: lambda b: (a, b)).ap(fb)
 
-    def __mul__(self, other: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
+    def __mul__(fa: Applicative[_A], fb: Applicative[_B]) -> Applicative[tuple[_A, _B]]:
         """Alias for product."""
-        return self.product(other)
+        return fa.product(fb)
 
 
 __all__ = [

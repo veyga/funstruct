@@ -16,7 +16,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses._monad import Monad
 from funstruct.typeclasses._traversable import Traversable
@@ -45,214 +45,61 @@ class CList(Monad, Traversable, Generic[A]):
     """
 
     @abstractmethod
-    def append(self, other: CList) -> CList:
-        """Append another list to the end of this list.
-
-        Args:
-            other: The list to append.
-
-        Returns:
-            A new list with the elements of `other` appended to this list.
-        """
-        ...
+    def append(fa: CList, other: CList) -> CList: ...
 
     @abstractmethod
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        """Fold the list from right to left.
-
-        Args:
-            acc: The initial accumulator value.
-            f: A function to apply, taking an element and the current accumulator.
-
-        Returns:
-            The result of folding the list from right to left.
-        """
-        ...
+    def fold_right(fa: CList, acc: B, f: Callable[[A, B], B]) -> B: ...
 
     @abstractmethod
-    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
-        """Fold the list from left to right.
-
-        Args:
-            acc: The initial accumulator value.
-            f: A function to apply, taking the current accumulator and an element.
-
-        Returns:
-            The result of folding the list from left to right.
-        """
-        ...
+    def fold_left(fa: CList, acc: B, f: Callable[[B, A], B]) -> B: ...
 
     @abstractmethod
-    def drop(self, n: int) -> CList:
-        """Drop the first `n` elements from the list.
-
-        Args:
-            n: The number of elements to drop.
-
-        Returns:
-            A new list with the first `n` elements removed.
-        """
-        ...
+    def drop(fa: CList, n: int) -> CList: ...
 
     @abstractmethod
-    def drop_while(self, f: Callable[[A], bool]) -> CList:
-        """Drop elements from the list as long as the predicate function `f` is true.
-
-        Args:
-            f: A predicate function to apply to each element.
-
-        Returns:
-            A new list with elements removed while `f` is true.
-        """
-        ...
+    def drop_while(fa: CList, f: Callable[[A], bool]) -> CList: ...
 
     @abstractmethod
-    def take(self, n: int) -> CList:
-        """Take the first `n` elements from the list.
-
-        Args:
-            n: The number of elements to take.
-
-        Returns:
-            A new list containing the first `n` elements.
-        """
-        ...
+    def take(fa: CList, n: int) -> CList: ...
 
     @abstractmethod
-    def take_while(self, f: Callable[[A], bool]) -> CList:
-        """Take elements from the list as long as the predicate function `f` is true.
-
-        Args:
-            f: A predicate function to apply to each element.
-
-        Returns:
-            A new list with elements taken while `f` is true.
-        """
-        ...
+    def take_while(fa: CList, f: Callable[[A], bool]) -> CList: ...
 
     @abstractmethod
-    def split_at(self, i: int) -> tuple[CList, CList]:
-        """Split the list into two lists at index `i`.
-
-        Args:
-            i: The index to split at.
-
-        Returns:
-            A tuple of two lists: the first containing elements up to `i`,
-            and the second containing the rest.
-        """
-        ...
+    def split_at(fa: CList, i: int) -> tuple[CList, CList]: ...
 
     @abstractmethod
-    def insert_at(self, i: int, value: A) -> CList:
-        """Insert an element at index `i`.
+    def insert_at(fa: CList, i: int, value: A) -> CList: ...
 
-        Args:
-            i: The index to split at.
-
-        Returns:
-            The new list
-        """
-        ...
-
-    def partition(self, f: Callable[[A], bool]) -> tuple[CList, CList]:
-        """Partition the list into two lists based on a predicate function.
-
-        Args:
-            f: A predicate function to apply to each element.
-
-        Returns:
-            A tuple of two lists: the first containing elements that satisfy `f`,
-            and the second containing the rest.
-        """
+    def partition(fa: CList, f: Callable[[A], bool]) -> tuple[CList, CList]:
         accum = lambda a, x: (a << x[0], x[1]) if f(a) else (x[0], a << x[1])
-        return self.fold_right((Nil(), Nil()), accum)
+        return fa.fold_right((Nil(), Nil()), accum)
 
-    def length(self) -> int:
-        """Compute the length of the list.
+    def length(fa: CList) -> int:
+        return fa.fold_right(0, lambda _, acc: acc + 1)
 
-        Returns:
-            The number of elements in the list.
-        """
-        return self.fold_right(0, lambda _, acc: acc + 1)
+    def prepend(fa: CList, new_head: A) -> CList:
+        return Cons(new_head, fa)
 
-    def prepend(self, new_head: A) -> CList:
-        """Prepend an element to the list.
+    def reversed(fa: CList) -> CList:
+        return fa.fold_left(Nil(), lambda acc, h: Cons(h, acc))
 
-        Args:
-            new_head: The element to prepend.
+    def filter(fa: CList, f: Callable[[A], bool]) -> CList:
+        return fa.fold_right(Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc)
 
-        Returns:
-            A new list with `new_head` added to the beginning.
-        """
-        return Cons(new_head, self)
+    def flatten(fa: CList) -> CList:
+        return CList.flatten_(fa)
 
-    def reversed(self) -> CList:
-        """Reverse the order of the elements in the list.
+    def bind(fa: CList, f: Callable[[A], CList]) -> CList:
+        return fa.fold_right(Nil(), lambda a, acc: f(a).append(acc))
 
-        Returns:
-            A new list with the elements in reversed order.
-        """
-        return self.fold_left(Nil(), lambda acc, h: Cons(h, acc))
-
-    def filter(self, f: Callable[[A], bool]) -> CList:
-        """Filter the elements of the list based on a predicate function.
-
-        Args:
-            f: A predicate function to apply to each element.
-
-        Returns:
-            A new list containing only the elements that satisfy `f`.
-        """
-        return self.fold_right(Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc)
-
-    def flatten(self) -> CList:
-        """Flatten a list of lists into a single list.
-
-        Returns:
-            A new list with all nested lists flattened into a single list.
-        """
-        return CList.flatten_(self)
-
-    def bind(self, f: Callable[[A], CList]) -> CList:
-        """Apply a function to each element and flatten the results.
-
-        Args:
-            f: A function that returns a list for each element.
-
-        Returns:
-            A new list with the results of applying `f` to each element,
-            flattened into a single list.
-        """
-        return self.fold_right(Nil(), lambda a, acc: f(a).append(acc))
-
-    def traverse(self, f: Callable, pure_fn: Callable) -> object:
-        """Traverse the list with an effectful function.
-
-        ``CList[A] → (A → F[B]) → F[CList[B]]``
-
-        Args:
-            f: A → F[B], applied to each element.
-            pure_fn: the target Applicative's pure.
-
-        Returns:
-            F[CList[B]] — the collected results.
-        """
-        return self.fold_right(
+    def traverse(fa: CList, f: Callable, pure_fn: Callable) -> object:
+        return fa.fold_right(
             pure_fn(Nil()),
             lambda a, acc: f(a).map2(acc, lambda b, bs: Cons(b, bs)),
         )
 
-    def sorted(self, cmp: Callable[[A, A], int]) -> CList:
-        """Sort the list using a comparison function.
-
-        Args:
-            cmp: A comparison function to use for sorting.
-
-        Returns:
-            A new list with the elements sorted according to `cmp`.
-        """
-
+    def sorted(fa: CList, cmp: Callable[[A, A], int]) -> CList:
         def merge(left: CList, right: CList) -> CList:
             match left, right:
                 case Nil(), r:
@@ -266,10 +113,10 @@ class CList(Monad, Traversable, Generic[A]):
                 case _:
                     return Nil()
 
-        length = len(self)
+        length = len(fa)
         if length <= 1:
-            return self
-        left, right = self.split_at(length // 2)
+            return fa
+        left, right = fa.split_at(length // 2)
         return merge(left.sorted(cmp), right.sorted(cmp))
 
     @staticmethod
@@ -333,6 +180,7 @@ class CList(Monad, Traversable, Generic[A]):
         return _thunk
 
     @classmethod
+    @final
     def pure(cls, value) -> CList:
         """Lift a value into a single-element list."""
         return Cons(value)
@@ -433,15 +281,13 @@ class CList(Monad, Traversable, Generic[A]):
         """
         return self.fold_right(0, lambda _, acc: acc + 1)
 
-    def to_list(self) -> list[A]:
-        """Convert to a Python list.
-
-        >>> Cons(1, Cons(2, Cons(3, Nil()))).to_list()
+    def to_list(fa: CList) -> list[A]:
+        """>>> Cons(1, Cons(2, Cons(3, Nil()))).to_list()
         [1, 2, 3]
         >>> Nil().to_list()
         []
         """
-        return list(self)
+        return list(fa)
 
     def __iter__(self) -> Iterator[A]:
         current = self
@@ -491,113 +337,31 @@ class Nil(CList):
     def __bool__(self) -> bool:
         return False
 
-    def append(self, other: CList) -> CList:
-        """Append another list to the empty list.
-
-        Args:
-            other: The list to append.
-
-        Returns:
-            The list `other`, since appending to an empty list results in `other`.
-        """
+    def append(fa: Nil, other: CList) -> CList:
         return other
 
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        """Fold the empty list from right to left.
-
-        Args:
-            acc: The initial accumulator value.
-            f: A function to apply, taking an element and the current accumulator.
-
-        Returns:
-            The accumulator value, since folding an empty list results
-            in the initial value.
-        """
+    def fold_right(fa: Nil, acc: B, f: Callable[[A, B], B]) -> B:
         return acc
 
-    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
-        """Fold the empty list from left to right.
-
-        Args:
-            acc: The initial accumulator value.
-            f: A function to apply, taking the current accumulator and an element.
-
-        Returns:
-            The accumulator value, since folding an empty list results
-            in the initial value.
-        """
+    def fold_left(fa: Nil, acc: B, f: Callable[[B, A], B]) -> B:
         return acc
 
-    def drop(self, n: int) -> CList:
-        """Drop the first `n` elements from the empty list.
+    def drop(fa: Nil, n: int) -> CList:
+        return fa
 
-        Args:
-            n: The number of elements to drop.
+    def drop_while(fa: Nil, f: Callable[[A], bool]) -> CList:
+        return fa
 
-        Returns:
-            The empty list, since dropping elements from an empty list results
-            in an empty list.
-        """
-        return self
+    def take(fa: Nil, n: int) -> CList:
+        return fa
 
-    def drop_while(self, f: Callable[[A], bool]) -> CList:
-        """Drop elements from the empty list as long as the predicate function
-        `f` is true.
+    def take_while(fa: Nil, f: Callable[[A], bool]) -> CList:
+        return fa
 
-        Args:
-            f: A predicate function to apply to each element.
+    def split_at(fa: Nil, i: int) -> tuple[CList, CList]:
+        return fa, fa
 
-        Returns:
-            The empty list, since dropping elements from an empty list results
-            in an empty list.
-        """
-        return self
-
-    def take(self, n: int) -> CList:
-        """Take the first `n` elements from the empty list.
-
-        Args:
-            n: The number of elements to take.
-
-        Returns:
-            The empty list, since taking elements from an empty list results
-            in an empty list.
-        """
-        return self
-
-    def take_while(self, f: Callable[[A], bool]) -> CList:
-        """Take elements from the empty list as long as the predicate function
-        `f` is true.
-
-        Args:
-            f: A predicate function to apply to each element.
-
-        Returns:
-            The empty list, since taking elements from an empty list results
-            in an empty list.
-        """
-        return self
-
-    def split_at(self, i: int) -> tuple[CList, CList]:
-        """Split the empty list into two lists at index `i`.
-
-        Args:
-            i: The index to split at.
-
-        Returns:
-            A tuple of two empty lists.
-        """
-        return self, self
-
-    def insert_at(self, i: int, value: A) -> CList:
-        """Insert an element at index `i`.
-
-        Args:
-            i: The index to split at.
-
-        Returns:
-            The new list
-        """
+    def insert_at(fa: Nil, i: int, value: A) -> CList:
         return Cons(value, Nil())
 
 
@@ -624,16 +388,13 @@ class Cons(CList[A]):
 
         return f"CList([{', '.join(_fmt(e) for e in self)}])"
 
-    def append(self, other: CList) -> CList:
-        """Append another list to the end of this non-empty list."""
-        return self.reversed().fold_left(other, lambda acc, h: Cons(h, acc))
+    def append(fa: Cons, other: CList) -> CList:
+        return fa.reversed().fold_left(other, lambda acc, h: Cons(h, acc))
 
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        """Fold from right to left. Stack-safe via reverse + fold_left."""
-        return self.reversed().fold_left(acc, lambda a, b: f(b, a))
+    def fold_right(fa: Cons, acc: B, f: Callable[[A, B], B]) -> B:
+        return fa.reversed().fold_left(acc, lambda a, b: f(b, a))
 
-    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
-        """Fold from left to right. Tail-recursive via @tco."""
+    def fold_left(fa: Cons, acc: B, f: Callable[[B, A], B]) -> B:
         from funstruct.util.tailrec import tail_call, tco
 
         @tco
@@ -644,78 +405,27 @@ class Cons(CList[A]):
                 case Cons(h, t):
                     return tail_call(_go)(t, f(result, h))
 
-        return _go(self, acc)
+        return _go(fa, acc)
 
-    def drop(self, n: int) -> CList:
-        """Drop the first `n` elements from the non-empty list.
+    def drop(fa: Cons, n: int) -> CList:
+        return fa if n <= 0 else fa.tail.drop(n - 1)
 
-        Args:
-            n: The number of elements to drop.
+    def drop_while(fa: Cons, f: Callable[[A], bool]) -> CList:
+        return fa if not f(fa.head) else fa.tail.drop_while(f)
 
-        Returns:
-            A new list with the first `n` elements removed.
-        """
-        return self if n <= 0 else self.tail.drop(n - 1)
+    def take(fa: Cons, n: int) -> CList:
+        return Cons(fa.head) if n <= 1 else fa.head << fa.tail.take(n - 1)
 
-    def drop_while(self, f: Callable[[A], bool]) -> CList:
-        """Drop elements from the non-empty list as long as the predicate function
-        `f` is true.
+    def take_while(fa: Cons, f: Callable[[A], bool]) -> CList:
+        return fa.head << fa.tail.take_while(f) if f(fa.head) else Nil()
 
-        Args:
-            f: A predicate function to apply to each element.
+    def split_at(fa: Cons, i: int) -> tuple[CList, CList]:
+        return fa.take(i), fa.drop(i)
 
-        Returns:
-            A new list with elements removed while `f` is true.
-        """
-        return self if not f(self.head) else self.tail.drop_while(f)
-
-    def take(self, n: int) -> CList:
-        """Take the first `n` elements from the non-empty list.
-
-        Args:
-            n: The number of elements to take.
-
-        Returns:
-            A new list containing the first `n` elements.
-        """
-        return Cons(self.head) if n <= 1 else self.head << self.tail.take(n - 1)
-
-    def take_while(self, f: Callable[[A], bool]) -> CList:
-        """Take elements from the non-empty list as long as the predicate function
-        `f` is true.
-
-        Args:
-            f: A predicate function to apply to each element.
-
-        Returns:
-            A new list with elements taken while `f` is true.
-        """
-        return self.head << self.tail.take_while(f) if f(self.head) else Nil()
-
-    def split_at(self, i: int) -> tuple[CList, CList]:
-        """Split the non-empty list into two lists at index `i`.
-
-        Args:
-            i: The index to split at.
-
-        Returns:
-            A tuple of two lists: the first containing elements up to `i`,
-            and the second containing the rest.
-        """
-        return self.take(i), self.drop(i)
-
-    def insert_at(self, i: int, value: A) -> CList:
-        """Insert an element at index `i`.
-
-        Args:
-            i: The index to split at.
-
-        Returns:
-            The new list
-        """
+    def insert_at(fa: Cons, i: int, value: A) -> CList:
         if i <= 0:
-            return Cons(value, self)
-        return Cons(self.head, self.tail.insert_at(i - 1, value))
+            return Cons(value, fa)
+        return Cons(fa.head, fa.tail.insert_at(i - 1, value))
 
 
 __all__ = [

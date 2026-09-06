@@ -40,7 +40,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar, final
 
 from funstruct.typeclasses._monad import Monad
 
@@ -64,15 +64,16 @@ class Option(Monad, Generic[A]):
     # Implementations live in Some/Nothing below. @abstractmethod with ...
     # means "must be implemented by subclasses" without raising anything.
     @abstractmethod
-    def bind(self, f: Callable[[A], Option[B]]) -> Option[B]: ...
+    def bind(fa: Option, f: Callable[[A], Option[B]]) -> Option[B]: ...
 
     @abstractmethod
-    def get_or_else(self, default: A) -> A: ...
+    def get_or_else(fa: Option, default: A) -> A: ...
 
     @abstractmethod
-    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]: ...
+    def handle_error_with(fa: Option, fallback: Callable[[], Option[A]]) -> Option[A]: ...
 
     @classmethod
+    @final
     def pure(cls, value: A) -> Option[A]:
         return Some(value)
 
@@ -159,20 +160,20 @@ class Some(Option[A]):
     def is_some(self) -> bool:
         return True
 
-    def bind(self, f: Callable[[A], Option]) -> Option:
-        return f(self.value)
+    def bind(fa: Some, f: Callable[[A], Option]) -> Option:
+        return f(fa.value)
 
-    def get_or_else(self, default: A) -> A:
-        return self.value
+    def get_or_else(fa: Some, default: A) -> A:
+        return fa.value
 
-    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
-        return self
+    def handle_error_with(fa: Some, fallback: Callable[[], Option[A]]) -> Option[A]:
+        return fa
 
-    def filter(self, f: Callable[[A], bool]) -> Option[A]:
-        return self if f(self.value) else Nothing()
+    def filter(fa: Some, f: Callable[[A], bool]) -> Option[A]:
+        return fa if f(fa.value) else Nothing()
 
-    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
-        return on_some(self.value)
+    def fold(fa: Some, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
+        return on_some(fa.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -202,19 +203,19 @@ class Nothing(Option):
     def is_some(self) -> bool:
         return False
 
-    def bind(self, f: Callable[[A], Option[B]]) -> Option[B]:
-        return self
+    def bind(fa: Nothing, f: Callable[[A], Option[B]]) -> Option[B]:
+        return fa
 
-    def get_or_else(self, default: A) -> A:
+    def get_or_else(fa: Nothing, default: A) -> A:
         return default
 
-    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
+    def handle_error_with(fa: Nothing, fallback: Callable[[], Option[A]]) -> Option[A]:
         return fallback()
 
-    def filter(self, f: Callable[[A], bool]) -> Option:
-        return self
+    def filter(fa: Nothing, f: Callable[[A], bool]) -> Option:
+        return fa
 
-    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
+    def fold(fa: Nothing, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
         return on_nothing()
 
     def __eq__(self, other: object) -> bool:

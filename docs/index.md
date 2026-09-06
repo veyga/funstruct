@@ -71,16 +71,16 @@ class Monoid(Semigroup):
     empty: object      # identity element
 
 class Functor(ABC):
-    def map(self, f) -> Functor: ...
+    def map(fa, f) -> Functor: ...
 
 class Applicative(Functor):
     def pure(cls, value) -> Applicative: ...
-    def ap(self, other) -> Applicative: ...      # F[A→B].ap(F[A]) → F[B]
-    def product(self, other) -> Applicative: ...  # F[A] * F[B] → F[(A, B)]
+    def ap(ff, fa) -> Applicative: ...            # F[A→B].ap(F[A]) → F[B]
+    def product(fa, fb) -> Applicative: ...       # F[A] * F[B] → F[(A, B)]
     def __mul__ = product  # * alias
 
 class Monad(Applicative):
-    def bind(self, f) -> Monad: ...
+    def bind(fa, f) -> Monad: ...
     def __rshift__ = bind  # >>
 ```
 

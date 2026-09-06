@@ -245,8 +245,8 @@ class frozendict(Generic[K, V]):
             raise KeyError(key)
         return result
 
-    def get(self, key: K) -> V | None:
-        return self.__root.get(key, hash(key), 0)
+    def get(fa: frozendict, key: K) -> V | None:
+        return fa.__root.get(key, hash(key), 0)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -297,28 +297,27 @@ class frozendict(Generic[K, V]):
             object.__setattr__(self, "_frozendict__hash_cache", h)
         return self.__hash_cache
 
-    def put(self, k: K, v: V) -> frozendict:
-        new_root = self.__root.put(k, v, hash(k), 0)
+    def put(fa: frozendict, k: K, v: V) -> frozendict:
+        new_root = fa.__root.put(k, v, hash(k), 0)
         new_fd = object.__new__(frozendict)
-        new_size = self.__size if k in self else self.__size + 1
+        new_size = fa.__size if k in fa else fa.__size + 1
         object.__setattr__(new_fd, "_frozendict__root", new_root)
         object.__setattr__(new_fd, "_frozendict__size", new_size)
         object.__setattr__(new_fd, "_frozendict__hash_cache", None)
         return new_fd
 
-    def remove(self, k: K) -> frozendict:
-        """Remove a key, returning a new frozendict. No-op if key absent."""
-        if k not in self:
-            return self
-        new_root = self.__root.remove(k, hash(k), 0)
+    def remove(fa: frozendict, k: K) -> frozendict:
+        if k not in fa:
+            return fa
+        new_root = fa.__root.remove(k, hash(k), 0)
         new_fd = object.__new__(frozendict)
         object.__setattr__(new_fd, "_frozendict__root", new_root)
-        object.__setattr__(new_fd, "_frozendict__size", self.__size - 1)
+        object.__setattr__(new_fd, "_frozendict__size", fa.__size - 1)
         object.__setattr__(new_fd, "_frozendict__hash_cache", None)
         return new_fd
 
-    def combine(self, other: frozendict) -> frozendict:
-        result = self
+    def combine(fa: frozendict, other: frozendict) -> frozendict:
+        result = fa
         for k, v in other.__root.items_iter():
             result = result.put(k, v)
         return result
@@ -327,11 +326,10 @@ class frozendict(Generic[K, V]):
         """Semigroup combine (merge). Right-biased on key conflicts."""
         return self.combine(other)
 
-    def map(self, f: Callable[[V], V]) -> frozendict:
-        """Apply f to every value, preserving keys."""
+    def map(fa: frozendict, f: Callable[[V], V]) -> frozendict:
         root = _EMPTY
         size = 0
-        for k, v in self.__root.items_iter():
+        for k, v in fa.__root.items_iter():
             root = root.put(k, f(v), hash(k), 0)
             size += 1
         new_fd = object.__new__(frozendict)

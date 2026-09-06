@@ -39,7 +39,7 @@ from abc import abstractmethod
 from collections.abc import Awaitable, Callable, Coroutine
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Generic, ParamSpec, TypeVar, overload
+from typing import Any, Generic, ParamSpec, TypeVar, final, overload
 
 from funstruct.monad.either import Either
 from funstruct.monad.future import Future
@@ -60,6 +60,7 @@ class Result(Monad, Generic[_A]):
     """
 
     @classmethod
+    @final
     def pure(cls, value: _A) -> Result[_A]:
         return Ok(value)
 
@@ -87,37 +88,25 @@ class Result(Monad, Generic[_A]):
         return _thunk
 
     @abstractmethod
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
-        """Eliminate the Result — apply on_err or on_ok."""
-        ...
+    def fold(fa: Result, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B: ...
 
     @abstractmethod
-    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
+    def bind(fa: Result, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
 
     @abstractmethod
-    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
-        """Transform the error value. No-op on Ok."""
-        ...
+    def left_map(fa: Result, f: Callable[[Exception], Exception]) -> Result[_A]: ...
 
     @abstractmethod
-    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
-        """Recover from error. No-op on Ok."""
-        ...
+    def handle_error_with(fa: Result, f: Callable[[Exception], Result[_A]]) -> Result[_A]: ...
 
     @abstractmethod
-    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
-        """Transform both sides."""
-        ...
+    def bimap(fa: Result, on_err: Callable, on_ok: Callable) -> Result: ...
 
     @abstractmethod
-    def get_or_else(self, default: _A) -> _A:
-        """Extract the value, or return default if Err."""
-        ...
+    def get_or_else(fa: Result, default: _A) -> _A: ...
 
     @abstractmethod
-    def swap(self) -> Result:
-        """Swap Ok and Err."""
-        ...
+    def swap(fa: Result) -> Result: ...
 
     @property
     @abstractmethod
@@ -134,34 +123,30 @@ class Ok(Result[_A]):
 
     value: _A
 
-    @classmethod
-    def pure(cls, value: _A) -> Ok:
-        return Ok(value)
-
     @property
     def is_ok(self) -> bool:
         return True
 
-    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
-        return f(self.value)
+    def bind(fa: Ok, f: Callable[[_A], Result[_B]]) -> Result[_B]:
+        return f(fa.value)
 
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
-        return on_ok(self.value)
+    def fold(fa: Ok, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        return on_ok(fa.value)
 
-    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
-        return self
+    def left_map(fa: Ok, f: Callable[[Exception], Exception]) -> Result[_A]:
+        return fa
 
-    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
-        return self
+    def handle_error_with(fa: Ok, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+        return fa
 
-    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
-        return Ok(on_ok(self.value))
+    def bimap(fa: Ok, on_err: Callable, on_ok: Callable) -> Result:
+        return Ok(on_ok(fa.value))
 
-    def get_or_else(self, default: _A) -> _A:
-        return self.value
+    def get_or_else(fa: Ok, default: _A) -> _A:
+        return fa.value
 
-    def swap(self) -> Result:
-        return Err(self.value)
+    def swap(fa: Ok) -> Result:
+        return Err(fa.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -184,26 +169,26 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
     def is_ok(self) -> bool:
         return False
 
-    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
-        return self
+    def bind(fa: Err, f: Callable[[_A], Result[_B]]) -> Result[_B]:
+        return fa
 
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
-        return on_err(self.error)
+    def fold(fa: Err, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        return on_err(fa.error)
 
-    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
-        return Err(f(self.error))
+    def left_map(fa: Err, f: Callable[[Exception], Exception]) -> Result[_A]:
+        return Err(f(fa.error))
 
-    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
-        return f(self.error)
+    def handle_error_with(fa: Err, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+        return f(fa.error)
 
-    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
-        return Err(on_err(self.error))
+    def bimap(fa: Err, on_err: Callable, on_ok: Callable) -> Result:
+        return Err(on_err(fa.error))
 
-    def get_or_else(self, default: _A) -> _A:
+    def get_or_else(fa: Err, default: _A) -> _A:
         return default
 
-    def swap(self) -> Result:
-        return Ok(self.error)
+    def swap(fa: Err) -> Result:
+        return Ok(fa.error)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -264,11 +249,9 @@ class AsyncResult(Monad, Generic[_A]):
             return value
         return Ok(value)
 
-    def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
-        """Chain: f receives value. Short-circuits on Err."""
-
+    def bind(fa: AsyncResult, f: Callable[[_A], Any]) -> AsyncResult:
         async def _inner():
-            result = await self._coro
+            result = await fa._coro
             match result:
                 case Ok(value):
                     return await AsyncResult._resolve(f(value))
@@ -277,11 +260,9 @@ class AsyncResult(Monad, Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def left_map(self, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
-        """Transform the error without recovering."""
-
+    def left_map(fa: AsyncResult, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
         async def _inner():
-            result = await self._coro
+            result = await fa._coro
             match result:
                 case Err(error):
                     return Err(f(error))
@@ -290,11 +271,9 @@ class AsyncResult(Monad, Generic[_A]):
 
         return AsyncResult(_inner())
 
-    def handle_error_with(self, f: Callable[[Exception], Any]) -> AsyncResult:
-        """Recover from error: f receives error. Short-circuits on success."""
-
+    def handle_error_with(fa: AsyncResult, f: Callable[[Exception], Any]) -> AsyncResult:
         async def _inner():
-            result = await self._coro
+            result = await fa._coro
             match result:
                 case Err(error):
                     return await AsyncResult._resolve(f(error))
@@ -304,6 +283,7 @@ class AsyncResult(Monad, Generic[_A]):
         return AsyncResult(_inner())
 
     @classmethod
+    @final
     def pure(cls, value: _A) -> AsyncResult[_A]:
         """Lift a plain value into Ok."""
 
@@ -340,15 +320,10 @@ class AsyncResult(Monad, Generic[_A]):
         return cls(_inner())
 
     def fold(
-        self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
+        fa: AsyncResult, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
     ) -> Future[_B]:
-        """Eliminate — apply on_err or on_ok. Returns a Future to await.
-
-        Usage: ``value = await async_result.fold(handle_err, handle_ok)``
-        """
-
         async def _inner():
-            result = await self._coro
+            result = await fa._coro
             return result.fold(on_err=on_err, on_ok=on_ok)
 
         return Future(_inner())

@@ -43,6 +43,13 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
+# Convention: we use `fa`, `ff`, `fb` instead of `self` in typeclass
+# operation methods to more closely match the function signatures of
+# Haskell/Scala/Cats, where typeclasses are standalone functions rather
+# than methods. This is intentional — not a Python convention violation.
+# Python dunder methods (__init__, __repr__, etc.) keep `self` as usual.
+
+
 class Functor(ABC, Generic[_A]):
     """Transform the value inside a context.
 
@@ -51,7 +58,7 @@ class Functor(ABC, Generic[_A]):
     """
 
     @abstractmethod
-    def map(self, f: Callable[[_A], _B]) -> Functor[_B]: ...
+    def map(fa: Functor[_A], f: Callable[[_A], _B]) -> Functor[_B]: ...
 
 
 __all__ = [

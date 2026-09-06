@@ -11,6 +11,8 @@ Examples:
     (99, 42)
 """
 
+from __future__ import annotations
+
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
@@ -32,26 +34,22 @@ class State(Monad, Generic[_A]):
     def __init__(self, run: Callable[[Any], tuple[Any, _A]]) -> None:
         self._run = run
 
-    def run(self, initial_state) -> tuple:
+    def run(fa: State, initial_state) -> tuple:
         """Execute with initial state.
 
         Returns ``(final_state, value)``.
                 >>> State.pure(10).run("any")
                 ('any', 10)
         """
-        return self._run(initial_state)
+        return fa._run(initial_state)
 
-    def bind(self, f: Callable[[_A], "State[_B]"]) -> "State[_B]":
-        """FlatMap: thread state, pass value to ``f`` returning next State.
-
-        >>> State.pure(1).bind(lambda x: State.pure(x + 10)).run(0)
-        (0, 11)
-        >>> (State.pure(1) >> (lambda x: State.pure(x + 10))).run(0)
+    def bind(fa: State, f: Callable[[_A], "State[_B]"]) -> "State[_B]":
+        """>>> State.pure(1).bind(lambda x: State.pure(x + 10)).run(0)
         (0, 11)
         """
 
         def inner(s):
-            new_s, a = self._run(s)
+            new_s, a = fa._run(s)
             return f(a).run(new_s)
 
         return State(inner)

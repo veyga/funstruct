@@ -38,6 +38,13 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
+# Convention: we use `fa`, `ff`, `fb` instead of `self` in typeclass
+# operation methods to more closely match the function signatures of
+# Haskell/Scala/Cats, where typeclasses are standalone functions rather
+# than methods. This is intentional — not a Python convention violation.
+# Python dunder methods (__init__, __repr__, etc.) keep `self` as usual.
+
+
 class Monad(Applicative[_A]):
     """Sequence computations that produce new contexts.
 
@@ -46,7 +53,9 @@ class Monad(Applicative[_A]):
     """
 
     @abstractmethod
-    def bind(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]: ...
+    def bind(fa: Monad[_A], f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
+        """Scala: ``def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]``"""
+        ...
 
     @classmethod
     @abstractmethod
@@ -55,36 +64,38 @@ class Monad(Applicative[_A]):
         ...
 
     @final
-    def map(self, f: Callable[[_A], _B]) -> Monad[_B]:
+    def map(fa: Monad[_A], f: Callable[[_A], _B]) -> Monad[_B]:
         """Derived from bind + pure. Overrides Applicative.map to avoid
         the ap ↔ map circularity.
+
+        Scala: ``def map[A, B](fa: F[A])(f: A => B): F[B]``
         """
-        return self.bind(lambda a: self.__class__.pure(f(a)))
+        return fa.bind(lambda a: fa.__class__.pure(f(a)))
 
     @final
-    def ap(self, other: Monad[_A]) -> Monad[_B]:
+    def ap(ff: Monad[_A], fa: Monad[_A]) -> Monad[_B]:
         """Derived from bind + map.
 
-        self contains a function A → B, other contains A. Returns F[B].
-        """
-        return self.bind(lambda f: other.map(f))
+        Scala: ``def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]``
 
-    def map2(self, other: Monad[_B], f: Callable[[_A, _B], object]) -> Monad:
+        ff: F[A → B], fa: F[A] → F[B]
+        """
+        return ff.bind(lambda f: fa.map(f))
+
+    def map2(fa: Monad[_A], fb: Monad[_B], f: Callable[[_A, _B], object]) -> Monad:
         """Combine two monadic values with a function.
 
-        map2(fa, fb, f) = fa.bind(a => fb.map(b => f(a, b)))
-
-        Like ap, but you choose the combiner instead of always tupling.
+        Scala: ``def map2[A, B, C](fa: F[A], fb: F[B])(f: (A, B) => C): F[C]``
         """
-        return self.bind(lambda a: other.map(lambda b: f(a, b)))
+        return fa.bind(lambda a: fb.map(lambda b: f(a, b)))
 
-    def then(self, other: Monad[_B]) -> Monad[_B]:
-        """Sequence: run self, discard value, run other."""
-        return self.bind(lambda _: other)
+    def then(fa: Monad[_A], fb: Monad[_B]) -> Monad[_B]:
+        """Sequence: run fa, discard value, run fb."""
+        return fa.bind(lambda _: fb)
 
-    def __rshift__(self, f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
+    def __rshift__(fa: Monad[_A], f: Callable[[_A], Monad[_B]]) -> Monad[_B]:
         """Alias for bind."""
-        return self.bind(f)
+        return fa.bind(f)
 
 
 __all__ = [

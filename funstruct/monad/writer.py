@@ -36,12 +36,11 @@ class Writer(Monad, Generic[_W, _A]):
         object.__setattr__(self, "value", value)
         object.__setattr__(self, "output", output)
 
-    def bind(self, f: Callable[[_A], Writer[_W, _B]]) -> Writer[_W, _B]:
-        """Chain: run f on the value, combine outputs via monoid."""
-        result = f(self.value)
-        return self.__class__(
+    def bind(fa: Writer, f: Callable[[_A], Writer[_W, _B]]) -> Writer[_W, _B]:
+        result = f(fa.value)
+        return fa.__class__(
             result.value,
-            self._monoid.combine(self.output, result.output),
+            fa._monoid.combine(fa.output, result.output),
         )
 
     @classmethod
