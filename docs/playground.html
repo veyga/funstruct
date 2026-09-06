@@ -9,126 +9,143 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #1a1b26;
-            color: #c0caf5;
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
             padding: 2rem;
+            background: #000;
+            color: #e0e2e4;
         }
-        h1 { color: #bb9af7; }
-        h2 { color: #7aa2f7; margin-top: 2.5rem; }
-        p { color: #9aa5ce; line-height: 1.7; }
-        a { color: #7aa2f7; }
-        code { background: #24283b; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-        .example { margin: 1.5rem 0; }
-        .example-label {
-            background: #24283b;
-            padding: 0.5rem 1rem;
-            border-radius: 8px 8px 0 0;
-            font-size: 0.85rem;
-            color: #7aa2f7;
-            border-bottom: 1px solid #414868;
-        }
+        h1 { color: #de1fcf; }
+        h2 { color: #93c763; margin-top: 2.5rem; }
+        h3 { color: #678cb1; margin-top: 1.5rem; }
+        p { color: #b0b2b4; line-height: 1.7; }
+        a { color: #89ddff; }
+        code { background: #1a1a1a; padding: 2px 6px; border-radius: 3px; color: #e97600; }
         #status {
-            background: #24283b;
+            background: #111;
             padding: 0.75rem 1rem;
-            border-radius: 8px;
+            border-radius: 6px;
             margin-bottom: 2rem;
-            font-size: 0.9rem;
+            border: 1px solid #333;
+            color: #e0e2e4;
         }
-        .footer {
-            margin-top: 3rem;
-            color: #414868;
-            text-align: center;
-            font-size: 0.85rem;
-        }
-        .note {
-            background: #24283b;
-            border-left: 3px solid #bb9af7;
-            padding: 0.75rem 1rem;
+        .todo {
+            background: #1a1500;
+            border-left: 3px solid #ffcd22;
+            padding: 0.5rem 1rem;
             margin: 1rem 0;
-            font-size: 0.9rem;
-            color: #9aa5ce;
+            font-size: 0.85rem;
+            color: #ffcd22;
+        }
+
+        /* Force editor blocks to have a light background so default
+           black text is readable against the dark page */
+        script[type="py-editor"] + *,
+        py-editor,
+        [id^="py-"] {
+            background: #1e1e1e !important;
+            color: #e0e2e4 !important;
+        }
+        /* Target the actual rendered editor wrapper */
+        div:has(> .cm-editor) {
+            background: #1e1e1e !important;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .cm-editor {
+            background: #1e1e1e !important;
+        }
+        .cm-editor .cm-content,
+        .cm-editor .cm-line {
+            color: #e0e2e4 !important;
+        }
+        .cm-editor .cm-gutters {
+            background: #161616 !important;
+            color: #555 !important;
         }
     </style>
 </head>
 <body>
 
+<!-- TODO: Requires funstruct >= 2.0.0 on PyPI. Publishing as 2.0.0-beta1. -->
+
 <h1>funstruct playground</h1>
-<p>Edit and run funstruct code in your browser. Powered by <a href="https://pyodide.org">Pyodide</a> (Python in WebAssembly).</p>
-<p>First run takes ~10 seconds to load Python + funstruct. After that it's instant.</p>
+<p>Edit and run funstruct code in your browser. Powered by <a href="https://pyodide.org">Pyodide</a>.</p>
 
-<div id="status">⏳ Loading Python + funstruct from PyPI...</div>
-
-<h2>Option monad</h2>
-<div class="example">
-    <div class="example-label">map, bind, and short-circuiting</div>
-    <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.option import Option, Some, Nothing
-
-# map transforms the value inside
-print("map:  ", Some(10).map(lambda x: x * 2))
-
-# bind chains operations that might fail
-print("bind: ", Some(10).bind(lambda x: Some(x + 1)))
-
-# Nothing short-circuits automatically
-print("short:", Nothing().map(lambda x: x * 2))
-
-# >> operator is an alias for bind
-print(">>:   ", Some(10) >> (lambda x: Some(x + 1)))
-    </script>
+<div class="todo">
+    Requires <code>funstruct >= 2.0.0</code> on PyPI. Currently publishing <code>2.0.0-beta1</code>.
 </div>
 
-<h2>Result monad</h2>
-<div class="example">
-    <div class="example-label">error handling without exceptions</div>
-    <script type="py-editor" config='{"packages":["funstruct"]}'>
+<div id="status">⏳ Loading Python + funstruct...</div>
+
+<h2>Basics</h2>
+
+<h3>Option — value might not exist</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.option import Option, Some, Nothing
+
+print(Some(10).map(lambda x: x * 2))       # Some(20)
+print(Some(10).bind(lambda x: Some(x+1)))   # Some(11)
+print(Nothing().map(lambda x: x * 2))       # Nothing()
+print(Some(1) * Some(2))                    # Some((1, 2))
+</script>
+
+<h3>Result — error handling without exceptions</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
 from funstruct.monad.result import Result, Ok, Err, Try
 
 print(Ok(42).map(lambda x: x * 2))
 print(Err(ValueError("oops")).map(lambda x: x * 2))
 
-# @Try wraps exception-throwing code
 @Try
 def safe_div(a, b):
     return a / b
 
 print(safe_div(10, 2))
 print(safe_div(10, 0))
+</script>
 
-# handle_error_with recovers from Err
-recovered = Err(ValueError("bad")).handle_error_with(
-    lambda e: Ok("default")
-)
-print("recovered:", recovered)
-    </script>
-</div>
+<h3>Do-notation</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.result import Result, Ok, Err
 
-<h2>Either monad</h2>
-<div class="example">
-    <div class="example-label">typed errors (Left) and values (Right)</div>
-    <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.either import Either, Right, Left
+@Result.do
+def pipeline(x):
+    a = yield Ok(x)
+    b = yield Ok(a + 1)
+    c = yield Ok(b * 2)
+    return c
 
-# Right-biased: map/bind operate on Right
-print(Right(10).map(lambda x: x * 2))
-print(Left("error").map(lambda x: x * 2))
+print(pipeline(10))  # Ok(22)
+</script>
 
-# bind chains
-result = (
-    Right(10)
-    .bind(lambda x: Right(x + 1))
-    .bind(lambda x: Right(x * 2))
-)
-print("chained:", result)
-    </script>
-</div>
+<h2>Typeclass instances</h2>
 
-<h2>frozendict</h2>
-<div class="example">
-    <div class="example-label">immutable dictionary with nested access</div>
-    <script type="py-editor" config='{"packages":["funstruct"]}'>
+<h3>Generic functions with trait bounds</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.monad.option import Option, Some
+from funstruct.monad.result import Result, Ok, Err
+
+def double(F: Monad, fa):
+    return F.map(fa, lambda x: x * 2)
+
+print(double(summon(Monad, Option), Some(21)))
+print(double(summon(Monad, Result), Ok(21)))
+
+def safe_divide(F: MonadError, a, b):
+    if b == 0:
+        return F.raise_error(ValueError("division by zero"))
+    return F.pure(a / b)
+
+print(safe_divide(summon(MonadError, Result), 10, 2))
+print(safe_divide(summon(MonadError, Result), 10, 0))
+</script>
+
+<h2>Collections</h2>
+
+<h3>frozendict — immutable dictionary</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
 import json
 from funstruct.collections.frozendict import frozendict
 
@@ -137,45 +154,111 @@ config = frozendict({
     "db": {"host": "localhost", "pool": 10},
 })
 
-# Nested access — inner dicts are auto-frozen
 print(config["app"]["name"])
-print(config["db"]["pool"])
-
-# map over values
-print(config.map(lambda v: str(v)))
-
-# JSON round-trip
 print(json.dumps(config.to_dict(), indent=2))
-    </script>
-</div>
+</script>
 
-<h2>CList (cons list)</h2>
-<div class="example">
-    <div class="example-label">persistent singly-linked list</div>
-    <script type="py-editor" config='{"packages":["funstruct"]}'>
+<h3>CList — persistent linked list</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
 from funstruct.collections.cons import CList
 
 xs = CList.new(1, 2, 3, 4, 5)
-print("list:  ", xs)
 print("map:   ", xs.map(lambda x: x * 10))
 print("filter:", xs.filter(lambda x: x > 2))
 print("sum:   ", xs.fold_left(0, lambda acc, x: acc + x))
 print("bind:  ", xs.bind(lambda x: CList.new(x, x)))
-    </script>
-</div>
+</script>
+
+<h2>Patterns</h2>
+
+<h3>Railway oriented programming</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.result import Ok, Err
+
+def parse_int(s):
+    try: return Ok(int(s))
+    except: return Err(ValueError(f"not a number: {s}"))
+
+def validate_positive(n):
+    return Ok(n) if n > 0 else Err(ValueError(f"not positive: {n}"))
+
+# Happy path — all steps succeed
+print(parse_int("21").bind(validate_positive).map(lambda x: x * 2))
+
+# Error at parse
+print(parse_int("abc").bind(validate_positive))
+
+# Error at validate
+print(parse_int("-5").bind(validate_positive))
+</script>
+
+<h3>Validated — accumulate all errors</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.applicative.validated import Validated
+
+result = (
+    Validated.cond("alice" != "", "alice", "name required")
+    * Validated.cond(30 > 0, 30, "age must be positive")
+    * Validated.cond("@" in "a@b.com", "a@b.com", "invalid email")
+)
+print("valid:", result)
+
+result = (
+    Validated.cond("" != "", "", "name required")
+    * Validated.cond(-1 > 0, -1, "age must be positive")
+    * Validated.cond("@" in "bad", "bad", "invalid email")
+)
+print("errors:", result)
+</script>
+
+<h3>Writer — accumulate a trace</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.writer import ListWriter
+from funstruct.typeclasses import Monoid
+
+list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+
+class Traced(ListWriter):
+    _monoid = list_monoid
+
+result = (
+    Traced(10, ["start: 10"])
+    .bind(lambda x: Traced(x * 2, [f"doubled: {x*2}"]))
+    .bind(lambda x: Traced(x + 1, [f"plus one: {x+1}"]))
+)
+print("value:", result.value)
+print("trace:", result.output)
+</script>
+
+<h3>State — pure stateful computation</h3>
+<script type="py-editor" config='{"packages":["funstruct"]}'>
+from funstruct.monad.state import State
+
+def next_id():
+    return State(lambda s: (s + 1, s))
+
+result = (
+    next_id()
+    .bind(lambda a: next_id()
+    .bind(lambda b: next_id()
+    .map(lambda c: (a, b, c))))
+)
+
+state, ids = result.run(100)
+print("IDs:", ids, "  counter:", state)
+</script>
 
 <script type="py" config='{"packages":["funstruct"]}'>
 from pyscript import document
 el = document.getElementById("status")
-el.innerHTML = "✅ Ready! Edit any code block and click ▶ to run."
-el.style.color = "#9ece6a"
+el.innerHTML = "✅ Ready! Click ▶ on any block to run."
+el.style.color = "#93c763"
 </script>
 
-<div class="footer">
-    funstruct — functional structures for Python<br>
-    <a href="https://github.com/veyga/funstruct" style="color:#565f89">github</a> ·
-    <a href="https://pypi.org/project/funstruct/" style="color:#565f89">pypi</a>
-</div>
+<p style="margin-top:3rem; text-align:center; color:#404040; font-size:0.85rem;">
+    <a href="https://github.com/veyga/funstruct">github</a> ·
+    <a href="https://pypi.org/project/funstruct/">pypi</a>
+</p>
 
 </body>
 </html>
