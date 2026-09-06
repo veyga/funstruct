@@ -1,4 +1,4 @@
-"""Result — plain data type with dot-syntax via Syntax mixin.
+"""Result — plain data type with dot-syntax via DotNotation mixin.
 
 Result[A] = Ok(value) | Err(exception).
 
@@ -17,12 +17,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from funstruct.experimental.v2._syntax import Syntax
+from funstruct.experimental.v2._syntax import DotNotation
 
 A = TypeVar("A")
 
 
-class Result(Syntax, Generic[A]):
+class Result(DotNotation, Generic[A]):
     """Result[A] = Ok(value) | Err(exception)."""
     pass
 

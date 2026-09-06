@@ -1,4 +1,4 @@
-"""Syntax mixin — provides dot-syntax by delegating to summon.
+"""DotNotation mixin — provides dot-syntax by delegating to summon.
 
 In Scala/Cats, `import cats.syntax.all._` gives you:
     Some(10).map(_ + 1)
@@ -7,9 +7,9 @@ which desugars to:
     Functor[Option].map(Some(10))(_ + 1)
 
 This mixin does the same thing for Python. Data types that extend
-Syntax get dot-syntax for all registered typeclass methods.
+DotNotation get dot-syntax for all registered typeclass methods.
 
-    class Option(Syntax, Generic[A]):
+    class Option(DotNotation, Generic[A]):
         _type_constructor = Option  # set after class definition
         ...
 
@@ -27,7 +27,7 @@ Both styles work:
 from __future__ import annotations
 
 
-class Syntax:
+class DotNotation:
     """Mixin that provides dot-syntax for typeclass operations.
 
     Subclasses must set _type_constructor to their base type after
@@ -73,4 +73,4 @@ class Syntax:
         return None
 
 
-__all__ = ["Syntax"]
+__all__ = ["DotNotation"]

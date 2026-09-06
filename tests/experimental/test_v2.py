@@ -11,6 +11,7 @@ import pytest
 # Import instances to trigger registration
 import funstruct.experimental.v2.option_instances  # noqa: F401
 import funstruct.experimental.v2.result_instances  # noqa: F401
+import funstruct.experimental.v2.clist_instances  # noqa: F401
 
 from funstruct.experimental.v2._registry import summon
 from funstruct.experimental.v2._typeclasses import (
@@ -19,9 +20,11 @@ from funstruct.experimental.v2._typeclasses import (
     Functor,
     Monad,
     MonadError,
+    Traversable,
 )
 from funstruct.experimental.v2.option import Nothing, Option, Some
 from funstruct.experimental.v2.result import Err, Ok, Result
+from funstruct.experimental.v2.clist import CList, Cons, Nil, from_list
 
 
 # ── Direct resolution ────────────────────────────────────────────────
@@ -277,3 +280,91 @@ class TestDotSyntax:
         dot_result = Some(10).map(f)
         summon_result = summon(Functor, Option).map(Some(10), f)
         assert dot_result == summon_result
+
+
+# ── Traversable ──────────────────────────────────────────────────────
+
+
+class TestTraversable:
+    """Traversable takes an Applicative instance G for the target effect.
+
+    This is cleaner than v1's pure_fn parameter — you just pass the
+    Applicative instance (or summon it).
+    """
+
+    def test_traverse_clist_with_option(self):
+        """CList[A] → (A → Option[B]) → Option[CList[B]]"""
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        xs = from_list([1, 2, 3])
+        result = T.traverse(xs, lambda x: Some(x * 10), G)
+        assert result == Some(from_list([10, 20, 30]))
+
+    def test_traverse_short_circuits_on_nothing(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        xs = from_list([1, 0, 3])
+        result = T.traverse(xs, lambda x: Some(x) if x != 0 else Nothing(), G)
+        assert result == Nothing()
+
+    def test_sequence_clist_of_options(self):
+        """CList[Option[A]] → Option[CList[A]]"""
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        xs = from_list([Some(1), Some(2), Some(3)])
+        result = T.sequence(xs, G)
+        assert result == Some(from_list([1, 2, 3]))
+
+    def test_sequence_short_circuits(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        xs = from_list([Some(1), Nothing(), Some(3)])
+        result = T.sequence(xs, G)
+        assert result == Nothing()
+
+    def test_traverse_empty_list(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        result = T.traverse(Nil(), lambda x: Some(x), G)
+        assert result == Some(Nil())
+
+    def test_fold_left(self):
+        T = summon(Traversable, CList)
+        xs = from_list([1, 2, 3])
+        assert T.fold_left(xs, 0, lambda acc, x: acc + x) == 6
+
+    def test_fold_right(self):
+        T = summon(Traversable, CList)
+        xs = from_list([1, 2, 3])
+        result = T.fold_right(xs, [], lambda x, acc: [x] + acc)
+        assert result == [1, 2, 3]
+
+    def test_traverse_with_result(self):
+        """CList[A] → (A → Result[B]) → Result[CList[B]]"""
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Result)
+        xs = from_list([1, 2, 3])
+        result = T.traverse(xs, lambda x: Ok(x * 10), G)
+        assert result == Ok(from_list([10, 20, 30]))
+
+
+class TestCListMonad:
+    def test_pure(self):
+        F = summon(Monad, CList)
+        assert F.pure(42) == Cons(42)
+
+    def test_map(self):
+        F = summon(Functor, CList)
+        xs = from_list([1, 2, 3])
+        result = F.map(xs, lambda x: x * 10)
+        assert result == from_list([10, 20, 30])
+
+    def test_bind(self):
+        F = summon(Monad, CList)
+        xs = from_list([1, 2, 3])
+        result = F.bind(xs, lambda x: from_list([x, x]))
+        assert result == from_list([1, 1, 2, 2, 3, 3])
+
+    def test_dot_syntax_map(self):
+        xs = from_list([1, 2, 3])
+        assert xs.map(lambda x: x * 2) == from_list([2, 4, 6])

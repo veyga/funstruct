@@ -1,4 +1,4 @@
-"""Option — plain data type with dot-syntax via Syntax mixin.
+"""Option — plain data type with dot-syntax via DotNotation mixin.
 
 Option[A] = Some(value) | Nothing.
 
@@ -18,12 +18,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from funstruct.experimental.v2._syntax import Syntax
+from funstruct.experimental.v2._syntax import DotNotation
 
 A = TypeVar("A")
 
 
-class Option(Syntax, Generic[A]):
+class Option(DotNotation, Generic[A]):
     """Option[A] = Some(value) | Nothing."""
     pass
 

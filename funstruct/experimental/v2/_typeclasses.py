@@ -94,6 +94,31 @@ class Foldable(ABC):
     def fold_right(self, fa, acc, f: Callable) -> object: ...
 
 
+class Traversable(Foldable):
+    """traverse + sequence.
+
+    traverse: (A → G[B]) → F[A] → G[F[B]]
+    sequence: F[G[A]] → G[F[A]]
+
+    G is an Applicative instance for the target effect, passed explicitly.
+    In Haskell this is implicit; in Python we pass it or summon it.
+
+    Scala: ``trait Traverse[F[_]] extends Functor[F] with Foldable[F]``
+    """
+
+    @abstractmethod
+    def traverse(self, fa, f: Callable, G: Applicative) -> object:
+        """Map each element to an effect, then collect the results.
+
+        G is the Applicative instance for the target effect type.
+        """
+        ...
+
+    def sequence(self, fga, G: Applicative) -> object:
+        """Swap layers: F[G[A]] → G[F[A]]. Derived from traverse."""
+        return self.traverse(fga, lambda x: x, G)
+
+
 __all__ = [
     "Functor",
     "Applicative",
@@ -101,4 +126,5 @@ __all__ = [
     "MonadError",
     "Alternative",
     "Foldable",
+    "Traversable",
 ]
