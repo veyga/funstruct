@@ -32,8 +32,8 @@ from funstruct.applicative.validated import Invalid, Valid
 from funstruct.collections.cons import Cons, Nil
 from funstruct.monad.writer import Writer
 from funstruct.typeclasses import Monoid, Semigroup
-from funstruct.typeclasses._functor import Functor
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses.functor import Functor
+from funstruct.typeclasses.monad import Monad
 from tests.laws import (
     assert_functor_laws,
     assert_monad_laws,
@@ -105,22 +105,26 @@ class TestSemigroupSufficesForValidated:
     """
 
     def test_validated_accumulates_via_semigroup_combine(self):
-        """Invalid.ap accumulates errors via + (CList's semigroup combine)."""
+        """Invalid.product accumulates errors via + (CList's semigroup combine)."""
         a = Invalid(Cons(1, Nil()))
         b = Invalid(Cons(2, Nil()))
-        result = a.ap(b)
+        result = a.product(b)
         assert result == Invalid(Cons(1, Cons(2, Nil())))
 
     def test_validated_with_monoid(self):
         """Monoid also works (it's a Semigroup with extra)."""
         a = Invalid(Cons("err1", Nil()))
         b = Invalid(Cons("err2", Nil()))
-        result = a.ap(b)
+        result = a.product(b)
         assert result == Invalid(Cons("err1", Cons("err2", Nil())))
 
     def test_valid_needs_no_semigroup(self):
-        """Valid.ap doesn't combine anything — just tuples values."""
-        assert Valid(1).ap(Valid(2)) == Valid((1, 2))
+        """Valid.product tuples values."""
+        assert Valid(1).product(Valid(2)) == Valid((1, 2))
+
+    def test_valid_ap_applies_function(self):
+        """Valid.ap applies a wrapped function."""
+        assert Valid(lambda x: x + 1).ap(Valid(2)) == Valid(3)
 
 
 class TestSemigroupVsMonoidOnWriter:

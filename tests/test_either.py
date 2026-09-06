@@ -1,6 +1,6 @@
 from funstruct.collections.cons import CList, Cons, Nil
 from funstruct.monad.either import Either, Left, Right
-from tests.laws import assert_functor_laws, assert_monad_laws
+from tests.laws import assert_functor_laws, assert_monad_laws, assert_type_contract
 
 
 class TestRight:
@@ -14,13 +14,19 @@ class TestRight:
         assert Right(1).bind(lambda x: Left("fail")) == Left("fail")
 
     def test_ap(self):
-        assert Right(1).ap(Right(2)) == Right((1, 2))
+        assert Right(lambda x: x + 1).ap(Right(2)) == Right(3)
 
     def test_ap_left(self):
-        assert Right(1).ap(Left("err")) == Left("err")
+        assert Right(lambda x: x + 1).ap(Left("err")) == Left("err")
 
-    def test_or_else(self):
-        assert Right(1).or_else(lambda e: Right(99)) == Right(1)
+    def test_product(self):
+        assert Right(1).product(Right(2)) == Right((1, 2))
+
+    def test_product_left(self):
+        assert Right(1).product(Left("err")) == Left("err")
+
+    def test_handle_error_with(self):
+        assert Right(1).handle_error_with(lambda e: Right(99)) == Right(1)
 
     def test_get_or_else(self):
         assert Right(1).get_or_else(99) == 1
@@ -55,11 +61,18 @@ class TestLeft:
     def test_ap(self):
         assert Left("err").ap(Right(1)) == Left("err")
 
-    def test_or_else(self):
-        assert Left("err").or_else(lambda e: Right("recovered")) == Right("recovered")
+    def test_product(self):
+        assert Left("err").product(Right(1)) == Left("err")
 
-    def test_or_else_to_left(self):
-        assert Left("err").or_else(lambda e: Left("still bad")) == Left("still bad")
+    def test_handle_error_with(self):
+        assert Left("err").handle_error_with(lambda e: Right("recovered")) == Right(
+            "recovered"
+        )
+
+    def test_handle_error_with_to_left(self):
+        assert Left("err").handle_error_with(lambda e: Left("still bad")) == Left(
+            "still bad"
+        )
 
     def test_get_or_else(self):
         assert Left("err").get_or_else(99) == 99
@@ -74,24 +87,38 @@ class TestLeft:
         assert Left("err").is_left is True
         assert Left("err").is_right is False
 
-    def test_alt_transforms_error(self):
-        assert Left("err").alt(str.upper) == Left("ERR")
+    def test_left_map_transforms_error(self):
+        assert Left("err").left_map(str.upper) == Left("ERR")
 
-    def test_alt_preserves_error_type(self):
-        result = Left(ValueError("x")).alt(lambda e: TypeError(str(e)))
+    def test_left_map_preserves_error_type(self):
+        result = Left(ValueError("x")).left_map(lambda e: TypeError(str(e)))
         match result:
             case Left(e):
                 assert type(e) is TypeError
 
 
-class TestAlt:
+class TestLeftMap:
     """alt transforms the error without recovering."""
 
     def test_right_alt_is_noop(self):
-        assert Right(1).alt(str.upper) == Right(1)
+        assert Right(1).left_map(str.upper) == Right(1)
 
     def test_left_alt_transforms_error(self):
-        assert Left("err").alt(lambda e: f"wrapped: {e}") == Left("wrapped: err")
+        assert Left("err").left_map(lambda e: f"wrapped: {e}") == Left("wrapped: err")
+
+
+class TestBimap:
+    def test_right_maps_right(self):
+        assert Right(5).bimap(str, lambda x: x * 2) == Right(10)
+
+    def test_left_maps_left(self):
+        assert Left("err").bimap(str.upper, lambda x: x * 2) == Left("ERR")
+
+    def test_right_ignores_on_left(self):
+        assert Right(1).bimap(lambda e: e, lambda x: x + 10) == Right(11)
+
+    def test_left_ignores_on_right(self):
+        assert Left("x").bimap(lambda e: e.upper(), lambda x: x) == Left("X")
 
 
 class TestDo:
@@ -101,7 +128,7 @@ class TestDo:
             y = yield Right(x + 10)
             return x + y
 
-        assert Either.do(pipeline) == Right(12)
+        assert Either.do(pipeline)() == Right(12)
 
     def test_short_circuits(self):
         def pipeline():
@@ -109,7 +136,7 @@ class TestDo:
             y = yield Left("boom")
             return x + y
 
-        assert Either.do(pipeline) == Left("boom")
+        assert Either.do(pipeline)() == Left("boom")
 
     def test_multiple_binds(self):
         def pipeline():
@@ -118,7 +145,15 @@ class TestDo:
             c = yield Right(3)
             return a + b + c
 
-        assert Either.do(pipeline) == Right(6)
+        assert Either.do(pipeline)() == Right(6)
+
+    def test_with_args(self):
+        def pipeline(base):
+            x = yield Right(base)
+            y = yield Right(x + 10)
+            return x + y
+
+        assert Either.do(pipeline)(5) == Right(20)
 
 
 class TestSequenceTraverse:
@@ -182,6 +217,9 @@ class TestLaws:
             g=lambda x: Right(x * 2),
         )
 
+    def test_type_contract(self):
+        assert_type_contract(Either.pure, Right)
+
 
 class TestTruthiness:
     """Either has no __bool__ — both cases are always truthy (Python default).
@@ -198,3 +236,85 @@ class TestTruthiness:
     def test_left_is_also_truthy(self):
         assert bool(Left("err")) is True
         assert bool(Left(None)) is True
+
+
+class TestEitherInstances:
+    """Tests exercising typeclass instances via summon (covers instances.py)."""
+
+    def test_monad_pure(self):
+        from funstruct.typeclasses import Monad, summon
+
+        assert summon(Monad, Either).pure(42) == Right(42)
+
+    def test_monad_bind_right(self):
+        from funstruct.typeclasses import Monad, summon
+
+        assert summon(Monad, Either).bind(Right(1), lambda x: Right(x + 1)) == Right(2)
+
+    def test_monad_bind_left(self):
+        from funstruct.typeclasses import Monad, summon
+
+        assert summon(Monad, Either).bind(Left("err"), lambda x: Right(x + 1)) == Left(
+            "err"
+        )
+
+    def test_monad_map_derived(self):
+        from funstruct.typeclasses import Monad, summon
+
+        assert summon(Monad, Either).map(Right(10), lambda x: x * 2) == Right(20)
+
+    def test_raise_error(self):
+        from funstruct.typeclasses import MonadError, summon
+
+        assert summon(MonadError, Either).raise_error("oops") == Left("oops")
+
+    def test_handle_error_with_left(self):
+        from funstruct.typeclasses import MonadError, summon
+
+        result = summon(MonadError, Either).handle_error_with(
+            Left("err"), lambda e: Right(f"recovered: {e}")
+        )
+        assert result == Right("recovered: err")
+
+    def test_handle_error_with_right_passthrough(self):
+        from funstruct.typeclasses import MonadError, summon
+
+        assert summon(MonadError, Either).handle_error_with(
+            Right(42), lambda e: Right(0)
+        ) == Right(42)
+
+    def test_bifunctor_bimap_right(self):
+        from funstruct.typeclasses import Bifunctor, summon
+
+        assert summon(Bifunctor, Either).bimap(
+            Right(10), str.upper, lambda x: x * 2
+        ) == Right(20)
+
+    def test_bifunctor_bimap_left(self):
+        from funstruct.typeclasses import Bifunctor, summon
+
+        assert summon(Bifunctor, Either).bimap(
+            Left("err"), str.upper, lambda x: x * 2
+        ) == Left("ERR")
+
+    def test_bifunctor_left_map_derived_right(self):
+        from funstruct.typeclasses import Bifunctor, summon
+
+        assert summon(Bifunctor, Either).left_map(Right(10), str.upper) == Right(10)
+
+    def test_bifunctor_left_map_derived_left(self):
+        from funstruct.typeclasses import Bifunctor, summon
+
+        assert summon(Bifunctor, Either).left_map(Left("err"), str.upper) == Left("ERR")
+
+    def test_dot_vs_summon_bimap(self):
+        from funstruct.typeclasses import Bifunctor, summon
+
+        f, g = str, lambda x: x * 2
+        assert Right(10).bimap(f, g) == summon(Bifunctor, Either).bimap(Right(10), f, g)
+
+    def test_dot_vs_summon_map(self):
+        from funstruct.typeclasses import Monad, summon
+
+        f = lambda x: x + 1
+        assert Right(10).map(f) == summon(Monad, Either).map(Right(10), f)

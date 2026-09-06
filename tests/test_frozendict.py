@@ -110,7 +110,7 @@ def fd_parity2(base_dict) -> frozendict:
 
 def test_constructor_copies_initial_dict(base_dict):
     dct = frozendict(base_dict)
-    assert dct.raw is not base_dict
+    assert dct.to_dict() is not base_dict
 
 
 def test_getitem__unsafe_found_returns_item(fd_parity1):
@@ -270,9 +270,9 @@ def test_fd_does_not_copy_underlying_sets():
 
 
 def test_put__does_not_change_original(fd_parity1):
-    initial = fd_parity1.raw
+    initial = fd_parity1.to_dict()
     fd_parity1.put("x", 2)
-    assert fd_parity1.raw == initial
+    assert fd_parity1.to_dict() == initial
 
 
 def test_put__returns_new(fd_parity1):
@@ -399,7 +399,7 @@ def test_hash_collision_remove_to_leaf():
     k1 = CollidingKey("a")
     k2 = CollidingKey("b")
     fd = frozendict({}).put(k1, 1).put(k2, 2)
-    fd2 = frozendict(fd.raw)
+    fd2 = frozendict(fd.to_dict())
     # Rebuild without k1 by creating fresh
     items = {k: v for k, v in fd2.items() if k != k1}
     fd3 = frozendict(items)
@@ -615,3 +615,233 @@ class TestBranchRemove:
         assert fd2.get("25") is None
         assert fd2.get("24") == 24
         assert len(fd2) == 49
+
+
+class TestFoldable:
+    def test_fold_left_sums_values(self):
+        fd = frozendict({"a": 1, "b": 2, "c": 3})
+        assert fd.fold_left(0, lambda acc, v: acc + v) == 6
+
+    def test_fold_right_sums_values(self):
+        fd = frozendict({"a": 1, "b": 2, "c": 3})
+        assert fd.fold_right(0, lambda v, acc: v + acc) == 6
+
+    def test_fold_left_collects_values(self):
+        fd = frozendict({"a": 1, "b": 2})
+        result = fd.fold_left([], lambda acc, v: acc + [v])
+        assert sorted(result) == [1, 2]
+
+    def test_fold_right_collects_values(self):
+        fd = frozendict({"a": 1, "b": 2})
+        result = fd.fold_right([], lambda v, acc: [v] + acc)
+        assert sorted(result) == [1, 2]
+
+    def test_fold_left_on_empty(self):
+        fd = frozendict()
+        assert fd.fold_left(42, lambda acc, v: acc + v) == 42
+
+    def test_fold_right_on_empty(self):
+        fd = frozendict()
+        assert fd.fold_right(42, lambda v, acc: v + acc) == 42
+
+    def test_fold_left_string_concat(self):
+        fd = frozendict({"x": "hello"})
+        assert fd.fold_left("", lambda acc, v: acc + v) == "hello"
+
+
+class TestDeep:
+    def test_deep_converts_nested_dicts(self):
+        fd = frozendict({"a": {"b": 1}})
+        assert isinstance(fd.get("a"), frozendict)
+        assert fd.get("a").get("b") == 1
+
+    def test_deep_converts_three_levels(self):
+        fd = frozendict({"x": {"y": {"z": 42}}})
+        assert fd.get("x").get("y").get("z") == 42
+
+    def test_deep_leaves_non_dicts_alone(self):
+        fd = frozendict({"name": "alice", "age": 30})
+        assert fd.get("name") == "alice"
+        assert fd.get("age") == 30
+
+    def test_deep_converts_dicts_inside_lists(self):
+        fd = frozendict({"users": [{"name": "alice"}, {"name": "bob"}]})
+        users = fd.get("users")
+        assert isinstance(users, list)
+        assert isinstance(users[0], frozendict)
+        assert users[0].get("name") == "alice"
+        assert users[1].get("name") == "bob"
+
+    def test_deep_fold_over_json_blob(self):
+        """Simulate wrapping an API response and folding over it."""
+        api_response = {
+            "status": "ok",
+            "data": {
+                "orders": [
+                    {"id": 1, "total": 49.99},
+                    {"id": 2, "total": 129.00},
+                    {"id": 3, "total": 9.99},
+                ],
+                "meta": {"count": 3, "currency": "USD"},
+            },
+        }
+        fd = frozendict(api_response)
+
+        assert fd.get("status") == "ok"
+        data = fd.get("data")
+        assert isinstance(data, frozendict)
+        assert data.get("meta").get("currency") == "USD"
+
+        orders = data.get("orders")
+        total = sum(o.get("total") for o in orders)
+        assert abs(total - 188.98) < 0.01
+
+        meta = data.get("meta")
+        assert meta.fold_left("", lambda acc, v: f"{acc}{v}") in (
+            "3USD",
+            "USD3",  # order is not guaranteed in HAMT
+        )
+
+    def test_fold_over_nested_structure(self):
+        """Nested frozendict: org chart with departments → teams → headcount.
+
+        Build a nested frozendict, map over inner values, then fold
+        to compute totals — exercises Functor + Foldable together.
+        """
+        org = frozendict(
+            {
+                "engineering": frozendict(
+                    {
+                        "backend": frozendict({"headcount": 12, "budget": 500_000}),
+                        "frontend": frozendict({"headcount": 8, "budget": 350_000}),
+                        "infra": frozendict({"headcount": 5, "budget": 200_000}),
+                    }
+                ),
+                "product": frozendict(
+                    {
+                        "design": frozendict({"headcount": 4, "budget": 150_000}),
+                        "research": frozendict({"headcount": 3, "budget": 120_000}),
+                    }
+                ),
+            }
+        )
+
+        # fold_left: total headcount across all departments and teams
+        total_headcount = org.fold_left(
+            0,
+            lambda acc, dept: dept.fold_left(
+                acc, lambda inner_acc, team: team.get("headcount") + inner_acc
+            ),
+        )
+        assert total_headcount == 32  # 12 + 8 + 5 + 4 + 3
+
+        # fold_right: total budget across all departments and teams
+        total_budget = org.fold_right(
+            0,
+            lambda dept, acc: dept.fold_right(
+                acc, lambda team, inner_acc: team.get("budget") + inner_acc
+            ),
+        )
+        assert total_budget == 1_320_000  # 500k + 350k + 200k + 150k + 120k
+
+        # map + fold: give every team a 10% budget raise, then total
+        raised = org.map(
+            lambda dept: dept.map(
+                lambda team: team.put("budget", int(team.get("budget") * 1.1))
+            )
+        )
+        raised_budget = raised.fold_left(
+            0,
+            lambda acc, dept: dept.fold_left(
+                acc, lambda inner_acc, team: team.get("budget") + inner_acc
+            ),
+        )
+        assert raised_budget == 1_452_000  # 1_320_000 * 1.1
+
+        # fold_left: collect all team names
+        team_names = org.fold_left(
+            [],
+            lambda acc, dept: dept.fold_left(
+                acc,
+                lambda inner_acc, team: inner_acc + [f"{team.get('headcount')} people"],
+            ),
+        )
+        assert len(team_names) == 5
+        assert sorted(team_names) == [
+            "12 people",
+            "3 people",
+            "4 people",
+            "5 people",
+            "8 people",
+        ]
+
+
+class TestToDict:
+    def test_flat(self):
+        fd = frozendict({"a": 1, "b": 2})
+        assert fd.to_dict() == {"a": 1, "b": 2}
+
+    def test_nested_converts_recursively(self):
+        fd = frozendict({"a": {"b": {"c": 1}}})
+        d = fd.to_dict()
+        assert d == {"a": {"b": {"c": 1}}}
+        assert isinstance(d["a"], dict)
+        assert not isinstance(d["a"], frozendict)
+
+    def test_lists_of_dicts_converted(self):
+        fd = frozendict({"items": [{"x": 1}, {"y": 2}]})
+        d = fd.to_dict()
+        assert d == {"items": [{"x": 1}, {"y": 2}]}
+        assert isinstance(d["items"][0], dict)
+        assert not isinstance(d["items"][0], frozendict)
+
+    def test_empty(self):
+        assert frozendict().to_dict() == {}
+
+    def test_non_dict_values_passthrough(self):
+        fd = frozendict({"name": "alice", "age": 30, "active": True})
+        assert fd.to_dict() == {"name": "alice", "age": 30, "active": True}
+
+
+class TestJsonRoundTrip:
+    def test_dumps_via_to_dict(self):
+        import json
+
+        fd = frozendict({"a": 1, "b": "hello"})
+        s = json.dumps(fd.to_dict())
+        assert json.loads(s) == {"a": 1, "b": "hello"}
+
+    def test_loads_deep_freezes(self):
+        import json
+
+        s = '{"x": 1, "y": {"z": 2}}'
+        fd = frozendict(json.loads(s))
+        assert fd["x"] == 1
+        assert isinstance(fd["y"], frozendict)
+        assert fd["y"]["z"] == 2
+
+    def test_full_round_trip(self):
+        import json
+
+        original = {"users": [{"name": "alice"}, {"name": "bob"}], "count": 2}
+        fd = frozendict(original)
+        s = json.dumps(fd.to_dict())
+        fd2 = frozendict(json.loads(s))
+        assert fd2["count"] == 2
+        assert fd2["users"][0]["name"] == "alice"
+
+    def test_nested_round_trip(self):
+        import json
+
+        fd = frozendict(
+            {
+                "config": {"db": {"host": "localhost", "port": 5432}},
+                "tags": ["prod", "us-east"],
+            }
+        )
+        d = fd.to_dict()
+        s = json.dumps(d)
+        fd2 = frozendict(json.loads(s))
+        assert fd2["config"]["db"]["host"] == "localhost"
+        assert fd2["config"]["db"]["port"] == 5432
+        assert fd2["tags"] == ["prod", "us-east"]

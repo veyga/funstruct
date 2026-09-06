@@ -8,7 +8,7 @@ from funstruct.collections.frozendict import frozendict
 from funstruct.typeclasses import Semigroup
 from tests.laws import assert_functor_laws, assert_semigroup_laws
 
-invalid_concat = Semigroup(typ=Invalid, combine=lambda a, b: a.ap(b))
+invalid_concat = Semigroup(typ=Invalid, combine=lambda a, b: a.product(b))
 
 
 class TestValidatedLaws:
@@ -34,12 +34,20 @@ class TestValid:
     def test_map(self):
         assert Valid(5).map(lambda x: x * 2) == Valid(10)
 
+    def test_ap(self):
+        result = Valid(lambda x: x + 1).ap(Valid(2))
+        assert result == Valid(3)
+
+    def test_ap_with_invalid(self):
+        result = Valid(lambda x: x + 1).ap(Invalid(["err"]))
+        assert result == Invalid(["err"])
+
     def test_product_both_valid(self):
-        result = Valid(1).ap(Valid(2))
+        result = Valid(1).product(Valid(2))
         assert result == Valid((1, 2))
 
     def test_product_with_invalid(self):
-        result = Valid(1).ap(Invalid(["err"]))
+        result = Valid(1).product(Invalid(["err"]))
         assert result == Invalid(["err"])
 
 
@@ -51,11 +59,11 @@ class TestInvalid:
         assert Invalid(["err"]).map(lambda x: x * 2) == Invalid(["err"])
 
     def test_product_accumulates(self):
-        result = Invalid(["a"]).ap(Invalid(["b"]))
+        result = Invalid(["a"]).product(Invalid(["b"]))
         assert result == Invalid(["a", "b"])
 
     def test_product_with_valid(self):
-        result = Invalid(["a"]).ap(Valid(1))
+        result = Invalid(["a"]).product(Valid(1))
         assert result == Invalid(["a"])
 
     def test_fold(self):
@@ -82,16 +90,19 @@ class TestValidatedConstructors:
 
 class TestProduct:
     def test_chain_multiple_valid(self):
-        result = Valid(None).ap(Valid(None)).ap(Valid(None))
+        result = Valid(None).product(Valid(None)).product(Valid(None))
         assert result.is_valid
 
     def test_chain_accumulates_all_errors(self):
-        result = Invalid(["a"]).ap(Invalid(["b"])).ap(Invalid(["c"]))
+        result = Invalid(["a"]).product(Invalid(["b"])).product(Invalid(["c"]))
         assert result == Invalid(["a", "b", "c"])
 
     def test_mixed_accumulates_errors_only(self):
         result = (
-            Valid(None).ap(Invalid(["first"])).ap(Valid(None)).ap(Invalid(["second"]))
+            Valid(None)
+            .product(Invalid(["first"]))
+            .product(Valid(None))
+            .product(Invalid(["second"]))
         )
         assert result == Invalid(["first", "second"])
 
@@ -100,16 +111,16 @@ class TestValidatedCond:
     def test_real_world_validation(self):
         result = (
             Validated.cond("value" == "value", None, "bad auth")
-            .ap(Validated.cond("a" in ["a", "b"], None, "no member"))
-            .ap(Validated.cond(1 < 2, None, "less than"))
+            .product(Validated.cond("a" in ["a", "b"], None, "no member"))
+            .product(Validated.cond(1 < 2, None, "less than"))
         )
         assert result.is_valid
 
     def test_real_world_multiple_failures(self):
         result = (
             Validated.cond("wrong" == "value", None, "bad auth")
-            .ap(Validated.cond("unknown" in ["a", "b"], None, "no member"))
-            .ap(Validated.cond(5 < 2, None, "less than"))
+            .product(Validated.cond("unknown" in ["a", "b"], None, "no member"))
+            .product(Validated.cond(5 < 2, None, "less than"))
         )
         assert not result.is_valid
         assert result.fold(lambda errs: errs, lambda _: []) == [
@@ -118,11 +129,11 @@ class TestValidatedCond:
             "less than",
         ]
 
-    def test_real_world_multiple_failures_add(self):
+    def test_real_world_multiple_failures_mul(self):
         result = (
             Validated.cond("wrong" == "value", None, "bad auth")
-            + Validated.cond("unknown" in ["a", "b"], None, "no member")
-            + Validated.cond(5 < 2, None, "less than")
+            * Validated.cond("unknown" in ["a", "b"], None, "no member")
+            * Validated.cond(5 < 2, None, "less than")
         )
         assert not result.is_valid
         assert result.fold(lambda errs: errs, lambda _: []) == [
@@ -132,37 +143,37 @@ class TestValidatedCond:
         ]
 
 
-class TestAddOperator:
-    def test_valid_plus_valid(self):
-        result = Valid(1) + Valid(2)
+class TestMulOperator:
+    def test_valid_mul_valid(self):
+        result = Valid(1) * Valid(2)
         assert result == Valid((1, 2))
 
-    def test_valid_plus_invalid(self):
-        result = Valid(1) + Invalid(["err"])
+    def test_valid_mul_invalid(self):
+        result = Valid(1) * Invalid(["err"])
         assert result == Invalid(["err"])
 
-    def test_invalid_plus_valid(self):
-        result = Invalid(["err"]) + Valid(1)
+    def test_invalid_mul_valid(self):
+        result = Invalid(["err"]) * Valid(1)
         assert result == Invalid(["err"])
 
-    def test_invalid_plus_invalid_accumulates(self):
-        result = Invalid(["a"]) + Invalid(["b"])
+    def test_invalid_mul_invalid_accumulates(self):
+        result = Invalid(["a"]) * Invalid(["b"])
         assert result == Invalid(["a", "b"])
 
     def test_chain_three_valids(self):
-        result = Valid(1) + Valid(2) + Valid(3)
+        result = Valid(1) * Valid(2) * Valid(3)
         assert result.is_valid
 
     def test_chain_accumulates_all_errors(self):
-        result = Invalid(["a"]) + Invalid(["b"]) + Invalid(["c"])
+        result = Invalid(["a"]) * Invalid(["b"]) * Invalid(["c"])
         assert result == Invalid(["a", "b", "c"])
 
-    def test_cond_chain_with_add(self):
-        result = Validated.cond(True, None, "x") + Validated.cond(True, None, "y")
+    def test_cond_chain_with_mul(self):
+        result = Validated.cond(True, None, "x") * Validated.cond(True, None, "y")
         assert result.is_valid
 
-    def test_cond_chain_failures_with_add(self):
-        result = Validated.cond(False, None, "first") + Validated.cond(
+    def test_cond_chain_failures_with_mul(self):
+        result = Validated.cond(False, None, "first") * Validated.cond(
             False, None, "second"
         )
         assert result.fold(lambda errs: errs, lambda _: []) == [
@@ -170,10 +181,10 @@ class TestAddOperator:
             "second",
         ]
 
-    def test_add_is_same_as_product(self):
+    def test_mul_is_same_as_product(self):
         a = Valid(1)
         b = Invalid(["err"])
-        assert (a + b) == a.ap(b)
+        assert (a * b) == a.product(b)
 
 
 class TestSemigroup:
@@ -181,22 +192,22 @@ class TestSemigroup:
 
     def test_string_semigroup(self):
         """str is a Semigroup over concatenation."""
-        validated = Invalid("error1: ").ap(Invalid("error2"))
+        validated = Invalid("error1: ").product(Invalid("error2"))
         assert validated == Invalid("error1: error2")
 
     def test_int_semigroup(self):
         """int is a Semigroup over addition — count errors."""
-        validated = Invalid(1).ap(Invalid(1)).ap(Invalid(1))
+        validated = Invalid(1).product(Invalid(1)).product(Invalid(1))
         assert validated == Invalid(3)
 
     def test_int_semigroup_valid(self):
         """int is a Semigroup over addition — count errors."""
-        validated = Valid(1) + Invalid(2) + Invalid(3)
+        validated = Valid(1) * Invalid(2) * Invalid(3)
         assert validated == Invalid(5)
 
     def test_default_uses_cons_list(self):
         """Validated.invalid() wraps in CList by default."""
-        validated = Validated.invalid("a").ap(Validated.invalid("b"))
+        validated = Validated.invalid("a").product(Validated.invalid("b"))
         assert validated.fold(
             on_invalid=lambda errs: errs == ["a", "b"],
             on_valid=lambda _: False,
@@ -238,7 +249,7 @@ class TestSemigroup:
                 "b wrong",
             )
 
-        validated = a(dct) + b(dct)
+        validated = a(dct) * b(dct)
         if invalids:
             assert validated.fold(
                 on_invalid=lambda errs: errs == invalids,
@@ -267,81 +278,204 @@ class TestToResult:
     all produce Ok. Validation status determines the case, not the value.
     """
 
-    def test_valid_to_result(self):
-        from funstruct.monad.result import Ok
+    def test_valid_fold_to_ok(self):
+        from funstruct.monad.result import Ok, Err
 
-        assert Valid(42).to_result() == Ok(42)
+        assert Valid(42).fold(Err, Ok) == Ok(42)
 
-    def test_valid_to_result_is_ok(self):
-        from funstruct.monad.result import Ok
+    def test_valid_fold_is_ok(self):
+        from funstruct.monad.result import Ok, Err
 
-        result = Valid(42).to_result()
-        assert isinstance(result, Ok)
+        result = Valid(42).fold(Err, Ok)
+        assert type(result) is Ok
 
     def test_valid_falsey_values_still_ok(self):
-        from funstruct.monad.result import Ok
+        from funstruct.monad.result import Ok, Err
 
-        assert Valid(0).to_result() == Ok(0)
-        assert Valid(None).to_result() == Ok(None)
-        assert Valid(False).to_result() == Ok(False)
-        assert Valid("").to_result() == Ok("")
-        assert Valid([]).to_result() == Ok([])
+        assert Valid(0).fold(Err, Ok) == Ok(0)
+        assert Valid(None).fold(Err, Ok) == Ok(None)
+        assert Valid(False).fold(Err, Ok) == Ok(False)
+        assert Valid("").fold(Err, Ok) == Ok("")
+        assert Valid([]).fold(Err, Ok) == Ok([])
 
-    def test_invalid_to_result(self):
-        from funstruct.monad.result import Err
+    def test_invalid_fold_to_err(self):
+        from funstruct.monad.result import Err, Ok
 
-        assert Invalid(["err"]).to_result() == Err(["err"])
+        assert Invalid(["err"]).fold(Err, Ok) == Err(["err"])
 
-    def test_invalid_to_result_is_err(self):
-        from funstruct.monad.result import Err
+    def test_invalid_fold_is_err(self):
+        from funstruct.monad.result import Err, Ok
 
-        result = Invalid(["err"]).to_result()
-        assert isinstance(result, Err)
+        result = Invalid(["err"]).fold(Err, Ok)
+        assert type(result) is Err
 
-    def test_valid_to_result_or(self):
-        from funstruct.monad.result import Ok
+    def test_valid_fold_then_left_map(self):
+        from funstruct.monad.result import Ok, Err
 
-        assert Valid(1).to_result_or(ValueError) == Ok(1)
+        result = Valid(1).fold(Err, Ok).left_map(lambda errs: ValueError(str(errs)))
+        assert result == Ok(1)
 
-    def test_valid_to_result_or_is_ok(self):
-        from funstruct.monad.result import Ok
-
-        result = Valid(1).to_result_or(ValueError)
-        assert isinstance(result, Ok)
-
-    def test_invalid_to_result_or(self):
-        from funstruct.monad.result import Err
-
-        result = Invalid(["a", "b"]).to_result_or(ValueError)
-        assert isinstance(result, Err)
-        match result:
-            case Err(e):
-                assert isinstance(e, ValueError)
-                assert "a; b" in str(e)
-
-    def test_invalid_to_result_or_custom_combine(self):
-        from funstruct.monad.result import Err
-
-        result = Invalid([1, 2, 3]).to_result_or(
-            TypeError, combine=lambda errs: str(sum(errs))
-        )
-        assert isinstance(result, Err)
-        match result:
-            case Err(e):
-                assert isinstance(e, TypeError)
-                assert "6" in str(e)
-
-    def test_invalid_to_result_or_pattern_match(self):
-        """Err pattern-matches in case statements — the mint test scenario."""
-        from funstruct.monad.result import Err
+    def test_invalid_fold_then_left_map(self):
+        from funstruct.monad.result import Err, Ok
 
         result = (
-            Validated.cond(False, None, "bad auth")
-            + Validated.cond(False, None, "no access")
-        ).to_result_or(ValueError)
+            Invalid(["a", "b"])
+            .fold(Err, Ok)
+            .left_map(lambda errs: ValueError("; ".join(str(e) for e in errs)))
+        )
+        assert type(result) is Err
+        match result:
+            case Err(e):
+                assert type(e) is ValueError
+                assert "a; b" in str(e)
+
+    def test_invalid_fold_then_left_map_custom(self):
+        from funstruct.monad.result import Err, Ok
+
+        result = (
+            Invalid([1, 2, 3])
+            .fold(Err, Ok)
+            .left_map(lambda errs: TypeError(str(sum(errs))))
+        )
+        assert type(result) is Err
+        match result:
+            case Err(e):
+                assert type(e) is TypeError
+                assert "6" in str(e)
+
+    def test_invalid_fold_left_map_pattern_match(self):
+        """Err pattern-matches in case statements — the mint test scenario."""
+        from funstruct.monad.result import Err, Ok
+
+        result = (
+            (
+                Validated.cond(False, None, "bad auth")
+                * Validated.cond(False, None, "no access")
+            )
+            .fold(Err, Ok)
+            .left_map(lambda errs: ValueError("; ".join(str(e) for e in errs)))
+        )
 
         match result:
             case Err(ValueError()):
                 pass
             case other:
                 raise AssertionError(f"Expected Err(ValueError), got {other}")
+
+
+class TestValidatedBifunctor:
+    def test_valid_bimap_applies_right(self):
+        assert Valid(10).bimap(str.upper, lambda x: x * 2) == Valid(20)
+
+    def test_invalid_bimap_applies_left(self):
+        assert Invalid("err").bimap(str.upper, lambda x: x * 2) == Invalid("ERR")
+
+    def test_valid_left_map_is_identity(self):
+        assert Valid(10).left_map(str.upper) == Valid(10)
+
+    def test_invalid_left_map_transforms_errors(self):
+        assert Invalid("err").left_map(str.upper) == Invalid("ERR")
+
+    def test_bimap_identity_law(self):
+        v = Valid(42)
+        i = Invalid("err")
+        assert v.bimap(lambda x: x, lambda x: x) == v
+        assert i.bimap(lambda x: x, lambda x: x) == i
+
+
+# ── Instance tests via summon ────────────────────────────────────────
+
+from funstruct.typeclasses import Applicative, summon
+from funstruct.typeclasses.bifunctor import Bifunctor
+
+
+class TestValidatedApplicativeInstance:
+    def test_pure_via_summon(self):
+        assert summon(Applicative, Validated).pure(42) == Valid(42)
+
+    @P.autodetect_parameters()
+    @P.case(
+        name="valid_valid",
+        ff=Valid(lambda x: x + 1),
+        fa=Valid(10),
+        expected_type=Valid,
+    )
+    @P.case(
+        name="invalid_valid",
+        ff=Invalid("err"),
+        fa=Valid(10),
+        expected_type=Invalid,
+    )
+    @P.case(
+        name="valid_invalid",
+        ff=Valid(lambda x: x + 1),
+        fa=Invalid("err"),
+        expected_type=Invalid,
+    )
+    @P.case(
+        name="invalid_invalid_accumulates",
+        ff=Invalid("a:"),
+        fa=Invalid("b"),
+        expected_type=Invalid,
+    )
+    def test_ap_via_summon(self, ff, fa, expected_type):
+        result = summon(Applicative, Validated).ap(ff, fa)
+        assert isinstance(result, expected_type)
+
+    def test_ap_valid_valid_value(self):
+        F = summon(Applicative, Validated)
+        assert F.ap(Valid(lambda x: x * 2), Valid(21)) == Valid(42)
+
+    def test_ap_invalid_invalid_accumulates_errors(self):
+        F = summon(Applicative, Validated)
+        result = F.ap(Invalid("a:"), Invalid("b"))
+        assert result == Invalid("a:b")
+
+    @P.autodetect_parameters()
+    @P.case(name="map_valid", fa=Valid(10), expected=Valid(20))
+    @P.case(name="map_invalid", fa=Invalid("err"), expected=Invalid("err"))
+    def test_map_via_summon(self, fa, expected):
+        F = summon(Applicative, Validated)
+        result = F.map(fa, lambda x: x * 2)
+        if isinstance(expected, Valid):
+            assert result == expected
+        else:
+            assert isinstance(result, Invalid)
+
+    def test_product_both_valid(self):
+        F = summon(Applicative, Validated)
+        assert F.product(Valid(1), Valid(2)) == Valid((1, 2))
+
+    def test_product_first_invalid(self):
+        F = summon(Applicative, Validated)
+        assert isinstance(F.product(Invalid("a"), Valid(2)), Invalid)
+
+    def test_product_second_invalid(self):
+        F = summon(Applicative, Validated)
+        assert isinstance(F.product(Valid(1), Invalid("b")), Invalid)
+
+    def test_product_both_invalid_accumulates(self):
+        F = summon(Applicative, Validated)
+        result = F.product(Invalid("a:"), Invalid("b"))
+        assert isinstance(result, Invalid)
+        assert result.errors == "a:b"
+
+    def test_dot_vs_summon_map(self):
+        f = lambda x: x + 1
+        assert Valid(10).map(f) == summon(Applicative, Validated).map(Valid(10), f)
+
+
+class TestValidatedBifunctorInstance:
+    @P.autodetect_parameters()
+    @P.case(name="valid", fa=Valid(10), expected=Valid(20))
+    @P.case(name="invalid", fa=Invalid("err"), expected=Invalid("ERR"))
+    def test_bimap_via_summon(self, fa, expected):
+        F = summon(Bifunctor, Validated)
+        assert F.bimap(fa, str.upper, lambda x: x * 2) == expected
+
+    @P.autodetect_parameters()
+    @P.case(name="valid_identity", fa=Valid(10), expected=Valid(10))
+    @P.case(name="invalid_transforms", fa=Invalid("err"), expected=Invalid("ERR"))
+    def test_left_map_via_summon(self, fa, expected):
+        F = summon(Bifunctor, Validated)
+        assert F.left_map(fa, str.upper) == expected

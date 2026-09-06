@@ -1,0 +1,3 @@
+# Bifunctor
+
+::: funstruct.typeclasses.bifunctor

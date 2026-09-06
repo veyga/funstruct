@@ -24,6 +24,12 @@ class _tail_call:
         else:
             return self.call(*self.args, **self.kwargs)
 
+    async def handle_async(self):
+        if type(self.call) is tco_async:
+            return await self.call.f(*self.args, **self.kwargs)
+        else:
+            return await self.call(*self.args, **self.kwargs)
+
 
 class tco:
     """Marks a function as tail-call optimized.
@@ -38,6 +44,32 @@ class tco:
         ret = self.f(*args, **kwargs)
         while type(ret) is _tail_call:
             ret = ret.handle()
+        return ret
+
+
+class tco_async:
+    """Marks an async function as tail-call optimized.
+
+    Same as @tco but for async functions — awaits each step.
+
+    Example::
+
+        @tco_async
+        async def async_sum(n, acc=0):
+            if n == 0:
+                return acc
+            return tail_call(async_sum)(n - 1, acc + n)
+
+        await async_sum(10000)  # no stack overflow
+    """
+
+    def __init__(self, f):
+        self.f = f
+
+    async def __call__(self, *args, **kwargs):
+        ret = await self.f(*args, **kwargs)
+        while type(ret) is _tail_call:
+            ret = await ret.handle_async()
         return ret
 
 
@@ -65,5 +97,6 @@ def tail_call(f):
 
 __all__ = [
     "tco",
+    "tco_async",
     "tail_call",
 ]

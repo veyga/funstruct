@@ -57,5 +57,15 @@ bench *args:
 nox *args:
   uv run nox {{args}}
 
-# docs-build:
-#   uv run mkdocs build
+# generate and open browser playground (PyScript + Pyodide)
+playground:
+  uv run python scripts/generate_playground.py
+  open demoplayground/index.html
+
+# generate and open typeclass hierarchy diagram
+diagram:
+  uv run python scripts/generate_diagram.py
+  open docs/typeclasses.svg
+
+docs-build:
+  uv run mkdocs build

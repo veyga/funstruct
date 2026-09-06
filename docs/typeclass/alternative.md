@@ -1,0 +1,3 @@
+# Alternative
+
+::: funstruct.typeclasses.alternative

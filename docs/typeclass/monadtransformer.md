@@ -1,3 +1,0 @@
-# MonadTransformer
-
-::: funstruct.typeclasses.MonadTransformer

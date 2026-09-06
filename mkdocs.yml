@@ -17,42 +17,61 @@ theme:
 
 nav:
   - Home: index.md
-  - typeclass:
+  - Playground: playground.html
+  - Guides:
+      - What is a Monad?: guides/monads.md
+      - Typeclass Pattern (JSON): guides/typeclass_pattern_json.md
+      - Typeclass Pattern (Ordering): guides/typeclass_pattern_ordering.md
+      - Generic Programming: guides/generic_programming.md
+      - Railway Oriented Programming: guides/railway_oriented_programming.md
+      - Tagless Final Style: guides/tagless_final.md
+      - Do-Notation: guides/do_notation.md
+      - Async Operations: guides/async.md
+      - Evaluation Strategy: guides/evaluation_strategy.md
+      - Creating a Data Type: guides/creating_a_data_type.md
+      - Anti-Patterns: guides/antipatterns.md
+  - Typeclasses:
       - Overview: typeclass/index.md
       - Semigroup: typeclass/semigroup.md
       - Monoid: typeclass/monoid.md
-      - Functor: functor/index.md
+      - Functor: typeclass/functor.md
       - Applicative: typeclass/applicative.md
+      - Alternative: typeclass/alternative.md
       - Monad: typeclass/monad.md
-      - MonadTransformer: typeclass/monadtransformer.md
-  - functor:
-      - Overview: functor/index.md
-  - applicative:
-      - Overview: applicative/index.md
-      - Validated: applicative/validated.md
-  - monad:
+      - MonadError: typeclass/monad_error.md
+      - Foldable: typeclass/foldable.md
+      - Traversable: typeclass/traversable.md
+      - Bifunctor: typeclass/bifunctor.md
+  - Monads:
       - Overview: monad/index.md
-      - Either: monad/either.md
       - Option: monad/option.md
+      - Either: monad/either.md
       - Result: monad/result.md
       - Reader: monad/reader.md
       - Writer: monad/writer.md
       - State: monad/state.md
       - Future: monad/future.md
-  - monadtransformer:
-      - Overview: monadtransformer/index.md
-      - ReaderT: monadtransformer/reader_t.md
-      - StateT: monadtransformer/state_t.md
-      - EitherT: monadtransformer/either_t.md
-      - OptionT: monadtransformer/option_t.md
-      - WriterT: monadtransformer/writer_t.md
-  - collections:
+  - Applicatives:
+      - Overview: applicative/index.md
+      - Validated: applicative/validated.md
+      - ZipList: applicative/ziplist.md
+  - Collections:
       - Overview: collections/index.md
-      - Cons: collections/cons.md
+      - CList: collections/cons.md
       - frozendict: collections/frozendict.md
       - Tree: collections/tree.md
-  - util:
+  - Utilities:
       - tailrec: util/tailrec.md
+      - CapturesCreationSiteMixin: util/created_at.md
+  - Experimental:
+      - Monad Transformers:
+          - Overview: experimental/monadtransformer/index.md
+          - ReaderT: experimental/monadtransformer/reader_t.md
+          - StateT: experimental/monadtransformer/state_t.md
+          - EitherT: experimental/monadtransformer/either_t.md
+          - OptionT: experimental/monadtransformer/option_t.md
+          - WriterT: experimental/monadtransformer/writer_t.md
+      - Optics (Lenses): experimental/optics/index.md
 
 extra:
   version:

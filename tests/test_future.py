@@ -2,28 +2,97 @@
 
 import asyncio
 
+import pytest
+
 from funstruct.monad.either import Left, Right
 from funstruct.monad.future import Future
 from funstruct.monad.result import AsyncResult, Err, Ok, TryAsync
 
 
 def run(future):
-    """Helper: await a Future and return the Either."""
+    """Helper: await a Future and return the Result."""
     return asyncio.run(future._awaitable())
+
+
+class TestReAwaitable:
+    """Future and AsyncResult can be safely branched (awaited from multiple paths)."""
+
+    def test_future_branching(self):
+        async def go():
+            f = Future.pure(42)
+            a = f.map(lambda x: x + 1)
+            b = f.map(lambda x: x * 2)
+            return (await a, await b)
+
+        assert asyncio.run(go()) == (43, 84)
+
+    def test_async_result_branching(self):
+        async def go():
+            r = AsyncResult.pure(10)
+            a = r.map(lambda x: x + 1)
+            b = r.map(lambda x: x * 2)
+            return (await a, await b)
+
+        ra, rb = asyncio.run(go())
+        assert ra == Ok(11)
+        assert rb == Ok(20)
+
+    def test_future_same_instance_awaited_twice(self):
+        async def go():
+            f = Future.pure(99)
+            first = await f
+            second = await f
+            return (first, second)
+
+        assert asyncio.run(go()) == (99, 99)
+
+
+class TestAwaitable:
+    """Future and AsyncResult are directly awaitable — no .run() needed."""
+
+    def test_future_is_awaitable(self):
+        async def go():
+            return await Future.pure(42)
+
+        assert asyncio.run(go()) == 42
+
+    def test_async_result_is_awaitable(self):
+        async def go():
+            return await AsyncResult.pure(42)
+
+        assert asyncio.run(go()) == Ok(42)
+
+    def test_async_result_is_not_callable(self):
+        ar = AsyncResult.pure(42)
+        with pytest.raises(TypeError):
+            ar()
+
+    def test_async_result_has_no_run(self):
+        ar = AsyncResult.pure(42)
+        assert not hasattr(ar, "run")
 
 
 class TestPure:
     def test_pure_succeeds(self):
-        assert run(AsyncResult.pure(42)) == Right(42)
+        assert run(AsyncResult.pure(42)) == Ok(42)
 
-    def test_from_error_fails(self):
-        assert run(AsyncResult.from_error("oops")) == Left("oops")
+    def test_raise_error_fails(self):
+        err = ValueError("oops")
+        result = run(AsyncResult.raise_error(err))
+        assert result == Err(err)
 
     def test_from_either_right(self):
         assert run(AsyncResult.from_either(Right(1))) == Right(1)
 
     def test_from_either_left(self):
         assert run(AsyncResult.from_either(Left("err"))) == Left("err")
+
+    def test_from_result_ok(self):
+        assert run(AsyncResult.from_result(Ok(1))) == Ok(1)
+
+    def test_from_result_err(self):
+        err = ValueError("bad")
+        assert run(AsyncResult.from_result(Err(err))) == Err(err)
 
 
 class TestTryAsyncWrapping:
@@ -32,7 +101,7 @@ class TestTryAsyncWrapping:
         async def coro():
             return 42
 
-        assert run(coro()) == Right(42)
+        assert run(coro()) == Ok(42)
 
     def test_catches_exception(self):
         @TryAsync
@@ -40,42 +109,43 @@ class TestTryAsyncWrapping:
             raise ValueError("boom")
 
         result = run(coro())
-        assert result.is_left
+        assert result.is_err
         match result:
-            case Left(e):
+            case Err(e):
                 assert type(e) is ValueError
 
 
 class TestMap:
     def test_maps_success(self):
         result = run(AsyncResult.pure(5).map(lambda x: x * 2))
-        assert result == Right(10)
+        assert result == Ok(10)
 
     def test_skips_on_error(self):
-        result = run(AsyncResult.from_error("err").map(lambda x: x * 2))
-        assert result == Left("err")
+        err = RuntimeError("err")
+        result = run(AsyncResult.raise_error(err).map(lambda x: x * 2))
+        assert result == Err(err)
 
     def test_chains_maps(self):
         result = run(AsyncResult.pure(1).map(lambda x: x + 1).map(lambda x: x * 10))
-        assert result == Right(20)
+        assert result == Ok(20)
 
 
 class TestBind:
     def test_chains_futures(self):
         result = run(AsyncResult.pure(1).bind(lambda x: AsyncResult.pure(x + 10)))
-        assert result == Right(11)
+        assert result == Ok(11)
 
     def test_short_circuits_on_error(self):
+        err = RuntimeError("stop")
         result = run(
-            AsyncResult.from_error("stop").bind(lambda x: AsyncResult.pure(x + 1))
+            AsyncResult.raise_error(err).bind(lambda x: AsyncResult.pure(x + 1))
         )
-        assert result == Left("stop")
+        assert result == Err(err)
 
     def test_bind_can_fail(self):
-        result = run(
-            AsyncResult.pure(1).bind(lambda x: AsyncResult.from_error("failed"))
-        )
-        assert result == Left("failed")
+        err = RuntimeError("failed")
+        result = run(AsyncResult.pure(1).bind(lambda x: AsyncResult.raise_error(err)))
+        assert result == Err(err)
 
 
 class TestBindWithEither:
@@ -88,8 +158,21 @@ class TestBindWithEither:
         assert result == Left("nope")
 
     def test_skips_on_initial_error(self):
-        result = run(AsyncResult.from_error("err").bind(lambda x: Right(99)))
-        assert result == Left("err")
+        err = RuntimeError("err")
+        result = run(AsyncResult.raise_error(err).bind(lambda x: Right(99)))
+        assert result == Err(err)
+
+
+class TestBindWithResult:
+    def test_success(self):
+        result = run(AsyncResult.pure(5).bind(lambda x: Ok(x * 2)))
+        assert result == Ok(10)
+
+    def test_failure(self):
+        result = run(AsyncResult.pure(5).bind(lambda x: Err(ValueError("nope"))))
+        match result:
+            case Err(e):
+                assert str(e) == "nope"
 
 
 class TestBindWithAwaitable:
@@ -98,52 +181,68 @@ class TestBindWithAwaitable:
             return x * 2
 
         result = run(AsyncResult.pure(5).bind(double))
-        assert result == Right(10)
+        assert result == Ok(10)
 
     def test_skips_on_error(self):
         async def double(x):
             return x * 2
 
-        result = run(AsyncResult.from_error("err").bind(double))
-        assert result == Left("err")
+        err = RuntimeError("err")
+        result = run(AsyncResult.raise_error(err).bind(double))
+        assert result == Err(err)
 
 
-class TestOrElse:
+class TestHandleErrorWith:
     def test_recovers_from_error(self):
+        err = ValueError("oops")
         result = run(
-            AsyncResult.from_error("oops").or_else(
+            AsyncResult.raise_error(err).handle_error_with(
                 lambda e: AsyncResult.pure(f"recovered: {e}")
             )
         )
-        assert result == Right("recovered: oops")
+        assert result == Ok("recovered: oops")
 
     def test_skips_on_success(self):
-        result = run(AsyncResult.pure(42).or_else(lambda e: AsyncResult.pure(0)))
-        assert result == Right(42)
+        result = run(
+            AsyncResult.pure(42).handle_error_with(lambda e: AsyncResult.pure(0))
+        )
+        assert result == Ok(42)
 
-    def test_or_else_with_either(self):
-        result = run(AsyncResult.from_error("oops").or_else(lambda e: Right("fixed")))
+    def test_handle_error_with_either(self):
+        err = ValueError("oops")
+        result = run(
+            AsyncResult.raise_error(err).handle_error_with(lambda e: Right("fixed"))
+        )
         assert result == Right("fixed")
+
+    def test_handle_error_with_result(self):
+        err = ValueError("oops")
+        result = run(
+            AsyncResult.raise_error(err).handle_error_with(lambda e: Ok("fixed"))
+        )
+        assert result == Ok("fixed")
 
 
 class TestThen:
     def test_sequences(self):
         result = run(AsyncResult.pure("discard").then(AsyncResult.pure("keep")))
-        assert result == Right("keep")
+        assert result == Ok("keep")
 
     def test_short_circuits(self):
-        result = run(AsyncResult.from_error("stop").then(AsyncResult.pure("never")))
-        assert result == Left("stop")
+        err = RuntimeError("stop")
+        result = run(AsyncResult.raise_error(err).then(AsyncResult.pure("never")))
+        assert result == Err(err)
 
 
 class TestAp:
-    def test_tuples_values(self):
-        result = run(AsyncResult.pure(1).ap(AsyncResult.pure(2)))
-        assert result == Right((1, 2))
+    def test_applies_function(self):
+        result = run(AsyncResult.pure(lambda x: x + 1).ap(AsyncResult.pure(2)))
+        assert result == Ok(3)
 
-    def test_short_circuits_left(self):
-        result = run(AsyncResult.from_error("err").ap(AsyncResult.pure(2)))
-        assert result == Left("err")
+    def test_short_circuits_err(self):
+        err = RuntimeError("err")
+        result = run(AsyncResult.raise_error(err).ap(AsyncResult.pure(2)))
+        assert result == Err(err)
 
 
 class TestTryAsync:
@@ -152,7 +251,7 @@ class TestTryAsync:
         async def fetch(id):
             return {"id": id, "name": "alice"}
 
-        assert run(fetch(1)) == Right({"id": 1, "name": "alice"})
+        assert run(fetch(1)) == Ok({"id": 1, "name": "alice"})
 
     def test_catches_exception(self):
         @TryAsync
@@ -160,9 +259,9 @@ class TestTryAsync:
             raise ValueError(f"not found: {id}")
 
         result = run(fetch(99))
-        assert result.is_left
+        assert result.is_err
         match result:
-            case Left(e):
+            case Err(e):
                 assert "not found: 99" in str(e)
 
     def test_preserves_function_name(self):
@@ -188,7 +287,7 @@ class TestPipeline:
             return f"sent to {email}"
 
         pipeline = fetch_user(1).map(lambda u: u["email"]).bind(send_email)
-        assert run(pipeline) == Right("sent to alice@example.com")
+        assert run(pipeline) == Ok("sent to alice@example.com")
 
     def test_pipeline_short_circuits(self):
         @TryAsync
@@ -201,15 +300,106 @@ class TestPipeline:
 
         pipeline = fetch_user(99).map(lambda u: u["email"]).bind(send_email)
         result = run(pipeline)
-        assert result.is_left
+        assert result.is_err
 
     def test_pipeline_with_recovery(self):
         pipeline = (
-            AsyncResult.from_error("timeout")
-            .or_else(lambda e: AsyncResult.pure("cached"))
+            AsyncResult.raise_error(TimeoutError("timeout"))
+            .handle_error_with(lambda e: AsyncResult.pure("cached"))
             .map(lambda v: v.upper())
         )
-        assert run(pipeline) == Right("CACHED")
+        assert run(pipeline) == Ok("CACHED")
+
+
+class TestAsyncResultDo:
+    def test_success(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield AsyncResult.pure(x + 10)
+            return x + y
+
+        assert run(pipeline()) == Ok(12)
+
+    def test_short_circuits_on_err(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield AsyncResult.raise_error(ValueError("boom"))
+            return x + y
+
+        result = run(pipeline())
+        assert result.is_err
+
+    def test_multiple_binds(self):
+        @AsyncResult.do
+        def pipeline():
+            a = yield AsyncResult.pure(10)
+            b = yield AsyncResult.pure(20)
+            c = yield AsyncResult.pure(30)
+            return a + b + c
+
+        assert run(pipeline()) == Ok(60)
+
+    def test_with_args(self):
+        def pipeline(base):
+            x = yield AsyncResult.pure(base)
+            y = yield AsyncResult.pure(x * 2)
+            return x + y
+
+        assert run(AsyncResult.do(pipeline)(5)) == Ok(15)
+
+    def test_accepts_lifted_result(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield AsyncResult.from_result(Ok(10))
+            return x + y
+
+        assert run(pipeline()) == Ok(11)
+
+    def test_short_circuits_on_lifted_err(self):
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.pure(1)
+            y = yield AsyncResult.from_result(Err(ValueError("sync error")))
+            return x + y
+
+        result = run(pipeline())
+        assert result.is_err
+
+
+class TestFutureDo:
+    def _run_future(self, future):
+        return asyncio.run(future._awaitable())
+
+    def test_success(self):
+        @Future.do
+        def pipeline():
+            x = yield Future.pure(1)
+            y = yield Future.pure(x + 10)
+            return x + y
+
+        assert self._run_future(pipeline()) == 12
+
+    def test_multiple_binds(self):
+        @Future.do
+        def pipeline():
+            a = yield Future.pure(10)
+            b = yield Future.pure(20)
+            c = yield Future.pure(30)
+            return a + b + c
+
+        assert self._run_future(pipeline()) == 60
+
+    def test_with_args(self):
+        def pipeline(base):
+            x = yield Future.pure(base)
+            y = yield Future.pure(x * 2)
+            return y
+
+        result = self._run_future(Future.do(pipeline)(21))
+        assert result == 42
 
 
 class TestTryAsyncWithSyncFunctions:
@@ -367,13 +557,120 @@ class TestTryAsyncComposition:
         result = run(parse("10").map(lambda x: x * 2))
         assert result == Ok(20)
 
-    def test_alt_after_sync_error(self):
+    def test_left_map_after_sync_error(self):
         @TryAsync
         def parse(raw):
             return int(raw)
 
-        result = run(parse("bad").alt(lambda e: TypeError("parse failed")))
+        result = run(parse("bad").left_map(lambda e: TypeError("parse failed")))
         assert isinstance(result, Err)
         match result:
             case Err(e):
                 assert isinstance(e, TypeError)
+
+
+class TestAsyncResultBifunctor:
+    def test_bimap_on_ok(self):
+        result = run(AsyncResult.pure(10).bimap(str, lambda x: x * 2))
+        assert result == Ok(20)
+
+    def test_bimap_on_err(self):
+        err = ValueError("bad")
+        result = run(
+            AsyncResult.raise_error(err).bimap(
+                lambda e: TypeError(str(e)), lambda x: x * 2
+            )
+        )
+        assert isinstance(result, Err)
+        match result:
+            case Err(e):
+                assert isinstance(e, TypeError)
+
+    def test_left_map_on_ok_is_identity(self):
+        result = run(AsyncResult.pure(10).left_map(lambda e: TypeError(str(e))))
+        assert result == Ok(10)
+
+    def test_left_map_on_err_transforms(self):
+        err = ValueError("bad")
+        result = run(
+            AsyncResult.raise_error(err).left_map(lambda e: TypeError("wrapped"))
+        )
+        assert isinstance(result, Err)
+        match result:
+            case Err(e):
+                assert isinstance(e, TypeError)
+                assert str(e) == "wrapped"
+
+    def test_bimap_identity_law(self):
+        ok_result = run(AsyncResult.pure(42).bimap(lambda x: x, lambda x: x))
+        assert ok_result == Ok(42)
+
+        err = ValueError("err")
+        err_result = run(AsyncResult.raise_error(err).bimap(lambda x: x, lambda x: x))
+        assert err_result == Err(err)
+
+
+class TestAsyncResultInstances:
+    """Tests exercising AsyncResult typeclass instances via summon."""
+
+    def _run(self, ar):
+        return asyncio.run(ar._awaitable())
+
+    def test_pure_via_summon(self):
+        from funstruct.typeclasses import Monad, summon
+
+        F = summon(Monad, AsyncResult)
+        assert self._run(F.pure(42)) == Ok(42)
+
+    def test_bind_via_summon(self):
+        from funstruct.typeclasses import Monad, summon
+
+        F = summon(Monad, AsyncResult)
+        result = self._run(
+            F.bind(AsyncResult.pure(10), lambda x: AsyncResult.pure(x + 1))
+        )
+        assert result == Ok(11)
+
+    def test_map_derived_via_summon(self):
+        from funstruct.typeclasses import Monad, summon
+
+        F = summon(Monad, AsyncResult)
+        result = self._run(F.map(AsyncResult.pure(10), lambda x: x * 2))
+        assert result == Ok(20)
+
+    def test_raise_error_via_summon(self):
+        from funstruct.typeclasses import MonadError, summon
+
+        F = summon(MonadError, AsyncResult)
+        result = self._run(F.raise_error(ValueError("x")))
+        assert isinstance(result, Err)
+
+    def test_handle_error_with_via_summon(self):
+        from funstruct.typeclasses import MonadError, summon
+
+        F = summon(MonadError, AsyncResult)
+        result = self._run(
+            F.handle_error_with(
+                AsyncResult.raise_error(ValueError("x")),
+                lambda e: AsyncResult.pure("recovered"),
+            )
+        )
+        assert result == Ok("recovered")
+
+    def test_handle_error_with_ok_passthrough_via_summon(self):
+        from funstruct.typeclasses import MonadError, summon
+
+        F = summon(MonadError, AsyncResult)
+        result = self._run(
+            F.handle_error_with(AsyncResult.pure(42), lambda e: AsyncResult.pure(0))
+        )
+        assert result == Ok(42)
+
+    def test_dot_vs_summon_equivalence(self):
+        from funstruct.typeclasses import Monad, summon
+
+        F = summon(Monad, AsyncResult)
+        f = lambda x: x + 1
+        dot_result = self._run(AsyncResult.pure(10).map(f))
+        summon_result = self._run(F.map(AsyncResult.pure(10), f))
+        assert dot_result == summon_result == Ok(11)

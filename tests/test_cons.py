@@ -10,6 +10,7 @@ from tests.laws import (
     assert_monad_laws,
     assert_monoid_laws,
     assert_semigroup_laws,
+    assert_type_contract,
 )
 
 
@@ -46,6 +47,9 @@ class TestCListLaws:
             g=lambda x: Cons(x * 10, Nil()),
         )
 
+    def test_type_contract(self):
+        assert_type_contract(Cons.pure, Cons)
+
 
 @pytest.fixture
 def nil():
@@ -67,9 +71,9 @@ def three_two_one():
     return Cons(3, Cons(2, Cons(1)))
 
 
-def test_cant_create_list_type():
-    with pytest.raises(TypeError):
-        CList()
+def test_use_nil_for_empty_list():
+    assert Nil() == Nil()
+    assert not Nil()
 
 
 def test_nil_is_falsey():
@@ -854,6 +858,30 @@ class TestStaticConstructors:
         assert Nil().length() == 0
 
 
+class TestFill:
+    def test_fill_zero(self):
+        assert CList.fill(0, 1) == Nil()
+
+    def test_fill_one(self):
+        assert CList.fill(1, 42) == Cons(42)
+
+    def test_fill_multiple(self):
+        assert CList.fill(3, 1) == CList.from_iterable([1, 1, 1])
+
+    def test_fill_negative(self):
+        assert CList.fill(-1, 1) == Nil()
+
+    def test_bind_with_fill(self):
+        xs = CList.from_iterable([1, 2, 3])
+        result = xs.bind(lambda n: CList.fill(n, n))
+        assert result == CList.from_iterable([1, 2, 2, 3, 3, 3])
+
+    def test_map_fill_then_flatten(self):
+        xs = CList.from_iterable([1, 2, 3])
+        result = xs.map(lambda n: CList.fill(n, n)).flatten()
+        assert result == CList.from_iterable([1, 2, 2, 3, 3, 3])
+
+
 class TestDoNotation:
     """CList do-notation — limited by Python generators being single-use.
 
@@ -870,3 +898,130 @@ class TestDoNotation:
         ys = CList.from_iterable(["a", "b"])
         result = xs.bind(lambda x: ys.map(lambda y: (x, y)))
         assert result == CList.from_iterable([(1, "a"), (1, "b"), (2, "a"), (2, "b")])
+
+
+# ── Instance tests via summon ────────────────────────────────────────
+
+from funstruct.typeclasses import Monad, Alternative, summon
+from funstruct.typeclasses.traversable import Traversable
+from funstruct.typeclasses.applicative import Applicative
+from funstruct.monad.option import Option, Some, Nothing
+
+
+class TestCListMonadInstance:
+    @P.autodetect_parameters()
+    @P.case(name="pure", input=42, expected=Cons(42))
+    @P.case(name="pure_str", input="x", expected=Cons("x"))
+    def test_pure_via_summon(self, input, expected):
+        assert summon(Monad, CList).pure(input) == expected
+
+    def test_bind_via_summon(self):
+        F = summon(Monad, CList)
+        assert F.bind(CList.new(1, 2, 3), lambda x: CList.new(x, x)) == CList.new(
+            1, 1, 2, 2, 3, 3
+        )
+
+    def test_bind_nil_via_summon(self):
+        assert summon(Monad, CList).bind(Nil(), lambda x: CList.new(x)) == Nil()
+
+    def test_map_derived_via_summon(self):
+        assert summon(Monad, CList).map(
+            CList.new(1, 2, 3), lambda x: x * 10
+        ) == CList.new(10, 20, 30)
+
+    def test_product_derived_via_summon(self):
+        assert summon(Monad, CList).product(CList.new(1), CList.new(2)) == CList.new(
+            (1, 2)
+        )
+
+    def test_dot_vs_summon_map(self):
+        f = lambda x: x + 1
+        xs = CList.new(1, 2, 3)
+        assert xs.map(f) == summon(Monad, CList).map(xs, f)
+
+
+class TestCListAlternativeInstance:
+    def test_empty_via_summon(self):
+        assert summon(Alternative, CList).empty() == Nil()
+
+    def test_or_else_nonempty_first(self):
+        F = summon(Alternative, CList)
+        assert F.or_else(CList.new(1, 2), Nil()) == CList.new(1, 2)
+
+    def test_or_else_empty_first(self):
+        F = summon(Alternative, CList)
+        assert F.or_else(Nil(), CList.new(3, 4)) == CList.new(3, 4)
+
+    def test_or_else_both_nonempty(self):
+        F = summon(Alternative, CList)
+        assert F.or_else(CList.new(1), CList.new(2)) == CList.new(1, 2)
+
+    @P.autodetect_parameters()
+    @P.case(
+        name="apply_two_fns_two_vals",
+        fns=[lambda x: x + 1, lambda x: x * 10],
+        vals=[1, 2],
+        expected=[2, 3, 10, 20],
+    )
+    @P.case(
+        name="apply_one_fn",
+        fns=[lambda x: x * 2],
+        vals=[5, 10],
+        expected=[10, 20],
+    )
+    def test_ap_via_summon(self, fns, vals, expected):
+        F = summon(Alternative, CList)
+        result = F.ap(CList.from_iterable(fns), CList.from_iterable(vals))
+        assert result == CList.from_iterable(expected)
+
+
+class TestCListTraversableInstance:
+    def test_traverse_with_option(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        result = T.traverse(CList.new(1, 2, 3), lambda x: Some(x * 10), G)
+        assert result == Some(CList.new(10, 20, 30))
+
+    def test_traverse_short_circuits_on_nothing(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        result = T.traverse(
+            CList.new(1, 0, 3), lambda x: Some(x) if x != 0 else Nothing(), G
+        )
+        assert result == Nothing()
+
+    def test_traverse_empty_list(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        assert T.traverse(Nil(), lambda x: Some(x), G) == Some(Nil())
+
+    def test_sequence_via_summon(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        assert T.sequence(CList.new(Some(1), Some(2), Some(3)), G) == Some(
+            CList.new(1, 2, 3)
+        )
+
+    def test_sequence_short_circuits(self):
+        T = summon(Traversable, CList)
+        G = summon(Applicative, Option)
+        assert T.sequence(CList.new(Some(1), Nothing(), Some(3)), G) == Nothing()
+
+    @P.autodetect_parameters()
+    @P.case(name="sum", input=[1, 2, 3], acc=0, expected=6)
+    @P.case(name="empty", input=[], acc=0, expected=0)
+    @P.case(name="product", input=[2, 3, 4], acc=1, expected=24)
+    def test_fold_left_via_summon(self, input, acc, expected):
+        T = summon(Traversable, CList)
+        op = (lambda a, b: a + b) if acc == 0 else (lambda a, b: a * b)
+        assert T.fold_left(CList.from_iterable(input), acc, op) == expected
+
+    @P.autodetect_parameters()
+    @P.case(name="collect", input=[1, 2, 3], expected=[1, 2, 3])
+    @P.case(name="empty", input=[], expected=[])
+    def test_fold_right_via_summon(self, input, expected):
+        T = summon(Traversable, CList)
+        assert (
+            T.fold_right(CList.from_iterable(input), [], lambda x, acc: [x] + acc)
+            == expected
+        )

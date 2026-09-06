@@ -21,7 +21,27 @@ def lint(session):
 def typecheck(session):
     """Run type checker."""
     session.install(".", "--group", "dev")
-    session.run("ty", "check", "funstruct/")
+    session.run("ty", "check")
+
+
+@nox.session
+def typecheck_compat(session):
+    """Type-check core library against Python 3.10 (minimum supported)."""
+    session.install(".", "--group", "dev")
+    session.run(
+        "ty",
+        "check",
+        "--python-version",
+        "3.10",
+        "--exclude",
+        "funstruct/playground/",
+        "--exclude",
+        "tests/",
+        "--exclude",
+        "docs/",
+        "--exclude",
+        "benchmarks/",
+    )
 
 
 @nox.session

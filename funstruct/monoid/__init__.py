@@ -8,6 +8,7 @@ from funstruct.typeclasses import Monoid
 IntAddition = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
 IntMultiplication = Monoid(typ=int, combine=lambda a, b: a * b, empty=1)
 StrConcat = Monoid(typ=str, combine=lambda a, b: a + b, empty="")
+ListConcat = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
 CListConcat = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())
 BoolOr = Monoid(typ=bool, combine=lambda a, b: a or b, empty=False)
 BoolAnd = Monoid(typ=bool, combine=lambda a, b: a and b, empty=True)

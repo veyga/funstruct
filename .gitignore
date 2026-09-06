@@ -134,3 +134,5 @@ coc-settings.json
 .vimspector.json
 notes.txt
 .benchmarks/
+.claude
+playground/

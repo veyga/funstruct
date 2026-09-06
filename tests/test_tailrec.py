@@ -1,6 +1,8 @@
+import asyncio
+
 import pytest
 
-from funstruct.util.tailrec import tail_call, tco
+from funstruct.util.tailrec import tail_call, tco, tco_async
 
 # pytest affects the default of 1000
 RECURSION_LIMIT = 700
@@ -81,3 +83,36 @@ def test_no_tail_call_stack_overflow():
 
     with pytest.raises(RecursionError):
         recurse(RECURSION_LIMIT * 2)
+
+
+class TestTcoAsync:
+    def test_async_sum(self):
+        @tco_async
+        async def async_sum(n, acc=0):
+            if n == 0:
+                return acc
+            return tail_call(async_sum)(n - 1, acc + n)
+
+        assert asyncio.run(async_sum(100)) == 5050
+
+    def test_async_beyond_recursion_limit(self):
+        @tco_async
+        async def async_sum(n, acc=0):
+            if n == 0:
+                return acc
+            return tail_call(async_sum)(n - 1, acc + n)
+
+        limit = RECURSION_LIMIT * 2
+        result = asyncio.run(async_sum(limit))
+        assert result == limit * (limit + 1) // 2
+
+    def test_async_without_tco_returns_tail_call(self):
+        """Without @tco_async, async functions return _tail_call objects."""
+
+        async def async_sum(n, acc=0):
+            if n == 0:
+                return acc
+            return tail_call(async_sum)(n - 1, acc + n)
+
+        result = asyncio.run(async_sum(5))
+        assert type(result) is not int

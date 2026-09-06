@@ -12,16 +12,44 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses import (
-    Applicative,
-    Functor,
-    Monad,
-    Monoid,
-    Semigroup,
-)
+from funstruct.typeclasses import Monoid, Semigroup
 
 A = TypeVar("A")
 Eq = Callable[[object, object], bool]
+
+
+def assert_type_contract(
+    pure_fn: Callable,
+    success_type: type,
+    is_monad: bool = True,
+) -> None:
+    """Verify a concrete type implements the required typeclass contract.
+
+    Every type extending Applicative must have a pure that returns the
+    correct success type. The derived map and ap must also preserve it.
+
+    For Monads, bind must also preserve the type.
+    """
+    val = pure_fn(1)
+    assert type(val) is success_type, (
+        f"pure must return {success_type.__name__}, got {type(val).__name__}"
+    )
+
+    mapped = pure_fn(1).map(lambda x: x + 1)
+    assert type(mapped) is success_type, (
+        f"map must return {success_type.__name__}, got {type(mapped).__name__}"
+    )
+
+    ap_result = pure_fn(lambda x: x).ap(pure_fn(1))
+    assert type(ap_result) is success_type, (
+        f"ap must return {success_type.__name__}, got {type(ap_result).__name__}"
+    )
+
+    if is_monad:
+        bound = pure_fn(1).bind(pure_fn)
+        assert type(bound) is success_type, (
+            f"bind must return {success_type.__name__}, got {type(bound).__name__}"
+        )
 
 
 def assert_semigroup_laws(a: A, b: A, c: A, sg: Semigroup) -> None:
@@ -71,7 +99,7 @@ def assert_monoid_laws(a: A, sg: Monoid) -> None:
     assert sg.combine(a, sg.empty) == a, "Monoid right identity violated"
 
 
-def assert_functor_laws(fa: Functor, eq: Eq | None = None) -> None:
+def assert_functor_laws(fa, eq: Eq | None = None) -> None:
     """Functor laws: identity and composition.
 
     1. Identity — mapping the identity function changes nothing:
@@ -103,77 +131,84 @@ def assert_functor_laws(fa: Functor, eq: Eq | None = None) -> None:
 
 
 def assert_applicative_laws(
-    pure_fn: Callable[[object], Applicative],
-    fa: Applicative,
-    fb: Applicative,
+    pure_fn: Callable,
+    fa,
+    fb,
     eq: Eq | None = None,
 ) -> None:
-    """Applicative laws: homomorphism and ap/map2 consistency.
+    """Applicative laws + type preservation.
 
-    1. Homomorphism — pure values combine purely:
-
-        pure(a).ap(pure(b)) == pure((a, b))
-
-        pure(1) ⊛ pure(2) == pure((1, 2))
-
-    2. Consistency — ap and map2 must agree when tupling:
-
-        fa.ap(fb) == fa.map2(fb, λa b → (a, b))
-
-        Both produce the same paired result from two
-        independent applicative values.
-
-    These ensure that `ap` is just "combine two independent
-    contexts" — no hidden sequencing or side effects.
+    1. Identity — pure(id).ap(v) == v
+    2. Homomorphism — pure(f).ap(pure(a)) == pure(f(a))
+    3. Interchange — u.ap(pure(y)) == pure(λf. f(y)).ap(u)
+    4. Composition — pure(∘).ap(u).ap(v).ap(w) == u.ap(v.ap(w))
+    5. product/map2 consistency — fa.product(fb) == fa.map2(fb, λa b → (a, b))
+    6. Type preservation — pure, map, ap all return the expected type
     """
     _eq = eq or (lambda a, b: a == b)
+    success_type = type(pure_fn(1))
 
-    assert _eq(pure_fn(1).ap(pure_fn(2)), pure_fn((1, 2))), (
-        "Applicative homomorphism violated: pure(1).ap(pure(2)) != pure((1,2))"
+    identity = lambda x: x
+    assert _eq(pure_fn(identity).ap(fa), fa), (
+        "Applicative identity violated: pure(id).ap(v) != v"
     )
 
-    assert _eq(fa.ap(fb), fa.map2(fb, lambda a, b: (a, b))), (
-        "Applicative ap/map2 consistency violated: ap must equal map2 with tupling"
+    f = lambda x: (x, "tagged")
+    assert _eq(pure_fn(f).ap(pure_fn(1)), pure_fn(f(1))), (
+        "Applicative homomorphism violated: pure(f).ap(pure(a)) != pure(f(a))"
+    )
+
+    u = pure_fn(lambda x: (x, "u"))
+    y = 42
+    assert _eq(u.ap(pure_fn(y)), pure_fn(lambda ff: ff(y)).ap(u)), (
+        "Applicative interchange violated: u.ap(pure(y)) != pure(λf.f(y)).ap(u)"
+    )
+
+    compose = lambda f: lambda g: lambda x: f(g(x))
+    u2 = pure_fn(lambda x: x + 1)
+    v = pure_fn(lambda x: x * 2)
+    w = pure_fn(10)
+    assert _eq(
+        pure_fn(compose).ap(u2).ap(v).ap(w),
+        u2.ap(v.ap(w)),
+    ), "Applicative composition violated: pure(∘).ap(u).ap(v).ap(w) != u.ap(v.ap(w))"
+
+    assert _eq(fa.product(fb), fa.map2(fb, lambda a, b: (a, b))), (
+        "Applicative product/map2 consistency violated"
+    )
+
+    assert type(pure_fn(1)) is success_type, (
+        f"Type preservation: pure must return {success_type.__name__}, "
+        f"got {type(pure_fn(1)).__name__}"
+    )
+    mapped = pure_fn(1).map(lambda x: x)
+    assert type(mapped) is success_type, (
+        f"Type preservation: map must return {success_type.__name__}, "
+        f"got {type(mapped).__name__}"
+    )
+    ap_result = pure_fn(lambda x: x).ap(pure_fn(1))
+    assert type(ap_result) is success_type, (
+        f"Type preservation: ap must return {success_type.__name__}, "
+        f"got {type(ap_result).__name__}"
     )
 
 
 def assert_monad_laws(
-    pure_fn: Callable[[object], Monad],
-    m: Monad,
-    f: Callable[[object], Monad],
-    g: Callable[[object], Monad],
+    pure_fn: Callable,
+    m,
+    f: Callable,
+    g: Callable,
     eq: Eq | None = None,
 ) -> None:
-    """Monad laws: left identity, right identity, associativity.
+    """Monad laws: left identity, right identity, associativity, type preservation.
 
-    1. Left identity — pure is a no-op wrapper for bind:
-
-        pure(a).bind(f) == f(a)
-
-        a --pure--> M[A] --bind(f)--> M[B]
-        a ---------f--------------------->    (same result)
-
-    2. Right identity — binding into pure changes nothing:
-
-        m.bind(pure) == m
-
-        M[A] --bind(pure)--> M[A]   (same value)
-
-    3. Associativity — bind chains are independent of grouping:
-
-        m.bind(f).bind(g) == m.bind(λx → f(x).bind(g))
-
-        M[A] → M[B] → M[C]     (left-to-right)
-             ≡
-        M[A] → (A → M[B] → M[C])  (nested)
-
-    These ensure that monadic pipelines behave predictably:
-    pure doesn't add effects, and sequencing is associative.
-
-    Counterexample: a monad where pure(a) adds a "tag" violates
-    left identity — pure(a).bind(f) has the tag, but f(a) doesn't.
+    1. Left identity — pure(a).bind(f) == f(a)
+    2. Right identity — m.bind(pure) == m
+    3. Associativity — m.bind(f).bind(g) == m.bind(λx → f(x).bind(g))
+    4. Type preservation — pure, map, bind, ap all return the expected type
     """
     _eq = eq or (lambda a, b: a == b)
+    success_type = type(pure_fn(1))
 
     a = 42
     assert _eq(pure_fn(a).bind(f), f(a)), (
@@ -184,4 +219,24 @@ def assert_monad_laws(
 
     assert _eq(m.bind(f).bind(g), m.bind(lambda x: f(x).bind(g))), (
         "Monad associativity violated"
+    )
+
+    assert type(pure_fn(1)) is success_type, (
+        f"Type preservation: pure must return {success_type.__name__}, "
+        f"got {type(pure_fn(1)).__name__}"
+    )
+    mapped = pure_fn(1).map(lambda x: x)
+    assert type(mapped) is success_type, (
+        f"Type preservation: map must return {success_type.__name__}, "
+        f"got {type(mapped).__name__}"
+    )
+    bound = pure_fn(1).bind(pure_fn)
+    assert type(bound) is success_type, (
+        f"Type preservation: bind must return {success_type.__name__}, "
+        f"got {type(bound).__name__}"
+    )
+    ap_result = pure_fn(lambda x: x).ap(pure_fn(1))
+    assert type(ap_result) is success_type, (
+        f"Type preservation: ap must return {success_type.__name__}, "
+        f"got {type(ap_result).__name__}"
     )
