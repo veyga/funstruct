@@ -20,7 +20,9 @@ nav:
   - Playground: playground.html
   - Guides:
       - What is a Monad?: guides/monads.md
-      - The Typeclass Pattern: guides/typeclass_pattern.md
+      - Typeclass Pattern (JSON): guides/typeclass_pattern_json.md
+      - Typeclass Pattern (Ordering): guides/typeclass_pattern_ordering.md
+      - Generic Programming: guides/generic_programming.md
       - Railway Oriented Programming: guides/railway_oriented_programming.md
       - Tagless Final Style: guides/tagless_final.md
       - Do-Notation: guides/do_notation.md

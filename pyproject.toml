@@ -61,7 +61,7 @@ rules.invalid-argument-type = "ignore"
 
 [tool.ty.src]
 # playground/tests/docs use 3.12+ syntax; exclude from the 3.10 check.
-exclude = ["funstruct/playground/", "tests/", "docs/", "benchmarks/"]
+exclude = ["funstruct/playground/", "tests/", "docs/", "benchmarks/", "demos/", "demoplayground/", "scripts/"]
 
 [tool.ty.environment]
 python-version = "3.14"
