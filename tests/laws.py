@@ -142,19 +142,42 @@ def assert_applicative_laws(
     fb: Applicative,
     eq: Eq | None = None,
 ) -> None:
-    """Applicative laws: homomorphism, product/map2 consistency, type preservation.
+    """Applicative laws + type preservation.
 
-    1. Homomorphism — pure(f).ap(pure(a)) == pure(f(a))
-    2. Consistency — fa.product(fb) == fa.map2(fb, λa b → (a, b))
-    3. Type preservation — pure, map, ap all return the expected type
+    1. Identity — pure(id).ap(v) == v
+    2. Homomorphism — pure(f).ap(pure(a)) == pure(f(a))
+    3. Interchange — u.ap(pure(y)) == pure(λf. f(y)).ap(u)
+    4. Composition — pure(∘).ap(u).ap(v).ap(w) == u.ap(v.ap(w))
+    5. product/map2 consistency — fa.product(fb) == fa.map2(fb, λa b → (a, b))
+    6. Type preservation — pure, map, ap all return the expected type
     """
     _eq = eq or (lambda a, b: a == b)
     success_type = type(pure_fn(1))
+
+    identity = lambda x: x
+    assert _eq(pure_fn(identity).ap(fa), fa), (
+        "Applicative identity violated: pure(id).ap(v) != v"
+    )
 
     f = lambda x: (x, "tagged")
     assert _eq(pure_fn(f).ap(pure_fn(1)), pure_fn(f(1))), (
         "Applicative homomorphism violated: pure(f).ap(pure(a)) != pure(f(a))"
     )
+
+    u = pure_fn(lambda x: (x, "u"))
+    y = 42
+    assert _eq(u.ap(pure_fn(y)), pure_fn(lambda ff: ff(y)).ap(u)), (
+        "Applicative interchange violated: u.ap(pure(y)) != pure(λf.f(y)).ap(u)"
+    )
+
+    compose = lambda f: lambda g: lambda x: f(g(x))
+    u2 = pure_fn(lambda x: x + 1)
+    v = pure_fn(lambda x: x * 2)
+    w = pure_fn(10)
+    assert _eq(
+        pure_fn(compose).ap(u2).ap(v).ap(w),
+        u2.ap(v.ap(w)),
+    ), "Applicative composition violated: pure(∘).ap(u).ap(v).ap(w) != u.ap(v.ap(w))"
 
     assert _eq(fa.product(fb), fa.map2(fb, lambda a, b: (a, b))), (
         "Applicative product/map2 consistency violated"
