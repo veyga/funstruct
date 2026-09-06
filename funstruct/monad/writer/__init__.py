@@ -1,13 +1,33 @@
 """Writer monad — computations with accumulated output.
 
->>> from funstruct.monad.writer import ListWriter
->>> w = ListWriter(1, ["init"])
->>> w.map(lambda x: x + 10)
-ListWriter(value=11, output=['init'])
->>> w.bind(lambda x: ListWriter(x + 1, ["inc"]))
-ListWriter(value=2, output=['init', 'inc'])
->>> ListWriter.pure(99)
-ListWriter(value=99, output=[])
+Built-in Writer types (each has its own Monoid):
+
+    ListWriter  — output: list   (combine = +, empty = [])
+    CListWriter — output: CList  (combine = +, empty = Nil())
+    StrWriter   — output: str    (combine = +, empty = "")
+    IntWriter   — output: int    (combine = +, empty = 0)
+
+Writer is unique among funstruct monads. Reader, State, Either, Option,
+and Result all have ONE type constructor with variants. Writer has MULTIPLE
+type constructors because each monoid creates a different type — ListWriter,
+StrWriter, IntWriter each need their own Monad instance.
+
+Create custom Writers with Writer.for_monoid:
+
+    >>> from funstruct.monad.writer import Writer
+    >>> from funstruct.typeclasses import Monoid
+    >>> SetWriter = Writer.for_monoid(Monoid(typ=set, combine=lambda a, b: a | b, empty=set()))
+
+Examples:
+
+    >>> from funstruct.monad.writer import ListWriter
+    >>> w = ListWriter(1, ["init"])
+    >>> w.map(lambda x: x + 10)
+    ListWriter(value=11, output=['init'])
+    >>> w.bind(lambda x: ListWriter(x + 1, ["inc"]))
+    ListWriter(value=2, output=['init', 'inc'])
+    >>> ListWriter.pure(99)
+    ListWriter(value=99, output=[])
 """
 
 from __future__ import annotations
@@ -87,33 +107,41 @@ class Writer(DataType, Generic[_W, _A]):
     __match_args__ = ("value", "output")
 
 
-class ListWriter(Writer):
-    """Writer with list output. Each subclass is its own type constructor."""
-    _monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
-    _type_constructor = None  # reset — set below after class definition
+    @classmethod
+    def for_monoid(cls, monoid: Monoid, name: str | None = None) -> type:
+        """Create a Writer subclass for a specific Monoid.
+
+        Each returned class is its own type constructor with auto-registered
+        Monad instance.
+
+            ListWriter = Writer.for_monoid(list_monoid)
+            CListWriter = Writer.for_monoid(clist_monoid)
+        """
+        cls_name = name or f"{monoid.typ.__name__.title()}Writer"
+        new_cls = type(cls_name, (cls,), {
+            "_monoid": monoid,
+            "_type_constructor": None,
+        })
+        new_cls._type_constructor = new_cls
+        return new_cls
 
 
-class CListWriter(Writer):
-    _monoid = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())
-    _type_constructor = None
-
-
-class StrWriter(Writer):
-    _monoid = Monoid(typ=str, combine=lambda a, b: a + b, empty="")
-    _type_constructor = None
-
-
-class IntWriter(Writer):
-    _monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
-    _type_constructor = None
-
-
-# Writer subclasses are each their own type constructor (different monoids).
-# Override the auto-detection which would set them all to Writer.
-ListWriter._type_constructor = ListWriter
-CListWriter._type_constructor = CListWriter
-StrWriter._type_constructor = StrWriter
-IntWriter._type_constructor = IntWriter
+ListWriter = Writer.for_monoid(
+    Monoid(typ=list, combine=lambda a, b: a + b, empty=[]),
+    "ListWriter",
+)
+CListWriter = Writer.for_monoid(
+    Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil()),
+    "CListWriter",
+)
+StrWriter = Writer.for_monoid(
+    Monoid(typ=str, combine=lambda a, b: a + b, empty=""),
+    "StrWriter",
+)
+IntWriter = Writer.for_monoid(
+    Monoid(typ=int, combine=lambda a, b: a + b, empty=0),
+    "IntWriter",
+)
 
 
 
