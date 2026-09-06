@@ -96,7 +96,7 @@ Three distinct class hierarchies, connected by instances:
 
 **Semigroup** — associative combine (`+` being the canonical 'combine' operation)
 
-```
+```python
 A ─┐
     ├──( + )──> A
 A ─┘
@@ -134,10 +134,12 @@ Heavily influenced by [Scalaz](https://github.com/scalaz/scalaz) and
 [Cats](https://typelevel.org/cats/).
 
 ```python
-# Signatures shown in Python 3.12+ syntax for clarity.
-# The library supports Python ≥3.10 for now
+# Python 3.12+ syntax for clarity. Library supports ≥3.10.
+# In v2, typeclasses are INSTANCE classes (self = instance, fa = data).
+# Data types extend DataType, NOT typeclasses.
 
-# Value-level typeclasses (not inherited — instantiated per type)
+# ── Value-level typeclasses (instantiated per use) ──
+
 @dataclass(frozen=True)
 class Semigroup[A]:
     typ: type
@@ -145,71 +147,68 @@ class Semigroup[A]:
 
 @dataclass(frozen=True)
 class Monoid[A](Semigroup[A]):
-    empty: A  # identity element
+    empty: A
 
-# Type-level hierarchy (inherited by data types)
-class Functor[A](ABC):
-    def map(fa: Functor[A], f) -> Functor[B]: ...              # abstract
+# ── Typeclass hierarchy (instance classes) ──
 
-class Applicative[A](Functor[A]):
-    def pure(cls, value: A) -> Applicative[A]: ...             # abstract @final on concrete types
-    def ap(
-        ff: Applicative[Callable[[A], B]],
-        fa: Applicative[A],
-    ) -> Applicative[B]: ...                                   # abstract
-    def map(fa: Applicative[A], f) -> Applicative[B]: ...      # derived: pure(f).ap(fa)
-    def product(
-        fa: Applicative[A],
-        fb: Applicative[B],
-    ) -> Applicative[tuple[A, B]]: ...
-    __mul__ = product                                          # * operator
+class Functor(BaseTypeclass):
+    def map(self, fa, f): ...                                  # abstract
 
-class Alternative[A](Applicative[A]):
-    def empty(cls) -> Alternative[A]: ...                      # abstract
-    def or_else(fa: Alternative[A], fb: Alternative[A]) -> Alternative[A]: ...  # abstract
+class Applicative(Functor):
+    def pure(self, value): ...                                 # abstract
+    def ap(self, ff, fa): ...                                  # abstract
+    def map(self, fa, f): ...                                  # derived: ap(pure(f), fa)
+    def map2(self, fa, fb, f): ...                             # derived: map + ap
+    def product(self, fa, fb): ...                             # derived: map + ap
 
-class Monad[A](Applicative[A]):
-    def bind(fa: Monad[A], f) -> Monad[B]: ...                 # abstract
-    def do(cls, gen_fn) -> Callable[..., Monad[A]]: ...        # abstract
-    def map(fa: Monad[A], f) -> Monad[B]: ...                  # @final: bind + pure
-    def ap(
-        ff: Monad[Callable[[A], B]],
-        fa: Monad[A],
-    ) -> Monad[B]: ...                                         # @final: bind + map
-    def then(fa: Monad[A], fb: Monad[B]) -> Monad[B]: ...     # derived: bind
-    def map2(fa: Monad[A], fb: Monad[B], f) -> Monad[C]: ...  # derived: bind + map
-    __rshift__ = bind                                          # >> operator
+class Alternative(Applicative):
+    def empty(self): ...                                       # abstract
+    def or_else(self, fa, fb): ...                             # abstract
 
-class MonadError[A](Monad[A]):
-    def raise_error(cls, error: E) -> MonadError[A]: ...       # abstract
-    def handle_error_with(
-        fa: MonadError[A], f,
-    ) -> MonadError[A]: ...                                    # abstract
+class Monad(Applicative):
+    def bind(self, fa, f): ...                                 # abstract
+    def map(self, fa, f): ...                                  # derived: bind + pure
+    def ap(self, ff, fa): ...                                  # derived: bind + map
 
-# Standalone — maps over two type parameters (not part of Functor)
-class Bifunctor[A, B](ABC):
-    def bimap(fa: Bifunctor[A, B], f, g) -> Bifunctor[C, D]: ...  # abstract
-    def left_map(fa: Bifunctor[A, B], f) -> Bifunctor[C, B]: ...  # derived: bimap(f, id)
+class MonadError(Monad):
+    def raise_error(self, error): ...                          # abstract
+    def handle_error_with(self, fa, f): ...                    # abstract
 
-# Separate hierarchy (experimental)
-# MT = MonadTransformer for brevity
-class MonadTransformer[F, A](ABC):
-    def bind(fa: MT[F, A], f) -> MT[F, B]: ...                 # abstract
-    def map(fa: MT[F, A], f) -> MT[F, B]: ...                  # abstract
-    def pure(cls, value: A, monad: type[F]) -> MT[F, A]: ...   # abstract
-    def lift_f(cls, inner: F[A]) -> MT[F, A]: ...              # abstract
-    def do(cls, gen_fn) -> Callable[..., MT[F, A]]: ...        # abstract
-    def ap(
-        ff: MT[F, Callable[[A], B]],
-        fa: MT[F, A],
-    ) -> MT[F, B]: ...                                         # derived: bind + map
-    def then(fa: MT[F, A], fb: MT[F, B]) -> MT[F, B]: ...     # derived: bind
-    def product(
-        fa: MT[F, A],
-        fb: MT[F, B],
-    ) -> MT[F, tuple[A, B]]: ...                               # derived: map + ap
-    __mul__ = product                                          # * operator
-    __rshift__ = bind                                          # >> operator
+class Bifunctor(BaseTypeclass):
+    def bimap(self, fa, f, g): ...                             # abstract
+    def left_map(self, fa, f): ...                             # derived: bimap(f, id)
+
+class Foldable(BaseTypeclass):
+    def fold_left(self, fa, acc, f): ...                       # abstract
+    def fold_right(self, fa, acc, f): ...                      # abstract
+
+class Traversable(Foldable):
+    def traverse(self, fa, f, G: Applicative): ...             # abstract
+    def sequence(self, fga, G: Applicative): ...               # derived
+
+# ── Data types (extend DataType, not typeclasses) ──
+
+class Option(DataType, Generic[A]):    ...  # Some(value) | Nothing()
+class Either(DataType, Generic[E, A]): ...  # Right(value) | Left(error)
+class Result(DataType, Generic[A]):    ...  # Ok(value) | Err(exception)
+
+# ── Instances (connect typeclasses to data types) ──
+
+class _OptionMonad(Monad, for_type=Option):
+    def pure(self, value): return Some(value)
+    def bind(self, fa, f):
+        match fa:
+            case Some(v): return f(v)
+            case Nothing(): return fa
+# map, ap, product, then, map2 — all inherited from Monad hierarchy
+
+# ── Experimental (monad transformers) ──
+
+class MonadTransformer(ABC):
+    def bind(self, fa, f): ...                                 # abstract
+    def map(self, fa, f): ...                                  # abstract
+    def pure(cls, value, monad: type): ...                     # abstract
+    def lift_f(cls, inner): ...                                # abstract
 ```
 
 ### Instances (which data types implement which typeclasses)
@@ -278,7 +277,22 @@ Every implementation must satisfy these mathematical laws:
 - Left identity: `pure(a).bind(f) == f(a)`
 - Right identity: `m.bind(pure) == m`
 - Associativity: `m.bind(f).bind(g) == m.bind(λx. f(x).bind(g))`
-- Type preservation: `pure`, `map`, `bind`, `ap` return the correct concrete type
+
+**Alternative**
+
+- Right identity: `fa.or_else(empty) == fa`
+- Left identity: `empty.or_else(fa) == fa`
+- Associativity: `a.or_else(b).or_else(c) == a.or_else(b.or_else(c))`
+
+**Bifunctor**
+
+- Identity: `bimap(id, id) == id`
+- Composition: `bimap(f1 ∘ f2, g1 ∘ g2) == bimap(f1, g1) ∘ bimap(f2, g2)`
+
+**Traversable**
+
+- Identity: `traverse(fa, pure, G) == pure(fa)`
+- Composition: `traverse(fa, f ∘ g, G) == traverse(traverse(fa, g, G), f, H)`
 
 ## Why no IO type?
 

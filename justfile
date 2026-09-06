@@ -57,9 +57,10 @@ bench *args:
 nox *args:
   uv run nox {{args}}
 
-# open browser playground (PyScript + Pyodide)
+# generate and open browser playground (PyScript + Pyodide)
 playground:
-  open docs/playground.html
+  uv run python scripts/generate_playground.py
+  open demoplayground/index.html
 
 # generate and open typeclass hierarchy diagram
 diagram:

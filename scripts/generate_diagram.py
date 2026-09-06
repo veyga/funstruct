@@ -28,7 +28,7 @@ import funstruct.applicative.validated
 import funstruct.applicative.ziplist
 
 from funstruct.typeclasses.typeclass import BaseTypeclass
-from funstruct.typeclasses.mixins.dot_notation import DotNotation
+from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.typeclasses.utils.registry import _registry
 
 
@@ -51,14 +51,19 @@ def discover_typeclasses() -> dict[type, list[type]]:
 
 
 def discover_data_types() -> list[type]:
-    """Find all data types (DotNotation subclasses with _type_constructor)."""
+    """Find all data types (DataType subclasses with _type_constructor)."""
     seen = set()
     result = []
-    for cls in DotNotation.__subclasses__():
-        tc = getattr(cls, "_type_constructor", None)
-        if tc and tc not in seen:
-            seen.add(tc)
-            result.append(tc)
+
+    def walk(cls):
+        for sub in cls.__subclasses__():
+            tc = getattr(sub, "_type_constructor", None)
+            if tc and tc not in seen and tc is sub:
+                seen.add(tc)
+                result.append(tc)
+            walk(sub)
+
+    walk(DataType)
     return sorted(result, key=lambda c: c.__name__)
 
 

@@ -15,7 +15,9 @@ pip install funstruct || uv add funstruct
 
 ### Type Class Hierarchy
 
-```
+![funstruct typeclass hierarchy](typeclasses.svg)
+
+```text
 Semigroup     Bifunctor     Foldable      Functor
     │                        \       /       │
  Monoid                   Traversable    Applicative
@@ -112,31 +114,6 @@ class Bifunctor[A, B](ABC):
 # Multiple semigroups for the same type:
 int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
 int_mul = Monoid(typ=int, combine=lambda a, b: a * b, empty=1)
-```
-
-### ~ Scala equivalent
-
-```scala
-trait Semigroup[A] {
-  def combine(x: A, y: A): A
-}
-
-trait Monoid[A] extends Semigroup[A] {
-  def empty: A
-}
-
-trait Functor[F[_]] {
-  def map[A, B](fa: F[A])(f: A => B): F[B]
-}
-
-trait Applicative[F[_]] extends Functor[F] {
-  def pure[A](a: A): F[A]
-  def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]
-}
-
-trait Monad[F[_]] extends Applicative[F] {
-  def bind(fa: F[A])(f: A => F[B]): F[B]
-}
 ```
 
 ### Laws
