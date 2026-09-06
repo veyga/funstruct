@@ -9,31 +9,21 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable, Generator
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._dot_notation import DotNotation
 from funstruct.util._reawaitable import ReAwaitable
 
 A = TypeVar("A")
 B = TypeVar("B")
 
 
-class Future(Monad, Generic[A]):
-    """Lazy async computation that produces A when awaited.
-
-    Build pipelines with .bind(), .map() — no await needed.
-    Execute once at the boundary with await.
-
-    Future[A] is a generic async monad. It does not know about errors.
-    For error-aware async, use AsyncResult[A] from funstruct.monad.result.
-
-    The inner coroutine is wrapped in ReAwaitable so the same Future
-    can be safely branched into multiple consumers.
-    """
+class Future(DotNotation, Generic[A]):
+    """Lazy async computation that produces A when awaited."""
 
     def __init__(self, coro: Awaitable[A]) -> None:
         self._coro = ReAwaitable(coro) if not isinstance(coro, ReAwaitable) else coro
 
     def __del__(self):
-        pass  # ReAwaitable manages the coroutine lifecycle()
+        pass
 
     def __await__(self) -> Generator[None, None, A]:
         return self._awaitable().__await__()
@@ -41,19 +31,15 @@ class Future(Monad, Generic[A]):
     async def _awaitable(self) -> A:
         return await self._coro
 
-    def bind(fa: Future, f: Callable[[A], Future[B]]) -> Future[B]:
+    def bind(self, f: Callable[[A], Future[B]]) -> Future[B]:
         async def _inner():
-            result = await fa._coro
+            result = await self._coro
             return await f(result)
-
         return Future(_inner())
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., Future]:
-        """Do-notation for Future. Each yield awaits a Future. Returns a callable.
-
-        The generator must be a regular function (not async def) — the
-        driver loop handles awaiting. Use yield instead of await.
+        """Do-notation for Future.
 
         >>> @Future.do
         ... def pipeline():
@@ -61,7 +47,6 @@ class Future(Monad, Generic[A]):
         ...     y = yield Future.pure(x + 10)
         ...     return x + y
         """
-
         def _thunk(*args, **kwargs):
             async def _run():
                 gen = gen_fn(*args, **kwargs)
@@ -72,23 +57,22 @@ class Future(Monad, Generic[A]):
                         monadic_val = gen.send(value)
                 except StopIteration as e:
                     return e.value
-
             return cls(_run())
-
         return _thunk
 
     @classmethod
     def pure(cls, value: A) -> Future[A]:
-        """Lift a plain value into a Future."""
-
         async def _inner():
             return value
-
         return cls(_inner())
 
     def __repr__(self) -> str:
         return f"Future({self._coro})"
 
+
+Future._type_constructor = Future
+
+import funstruct.monad.future_instances  # noqa: E402, F401
 
 __all__ = [
     "Future",

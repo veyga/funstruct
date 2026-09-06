@@ -37,13 +37,11 @@ Examples:
 
 from __future__ import annotations
 
-from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar, final
+from typing import TYPE_CHECKING, Generic, TypeVar
 
-from funstruct.typeclasses._alternative import Alternative
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._dot_notation import DotNotation
 
 if TYPE_CHECKING:
     from funstruct.collections.cons import CList
@@ -53,30 +51,10 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Option(Monad, Alternative, Generic[A]):
-    """Option[A]: either Some(value) or Nothing.
-
-    Performance characteristics:
-        - map/bind/ap: O(1)
-        - pure:        O(1)
-    """
-
-    # Type-narrowed signatures so type checkers see Option[B], not Monad[B].
-    # Implementations live in Some/Nothing below. @abstractmethod with ...
-    # means "must be implemented by subclasses" without raising anything.
-    @abstractmethod
-    def bind(fa: Option, f: Callable[[A], Option[B]]) -> Option[B]: ...
-
-    @abstractmethod
-    def get_or_else(fa: Option, default: A) -> A: ...
-
-    @abstractmethod
-    def handle_error_with(
-        fa: Option, fallback: Callable[[], Option[A]]
-    ) -> Option[A]: ...
+class Option(DotNotation, Generic[A]):
+    """Option[A]: either Some(value) or Nothing."""
 
     @classmethod
-    @final
     def pure(cls, value: A) -> Option[A]:
         return Some(value)
 
@@ -85,17 +63,16 @@ class Option(Monad, Alternative, Generic[A]):
         return Nothing()
 
     @classmethod
+    def raise_error(cls, error) -> Option:
+        return Nothing()
+
+    @classmethod
     def from_optional(cls, value: A | None) -> Option[A]:
-        """Convert a Python value that might be None into an Option."""
         return Nothing() if value is None else Some(value)
 
     @classmethod
     def sequence(cls, options: CList[Option[A]]) -> Option[CList[A]]:
-        """CList[Option[A]] → Option[CList[A]].
-
-        Returns Some(clist) if all are Some, Nothing if any is Nothing.
-        Tail-recursive via @tco.
-        """
+        """CList[Option[A]] → Option[CList[A]]."""
         from funstruct.collections.cons import Cons, Nil
         from funstruct.util.tailrec import tail_call, tco
 
@@ -115,10 +92,6 @@ class Option(Monad, Alternative, Generic[A]):
 
     @classmethod
     def traverse(cls, values: CList[A], f: Callable[[A], Option]) -> Option[CList]:
-        """CList[A] → (A → Option[B]) → Option[CList[B]].
-
-        Applies f to each element, short-circuits on first Nothing.
-        """
         return cls.sequence(values.map(f))
 
     @classmethod
@@ -149,8 +122,8 @@ class Option(Monad, Alternative, Generic[A]):
         return _thunk
 
     @property
-    @abstractmethod
-    def is_some(self) -> bool: ...
+    def is_some(self) -> bool:
+        return False
 
     @property
     def is_nothing(self) -> bool:
@@ -167,23 +140,20 @@ class Some(Option[A]):
     def is_some(self) -> bool:
         return True
 
-    def bind(fa: Some, f: Callable[[A], Option]) -> Option:
-        return f(fa.value)
+    def get_or_else(self, default: A) -> A:
+        return self.value
 
-    def get_or_else(fa: Some, default: A) -> A:
-        return fa.value
+    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
+        return self
 
-    def handle_error_with(fa: Some, fallback: Callable[[], Option[A]]) -> Option[A]:
-        return fa
+    def or_else(self, fb: Option[A]) -> Option[A]:
+        return self
 
-    def or_else(fa: Some, fb: Option[A]) -> Option[A]:
-        return fa
+    def filter(self, f: Callable[[A], bool]) -> Option[A]:
+        return self if f(self.value) else Nothing()
 
-    def filter(fa: Some, f: Callable[[A], bool]) -> Option[A]:
-        return fa if f(fa.value) else Nothing()
-
-    def fold(fa: Some, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
-        return on_some(fa.value)
+    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
+        return on_some(self.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -213,22 +183,19 @@ class Nothing(Option):
     def is_some(self) -> bool:
         return False
 
-    def bind(fa: Nothing, f: Callable[[A], Option[B]]) -> Option[B]:
-        return fa
-
-    def get_or_else(fa: Nothing, default: A) -> A:
+    def get_or_else(self, default: A) -> A:
         return default
 
-    def handle_error_with(fa: Nothing, fallback: Callable[[], Option[A]]) -> Option[A]:
+    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
         return fallback()
 
-    def or_else(fa: Nothing, fb: Option[A]) -> Option[A]:
+    def or_else(self, fb: Option[A]) -> Option[A]:
         return fb
 
-    def filter(fa: Nothing, f: Callable[[A], bool]) -> Option:
-        return fa
+    def filter(self, f: Callable[[A], bool]) -> Option:
+        return self
 
-    def fold(fa: Nothing, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
+    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
         return on_nothing()
 
     def __eq__(self, other: object) -> bool:
@@ -244,6 +211,13 @@ class Nothing(Option):
     def __repr__(self) -> str:
         return "Nothing()"
 
+
+Option._type_constructor = Option
+Some._type_constructor = Option
+Nothing._type_constructor = Option
+
+
+import funstruct.monad.option_instances  # noqa: E402, F401 — register typeclass instances
 
 __all__ = [
     "Option",

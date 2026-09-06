@@ -71,9 +71,9 @@ def three_two_one():
     return Cons(3, Cons(2, Cons(1)))
 
 
-def test_cant_create_list_type():
-    with pytest.raises(TypeError):
-        CList()
+def test_use_nil_for_empty_list():
+    assert Nil() == Nil()
+    assert not Nil()
 
 
 def test_nil_is_falsey():

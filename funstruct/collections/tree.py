@@ -39,23 +39,18 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Cons
-from funstruct.typeclasses._traversable import Traversable
+from funstruct.typeclasses._dot_notation import DotNotation
 
 A = TypeVar("A")
 B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Tree(Traversable, Generic[A]):
-    """Binary tree where every node holds a value.
-
-    A Functor and Traversable but NOT a Monad — map preserves structure,
-    but there's no meaningful bind (no way to "flatten" a tree of trees
-    without choosing a grafting strategy).
-    """
+class Tree(DotNotation, Generic[A]):
+    """Binary tree where every node holds a value."""
 
     @abstractmethod
-    def map(fa: Tree, f: Callable[[A], B]) -> Tree[B]: ...
+    def map(self, f: Callable[[A], B]) -> Tree[B]: ...
 
     @property
     @abstractmethod
@@ -66,12 +61,32 @@ class Tree(Traversable, Generic[A]):
     def depth(self) -> int: ...
 
     @abstractmethod
-    def fold(
-        fa: Tree, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]
-    ) -> C: ...
+    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C: ...
 
     @abstractmethod
-    def to_list(fa: Tree) -> CList[A]: ...
+    def to_list(self) -> CList[A]: ...
+
+    @abstractmethod
+    def fold_right(self, acc, f): ...
+
+    def fold_left(self, acc, f):
+        items = []
+        self.fold_right(None, lambda a, _: items.append(a))
+        for item in items:
+            acc = f(acc, item)
+        return acc
+
+    def length(self) -> int:
+        return self.fold_right(0, lambda _, acc: acc + 1)
+
+    def is_empty(self) -> bool:
+        return False
+
+    @abstractmethod
+    def traverse(self, f: Callable, pure_fn: Callable) -> object: ...
+
+    def sequence(self, pure_fn: Callable) -> object:
+        return self.traverse(lambda x: x, pure_fn)
 
 
 @dataclass(frozen=True, eq=False)
@@ -80,8 +95,8 @@ class Leaf(Tree[A]):
 
     value: A
 
-    def map(fa: Leaf, f: Callable[[A], B]) -> Tree[B]:
-        return Leaf(f(fa.value))
+    def map(self, f: Callable[[A], B]) -> Tree[B]:
+        return Leaf(f(self.value))
 
     @property
     def size(self) -> int:
@@ -91,19 +106,17 @@ class Leaf(Tree[A]):
     def depth(self) -> int:
         return 0
 
-    def fold(
-        fa: Leaf, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]
-    ) -> C:
-        return on_leaf(fa.value)
+    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
+        return on_leaf(self.value)
 
-    def fold_right(fa: Leaf, acc, f):
-        return f(fa.value, acc)
+    def fold_right(self, acc, f):
+        return f(self.value, acc)
 
-    def traverse(fa: Leaf, f: Callable, pure_fn: Callable) -> object:
-        return f(fa.value).map(Leaf)
+    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+        return f(self.value).map(Leaf)
 
-    def to_list(fa: Leaf) -> CList[A]:
-        return Cons.pure(fa.value)
+    def to_list(self) -> CList[A]:
+        return Cons.pure(self.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -124,8 +137,8 @@ class Branch(Tree[A]):
     left: Tree[A]
     right: Tree[A]
 
-    def map(fa: Branch, f: Callable[[A], B]) -> Tree[B]:
-        return Branch(f(fa.value), fa.left.map(f), fa.right.map(f))
+    def map(self, f: Callable[[A], B]) -> Tree[B]:
+        return Branch(f(self.value), self.left.map(f), self.right.map(f))
 
     @property
     def size(self) -> int:
@@ -135,31 +148,29 @@ class Branch(Tree[A]):
     def depth(self) -> int:
         return 1 + max(self.left.depth, self.right.depth)
 
-    def fold(
-        fa: Branch, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]
-    ) -> C:
+    def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
         return on_branch(
-            fa.value,
-            fa.left.fold(on_leaf, on_branch),
-            fa.right.fold(on_leaf, on_branch),
+            self.value,
+            self.left.fold(on_leaf, on_branch),
+            self.right.fold(on_leaf, on_branch),
         )
 
-    def fold_right(fa: Branch, acc, f):
-        acc = fa.right.fold_right(acc, f)
-        acc = f(fa.value, acc)
-        acc = fa.left.fold_right(acc, f)
+    def fold_right(self, acc, f):
+        acc = self.right.fold_right(acc, f)
+        acc = f(self.value, acc)
+        acc = self.left.fold_right(acc, f)
         return acc
 
-    def traverse(fa: Branch, f: Callable, pure_fn: Callable) -> object:
-        fv = f(fa.value)
-        fl = fa.left.traverse(f, pure_fn)
-        fr = fa.right.traverse(f, pure_fn)
+    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+        fv = f(self.value)
+        fl = self.left.traverse(f, pure_fn)
+        fr = self.right.traverse(f, pure_fn)
         return (
             pure_fn(lambda v: lambda l: lambda r: Branch(v, l, r)).ap(fv).ap(fl).ap(fr)
         )
 
-    def to_list(fa: Branch) -> CList[A]:
-        return fa.left.to_list() + Cons(fa.value, fa.right.to_list())
+    def to_list(self) -> CList[A]:
+        return self.left.to_list() + Cons(self.value, self.right.to_list())
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -171,5 +182,9 @@ class Branch(Tree[A]):
     def __repr__(self) -> str:
         return f"Branch({repr(self.value)}, {repr(self.left)}, {repr(self.right)})"
 
+
+Tree._type_constructor = Tree
+Leaf._type_constructor = Tree
+Branch._type_constructor = Tree
 
 __all__ = ["Tree", "Leaf", "Branch"]

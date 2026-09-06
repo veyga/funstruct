@@ -1,8 +1,8 @@
 """Tests for typeclass resolution via summon.
 
 Demonstrates:
-    - Direct resolution: summon(Monad, Option) → Option
-    - Derived resolution: summon(Functor, Option) → Option (via Monad <: Functor)
+    - Direct resolution: summon(Monad, Option) → OptionMonad instance
+    - Derived resolution: summon(Functor, Option) → same instance (via Monad <: Functor)
     - Error on missing: summon(MonadError, Option) → TypeError
     - Effect-polymorphic programs using summon as TypeConstructor
 """
@@ -13,7 +13,6 @@ from funstruct.typeclasses import (
     Alternative,
     Applicative,
     Bifunctor,
-    Foldable,
     Functor,
     Monad,
     MonadError,
@@ -27,52 +26,47 @@ from funstruct.collections.cons import CList, Cons, Nil
 
 class TestDirectResolution:
     def test_summon_monad_option(self):
-        assert summon(Monad, Option) is Option
+        assert isinstance(summon(Monad, Option), Monad)
 
     def test_summon_monad_either(self):
-        assert summon(Monad, Either) is Either
+        assert isinstance(summon(Monad, Either), Monad)
 
     def test_summon_monad_result(self):
-        assert summon(Monad, Result) is Result
+        assert isinstance(summon(Monad, Result), Monad)
 
     def test_summon_monad_error_result(self):
-        assert summon(MonadError, Result) is Result
+        assert isinstance(summon(MonadError, Result), MonadError)
 
     def test_summon_monad_error_either(self):
-        assert summon(MonadError, Either) is Either
+        assert isinstance(summon(MonadError, Either), MonadError)
 
     def test_summon_bifunctor_either(self):
-        assert summon(Bifunctor, Either) is Either
+        assert isinstance(summon(Bifunctor, Either), Bifunctor)
 
     def test_summon_alternative_option(self):
-        assert summon(Alternative, Option) is Option
+        assert isinstance(summon(Alternative, Option), Alternative)
 
     def test_summon_alternative_clist(self):
-        assert summon(Alternative, CList) is CList
+        assert isinstance(summon(Alternative, CList), Alternative)
 
 
 class TestDerivedResolution:
-    """summon derives parent typeclasses via the inheritance hierarchy.
-
-    Option extends Monad, which extends Applicative, which extends Functor.
-    So summon(Functor, Option) should resolve even though Option doesn't
-    directly declare itself a Functor.
-    """
+    """summon derives parent typeclasses via the inheritance hierarchy."""
 
     def test_functor_from_monad(self):
-        assert summon(Functor, Option) is Option
+        assert isinstance(summon(Functor, Option), Functor)
 
     def test_applicative_from_monad(self):
-        assert summon(Applicative, Option) is Option
+        assert isinstance(summon(Applicative, Option), Applicative)
 
     def test_functor_from_monad_error(self):
-        assert summon(Functor, Result) is Result
+        assert isinstance(summon(Functor, Result), Functor)
 
     def test_applicative_from_monad_error(self):
-        assert summon(Applicative, Result) is Result
+        assert isinstance(summon(Applicative, Result), Applicative)
 
     def test_monad_from_monad_error(self):
-        assert summon(Monad, Result) is Result
+        assert isinstance(summon(Monad, Result), Monad)
 
 
 class TestResolutionErrors:
@@ -90,23 +84,17 @@ class TestResolutionErrors:
 
 
 class TestTypeConstructorPattern:
-    """The class itself IS the type constructor.
-
-    F = Option means F[_] = Option. F.pure(x) = Option.pure(x) = Some(x).
-    This lets you write effect-polymorphic programs.
-    """
-
     def test_pure_via_summon(self):
         F = summon(Monad, Option)
         assert F.pure(42) == Some(42)
 
     def test_map_via_summon(self):
         F = summon(Functor, Option)
-        assert F.pure(10).map(lambda x: x * 2) == Some(20)
+        assert F.map(Some(10), lambda x: x * 2) == Some(20)
 
     def test_bind_via_summon(self):
         F = summon(Monad, Result)
-        result = F.pure(10).bind(lambda x: F.pure(x + 1))
+        result = F.bind(Ok(10), lambda x: F.pure(x + 1))
         assert result == Ok(11)
 
     def test_raise_error_via_summon(self):
@@ -120,21 +108,18 @@ class TestTypeConstructorPattern:
 
 
 class TestEffectPolymorphicProgram:
-    """Write once, run with different type constructors."""
-
     def test_same_program_option_and_result(self):
         def increment(F, value):
-            return F.pure(value).map(lambda x: x + 1)
+            return F.map(F.pure(value), lambda x: x + 1)
 
         assert increment(summon(Monad, Option), 41) == Some(42)
         assert increment(summon(Monad, Result), 41) == Ok(42)
 
     def test_pipeline_generic_in_f(self):
         def pipeline(F):
-            return (
-                F.pure(10)
-                .bind(lambda x: F.pure(x * 2))
-                .map(lambda x: x + 1)
+            return F.map(
+                F.bind(F.pure(10), lambda x: F.pure(x * 2)),
+                lambda x: x + 1,
             )
 
         assert pipeline(summon(Monad, Option)) == Some(21)
@@ -154,3 +139,29 @@ class TestEffectPolymorphicProgram:
         G = summon(MonadError, Either)
         assert safe_divide(G, 10, 2) == Right(5.0)
         assert isinstance(safe_divide(G, 10, 0), Left)
+
+
+class TestDotSyntaxEquivalence:
+    """Dot notation == summon. Both must produce the same result."""
+
+    def test_option_map(self):
+        f = lambda x: x + 1
+        assert Some(10).map(f) == summon(Monad, Option).map(Some(10), f)
+
+    def test_option_bind(self):
+        f = lambda x: Some(x + 1)
+        assert Some(10).bind(f) == summon(Monad, Option).bind(Some(10), f)
+
+    def test_result_map(self):
+        f = lambda x: x * 2
+        assert Ok(5).map(f) == summon(Monad, Result).map(Ok(5), f)
+
+    def test_either_map(self):
+        f = lambda x: x + 1
+        assert Right(10).map(f) == summon(Monad, Either).map(Right(10), f)
+
+    def test_rshift_operator(self):
+        assert Some(1) >> (lambda x: Some(x + 1)) == Some(2)
+
+    def test_product_operator(self):
+        assert Some(1) * Some(2) == Some((1, 2))

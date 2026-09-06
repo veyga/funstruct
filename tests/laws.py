@@ -12,13 +12,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses import (
-    Applicative,
-    Functor,
-    Monad,
-    Monoid,
-    Semigroup,
-)
+from funstruct.typeclasses import Monoid, Semigroup
 
 A = TypeVar("A")
 Eq = Callable[[object, object], bool]
@@ -105,7 +99,7 @@ def assert_monoid_laws(a: A, sg: Monoid) -> None:
     assert sg.combine(a, sg.empty) == a, "Monoid right identity violated"
 
 
-def assert_functor_laws(fa: Functor, eq: Eq | None = None) -> None:
+def assert_functor_laws(fa, eq: Eq | None = None) -> None:
     """Functor laws: identity and composition.
 
     1. Identity — mapping the identity function changes nothing:
@@ -137,9 +131,9 @@ def assert_functor_laws(fa: Functor, eq: Eq | None = None) -> None:
 
 
 def assert_applicative_laws(
-    pure_fn: Callable[[object], Applicative],
-    fa: Applicative,
-    fb: Applicative,
+    pure_fn: Callable,
+    fa,
+    fb,
     eq: Eq | None = None,
 ) -> None:
     """Applicative laws + type preservation.
@@ -200,10 +194,10 @@ def assert_applicative_laws(
 
 
 def assert_monad_laws(
-    pure_fn: Callable[[object], Monad],
-    m: Monad,
-    f: Callable[[object], Monad],
-    g: Callable[[object], Monad],
+    pure_fn: Callable,
+    m,
+    f: Callable,
+    g: Callable,
     eq: Eq | None = None,
 ) -> None:
     """Monad laws: left identity, right identity, associativity, type preservation.

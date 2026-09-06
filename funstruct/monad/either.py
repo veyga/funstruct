@@ -32,13 +32,11 @@ Examples:
 
 from __future__ import annotations
 
-from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar, final
+from typing import TYPE_CHECKING, Generic, TypeVar
 
-from funstruct.typeclasses._bifunctor import Bifunctor
-from funstruct.typeclasses._monad_error import MonadError
+from funstruct.typeclasses._dot_notation import DotNotation
 from funstruct.util.created_at import CapturesCreationSiteMixin
 
 if TYPE_CHECKING:
@@ -50,25 +48,19 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Either(MonadError, Bifunctor, Generic[E, A]):
+class Either(DotNotation, Generic[E, A]):
     """Either[E, A]: Right(value) or Left(error).
 
     Right-biased monad. bind/map/>> operate on the Right value
     and short-circuit on Left.
-
-    No __bool__: Either deliberately has no truthiness. Both Right and Left
-    carry a value — neither case is "empty" or "absent." Use .is_right /
-    .is_left or pattern matching instead of `if my_either:`.
     """
 
     @classmethod
-    @final
     def pure(cls, value: A) -> Either[E, A]:
         return Right(value)
 
     @classmethod
     def raise_error(cls, error: E) -> Either[E, A]:
-        """Lift an error into Left."""
         return Left(error)
 
     @classmethod
@@ -100,10 +92,7 @@ class Either(MonadError, Bifunctor, Generic[E, A]):
 
     @classmethod
     def sequence(cls, eithers: CList[Either[E, A]]) -> Either[E, CList[A]]:
-        """CList[Either[E, A]] -> Either[E, CList[A]].
-
-        Returns Right(clist) if all are Right, first Left otherwise.
-        """
+        """CList[Either[E, A]] -> Either[E, CList[A]]."""
         from funstruct.collections.cons import Cons, Nil
         from funstruct.util.tailrec import tail_call, tco
 
@@ -123,30 +112,11 @@ class Either(MonadError, Bifunctor, Generic[E, A]):
 
     @classmethod
     def traverse(cls, values, f: Callable[[A], Either[E, B]]) -> Either:
-        """CList[A] -> (A -> Either[E, B]) -> Either[E, CList[B]].
-
-        Applies f to each element, short-circuits on first Left.
-        """
         return cls.sequence(values.map(f))
 
-    @abstractmethod
-    def get_or_else(self, default: A) -> A:
-        """Extract the value, or return default if Left."""
-        ...
-
-    @abstractmethod
-    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
-        """Eliminate — apply on_left or on_right depending on the case."""
-        ...
-
-    @abstractmethod
-    def swap(self) -> Either[A, E]:
-        """Swap Left and Right."""
-        ...
-
     @property
-    @abstractmethod
-    def is_right(self) -> bool: ...
+    def is_right(self) -> bool:
+        return False
 
     @property
     def is_left(self) -> bool:
@@ -163,28 +133,26 @@ class Right(Either[E, A]):
     def is_right(self) -> bool:
         return True
 
-    def bind(fa: Right, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
-        return f(fa.value)
+    def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
+        return f(self.value)
 
-    def left_map(fa: Right, f: Callable[[E], E]) -> Either[E, A]:
-        return fa
+    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
+        return self
 
-    def handle_error_with(fa: Right, f: Callable[[E], Either]) -> Either[E, A]:
-        return fa
+    def handle_error_with(self, f: Callable[[E], Either]) -> Either[E, A]:
+        return self
 
-    def bimap(
-        fa: Right, on_left: Callable[[E], E], on_right: Callable[[A], B]
-    ) -> Either:
-        return Right(on_right(fa.value))
+    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+        return Right(on_right(self.value))
 
-    def get_or_else(fa: Right, default: A) -> A:
-        return fa.value
+    def get_or_else(self, default: A) -> A:
+        return self.value
 
-    def fold(fa: Right, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
-        return on_right(fa.value)
+    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
+        return on_right(self.value)
 
-    def swap(fa: Right) -> Either[A, E]:
-        return Left(fa.value)
+    def swap(self) -> Either[A, E]:
+        return Left(self.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -207,34 +175,32 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
     def is_right(self) -> bool:
         return False
 
-    def bind(fa: Left, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
-        return fa
+    def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
+        return self
 
-    def left_map(fa: Left, f: Callable[[E], E]) -> Either[E, A]:
+    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
         """>>> Left("oops").left_map(lambda e: e.upper())
         Left('OOPS')
         """
-        return Left(f(fa.error))
+        return Left(f(self.error))
 
-    def handle_error_with(fa: Left, f: Callable[[E], Either]) -> Either:
+    def handle_error_with(self, f: Callable[[E], Either]) -> Either:
         """>>> Left("oops").handle_error_with(lambda e: Right(f"recovered: {e}"))
         Right('recovered: oops')
         """
-        return f(fa.error)
+        return f(self.error)
 
-    def bimap(
-        fa: Left, on_left: Callable[[E], E], on_right: Callable[[A], B]
-    ) -> Either:
-        return Left(on_left(fa.error))
+    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
+        return Left(on_left(self.error))
 
-    def get_or_else(fa: Left, default: A) -> A:
+    def get_or_else(self, default: A) -> A:
         return default
 
-    def fold(fa: Left, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
-        return on_left(fa.error)
+    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
+        return on_left(self.error)
 
-    def swap(fa: Left) -> Either[A, E]:
-        return Right(fa.error)
+    def swap(self) -> Either[A, E]:
+        return Right(self.error)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -246,6 +212,13 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
     def __repr__(self) -> str:
         return f"Left({repr(self.error)})"
 
+
+Either._type_constructor = Either
+Right._type_constructor = Either
+Left._type_constructor = Either
+
+
+import funstruct.monad.either_instances  # noqa: E402, F401
 
 __all__ = [
     "Either",

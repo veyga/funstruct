@@ -1,8 +1,5 @@
 """Reader monad — computations that read from a shared environment.
 
-bind lets multiple computations share the same context without
-passing it explicitly. Each step in the chain sees the same env.
-
 Examples:
     >>> from funstruct.monad.reader import Reader
     >>> get_host = Reader(lambda cfg: cfg["host"])
@@ -22,41 +19,34 @@ Examples:
 
 from __future__ import annotations
 
-from collections.abc import Callable, Generator
+from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._dot_notation import DotNotation
 
 _Ctx = TypeVar("_Ctx")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
-_R = TypeVar("_R")
 
 
-class Reader(Monad, Generic[_Ctx, _A]):
-    """Reader: Ctx -> A.
-
-    A computation that reads from a shared environment.
-    """
+class Reader(DotNotation, Generic[_Ctx, _A]):
+    """Reader: Ctx -> A."""
 
     def __init__(self, run: Callable[[_Ctx], _A]) -> None:
         self._run = run
 
-    def run(fa: Reader, ctx):
-        return fa._run(ctx)
+    def run(self, ctx):
+        return self._run(ctx)
 
     def __call__(self, ctx):
         return self.run(ctx)
 
-    def bind(fa: Reader, f: Callable[[_A], Reader[_Ctx, _B]]) -> Reader[_Ctx, _B]:
-        return Reader(lambda ctx: f(fa._run(ctx)).run(ctx))
+    def bind(self, f: Callable[[_A], Reader[_Ctx, _B]]) -> Reader[_Ctx, _B]:
+        return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., Reader]:
         """Do-notation via generators. Returns a callable.
-
-        Each `yield` extracts the value from a Reader (all share the same ctx).
-        The final `return` value becomes the Reader's result.
 
         >>> def pipeline():
         ...     x = yield Reader(lambda ctx: ctx["x"])
@@ -65,7 +55,6 @@ class Reader(Monad, Generic[_Ctx, _A]):
         >>> Reader.do(pipeline)().run({"x": 1, "y": 10})
         11
         """
-
         def _thunk(*args, **kwargs):
             def _run(ctx):
                 gen = gen_fn(*args, **kwargs)
@@ -76,24 +65,24 @@ class Reader(Monad, Generic[_Ctx, _A]):
                         monadic_val = gen.send(result)
                 except StopIteration as e:
                     return e.value
-
             return cls(_run)
-
         return _thunk
 
     @classmethod
     def pure(cls, value, *args, **kwargs) -> Reader:
-        """Lift a value — ignores context."""
         return cls(lambda _: value)
 
     @classmethod
     def ask(cls) -> Reader:
-        """Return the context itself as the value."""
         return cls(lambda ctx: ctx)
 
     def __repr__(self) -> str:
         return f"Reader({self._run})"
 
+
+Reader._type_constructor = Reader
+
+import funstruct.monad.reader_instances  # noqa: E402, F401
 
 __all__ = [
     "Reader",

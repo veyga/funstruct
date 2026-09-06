@@ -20,8 +20,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import Cons
-from funstruct.typeclasses._applicative import Applicative
-from funstruct.typeclasses._bifunctor import Bifunctor
+from funstruct.typeclasses._dot_notation import DotNotation
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -29,14 +28,14 @@ _C = TypeVar("_C")
 _E = TypeVar("_E")
 
 
-class Validated(Applicative, Bifunctor):
-    """Base class for Valid/Invalid — provides constructors and supports + operator."""
+class Validated(DotNotation):
+    """Base class for Valid/Invalid."""
 
     @abstractmethod
-    def ap(ff: Validated, other) -> Validated: ...
+    def ap(self, other) -> Validated: ...
 
     @abstractmethod
-    def product(fa: Validated, other) -> Validated: ...
+    def product(self, other) -> Validated: ...
 
     def __mul__(self, other) -> Validated:
         return self.product(other)
@@ -46,32 +45,22 @@ class Validated(Applicative, Bifunctor):
     def is_valid(self) -> bool: ...
 
     @abstractmethod
-    def fold(
-        fa: Validated, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]
-    ) -> _C: ...
+    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C: ...
 
     @classmethod
     def pure(cls, value) -> Validated:
-        """Lift a value into Valid."""
         return Valid(value)
 
     @staticmethod
     def valid(value: _A) -> Validated:
-        """Alias for pure."""
         return Valid(value)
 
     @staticmethod
     def invalid(error: _E) -> Validated:
-        """Lift a single error into Invalid.
-
-        Default semigroup: CList (cons list over +/append).
-        For a custom semigroup, construct Invalid(your_value) directly.
-        """
         return Invalid(Cons.pure(error))
 
     @staticmethod
     def cond(test: bool, value: _A, error: _E) -> Validated:
-        """Conditional — Valid(value) if test, else Invalid(Cons(error))."""
         if test:
             return Valid(value)
         return Invalid(Cons.pure(error))
@@ -90,45 +79,38 @@ class Valid(Validated, Generic[_A]):
     def __bool__(self) -> bool:
         return True
 
-    def fold(
-        fa: Valid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]
-    ) -> _C:
-        return on_valid(fa.value)
+    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+        return on_valid(self.value)
 
-    def map(fa: Valid, f: Callable[[_A], _B]) -> Valid[_B]:
-        return Valid(f(fa.value))
+    def map(self, f: Callable[[_A], _B]) -> Valid[_B]:
+        return Valid(f(self.value))
 
-    def bimap(fa: Valid, on_invalid: Callable, on_valid: Callable) -> Validated:
-        return Valid(on_valid(fa.value))
+    def bimap(self, on_invalid: Callable, on_valid: Callable) -> Validated:
+        return Valid(on_valid(self.value))
 
-    def left_map(fa: Valid, f: Callable) -> Validated:
-        return fa
+    def left_map(self, f: Callable) -> Validated:
+        return self
 
-    def ap(ff: Valid, other) -> Validated:
+    def ap(self, other) -> Validated:
         match other:
             case Valid(val):
                 from typing import cast
-                from collections.abc import Callable
-
-                fn = cast(Callable, ff.value)
+                fn = cast(Callable, self.value)
                 return Valid(fn(val))
             case _:
                 return other
 
-    def product(fa: Valid, other) -> Validated:
+    def product(self, other) -> Validated:
         match other:
             case Valid(val):
-                return Valid((fa.value, val))
+                return Valid((self.value, val))
             case _:
                 return other
 
 
 @dataclass(frozen=True)
 class Invalid(Validated, Generic[_E]):
-    """Failure case — accumulated errors.
-
-    `errors` can be any Semigroup (supports +): list, str, tuple, or custom.
-    """
+    """Failure case — accumulated errors."""
 
     errors: _E
 
@@ -139,31 +121,36 @@ class Invalid(Validated, Generic[_E]):
     def __bool__(self) -> bool:
         return False
 
-    def fold(
-        fa: Invalid, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]
-    ) -> _C:
-        return on_invalid(fa.errors)
+    def fold(self, on_invalid: Callable[[_E], _C], on_valid: Callable[[_A], _C]) -> _C:
+        return on_invalid(self.errors)
 
-    def bimap(fa: Invalid, on_invalid: Callable, on_valid: Callable) -> Validated:
-        return Invalid(on_invalid(fa.errors))
+    def bimap(self, on_invalid: Callable, on_valid: Callable) -> Validated:
+        return Invalid(on_invalid(self.errors))
 
-    def left_map(fa: Invalid, f: Callable) -> Validated:
-        return Invalid(f(fa.errors))
+    def left_map(self, f: Callable) -> Validated:
+        return Invalid(f(self.errors))
 
-    def ap(ff: Invalid, other) -> Validated:
+    def map(self, f: Callable) -> Validated:
+        return self
+
+    def ap(self, other) -> Validated:
         match other:
             case Invalid(errs):
-                return Invalid(ff.errors + errs)
+                return Invalid(self.errors + errs)
             case _:
-                return ff
+                return self
 
-    def product(fa: Invalid, other) -> Validated:
+    def product(self, other) -> Validated:
         match other:
             case Invalid(errs):
-                return Invalid(fa.errors + errs)
+                return Invalid(self.errors + errs)
             case _:
-                return fa
+                return self
 
+
+Validated._type_constructor = Validated
+Valid._type_constructor = Validated
+Invalid._type_constructor = Validated
 
 __all__ = [
     "Validated",

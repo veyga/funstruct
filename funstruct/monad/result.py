@@ -35,17 +35,14 @@ Examples:
 from __future__ import annotations
 
 import inspect
-from abc import abstractmethod
 from collections.abc import Awaitable, Callable, Coroutine
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Generic, ParamSpec, TypeVar, final, overload
+from typing import Any, Generic, ParamSpec, TypeVar, overload
 
 from funstruct.monad.either import Either
 from funstruct.monad.future import Future
-from funstruct.typeclasses._bifunctor import Bifunctor
-from funstruct.typeclasses._monad import Monad
-from funstruct.typeclasses._monad_error import MonadError
+from funstruct.typeclasses._dot_notation import DotNotation
 from funstruct.util.created_at import CapturesCreationSiteMixin
 from funstruct.util._reawaitable import ReAwaitable
 
@@ -53,16 +50,10 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Result(MonadError, Bifunctor, Generic[_A]):
-    """Result[A] = Ok(value) | Err(exception).
-
-    A monad for computations that can fail with an Exception.
-    Standalone type — not an alias for Either. Uses domain-specific
-    naming: Ok/Err instead of Right/Left, is_ok/is_err.
-    """
+class Result(DotNotation, Generic[_A]):
+    """Result[A] = Ok(value) | Err(exception)."""
 
     @classmethod
-    @final
     def pure(cls, value: _A) -> Result[_A]:
         return Ok(value)
 
@@ -89,23 +80,9 @@ class Result(MonadError, Bifunctor, Generic[_A]):
 
         return _thunk
 
-    @abstractmethod
-    def fold(
-        fa: Result, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
-    ) -> _B: ...
-
-    @abstractmethod
-    def bind(fa: Result, f: Callable[[_A], Result[_B]]) -> Result[_B]: ...
-
-    @abstractmethod
-    def get_or_else(fa: Result, default: _A) -> _A: ...
-
-    @abstractmethod
-    def swap(fa: Result) -> Result: ...
-
     @property
-    @abstractmethod
-    def is_ok(self) -> bool: ...
+    def is_ok(self) -> bool:
+        return False
 
     @property
     def is_err(self) -> bool:
@@ -122,28 +99,26 @@ class Ok(Result[_A]):
     def is_ok(self) -> bool:
         return True
 
-    def bind(fa: Ok, f: Callable[[_A], Result[_B]]) -> Result[_B]:
-        return f(fa.value)
+    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
+        return f(self.value)
 
-    def fold(
-        fa: Ok, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
-    ) -> _B:
-        return on_ok(fa.value)
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        return on_ok(self.value)
 
-    def left_map(fa: Ok, f: Callable[[Exception], Exception]) -> Result[_A]:
-        return fa
+    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
+        return self
 
-    def handle_error_with(fa: Ok, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
-        return fa
+    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+        return self
 
-    def bimap(fa: Ok, on_err: Callable, on_ok: Callable) -> Result:
-        return Ok(on_ok(fa.value))
+    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
+        return Ok(on_ok(self.value))
 
-    def get_or_else(fa: Ok, default: _A) -> _A:
-        return fa.value
+    def get_or_else(self, default: _A) -> _A:
+        return self.value
 
-    def swap(fa: Ok) -> Result:
-        return Err(fa.value)
+    def swap(self) -> Result:
+        return Err(self.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -166,28 +141,26 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
     def is_ok(self) -> bool:
         return False
 
-    def bind(fa: Err, f: Callable[[_A], Result[_B]]) -> Result[_B]:
-        return fa
+    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
+        return self
 
-    def fold(
-        fa: Err, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
-    ) -> _B:
-        return on_err(fa.error)
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        return on_err(self.error)
 
-    def left_map(fa: Err, f: Callable[[Exception], Exception]) -> Result[_A]:
-        return Err(f(fa.error))
+    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
+        return Err(f(self.error))
 
-    def handle_error_with(fa: Err, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
-        return f(fa.error)
+    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
+        return f(self.error)
 
-    def bimap(fa: Err, on_err: Callable, on_ok: Callable) -> Result:
-        return Err(on_err(fa.error))
+    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
+        return Err(on_err(self.error))
 
-    def get_or_else(fa: Err, default: _A) -> _A:
+    def get_or_else(self, default: _A) -> _A:
         return default
 
-    def swap(fa: Err) -> Result:
-        return Ok(fa.error)
+    def swap(self) -> Result:
+        return Ok(self.error)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -200,35 +173,15 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
         return f"Err({repr(self.error)})"
 
 
+Result._type_constructor = Result
+Ok._type_constructor = Result
+Err._type_constructor = Result
+
 _P = ParamSpec("_P")
 
 
-class AsyncResult(MonadError, Bifunctor, Generic[_A]):
-    """Async computation that produces Result[A] — essentially Future[Result[A]].
-
-    AsyncResult is syntactic sugar for composing async operations that can
-    fail. Instead of manually awaiting and pattern-matching at each step,
-    chain with .bind(), .map(), .left_map() — one await at the boundary.
-
-    Equivalent to Scala's ``EitherT[Future, Exception, A]`` but with a
-    simpler API designed for Python's async/await.
-
-    Create with:
-        AsyncResult.pure(42)                     # Ok(42) wrapped in async
-        AsyncResult.raise_error(ValueError())     # Err wrapped in async
-        AsyncResult.from_result(Ok(42))          # lift sync Result
-        @TryAsync decorator                      # catch exceptions
-
-    Compose (lazy — nothing executes until awaited):
-        result.map(f)                            # transform success value
-        result.bind(f)                           # chain async operations
-        result.left_map(f)                       # transform error value
-        result.handle_error_with(f)              # recover from error
-
-    Execute (one await at the boundary):
-        value = await result                     # Result[A]
-        value = await result.fold(on_err, on_ok) # _B
-    """
+class AsyncResult(DotNotation, Generic[_A]):
+    """Async computation that produces Result[A] — essentially Future[Result[A]]."""
 
     def __init__(self, coro: Awaitable[Result[_A]]) -> None:
         self._coro = ReAwaitable(coro) if not isinstance(coro, ReAwaitable) else coro
@@ -241,42 +194,35 @@ class AsyncResult(MonadError, Bifunctor, Generic[_A]):
 
     @staticmethod
     async def _resolve(value: Any) -> Result:
-        """Resolve a mixed return type into a Result."""
         if inspect.isawaitable(value):
             value = await value
         if isinstance(value, (Either, Result)):
             return value
         return Ok(value)
 
-    def bind(fa: AsyncResult, f: Callable[[_A], Any]) -> AsyncResult:
+    def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
         async def _inner():
-            result = await fa._coro
+            result = await self._coro
             match result:
                 case Ok(value):
                     return await AsyncResult._resolve(f(value))
                 case _:
                     return result
-
         return AsyncResult(_inner())
 
-    def left_map(
-        fa: AsyncResult, f: Callable[[Exception], Exception]
-    ) -> AsyncResult[_A]:
+    def left_map(self, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
         async def _inner():
-            result = await fa._coro
+            result = await self._coro
             match result:
                 case Err(error):
                     return Err(f(error))
                 case _:
                     return result
-
         return AsyncResult(_inner())
 
-    def bimap(
-        fa: AsyncResult, on_err: Callable[[Exception], Exception], on_ok: Callable
-    ) -> AsyncResult:
+    def bimap(self, on_err: Callable[[Exception], Exception], on_ok: Callable) -> AsyncResult:
         async def _inner():
-            result = await fa._coro
+            result = await self._coro
             match result:
                 case Ok(value):
                     return Ok(on_ok(value))
@@ -284,82 +230,51 @@ class AsyncResult(MonadError, Bifunctor, Generic[_A]):
                     return Err(on_err(error))
                 case _:
                     return result
-
         return AsyncResult(_inner())
 
-    def handle_error_with(
-        fa: AsyncResult, f: Callable[[Exception], Any]
-    ) -> AsyncResult:
+    def handle_error_with(self, f: Callable[[Exception], Any]) -> AsyncResult:
         async def _inner():
-            result = await fa._coro
+            result = await self._coro
             match result:
                 case Err(error):
                     return await AsyncResult._resolve(f(error))
                 case _:
                     return result
-
         return AsyncResult(_inner())
 
     @classmethod
-    @final
     def pure(cls, value: _A) -> AsyncResult[_A]:
-        """Lift a plain value into Ok."""
-
         async def _inner():
             return Ok(value)
-
         return cls(_inner())
 
     @classmethod
     def raise_error(cls, error: Exception) -> AsyncResult:
-        """Lift an exception into Err."""
-
         async def _inner():
             return Err(error)
-
         return cls(_inner())
 
     @classmethod
     def from_result(cls, result: Result) -> AsyncResult:
-        """Lift a sync Result into AsyncResult."""
-
         async def _inner():
             return result
-
         return cls(_inner())
 
     @classmethod
     def from_either(cls, either: Either) -> AsyncResult:
-        """Lift a sync Either into AsyncResult."""
-
         async def _inner():
             return either
-
         return cls(_inner())
 
-    def fold(
-        fa: AsyncResult, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
-    ) -> Future[_B]:
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> Future[_B]:
         async def _inner():
-            result = await fa._coro
+            result = await self._coro
             return result.fold(on_err=on_err, on_ok=on_ok)
-
         return Future(_inner())
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., AsyncResult]:
-        """Do-notation for AsyncResult. Short-circuits on Err. Returns a callable.
-
-        Every yielded value must be an AsyncResult. Use
-        ``AsyncResult.from_result()`` to lift sync Result values.
-
-        >>> @AsyncResult.do
-        ... def pipeline():
-        ...     x = yield AsyncResult.pure(1)
-        ...     y = yield AsyncResult.pure(x + 10)
-        ...     return x + y
-        """
-
+        """Do-notation for AsyncResult."""
         def _thunk(*args, **kwargs):
             async def _run():
                 gen = gen_fn(*args, **kwargs)
@@ -374,23 +289,20 @@ class AsyncResult(MonadError, Bifunctor, Generic[_A]):
                                 return result
                 except StopIteration as e:
                     return Ok(e.value)
-
             return cls(_run())
-
         return _thunk
 
     def __repr__(self) -> str:
         return f"AsyncResult({self._coro})"
 
 
+AsyncResult._type_constructor = AsyncResult
+
+
 def Try(
     f: Callable[_P, _A],
 ) -> Callable[_P, Result[_A]]:
-    """Decorator: wraps a sync function so exceptions become Err.
-
-    Successful calls return Ok(value), exceptions return Err(exception).
-    Pattern match the result with Ok(v) / Err(e).
-    """
+    """Decorator: wraps a sync function so exceptions become Err."""
 
     @wraps(f)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> Result[_A]:
@@ -413,35 +325,7 @@ def TryAsync(
 def TryAsync(
     f: Callable[_P, _A],
 ) -> Callable[_P, AsyncResult[_A]]:
-    """Decorator: wraps a function so exceptions become Err.
-
-    Accepts both sync and async functions. Returns AsyncResult[A] — a
-    lazy computation. Await at the boundary to get Result[A] (Ok or Err).
-    Compose with .bind(), .map(), .left_map() without awaiting.
-
-    Usage::
-
-        @TryAsync
-        async def fetch_user(id: int) -> User:
-            resp = await httpx.get(f"/users/{id}")
-            if resp.status_code != 200:
-                raise NotFoundError(f"user {id}")
-            return User(**resp.json())
-
-        @TryAsync
-        def parse_id(raw: str) -> int:
-            return int(raw)
-
-        # Build pipeline — no await needed:
-        pipeline = (
-            parse_id("42")
-            .bind(fetch_user)
-            .map(lambda u: u.email)
-        )
-
-        # Await once at the boundary:
-        result = await pipeline  # Ok("alice@example.com") or Err(...)
-    """
+    """Decorator: wraps a function so exceptions become Err."""
 
     @wraps(f)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> AsyncResult[_A]:
@@ -453,11 +337,12 @@ def TryAsync(
                 return Ok(result)
             except Exception as e:
                 return Err(e)
-
         return AsyncResult(_inner())
 
     return wrapper
 
+
+import funstruct.monad.result_instances  # noqa: E402, F401
 
 __all__ = [
     "Result",

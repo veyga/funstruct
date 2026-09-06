@@ -16,17 +16,15 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Generic, TypeVar, final
+from typing import Generic, TypeVar
 
-from funstruct.typeclasses._alternative import Alternative
-from funstruct.typeclasses._monad import Monad
-from funstruct.typeclasses._traversable import Traversable
+from funstruct.typeclasses._dot_notation import DotNotation
 
 A = TypeVar("A")
 B = TypeVar("B")
 
 
-class CList(Monad, Traversable, Alternative, Generic[A]):
+class CList(DotNotation, Generic[A]):
     """A Lisp/ML/Scala style singly linked list (cons list).
 
     Performance characteristics:
@@ -41,66 +39,71 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
         - reversed:      O(n) — builds new list via fold
         - index access:  O(n) — no random access (use Python list for that)
 
-    This is a persistent, immutable, singly-linked structure. Prepend is cheap;
-    append is expensive. Best for recursive algorithms and stack-like access patterns.
+    This is a persistent, immutable, singly-linked structure.
     """
 
     @abstractmethod
-    def append(fa: CList, other: CList) -> CList: ...
+    def append(self, other: CList) -> CList: ...
 
     @abstractmethod
-    def fold_right(fa: CList, acc: B, f: Callable[[A, B], B]) -> B: ...
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B: ...
 
     @abstractmethod
-    def fold_left(fa: CList, acc: B, f: Callable[[B, A], B]) -> B: ...
+    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B: ...
 
     @abstractmethod
-    def drop(fa: CList, n: int) -> CList: ...
+    def drop(self, n: int) -> CList: ...
 
     @abstractmethod
-    def drop_while(fa: CList, f: Callable[[A], bool]) -> CList: ...
+    def drop_while(self, f: Callable[[A], bool]) -> CList: ...
 
     @abstractmethod
-    def take(fa: CList, n: int) -> CList: ...
+    def take(self, n: int) -> CList: ...
 
     @abstractmethod
-    def take_while(fa: CList, f: Callable[[A], bool]) -> CList: ...
+    def take_while(self, f: Callable[[A], bool]) -> CList: ...
 
     @abstractmethod
-    def split_at(fa: CList, i: int) -> tuple[CList, CList]: ...
+    def split_at(self, i: int) -> tuple[CList, CList]: ...
 
     @abstractmethod
-    def insert_at(fa: CList, i: int, value: A) -> CList: ...
+    def insert_at(self, i: int, value: A) -> CList: ...
 
-    def partition(fa: CList, f: Callable[[A], bool]) -> tuple[CList, CList]:
+    def partition(self, f: Callable[[A], bool]) -> tuple[CList, CList]:
         accum = lambda a, x: (a << x[0], x[1]) if f(a) else (x[0], a << x[1])
-        return fa.fold_right((Nil(), Nil()), accum)
+        return self.fold_right((Nil(), Nil()), accum)
 
-    def length(fa: CList) -> int:
-        return fa.fold_right(0, lambda _, acc: acc + 1)
+    def length(self) -> int:
+        return self.fold_right(0, lambda _, acc: acc + 1)
 
-    def prepend(fa: CList, new_head: A) -> CList:
-        return Cons(new_head, fa)
+    def is_empty(self) -> bool:
+        return not bool(self)
 
-    def reversed(fa: CList) -> CList:
-        return fa.fold_left(Nil(), lambda acc, h: Cons(h, acc))
+    def prepend(self, new_head: A) -> CList:
+        return Cons(new_head, self)
 
-    def filter(fa: CList, f: Callable[[A], bool]) -> CList:
-        return fa.fold_right(Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc)
+    def reversed(self) -> CList:
+        return self.fold_left(Nil(), lambda acc, h: Cons(h, acc))
 
-    def flatten(fa: CList) -> CList:
-        return CList.flatten_(fa)
+    def filter(self, f: Callable[[A], bool]) -> CList:
+        return self.fold_right(Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc)
 
-    def bind(fa: CList, f: Callable[[A], CList]) -> CList:
-        return fa.fold_right(Nil(), lambda a, acc: f(a).append(acc))
+    def flatten(self) -> CList:
+        return CList.flatten_(self)
 
-    def traverse(fa: CList, f: Callable, pure_fn: Callable) -> object:
-        return fa.fold_right(
+    def bind(self, f: Callable[[A], CList]) -> CList:
+        return self.fold_right(Nil(), lambda a, acc: f(a).append(acc))
+
+    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+        return self.fold_right(
             pure_fn(Nil()),
             lambda a, acc: f(a).map2(acc, lambda b, bs: Cons(b, bs)),
         )
 
-    def sorted(fa: CList, cmp: Callable[[A, A], int]) -> CList:
+    def sequence(self, pure_fn: Callable) -> object:
+        return self.traverse(lambda x: x, pure_fn)
+
+    def sorted(self, cmp: Callable[[A, A], int]) -> CList:
         def merge(left: CList, right: CList) -> CList:
             match left, right:
                 case Nil(), r:
@@ -114,23 +117,14 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
                 case _:
                     return Nil()
 
-        length = len(fa)
+        length = len(self)
         if length <= 1:
-            return fa
-        left, right = fa.split_at(length // 2)
+            return self
+        left, right = self.split_at(length // 2)
         return merge(left.sorted(cmp), right.sorted(cmp))
 
     @staticmethod
     def flatten_(lst: CList[CList[A]]) -> CList:
-        """Flatten a nested list of lists into a single list.
-
-        Args:
-            lst: A list of lists to be flattened.
-
-        Returns:
-            A new list with all nested lists flattened into a single list.
-        """
-
         def concat(left, right):
             match left:
                 case Nil():
@@ -157,7 +151,7 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
 
     @classmethod
     def do(cls, gen_fn) -> Callable[..., CList]:
-        """Do-notation for CList. Collects all yielded results via flatMap. Returns a callable."""
+        """Do-notation for CList."""
 
         def _thunk(*args, **kwargs):
             def _collect():
@@ -181,40 +175,22 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
         return _thunk
 
     @classmethod
-    @final
     def pure(cls, value) -> CList:
-        """Lift a value into a single-element list."""
         return Cons(value)
 
     @staticmethod
     def cons(a: A) -> CList:
-        """Create a new list with a single element.
-
-        Args:
-            a: The element to add to the list.
-
-        Returns:
-            A new list containing the single element `a`.
-        """
         return Cons(a)
 
     @classmethod
     def empty(cls) -> CList:
         return Nil()
 
-    def or_else(fa: CList, fb: CList) -> CList:
-        return fa.append(fb)
+    def or_else(self, fb: CList) -> CList:
+        return self.append(fb)
 
     @staticmethod
     def new(*xs: A) -> CList:
-        """Create a new list from the given elements.
-
-        Args:
-            *xs: The elements to add to the list.
-
-        Returns:
-            A new list containing the elements `xs`.
-        """
         from funstruct.util.tailrec import tail_call, tco
 
         @tco
@@ -246,7 +222,7 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
 
     @staticmethod
     def from_iterable(iterable: Iterable[A]) -> CList:
-        """Create a new list from an iterable of elements.
+        """Create a new list from an iterable.
 
         >>> CList.from_iterable([1, 2, 3]).to_list()
         [1, 2, 3]
@@ -256,37 +232,21 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
         return CList.new(*iterable)
 
     def __rlshift__(self, other: A) -> CList:
-        """Prepend an element to the list using the `<<` operator.
-        Ex:
-        1 << Nil() == Cons(1)
-
-        Args:
-            other: The element to prepend.
-
-        Returns:
-            A new list with `other` added to the beginning.
-        """
         return self.prepend(other)
 
     def __add__(self, other: CList) -> CList:
-        """Concatenate two lists (Monoid append, not Applicative ap)."""
         return self.append(other)
 
     def __len__(self) -> int:
-        """Compute the length of the list.
-
-        Returns:
-            The number of elements in the list.
-        """
         return self.fold_right(0, lambda _, acc: acc + 1)
 
-    def to_list(fa: CList) -> list[A]:
+    def to_list(self) -> list[A]:
         """>>> Cons(1, Cons(2, Cons(3, Nil()))).to_list()
         [1, 2, 3]
         >>> Nil().to_list()
         []
         """
-        return list(fa)
+        return list(self)
 
     def __iter__(self) -> Iterator[A]:
         current = self
@@ -295,14 +255,6 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
             current = current.tail
 
     def __eq__(self, other: object) -> bool:
-        """Check if this list is equal to another list.
-
-        Args:
-            other: The list to compare with.
-
-        Returns:
-            True if the lists are equal, False otherwise.
-        """
         match other:
             case list():
                 return list(self) == other
@@ -318,7 +270,7 @@ class CList(Monad, Traversable, Alternative, Generic[A]):
 
 
 class Nil(CList):
-    """A singleton representing the empty list/end of a singly linked list."""
+    """Empty list (singleton)."""
 
     _instance = None
 
@@ -336,37 +288,37 @@ class Nil(CList):
     def __bool__(self) -> bool:
         return False
 
-    def append(fa: Nil, other: CList) -> CList:
+    def append(self, other: CList) -> CList:
         return other
 
-    def fold_right(fa: Nil, acc: B, f: Callable[[A, B], B]) -> B:
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
         return acc
 
-    def fold_left(fa: Nil, acc: B, f: Callable[[B, A], B]) -> B:
+    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
         return acc
 
-    def drop(fa: Nil, n: int) -> CList:
-        return fa
+    def drop(self, n: int) -> CList:
+        return self
 
-    def drop_while(fa: Nil, f: Callable[[A], bool]) -> CList:
-        return fa
+    def drop_while(self, f: Callable[[A], bool]) -> CList:
+        return self
 
-    def take(fa: Nil, n: int) -> CList:
-        return fa
+    def take(self, n: int) -> CList:
+        return self
 
-    def take_while(fa: Nil, f: Callable[[A], bool]) -> CList:
-        return fa
+    def take_while(self, f: Callable[[A], bool]) -> CList:
+        return self
 
-    def split_at(fa: Nil, i: int) -> tuple[CList, CList]:
-        return fa, fa
+    def split_at(self, i: int) -> tuple[CList, CList]:
+        return self, self
 
-    def insert_at(fa: Nil, i: int, value: A) -> CList:
+    def insert_at(self, i: int, value: A) -> CList:
         return Cons(value, Nil())
 
 
 @dataclass(frozen=True, eq=False)
 class Cons(CList[A]):
-    """Represents a non-empty list with a head element and a tail list."""
+    """Non-empty list with head and tail."""
 
     head: A
     tail: CList[A] = field(default_factory=Nil)
@@ -384,16 +336,15 @@ class Cons(CList[A]):
                     return f"[{', '.join(_fmt(e) for e in elem)}]"
                 case _:
                     return str(elem)
-
         return f"CList([{', '.join(_fmt(e) for e in self)}])"
 
-    def append(fa: Cons, other: CList) -> CList:
-        return fa.reversed().fold_left(other, lambda acc, h: Cons(h, acc))
+    def append(self, other: CList) -> CList:
+        return self.reversed().fold_left(other, lambda acc, h: Cons(h, acc))
 
-    def fold_right(fa: Cons, acc: B, f: Callable[[A, B], B]) -> B:
-        return fa.reversed().fold_left(acc, lambda a, b: f(b, a))
+    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
+        return self.reversed().fold_left(acc, lambda a, b: f(b, a))
 
-    def fold_left(fa: Cons, acc: B, f: Callable[[B, A], B]) -> B:
+    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
         from funstruct.util.tailrec import tail_call, tco
 
         @tco
@@ -404,28 +355,34 @@ class Cons(CList[A]):
                 case Cons(h, t):
                     return tail_call(_go)(t, f(result, h))
 
-        return _go(fa, acc)
+        return _go(self, acc)
 
-    def drop(fa: Cons, n: int) -> CList:
-        return fa if n <= 0 else fa.tail.drop(n - 1)
+    def drop(self, n: int) -> CList:
+        return self if n <= 0 else self.tail.drop(n - 1)
 
-    def drop_while(fa: Cons, f: Callable[[A], bool]) -> CList:
-        return fa if not f(fa.head) else fa.tail.drop_while(f)
+    def drop_while(self, f: Callable[[A], bool]) -> CList:
+        return self if not f(self.head) else self.tail.drop_while(f)
 
-    def take(fa: Cons, n: int) -> CList:
-        return Cons(fa.head) if n <= 1 else fa.head << fa.tail.take(n - 1)
+    def take(self, n: int) -> CList:
+        return Cons(self.head) if n <= 1 else self.head << self.tail.take(n - 1)
 
-    def take_while(fa: Cons, f: Callable[[A], bool]) -> CList:
-        return fa.head << fa.tail.take_while(f) if f(fa.head) else Nil()
+    def take_while(self, f: Callable[[A], bool]) -> CList:
+        return self.head << self.tail.take_while(f) if f(self.head) else Nil()
 
-    def split_at(fa: Cons, i: int) -> tuple[CList, CList]:
-        return fa.take(i), fa.drop(i)
+    def split_at(self, i: int) -> tuple[CList, CList]:
+        return self.take(i), self.drop(i)
 
-    def insert_at(fa: Cons, i: int, value: A) -> CList:
+    def insert_at(self, i: int, value: A) -> CList:
         if i <= 0:
-            return Cons(value, fa)
-        return Cons(fa.head, fa.tail.insert_at(i - 1, value))
+            return Cons(value, self)
+        return Cons(self.head, self.tail.insert_at(i - 1, value))
 
+
+CList._type_constructor = CList
+Cons._type_constructor = CList
+Nil._type_constructor = CList
+
+import funstruct.collections.cons_instances  # noqa: E402, F401
 
 __all__ = [
     "CList",

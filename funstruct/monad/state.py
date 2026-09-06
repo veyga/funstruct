@@ -16,49 +16,38 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._dot_notation import DotNotation
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class State(Monad, Generic[_A]):
-    """Pure State monad: ``S -> (S, A)``.
-
-    Always succeeds. No exceptions, no Result, no error rail.
-
-    Haskell: ``State s a``
-    Scala:   ``State[S, A]``
-    """
+class State(DotNotation, Generic[_A]):
+    """Pure State monad: ``S -> (S, A)``."""
 
     def __init__(self, run: Callable[[Any], tuple[Any, _A]]) -> None:
         self._run = run
 
-    def run(fa: State, initial_state) -> tuple:
-        """Execute with initial state.
+    def run(self, initial_state) -> tuple:
+        """Execute with initial state. Returns ``(final_state, value)``.
 
-        Returns ``(final_state, value)``.
-                >>> State.pure(10).run("any")
-                ('any', 10)
+        >>> State.pure(10).run("any")
+        ('any', 10)
         """
-        return fa._run(initial_state)
+        return self._run(initial_state)
 
-    def bind(fa: State, f: Callable[[_A], "State[_B]"]) -> "State[_B]":
+    def bind(self, f: Callable[[_A], State[_B]]) -> State[_B]:
         """>>> State.pure(1).bind(lambda x: State.pure(x + 10)).run(0)
         (0, 11)
         """
-
         def inner(s):
-            new_s, a = fa._run(s)
+            new_s, a = self._run(s)
             return f(a).run(new_s)
-
         return State(inner)
 
     @classmethod
-    def do(cls, gen_fn) -> Callable[..., "State"]:
+    def do(cls, gen_fn) -> Callable[..., State]:
         """Do-notation via generators. Returns a callable.
-
-        Each `yield` extracts the value from a State (state threads through).
 
         >>> def pipeline():
         ...     x = yield State(lambda s: (s + 1, s))
@@ -67,7 +56,6 @@ class State(Monad, Generic[_A]):
         >>> State.do(pipeline)().run(0)
         (2, 1)
         """
-
         def _thunk(*args, **kwargs):
             def _run(s):
                 gen = gen_fn(*args, **kwargs)
@@ -79,13 +67,11 @@ class State(Monad, Generic[_A]):
                         monadic_val = gen.send(result)
                 except StopIteration as e:
                     return (s, e.value)
-
             return cls(_run)
-
         return _thunk
 
     @classmethod
-    def pure(cls, value) -> "State":
+    def pure(cls, value) -> State:
         """Lift a value without modifying state.
 
         >>> State.pure("hello").run(99)
@@ -94,7 +80,7 @@ class State(Monad, Generic[_A]):
         return cls(lambda s: (s, value))
 
     @classmethod
-    def get(cls) -> "State":
+    def get(cls) -> State:
         """Produce current state as the value.
 
         >>> State.get().run(42)
@@ -103,7 +89,7 @@ class State(Monad, Generic[_A]):
         return cls(lambda s: (s, s))
 
     @classmethod
-    def modify(cls, f: Callable[[Any], Any]) -> "State":
+    def modify(cls, f: Callable[[Any], Any]) -> State:
         """Modify state, produce None.
 
         >>> State.modify(lambda s: s + 1).run(5)
@@ -114,6 +100,10 @@ class State(Monad, Generic[_A]):
     def __repr__(self) -> str:
         return f"State({self._run})"
 
+
+State._type_constructor = State
+
+import funstruct.monad.state_instances  # noqa: E402, F401
 
 __all__ = [
     "State",

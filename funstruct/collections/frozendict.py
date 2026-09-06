@@ -36,8 +36,7 @@ from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._foldable import Foldable
-from funstruct.typeclasses._functor import Functor
+from funstruct.typeclasses._dot_notation import DotNotation
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -236,7 +235,7 @@ def _make_branch(k1, v1, h1, k2, v2, h2, shift):
 _EMPTY = _Empty()
 
 
-class frozendict(Functor[V], Foldable, Generic[K, V]):
+class frozendict(DotNotation, Generic[K, V]):
     """An immutable, persistent dictionary backed by a HAMT.
 
     Functor over values (map transforms V, keys unchanged).

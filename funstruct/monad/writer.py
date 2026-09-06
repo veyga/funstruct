@@ -16,7 +16,7 @@ from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Nil
-from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._dot_notation import DotNotation
 from funstruct.typeclasses._monoid import Monoid
 
 _W = TypeVar("_W")
@@ -24,11 +24,8 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Writer(Monad, Generic[_W, _A]):
-    """Writer: (A, W) with output combined via a class-level Monoid.
-
-    Subclass and set _monoid to use.
-    """
+class Writer(DotNotation, Generic[_W, _A]):
+    """Writer: (A, W) with output combined via a class-level Monoid."""
 
     _monoid: Monoid
 
@@ -36,16 +33,16 @@ class Writer(Monad, Generic[_W, _A]):
         object.__setattr__(self, "value", value)
         object.__setattr__(self, "output", output)
 
-    def bind(fa: Writer, f: Callable[[_A], Writer[_W, _B]]) -> Writer[_W, _B]:
-        result = f(fa.value)
-        return fa.__class__(
+    def bind(self, f: Callable[[_A], Writer[_W, _B]]) -> Writer[_W, _B]:
+        result = f(self.value)
+        return self.__class__(
             result.value,
-            fa._monoid.combine(fa.output, result.output),
+            self._monoid.combine(self.output, result.output),
         )
 
     @classmethod
     def do(cls, gen_fn) -> Callable[..., Writer]:
-        """Do-notation for Writer. Accumulates output across yields. Returns a callable.
+        """Do-notation for Writer.
 
         >>> def pipeline():
         ...     x = yield ListWriter(1, ["init"])
@@ -54,7 +51,6 @@ class Writer(Monad, Generic[_W, _A]):
         >>> ListWriter.do(pipeline)()
         ListWriter(value=12, output=['init', 'step'])
         """
-
         def _thunk(*args, **kwargs):
             gen = gen_fn(*args, **kwargs)
             try:
@@ -67,17 +63,14 @@ class Writer(Monad, Generic[_W, _A]):
                     value = next_w.value
             except StopIteration as e:
                 return cls(e.value, output)
-
         return _thunk
 
     @classmethod
     def pure(cls, value) -> Writer:
-        """Lift a value with empty output (uses _monoid.empty)."""
         return cls(value, cls._monoid.empty)
 
     @classmethod
     def tell(cls, output: _W) -> Writer:
-        """Produce output with no meaningful value."""
         return cls(None, output)
 
     def __eq__(self, other: object) -> bool:
@@ -109,6 +102,14 @@ class StrWriter(Writer):
 class IntWriter(Writer):
     _monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
 
+
+Writer._type_constructor = Writer
+ListWriter._type_constructor = ListWriter
+CListWriter._type_constructor = CListWriter
+StrWriter._type_constructor = StrWriter
+IntWriter._type_constructor = IntWriter
+
+import funstruct.monad.writer_instances  # noqa: E402, F401
 
 __all__ = [
     "Writer",
