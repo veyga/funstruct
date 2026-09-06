@@ -10,6 +10,7 @@ from collections.abc import Awaitable, Callable, Generator
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
+from funstruct.util.reawaitable import ReAwaitable
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -23,14 +24,16 @@ class Future(Monad, Generic[A]):
 
     Future[A] is a generic async monad. It does not know about errors.
     For error-aware async, use AsyncResult[A] from funstruct.monad.result.
+
+    The inner coroutine is wrapped in ReAwaitable so the same Future
+    can be safely branched into multiple consumers.
     """
 
     def __init__(self, coro: Awaitable[A]) -> None:
-        self._coro = coro
+        self._coro = ReAwaitable(coro) if not isinstance(coro, ReAwaitable) else coro
 
     def __del__(self):
-        if hasattr(self._coro, "close"):
-            getattr(self._coro, "close")()
+        pass  # ReAwaitable manages the coroutine lifecycle()
 
     def __await__(self) -> Generator[None, None, A]:
         return self._awaitable().__await__()

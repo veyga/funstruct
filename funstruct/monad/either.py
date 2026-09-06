@@ -38,6 +38,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
+from funstruct.util.created_at import CapturesCreationSiteMixin
 
 if TYPE_CHECKING:
     from funstruct.collections.cons import CList
@@ -223,8 +224,8 @@ class Right(Either[E, A]):
 
 
 @dataclass(frozen=True, eq=False)
-class Left(Either[E, A]):
-    """Error case."""
+class Left(CapturesCreationSiteMixin, Either[E, A]):
+    """Error case. Captures creation site automatically."""
 
     error: E
 

@@ -44,6 +44,8 @@ from typing import Any, Generic, ParamSpec, TypeVar, overload
 from funstruct.monad.either import Either
 from funstruct.monad.future import Future
 from funstruct.typeclasses._monad import Monad
+from funstruct.util.created_at import CapturesCreationSiteMixin
+from funstruct.util.reawaitable import ReAwaitable
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -173,8 +175,8 @@ class Ok(Result[_A]):
 
 
 @dataclass(frozen=True, eq=False)
-class Err(Result[_A]):
-    """Error case of Result."""
+class Err(CapturesCreationSiteMixin, Result[_A]):
+    """Error case of Result. Captures creation site automatically."""
 
     error: Exception
 
@@ -245,11 +247,7 @@ class AsyncResult(Monad, Generic[_A]):
     """
 
     def __init__(self, coro: Awaitable[Result[_A]]) -> None:
-        self._coro = coro
-
-    def __del__(self):
-        if hasattr(self._coro, "close"):
-            getattr(self._coro, "close")()
+        self._coro = ReAwaitable(coro) if not isinstance(coro, ReAwaitable) else coro
 
     def __await__(self):
         return self._awaitable().__await__()

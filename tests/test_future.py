@@ -14,6 +14,39 @@ def run(future):
     return asyncio.run(future._awaitable())
 
 
+class TestReAwaitable:
+    """Future and AsyncResult can be safely branched (awaited from multiple paths)."""
+
+    def test_future_branching(self):
+        async def go():
+            f = Future.pure(42)
+            a = f.map(lambda x: x + 1)
+            b = f.map(lambda x: x * 2)
+            return (await a, await b)
+
+        assert asyncio.run(go()) == (43, 84)
+
+    def test_async_result_branching(self):
+        async def go():
+            r = AsyncResult.pure(10)
+            a = r.map(lambda x: x + 1)
+            b = r.map(lambda x: x * 2)
+            return (await a, await b)
+
+        ra, rb = asyncio.run(go())
+        assert ra == Ok(11)
+        assert rb == Ok(20)
+
+    def test_future_same_instance_awaited_twice(self):
+        async def go():
+            f = Future.pure(99)
+            first = await f
+            second = await f
+            return (first, second)
+
+        assert asyncio.run(go()) == (99, 99)
+
+
 class TestAwaitable:
     """Future and AsyncResult are directly awaitable — no .run() needed."""
 

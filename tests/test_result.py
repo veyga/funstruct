@@ -114,6 +114,22 @@ class TestAsyncResultFold:
         assert asyncio.run(go()) == "bad"
 
 
+class TestCreatedAt:
+    def test_err_captures_creation_site(self):
+        from funstruct.util.created_at import CreatedAt
+
+        err = Err(ValueError("bad"))
+        assert isinstance(err.created_at, CreatedAt)
+        assert err.created_at.funcname == "test_err_captures_creation_site"
+        assert "test_result.py" in err.created_at.filename
+
+    def test_err_created_at_str(self):
+        err = Err(ValueError("bad"))
+        s = str(err.created_at)
+        assert "test_result.py" in s
+        assert "test_err_created_at_str" in s
+
+
 class TestConstructors:
     def test_ok_direct_equals_pure(self):
         assert Ok(42) == Ok.pure(42)
