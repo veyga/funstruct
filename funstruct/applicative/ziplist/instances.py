@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.registry import register
+from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.applicative.ziplist import ZipList
 

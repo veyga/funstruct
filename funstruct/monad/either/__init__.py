@@ -67,6 +67,10 @@ class Either(DotNotation, Generic[E, A]):
     def do(cls, gen_fn: Callable) -> Callable[..., Either]:
         """Do-notation. Short-circuits on Left. Returns a callable.
 
+        # TODO: do-notation is ~2x slower than raw bind chains due to generator
+        # protocol overhead. Consider optimizing the generator loop or providing
+        # a bind-chain builder as an alternative for performance-sensitive code.
+
         >>> def pipeline():
         ...     x = yield Right(1)
         ...     y = yield Right(x + 10)

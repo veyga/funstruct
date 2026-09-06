@@ -63,7 +63,12 @@ class Result(DotNotation, Generic[_A]):
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., Result]:
-        """Do-notation. Short-circuits on Err. Returns a callable."""
+        """Do-notation. Short-circuits on Err. Returns a callable.
+
+        # TODO: do-notation is ~2x slower than raw bind chains due to generator
+        # protocol overhead. Consider optimizing the generator loop or providing
+        # a bind-chain builder as an alternative for performance-sensitive code.
+        """
 
         def _thunk(*args, **kwargs):
             gen = gen_fn(*args, **kwargs)
@@ -318,7 +323,12 @@ class AsyncResult(DotNotation, Generic[_A]):
 
     @classmethod
     def do(cls, gen_fn: Callable) -> Callable[..., AsyncResult]:
-        """Do-notation for AsyncResult."""
+        """Do-notation for AsyncResult.
+
+        # TODO: do-notation is ~2x slower than raw bind chains due to generator
+        # protocol overhead. Consider optimizing the generator loop or providing
+        # a bind-chain builder as an alternative for performance-sensitive code.
+        """
         def _thunk(*args, **kwargs):
             async def _run():
                 gen = gen_fn(*args, **kwargs)

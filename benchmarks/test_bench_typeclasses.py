@@ -11,7 +11,7 @@ from funstruct.monad.option import Option, Some, Nothing
 from funstruct.monad.result import Result, Ok, Err, AsyncResult
 from funstruct.monad.either import Either, Right, Left
 from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.typeclasses import Monad, Functor, MonadError, Alternative, summon, tc_of
+from funstruct.typeclasses import Alternative, Functor, Monad, MonadError, summon, tc_of
 
 
 class TestDotNotationOverhead:

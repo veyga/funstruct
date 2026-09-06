@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypeVar
 
-from funstruct.typeclasses.registry import register
+from funstruct.typeclasses.utils.registry import register
 from funstruct.typeclasses.bifunctor import Bifunctor
 from funstruct.typeclasses.monad_error import MonadError
 from funstruct.monad.result import AsyncResult, Err, Ok, Result
