@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../monad/">
+        <link rel="prev" href="../do_notation/">
       
       
-        <link rel="next" href="../../functor/">
+        <link rel="next" href="../evaluation_strategy/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>MonadTransformer - funstruct</title>
+        <title>Async Operations - funstruct</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#monadtransformer" class="md-skip">
+        <a href="#async-operations" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MonadTransformer
+              Async Operations
             
           </span>
         </div>
@@ -264,6 +264,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../playground.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Playground
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -277,17 +304,17 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    typeclass
+    Guides
   
 
     
@@ -298,12 +325,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
-    typeclass
+    Guides
   
 
           </label>
@@ -316,14 +343,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../monads/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overview
+    What is a Monad?
   
 
     
@@ -344,14 +371,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../semigroup/" class="md-nav__link">
+      <a href="../typeclass_pattern_json/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Semigroup
+    Typeclass Pattern (JSON)
   
 
     
@@ -372,14 +399,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../monoid/" class="md-nav__link">
+      <a href="../typeclass_pattern_ordering/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Monoid
+    Typeclass Pattern (Ordering)
   
 
     
@@ -400,14 +427,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../functor/" class="md-nav__link">
+      <a href="../generic_programming/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Functor
+    Generic Programming
   
 
     
@@ -428,14 +455,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../applicative/" class="md-nav__link">
+      <a href="../railway_oriented_programming/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Applicative
+    Railway Oriented Programming
   
 
     
@@ -456,14 +483,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../monad/" class="md-nav__link">
+      <a href="../tagless_final/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Monad
+    Tagless Final Style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../do_notation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Notation
   
 
     
@@ -500,7 +555,7 @@
   <span class="md-ellipsis">
     
   
-    MonadTransformer
+    Async Operations
   
 
     
@@ -518,7 +573,7 @@
   <span class="md-ellipsis">
     
   
-    MonadTransformer
+    Async Operations
   
 
     
@@ -544,41 +599,90 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.MonadTransformer" class="md-nav__link">
+  <a href="#the-recommended-approach-asyncresult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MonadTransformer
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MonadTransformer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.MonadTransformer.lift_f" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lift_f
+        The recommended approach: AsyncResult
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.MonadTransformer.and_then" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#tryasync-wrapping-exception-throwing-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        and_then
+        @TryAsync — wrapping exception-throwing code
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#do-notation-for-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do-notation for async
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bind-chains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bind chains
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-asyncresult-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating AsyncResult values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-which" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to use which
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -591,39 +695,21 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
+              
+                
   
   
   
   
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
+    <li class="md-nav__item">
+      <a href="../evaluation_strategy/" class="md-nav__link">
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
   
   
   <span class="md-ellipsis">
     
   
-    functor
+    Evaluation Strategy
   
 
     
@@ -631,19 +717,11 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    functor
+      </a>
+    </li>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
+              
             
               
                 
@@ -652,14 +730,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../functor/" class="md-nav__link">
+      <a href="../creating_a_data_type/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Functor
+    Creating a Data Type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../antipatterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anti-Patterns
   
 
     
@@ -705,7 +811,7 @@
   <span class="md-ellipsis">
     
   
-    applicative
+    Typeclasses
   
 
     
@@ -721,7 +827,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    applicative
+    Typeclasses
   
 
           </label>
@@ -734,7 +840,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../applicative/" class="md-nav__link">
+      <a href="../../typeclass/" class="md-nav__link">
         
   
   
@@ -762,14 +868,266 @@
   
   
     <li class="md-nav__item">
-      <a href="../../applicative/validated/" class="md-nav__link">
+      <a href="../../typeclass/semigroup/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Validated
+    Semigroup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/monoid/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monoid
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/functor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/applicative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applicative
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/alternative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alternative
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/monad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/monad_error/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MonadError
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/foldable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foldable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/traversable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traversable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/bifunctor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bifunctor
   
 
     
@@ -815,7 +1173,7 @@
   <span class="md-ellipsis">
     
   
-    monad
+    Monads
   
 
     
@@ -831,7 +1189,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    monad
+    Monads
   
 
           </label>
@@ -872,14 +1230,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monad/either/" class="md-nav__link">
+      <a href="../../monad/option/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Either
+    Option
   
 
     
@@ -900,14 +1258,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monad/option/" class="md-nav__link">
+      <a href="../../monad/either/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Option
+    Either
   
 
     
@@ -1093,7 +1451,7 @@
   <span class="md-ellipsis">
     
   
-    monadtransformer
+    Applicatives
   
 
     
@@ -1109,7 +1467,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    monadtransformer
+    Applicatives
   
 
           </label>
@@ -1122,7 +1480,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monadtransformer/" class="md-nav__link">
+      <a href="../../applicative/" class="md-nav__link">
         
   
   
@@ -1150,14 +1508,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monadtransformer/reader_t/" class="md-nav__link">
+      <a href="../../applicative/validated/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ReaderT
+    Validated
   
 
     
@@ -1178,98 +1536,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monadtransformer/state_t/" class="md-nav__link">
+      <a href="../../applicative/ziplist/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    StateT
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../monadtransformer/either_t/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    EitherT
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../monadtransformer/option_t/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OptionT
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../monadtransformer/writer_t/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WriterT
+    ZipList
   
 
     
@@ -1315,7 +1589,7 @@
   <span class="md-ellipsis">
     
   
-    collections
+    Collections
   
 
     
@@ -1331,7 +1605,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    collections
+    Collections
   
 
           </label>
@@ -1379,7 +1653,7 @@
   <span class="md-ellipsis">
     
   
-    Cons
+    CList
   
 
     
@@ -1481,7 +1755,7 @@
   <span class="md-ellipsis">
     
   
-    util
+    Utilities
   
 
     
@@ -1497,7 +1771,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    util
+    Utilities
   
 
           </label>
@@ -1518,6 +1792,339 @@
     
   
     tailrec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../util/created_at/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CapturesCreationSiteMixin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Experimental
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Experimental
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monad Transformers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Monad Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/monadtransformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/monadtransformer/reader_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ReaderT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/monadtransformer/state_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    StateT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/monadtransformer/either_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EitherT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/monadtransformer/option_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OptionT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/monadtransformer/writer_t/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WriterT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/optics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optics (Lenses)
   
 
     
@@ -1565,41 +2172,90 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.MonadTransformer" class="md-nav__link">
+  <a href="#the-recommended-approach-asyncresult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MonadTransformer
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MonadTransformer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.MonadTransformer.lift_f" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lift_f
+        The recommended approach: AsyncResult
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.MonadTransformer.and_then" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#tryasync-wrapping-exception-throwing-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        and_then
+        @TryAsync — wrapping exception-throwing code
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#do-notation-for-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do-notation for async
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bind-chains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bind chains
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-asyncresult-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating AsyncResult values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-which" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to use which
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1620,230 +2276,142 @@
 
 
 
-<h1 id="monadtransformer">MonadTransformer</h1>
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="funstruct.typeclasses.MonadTransformer" class="doc doc-heading">
-            <code>funstruct.typeclasses.MonadTransformer</code>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="funstruct.typeclasses.Monad (funstruct.typeclasses._monad.Monad)" href="../monad/#funstruct.typeclasses.Monad">Monad</a></code>, <code><span title="typing.Generic">Generic</span>[<span title="funstruct.typeclasses._monad_transformer._F">_F</span>, <span title="funstruct.typeclasses._monad_transformer._A">_A</span>]</code></p>
-
-
-
-        <p>Base for monad transformers.</p>
-<p>Mathematically, a monad transformer is a type constructor (Monad -&gt; Monad).
-Haskell equivalent: <code>class MonadTrans t where lift :: Monad m =&gt; m a -&gt; t m a</code>.
-In funstruct this is <code>lift_f</code> to distinguish from function-lifting combinators.
-Python lacks higher-kinded types, so this class is a pragmatic marker.</p>
-
-
-<p>
-      <span class="doc-section-title">
-        Class Type Parameters:
-      </span>
-    </p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Bound or Constraints</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>_F</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The inner monad type. Must support .bind(), .map(),
-.pure(). Duck-typed at runtime.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>_A</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value type produced by the transformer.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-              <details class="mkdocstrings-source">
-                <summary>Source code in <code>funstruct/typeclasses/_monad_transformer.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MonadTransformer</span><span class="p">(</span><span class="n">Monad</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">_F</span><span class="p">,</span> <span class="n">_A</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">"""Base for monad transformers.</span>
-
-<span class="sd">    Mathematically, a monad transformer is a type constructor (Monad -&gt; Monad).</span>
-<span class="sd">    Haskell equivalent: `class MonadTrans t where lift :: Monad m =&gt; m a -&gt; t m a`.</span>
-<span class="sd">    In funstruct this is `lift_f` to distinguish from function-lifting combinators.</span>
-<span class="sd">    Python lacks higher-kinded types, so this class is a pragmatic marker.</span>
-
-<span class="sd">    Type parameters:</span>
-<span class="sd">        _F: The inner monad type. Must support .bind(), .map(),</span>
-<span class="sd">            .pure(). Duck-typed at runtime.</span>
-<span class="sd">        _A: The value type produced by the transformer.</span>
-<span class="sd">    """</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">lift_f</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">inner</span><span class="p">:</span> <span class="n">_F</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MonadTransformer</span><span class="p">[</span><span class="n">_F</span><span class="p">,</span> <span class="n">_A</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Lift an inner monad value into the transformer."""</span>
-        <span class="o">...</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">and_then</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MonadTransformer</span><span class="p">[</span><span class="n">_F</span><span class="p">,</span> <span class="n">_A</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""Kleisli composition: output of self becomes input of other."""</span>
-        <span class="o">...</span>
-</code></pre></div></td></tr></table></div>
-              </details>
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="funstruct.typeclasses.MonadTransformer.lift_f" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">lift_f</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Lift an inner monad value into the transformer.</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>funstruct/typeclasses/_monad_transformer.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
-<span class="nd">@abstractmethod</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">lift_f</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">inner</span><span class="p">:</span> <span class="n">_F</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MonadTransformer</span><span class="p">[</span><span class="n">_F</span><span class="p">,</span> <span class="n">_A</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Lift an inner monad value into the transformer."""</span>
-    <span class="o">...</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="funstruct.typeclasses.MonadTransformer.and_then" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">and_then</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Kleisli composition: output of self becomes input of other.</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>funstruct/typeclasses/_monad_transformer.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">and_then</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MonadTransformer</span><span class="p">[</span><span class="n">_F</span><span class="p">,</span> <span class="n">_A</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Kleisli composition: output of self becomes input of other."""</span>
-    <span class="o">...</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
+<h1 id="async-operations">Async Operations</h1>
+<h2 id="the-recommended-approach-asyncresult">The recommended approach: AsyncResult</h2>
+<p>For async code that can fail, use <code>AsyncResult</code>. It's essentially
+<code>Future[Result[A]]</code> — an async computation that produces either
+<code>Ok(value)</code> or <code>Err(exception)</code>.</p>
+<pre><code class="language-python">from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
+
+# Wrap async functions that might throw
+@TryAsync
+async def fetch_user(id: int) -&gt; User:
+    resp = await httpx.get(f&quot;/users/{id}&quot;)
+    if resp.status_code != 200:
+        raise NotFoundError(f&quot;user {id}&quot;)
+    return User(**resp.json())
+
+# Wrap sync functions that might throw
+@TryAsync
+def parse_id(raw: str) -&gt; int:
+    return int(raw)
+
+# Compose — nothing executes until await
+pipeline = (
+    parse_id(&quot;42&quot;)
+    .bind(fetch_user)
+    .map(lambda u: u.email)
+)
+
+# Await once at the boundary
+result = await pipeline  # Ok(&quot;alice@example.com&quot;) or Err(...)
+</code></pre>
+<h2 id="tryasync-wrapping-exception-throwing-code">@TryAsync — wrapping exception-throwing code</h2>
+<p><code>@TryAsync</code> wraps both sync and async functions. Exceptions become
+<code>Err</code>, return values become <code>Ok</code>:</p>
+<pre><code class="language-python"># Async function
+@TryAsync
+async def fetch(url: str) -&gt; dict:
+    resp = await httpx.get(url)
+    return resp.json()
+
+# Sync function (also works)
+@TryAsync
+def parse(raw: str) -&gt; int:
+    return int(raw)
+
+await fetch(&quot;https://api.example.com&quot;)  # Ok({&quot;data&quot;: ...}) or Err(...)
+await parse(&quot;42&quot;)                        # Ok(42)
+await parse(&quot;bad&quot;)                       # Err(ValueError(...))
+</code></pre>
+<h2 id="do-notation-for-async">Do-notation for async</h2>
+<pre><code class="language-python">@AsyncResult.do
+def get_profile(user_id: str):
+    user = yield fetch_user(user_id)
+    email = yield fetch_email(user)
+    prefs = yield fetch_preferences(user)
+    return Profile(user, email, prefs)
+
+result = await get_profile(&quot;alice&quot;)
+</code></pre>
+<p>Each <code>yield</code> awaits the <code>AsyncResult</code> and extracts the value. If any
+step returns <code>Err</code>, the rest is skipped.</p>
+<p><strong>Important:</strong> <code>@AsyncResult.do</code> uses generators (<code>yield</code>), NOT
+<code>async</code>/<code>await</code>. You cannot write <code>async def</code> with <code>@do</code>.</p>
+<h2 id="bind-chains">Bind chains</h2>
+<p>For 1-2 steps, bind chains are cleaner (and ~2x faster) than do:</p>
+<pre><code class="language-python"># One step
+result = await fetch_user(42).map(lambda u: u.email)
+
+# Two steps
+result = await fetch_user(42).bind(lambda u: fetch_email(u))
+
+# &gt;&gt; operator is bind
+result = await fetch_user(42) &gt;&gt; fetch_email
+</code></pre>
+<h2 id="error-handling">Error handling</h2>
+<pre><code class="language-python"># Recover from errors
+result = await (
+    fetch_user(42)
+    .handle_error_with(lambda e: AsyncResult.pure(default_user))
+)
+
+# Transform errors
+result = await (
+    fetch_user(42)
+    .left_map(lambda e: CustomError(f&quot;user fetch failed: {e}&quot;))
+)
+
+# Pattern match the final result
+match await pipeline:
+    case Ok(value):
+        return value
+    case Err(e):
+        log.error(f&quot;Failed: {e}&quot;)
+        return fallback
+</code></pre>
+<h2 id="creating-asyncresult-values">Creating AsyncResult values</h2>
+<pre><code class="language-python">AsyncResult.pure(42)                     # Ok(42) wrapped in async
+AsyncResult.raise_error(ValueError(&quot;x&quot;)) # Err wrapped in async
+AsyncResult.from_result(Ok(42))          # lift sync Result
+AsyncResult.from_either(Right(42))       # lift sync Either
+</code></pre>
+<h2 id="when-to-use-which">When to use which</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Use for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Result[A]</code></td>
+<td>Sync computations that can fail</td>
+</tr>
+<tr>
+<td><code>AsyncResult[A]</code></td>
+<td>Async computations that can fail</td>
+</tr>
+<tr>
+<td><code>Future[A]</code></td>
+<td>Async computations that always succeed</td>
+</tr>
+<tr>
+<td><code>@Try</code></td>
+<td>Wrapping sync exception-throwing code</td>
+</tr>
+<tr>
+<td><code>@TryAsync</code></td>
+<td>Wrapping async (or sync) exception-throwing code</td>
+</tr>
+</tbody>
+</table>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><code>demos/01_result_pipeline.py</code> — AsyncResult pipeline</li>
+<li><code>demos/transformers/03_alternative.py</code> — all functions return AsyncResult</li>
+</ul>
 
 
 
