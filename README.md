@@ -388,8 +388,10 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 
 ## Roadmap
 
+- **Interactive demos** — browser-runnable examples via PyScript/Pyodide. Edit and run funstruct code directly in the docs.
+- **Documentation site** — expanded static site (Astro/Next.js/etc) with guides, interactive demos, and API reference.
 - **Functional collections** — persistent queue, deque, red-black tree, persistent stack, heap
-- **Native collections (Rust/PyO3)** — Rust-backed CList, frozendict via `funstruct[native]`. Pure Python fallback stays zero-dependency.
+- **Native collections (Rust/PyO3)** — Rust-backed CList, frozendict via `funstruct[native]`. 
 - **Typeclass derivation** — auto-generate Functor/Foldable instances from dataclass structure.
 - **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`).
 - **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax.
