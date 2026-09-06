@@ -13,11 +13,11 @@ pip install funstruct || uv add funstruct
 ### Type Class Hierarchy
 
 ```
-Semigroup              Functor
-    │                      │
- Monoid              Applicative
-                           │
-                         Monad
+Semigroup        Foldable    Functor
+    │                \       /    \
+ Monoid          Traversable   Applicative
+                                    │
+                                  Monad
 ```
 
 #### Diagrams
@@ -112,7 +112,8 @@ class MonadTransformer(ABC, Generic[F, A]):
 | Typeclass        | Implementations                                                           |
 | ---------------- | ------------------------------------------------------------------------- |
 | Functor          | Tree, frozendict, + all below                                             |
-| Applicative      | Validated, + all below                                                    |
+| Traversable      | CList, Tree                                                               |
+| Applicative      | Validated, ZipList, + all below                                           |
 | Monad            | Option, Either, Result, State, Reader, Writer, CList, Future, AsyncResult |
 | MonadTransformer | ReaderT, StateT, EitherT, OptionT, WriterT                                |
 
@@ -130,21 +131,6 @@ class MonadTransformer(ABC, Generic[F, A]):
 | `CList[A]`         | Persistent singly-linked list                   |
 | `Tree[A]`          | Immutable binary tree (functor only)            |
 | `frozendict[K, V]` | Persistent HAMT dictionary                      |
-
-### Monad Transformers (experimental)
-
-> The transformer API is alpha and may change. For most use cases, plain
-> monads with `do`-notation and `fold` are sufficient.
-
-A transformer combines effects by wrapping one monad inside another.
-
-```
-ReaderT[F, Ctx, A]  =  Ctx -> F[A]         (environment + F's effects)
-StateT[F, S, A]     =  S -> F[(S, A)]      (state + F's effects)
-EitherT[F, E, A]    =  F[Either[E, A]]     (errors + F's effects)
-OptionT[F, A]       =  F[Option[A]]        (absence + F's effects)
-WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
-```
 
 ### Laws
 
@@ -206,3 +192,35 @@ Instead, funstruct provides:
 These give you the composition benefits of monadic pipelines where they
 matter (error handling, async sequencing) without pretending Python is
 something it isn't.
+
+## Experimental
+
+Experimental modules live in `funstruct.experimental`. APIs may change.
+
+### Monad Transformers
+
+```python
+from funstruct.experimental.monadtransformer import (
+    ReaderT, StateT, EitherT, OptionT, WriterT,
+)
+```
+
+Transformers combine effects by wrapping one monad inside another.
+For most use cases, plain monads with `do`-notation and `fold` are
+sufficient. Reach for transformers only when you need to combine
+multiple effects in a single pipeline.
+
+```
+ReaderT[F, Ctx, A]  =  Ctx -> F[A]         (environment + F's effects)
+StateT[F, S, A]     =  S -> F[(S, A)]      (state + F's effects)
+EitherT[F, E, A]    =  F[Either[E, A]]     (errors + F's effects)
+OptionT[F, A]       =  F[Option[A]]        (absence + F's effects)
+WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
+```
+
+## Roadmap
+
+- **Python 3.12+ minimum** — rewrite type signatures using `type X[A, B] = ...` aliases and `class Foo[A]:` syntax. Eliminates `TypeVar` boilerplate and `Callable[[A, B], C]` throughout.
+- **Parser combinators** — monadic parser library (`funstruct.experimental.parsing`). Demonstrate composing parsers with `bind`/`do`, with a JSON parser as the showcase.
+- **Typeclass derivation** — auto-generate `map`, `fold`, `pure` for dataclasses via `@derive(Functor)`. Runtime derivation via decorators, with type checker plugin support (mypy/ty) when available.
+- **ZipList improvements** — infinite streams, lazy evaluation.

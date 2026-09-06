@@ -10,7 +10,7 @@ bind: chain computations that share context, any can fail.
 and_then: pipe output forward as the next context (Kleisli composition).
 
 Examples:
-    >>> from funstruct.monadtransformer import ReaderT
+    >>> from funstruct.experimental.monadtransformer import ReaderT
     >>> from funstruct.monad.either import Either, Right, Left
 
     bind — shared context, with failure:
@@ -56,7 +56,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad_transformer import MonadTransformer
+from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 
 
 def _pure(monad_cls, value):

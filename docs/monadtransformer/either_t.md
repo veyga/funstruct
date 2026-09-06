@@ -1,3 +1,3 @@
 # EitherT
 
-::: funstruct.monadtransformer.either_t
+::: funstruct.experimental.monadtransformer.either_t

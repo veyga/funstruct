@@ -30,7 +30,7 @@ Transformers add a layer of wrapping. Use `.run()` at the boundary to
 unwrap back to the inner monad:
 
 ```python
-from funstruct.monadtransformer.option_t import OptionT
+from funstruct.experimental.monadtransformer.option_t import OptionT
 from funstruct.monad.either import Right
 
 # Build a pipeline inside the transformer:

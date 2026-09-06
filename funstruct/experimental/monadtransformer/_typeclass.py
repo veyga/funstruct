@@ -84,6 +84,11 @@ _B = TypeVar("_B")
 class MonadTransformer(ABC, Generic[_F, _A]):
     """Base for monad transformers — separate from the Monad hierarchy.
 
+    NOTE: This base class currently lives in ``funstruct.typeclasses`` but
+    belongs with its implementations in ``funstruct.experimental.monadtransformer``.
+    When monad transformers graduate from experimental, move this file to
+    ``funstruct.monadtransformer._base`` and update imports accordingly.
+
     In Scala/Haskell, transformers are not a typeclass — they're data types
     with separate Monad instances. This base provides the shared interface
     and derived methods without inheriting from Monad.

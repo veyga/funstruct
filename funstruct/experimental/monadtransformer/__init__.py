@@ -22,8 +22,8 @@ Pattern:
 - WriterT[F, W, A] = F[(A, W)] — adds accumulated output to F
 """
 
-from funstruct.monadtransformer.either_t import EitherT as EitherT
-from funstruct.monadtransformer.option_t import OptionT as OptionT
-from funstruct.monadtransformer.reader_t import ReaderT as ReaderT
-from funstruct.monadtransformer.state_t import StateT as StateT
-from funstruct.monadtransformer.writer_t import WriterT as WriterT
+from funstruct.experimental.monadtransformer.either_t import EitherT as EitherT
+from funstruct.experimental.monadtransformer.option_t import OptionT as OptionT
+from funstruct.experimental.monadtransformer.reader_t import ReaderT as ReaderT
+from funstruct.experimental.monadtransformer.state_t import StateT as StateT
+from funstruct.experimental.monadtransformer.writer_t import WriterT as WriterT

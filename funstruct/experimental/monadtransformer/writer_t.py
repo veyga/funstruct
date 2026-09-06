@@ -4,7 +4,7 @@ Adds accumulated output/logging to any monad F.
 WriterT[F, W, A] wraps F[(A, W)].
 
 Examples:
-    >>> from funstruct.monadtransformer.writer_t import WriterT
+    >>> from funstruct.experimental.monadtransformer.writer_t import WriterT
     >>> from funstruct.monad.either import Either, Right, Left
     >>> from funstruct.typeclasses import Monoid
 
@@ -44,7 +44,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad_transformer import MonadTransformer
+from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 from funstruct.typeclasses._monoid import Monoid
 
 _F = TypeVar("_F")

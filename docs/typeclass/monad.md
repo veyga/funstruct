@@ -128,7 +128,7 @@ both layers:
 ```python
 from funstruct.monad.either import Right
 from funstruct.monad.option import Some
-from funstruct.monadtransformer.either_t import EitherT
+from funstruct.experimental.monadtransformer.either_t import EitherT
 
 @EitherT.do
 def pipeline():

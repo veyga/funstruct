@@ -1,7 +1,7 @@
 """StateT — state monad transformer over any monad.
 
 Examples:
-    >>> from funstruct.monadtransformer import StateT
+    >>> from funstruct.experimental.monadtransformer import StateT
     >>> from funstruct.monad.either import Either, Right, Left
     >>> inc = StateT(lambda s: Right((s + 1, s)))
     >>> inc.run(0)
@@ -15,7 +15,7 @@ Examples:
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from funstruct.typeclasses._monad_transformer import MonadTransformer
+from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 
 
 def _pure(monad_cls, value):

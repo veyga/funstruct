@@ -39,17 +39,17 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Cons
-from funstruct.typeclasses._functor import Functor
+from funstruct.typeclasses._traversable import Traversable
 
 A = TypeVar("A")
 B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Tree(Functor, Generic[A]):
+class Tree(Traversable, Generic[A]):
     """Binary tree where every node holds a value.
 
-    A Functor but NOT a Monad — map preserves structure,
+    A Functor and Traversable but NOT a Monad — map preserves structure,
     but there's no meaningful bind (no way to "flatten" a tree of trees
     without choosing a grafting strategy).
     """
@@ -94,6 +94,12 @@ class Leaf(Tree[A]):
     def fold(self, on_leaf: Callable[[A], C], on_branch: Callable[[A, C, C], C]) -> C:
         return on_leaf(self.value)
 
+    def fold_right(self, acc, f):
+        return f(self.value, acc)
+
+    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+        return f(self.value).map(Leaf)
+
     def to_list(self) -> CList[A]:
         return Cons.pure(self.value)
 
@@ -133,6 +139,18 @@ class Branch(Tree[A]):
             self.left.fold(on_leaf, on_branch),
             self.right.fold(on_leaf, on_branch),
         )
+
+    def fold_right(self, acc, f):
+        acc = self.right.fold_right(acc, f)
+        acc = f(self.value, acc)
+        acc = self.left.fold_right(acc, f)
+        return acc
+
+    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+        fv = f(self.value)
+        fl = self.left.traverse(f, pure_fn)
+        fr = self.right.traverse(f, pure_fn)
+        return pure_fn(lambda v: lambda l: lambda r: Branch(v, l, r)).ap(fv).ap(fl).ap(fr)
 
     def to_list(self) -> CList[A]:
         return self.left.to_list() + Cons(self.value, self.right.to_list())

@@ -4,7 +4,7 @@ import pytest
 
 from funstruct.monad.either import Either, Left, Right
 from funstruct.monad.option import Nothing, Some
-from funstruct.monadtransformer.option_t import OptionT
+from funstruct.experimental.monadtransformer.option_t import OptionT
 
 
 class TestMap:

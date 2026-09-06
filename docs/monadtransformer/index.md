@@ -5,7 +5,7 @@
 > Reach for transformers only when you need to combine multiple effects
 > in a single pipeline.
 
-::: funstruct.monadtransformer
+::: funstruct.experimental.monadtransformer
 
 Transformers combine two monads into one, so you can write a flat pipeline
 instead of nested pattern matching. Use `lift_f` to bring an inner monad

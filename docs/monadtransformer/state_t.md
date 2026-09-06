@@ -23,4 +23,4 @@ result = divide_state(0).run(10)  # Left('division by zero')
 
 ## API Reference
 
-::: funstruct.monadtransformer.state_t
+::: funstruct.experimental.monadtransformer.state_t

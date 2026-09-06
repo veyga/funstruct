@@ -4,7 +4,7 @@ OptionT[F, A] wraps F[Option[A]]. bind short-circuits on Nothing,
 map transforms the value inside Some.
 
 Examples:
-    >>> from funstruct.monadtransformer.option_t import OptionT
+    >>> from funstruct.experimental.monadtransformer.option_t import OptionT
     >>> from funstruct.monad.either import Either, Right, Left
     >>> from funstruct.monad.option import Some, Nothing
 
@@ -47,7 +47,7 @@ from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.monad.option import Nothing, Option, Some
-from funstruct.typeclasses._monad_transformer import MonadTransformer
+from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 
 _F = TypeVar("_F")
 _A = TypeVar("_A")

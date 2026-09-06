@@ -19,12 +19,13 @@ from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses._monad import Monad
+from funstruct.typeclasses._traversable import Traversable
 
 A = TypeVar("A")
 B = TypeVar("B")
 
 
-class CList(Monad, Generic[A]):
+class CList(Monad, Traversable, Generic[A]):
     """A Lisp/ML/Scala style singly linked list (cons list).
 
     Performance characteristics:
@@ -224,6 +225,23 @@ class CList(Monad, Generic[A]):
             flattened into a single list.
         """
         return self.fold_right(Nil(), lambda a, acc: f(a).append(acc))
+
+    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+        """Traverse the list with an effectful function.
+
+        ``CList[A] → (A → F[B]) → F[CList[B]]``
+
+        Args:
+            f: A → F[B], applied to each element.
+            pure_fn: the target Applicative's pure.
+
+        Returns:
+            F[CList[B]] — the collected results.
+        """
+        return self.fold_right(
+            pure_fn(Nil()),
+            lambda a, acc: f(a).map2(acc, lambda b, bs: Cons(b, bs)),
+        )
 
     def sorted(self, cmp: Callable[[A, A], int]) -> CList:
         """Sort the list using a comparison function.

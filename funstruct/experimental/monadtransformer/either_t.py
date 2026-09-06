@@ -3,7 +3,7 @@
 ``EitherT[F, E, A]`` wraps ``F[Either[E, A]]``.
 
 Examples:
-    >>> from funstruct.monadtransformer.either_t import EitherT
+    >>> from funstruct.experimental.monadtransformer.either_t import EitherT
     >>> from funstruct.monad.option import Option, Some, Nothing
     >>> from funstruct.monad.either import Right, Left
 
@@ -48,7 +48,7 @@ from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.monad.either import Either, Left, Right
-from funstruct.typeclasses._monad_transformer import MonadTransformer
+from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 
 _F = TypeVar("_F")
 _E = TypeVar("_E")

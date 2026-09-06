@@ -1,3 +1,3 @@
 # WriterT
 
-::: funstruct.monadtransformer.writer_t
+::: funstruct.experimental.monadtransformer.writer_t
