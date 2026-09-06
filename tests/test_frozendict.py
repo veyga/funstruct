@@ -110,7 +110,7 @@ def fd_parity2(base_dict) -> frozendict:
 
 def test_constructor_copies_initial_dict(base_dict):
     dct = frozendict(base_dict)
-    assert dct.raw is not base_dict
+    assert dct.to_dict() is not base_dict
 
 
 def test_getitem__unsafe_found_returns_item(fd_parity1):
@@ -270,9 +270,9 @@ def test_fd_does_not_copy_underlying_sets():
 
 
 def test_put__does_not_change_original(fd_parity1):
-    initial = fd_parity1.raw
+    initial = fd_parity1.to_dict()
     fd_parity1.put("x", 2)
-    assert fd_parity1.raw == initial
+    assert fd_parity1.to_dict() == initial
 
 
 def test_put__returns_new(fd_parity1):
@@ -399,7 +399,7 @@ def test_hash_collision_remove_to_leaf():
     k1 = CollidingKey("a")
     k2 = CollidingKey("b")
     fd = frozendict({}).put(k1, 1).put(k2, 2)
-    fd2 = frozendict(fd.raw)
+    fd2 = frozendict(fd.to_dict())
     # Rebuild without k1 by creating fresh
     items = {k: v for k, v in fd2.items() if k != k1}
     fd3 = frozendict(items)
@@ -756,3 +756,68 @@ class TestDeep:
         assert sorted(team_names) == [
             "12 people", "3 people", "4 people", "5 people", "8 people",
         ]
+
+
+class TestToDict:
+    def test_flat(self):
+        fd = frozendict({"a": 1, "b": 2})
+        assert fd.to_dict() == {"a": 1, "b": 2}
+
+    def test_nested_converts_recursively(self):
+        fd = frozendict({"a": {"b": {"c": 1}}})
+        d = fd.to_dict()
+        assert d == {"a": {"b": {"c": 1}}}
+        assert isinstance(d["a"], dict)
+        assert not isinstance(d["a"], frozendict)
+
+    def test_lists_of_dicts_converted(self):
+        fd = frozendict({"items": [{"x": 1}, {"y": 2}]})
+        d = fd.to_dict()
+        assert d == {"items": [{"x": 1}, {"y": 2}]}
+        assert isinstance(d["items"][0], dict)
+        assert not isinstance(d["items"][0], frozendict)
+
+    def test_empty(self):
+        assert frozendict().to_dict() == {}
+
+    def test_non_dict_values_passthrough(self):
+        fd = frozendict({"name": "alice", "age": 30, "active": True})
+        assert fd.to_dict() == {"name": "alice", "age": 30, "active": True}
+
+
+class TestJsonRoundTrip:
+    def test_dumps_via_to_dict(self):
+        import json
+        fd = frozendict({"a": 1, "b": "hello"})
+        s = json.dumps(fd.to_dict())
+        assert json.loads(s) == {"a": 1, "b": "hello"}
+
+    def test_loads_deep_freezes(self):
+        import json
+        s = '{"x": 1, "y": {"z": 2}}'
+        fd = frozendict(json.loads(s))
+        assert fd["x"] == 1
+        assert isinstance(fd["y"], frozendict)
+        assert fd["y"]["z"] == 2
+
+    def test_full_round_trip(self):
+        import json
+        original = {"users": [{"name": "alice"}, {"name": "bob"}], "count": 2}
+        fd = frozendict(original)
+        s = json.dumps(fd.to_dict())
+        fd2 = frozendict(json.loads(s))
+        assert fd2["count"] == 2
+        assert fd2["users"][0]["name"] == "alice"
+
+    def test_nested_round_trip(self):
+        import json
+        fd = frozendict({
+            "config": {"db": {"host": "localhost", "port": 5432}},
+            "tags": ["prod", "us-east"],
+        })
+        d = fd.to_dict()
+        s = json.dumps(d)
+        fd2 = frozendict(json.loads(s))
+        assert fd2["config"]["db"]["host"] == "localhost"
+        assert fd2["config"]["db"]["port"] == 5432
+        assert fd2["tags"] == ["prod", "us-east"]

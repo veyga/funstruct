@@ -153,3 +153,58 @@ class TestReaderEquivalence:
 
         ctx = {"x": 10, "y": 20}
         assert do_version().run(ctx) == bind_version.run(ctx) == 30
+
+
+class TestDoNotationLimitations:
+    """@do uses generators (yield), NOT coroutines (async/await).
+
+    Key rules:
+        1. @Result.do / @Option.do takes a regular generator function (def + yield)
+        2. You CANNOT decorate an async def with @do — it won't work
+        3. You CANNOT yield AsyncResult from @Result.do — it won't unwrap
+        4. For async pipelines, use @AsyncResult.do (which awaits internally)
+        5. To mix sync Result into @AsyncResult.do, use AsyncResult.from_result()
+    """
+
+    def test_do_takes_generator_not_coroutine(self):
+        """@Result.do works with generators. async def is not a generator."""
+
+        @Result.do
+        def sync_pipeline():
+            x = yield Ok(10)
+            y = yield Ok(20)
+            return x + y
+
+        assert sync_pipeline() == Ok(30)
+
+    def test_async_result_is_not_ok_or_err(self):
+        """AsyncResult is not Ok or Err — it can't be pattern-matched in sync do.
+
+        @Result.do matches on Ok(value) / Err(). An AsyncResult is neither,
+        so yielding one in @Result.do would spin forever. Don't do it.
+        """
+        ar = AsyncResult.pure(20)
+        assert not isinstance(ar, Ok)
+        assert not isinstance(ar, Err)
+
+    def test_async_do_awaits_properly(self):
+        """@AsyncResult.do handles async values correctly."""
+        @AsyncResult.do
+        def async_pipeline():
+            x = yield AsyncResult.pure(10)
+            y = yield AsyncResult.pure(20)
+            return x + y
+
+        result = asyncio.run(async_pipeline()._awaitable())
+        assert result == Ok(30)
+
+    def test_mixing_sync_result_into_async_do(self):
+        """Use AsyncResult.from_result() to lift sync Result into async do."""
+        @AsyncResult.do
+        def pipeline():
+            x = yield AsyncResult.from_result(Ok(10))
+            y = yield AsyncResult.pure(20)
+            return x + y
+
+        result = asyncio.run(pipeline()._awaitable())
+        assert result == Ok(30)

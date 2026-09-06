@@ -361,9 +361,21 @@ class frozendict(DotNotation, Generic[K, V]):
             acc = f(v, acc)
         return acc
 
-    @property
-    def raw(self) -> dict:
-        return dict(self.__root.items_iter())
+    def to_dict(self) -> dict:
+        """Recursively convert to plain Python dicts. Inverse of deep-freeze.
+
+        >>> frozendict({"a": {"b": 1}}).to_dict()
+        {'a': {'b': 1}}
+        """
+        def _thaw(v):
+            match v:
+                case frozendict():
+                    return v.to_dict()
+                case list():
+                    return [_thaw(item) for item in v]
+                case _:
+                    return v
+        return {k: _thaw(v) for k, v in self.__root.items_iter()}
 
     @classmethod
     def fromkeys(cls, *args, **kwargs) -> frozendict:
