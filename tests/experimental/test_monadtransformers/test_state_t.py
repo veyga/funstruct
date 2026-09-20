@@ -3,8 +3,8 @@
 from parametrization import Parametrization as P
 
 from funstruct.experimental.monadtransformer import StateT
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Option, Some
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Option, Some
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,
@@ -110,7 +110,7 @@ class TestBind:
         assert pipeline.run([]) == Right(([1, 2, 3], 3))
 
     def test_bind_chains_state_with_clist(self):
-        from funstruct.collections.cons import CList, Cons, Nil
+        from funstruct.types.cons import CList, Cons, Nil
 
         push = lambda v: StateT(lambda s: Right((Cons(v, s), v)))
         pipeline = push(1).bind(lambda _: push(2)).bind(lambda _: push(3))

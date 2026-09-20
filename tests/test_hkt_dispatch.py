@@ -7,9 +7,9 @@ DotNotation handles instance-level dispatch.
 
 import pytest
 
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.result import Err, Ok, Result
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 
 class TestClassLevelDispatch:

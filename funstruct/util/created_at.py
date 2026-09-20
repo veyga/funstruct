@@ -14,7 +14,7 @@ walking — just ``sys._getframe()``, which is a single pointer lookup.
 ``Err`` and ``Left`` use this mixin automatically. Every error value
 knows where it was created::
 
-    from funstruct.monad.result import Err
+    from funstruct.types.result import Err
 
     def validate_auth(req):
         if not req.valid:

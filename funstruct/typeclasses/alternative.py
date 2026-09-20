@@ -12,7 +12,7 @@ Examples:
 
     Option — fallback chains:
 
-    >>> from funstruct.monad.option import Some, Nothing
+    >>> from funstruct.types.option import Some, Nothing
     >>> Some(1).or_else(Some(2))
     Some(1)
     >>> Nothing().or_else(Some(2))
@@ -22,7 +22,7 @@ Examples:
 
     CList — concatenation (Alternative for lists is append):
 
-    >>> from funstruct.collections.cons import CList, Nil
+    >>> from funstruct.types.cons import CList, Nil
     >>> CList.new(1, 2).or_else(CList.new(3, 4)).to_list()
     [1, 2, 3, 4]
     >>> Nil().or_else(CList.new(1)).to_list()

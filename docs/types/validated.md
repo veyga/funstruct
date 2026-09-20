@@ -1,0 +1,3 @@
+# Validated
+
+::: funstruct.types.validated

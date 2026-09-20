@@ -149,8 +149,8 @@ effect types:
 
 ```python
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.monad.option import Option, Some
-from funstruct.monad.result import Result, Ok
+from funstruct.types.option import Option, Some
+from funstruct.types.result import Result, Ok
 
 # The "algebra" is the typeclass (Monad, MonadError, etc.)
 # The "program" is generic in F:

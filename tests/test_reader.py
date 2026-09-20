@@ -1,6 +1,6 @@
 """Tests for Reader monad."""
 
-from funstruct.monad.reader import Reader
+from funstruct.types.reader import Reader
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,

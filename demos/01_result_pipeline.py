@@ -15,7 +15,7 @@ import asyncio
 from dataclasses import dataclass
 
 from demos._util import header
-from funstruct.monad.result import AsyncResult, TryAsync
+from funstruct.types.result import AsyncResult, TryAsync
 
 
 @dataclass

@@ -18,8 +18,8 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from demos._util import header
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
 from funstruct.typeclasses import MonadError, summon
+from funstruct.types.result import AsyncResult, Err, Ok, Result, TryAsync
 
 # ── Domain ───────────────────────────────────────────────────────────
 

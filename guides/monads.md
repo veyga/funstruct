@@ -42,7 +42,7 @@ With the Option monad — bind chains the operations, and Nothing
 short-circuits automatically:
 
 ```python
-from funstruct.monad.option import Option, Some, Nothing
+from funstruct.types.option import Option, Some, Nothing
 
 def lookup_user(user_id: str) -> Option[User]:
     return Some(User("Alice")) if user_id == "1" else Nothing()

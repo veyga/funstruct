@@ -1,8 +1,8 @@
-from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.monad.either import Either, Left, Right
 from funstruct.typeclasses import summon
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.traversable import Traversable
+from funstruct.types.cons import CList, Cons, Nil
+from funstruct.types.either import Either, Left, Right
 from tests.laws import assert_functor_laws, assert_monad_laws, assert_type_contract
 
 

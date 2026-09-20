@@ -1,3 +1,0 @@
-# State
-
-::: funstruct.monad.state

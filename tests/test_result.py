@@ -1,4 +1,4 @@
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, Try
+from funstruct.types.result import AsyncResult, Err, Ok, Result, Try
 from tests.laws import assert_type_contract
 
 

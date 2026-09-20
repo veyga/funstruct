@@ -28,12 +28,12 @@ Semigroup vs Monoid requirement:
 
 import pytest
 
-from funstruct.applicative.validated import Invalid, Valid
-from funstruct.collections.cons import Cons, Nil
-from funstruct.monad.writer import Writer
 from funstruct.typeclasses import Monoid, Semigroup
 from funstruct.typeclasses.functor import Functor
 from funstruct.typeclasses.monad import Monad
+from funstruct.types.cons import Cons, Nil
+from funstruct.types.validated import Invalid, Valid
+from funstruct.types.writer import Writer
 from tests.laws import (
     assert_functor_laws,
     assert_monad_laws,

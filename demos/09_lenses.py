@@ -21,8 +21,8 @@ Run: uv run python demos/09_lenses.py
 """
 
 from demos._util import header
-from funstruct.collections.frozendict import frozendict
 from funstruct.experimental.optics import at
+from funstruct.types.frozendict import frozendict
 
 
 def main():

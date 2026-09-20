@@ -1,3 +1,0 @@
-# frozendict
-
-::: funstruct.collections.frozendict

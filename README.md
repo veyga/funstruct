@@ -320,8 +320,8 @@ Every implementation must satisfy these mathematical laws:
 **Dot syntax** — the default, for everyday code:
 
 ```python
-from funstruct.monad.option import Some, Nothing
-from funstruct.monad.result import Ok, Err
+from funstruct.types.option import Some, Nothing
+from funstruct.types.result import Ok, Err
 
 Some(10).map(lambda x: x * 2).bind(lambda x: Some(x + 1))  # Some(21)
 Ok(10).map(str)                                              # Ok('10')
@@ -334,8 +334,8 @@ Nothing().map(lambda x: x + 1)                               # Nothing()
 
 ```python
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.monad.option import Option, Some
-from funstruct.monad.result import Result, Ok, Err
+from funstruct.types.option import Option, Some
+from funstruct.types.result import Result, Ok, Err
 
 # F: Monad    = the typeclass instance (constraint / trait bound)
 # fa: F[A]    = a value in the monadic context (Some(21), Ok(21), etc.)
@@ -442,7 +442,7 @@ WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
 
 ```python
 from funstruct.experimental.optics import Lens, at
-from funstruct.collections.frozendict import frozendict
+from funstruct.types.frozendict import frozendict
 ```
 
 Lenses let you read and update deeply nested immutable structures

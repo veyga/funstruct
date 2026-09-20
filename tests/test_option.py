@@ -1,10 +1,10 @@
 """Tests for Option monad."""
 
-from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.monad.option import Nothing, Option, Some
 from funstruct.typeclasses import summon
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.traversable import Traversable
+from funstruct.types.cons import CList, Cons, Nil
+from funstruct.types.option import Nothing, Option, Some
 from tests.laws import assert_type_contract
 
 

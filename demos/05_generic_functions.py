@@ -18,10 +18,10 @@ Run: uv run python demos/05_generic_functions.py
 from __future__ import annotations
 
 from demos._util import header
-from funstruct.monad.either import Either, Right
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.result import Ok, Result
 from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.types.either import Either, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Ok, Result
 
 # ── Generic functions (the constraint is the type hint) ──────────────
 

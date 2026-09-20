@@ -17,8 +17,8 @@ from dataclasses import dataclass
 
 from demos._util import header
 from funstruct.experimental.monadtransformer.option_t import OptionT
-from funstruct.monad.future import Future
-from funstruct.monad.option import Option
+from funstruct.types.future import Future
+from funstruct.types.option import Option
 
 
 @dataclass

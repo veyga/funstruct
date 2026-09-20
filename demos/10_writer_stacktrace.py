@@ -16,7 +16,7 @@ Run: uv run python demos/10_writer_stacktrace.py
 """
 
 from demos._util import header
-from funstruct.monad.writer import ListWriter
+from funstruct.types.writer import ListWriter
 
 
 def lookup_user(name: str) -> ListWriter:

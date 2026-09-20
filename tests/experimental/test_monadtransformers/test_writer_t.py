@@ -2,11 +2,11 @@
 
 import pytest
 
-from funstruct.collections.cons import CList, Cons, Nil
 from funstruct.experimental.monadtransformer.writer_t import WriterT
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Nothing, Option, Some
 from funstruct.typeclasses import Monoid, Semigroup
+from funstruct.types.cons import CList, Cons, Nil
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
 
 list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
 clist_monoid = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())

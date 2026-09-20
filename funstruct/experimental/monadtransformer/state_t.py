@@ -2,7 +2,7 @@
 
 Examples:
     >>> from funstruct.experimental.monadtransformer import StateT
-    >>> from funstruct.monad.either import Either, Right, Left
+    >>> from funstruct.types.either import Either, Right, Left
     >>> inc = StateT(lambda s: Right((s + 1, s)))
     >>> inc.run(0)
     Right((1, 0))
@@ -53,7 +53,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
     def bind(self, f: Callable[[_A], "StateT[_F, _S, _B]"]) -> "StateT[_F, _S, _B]":
         """FlatMap: thread state, pass value to ``f``.
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.pure(1, Option).bind(lambda x: StateT.pure(x + 10, Option)).run(0)
         Some((0, 11))
         """
@@ -66,7 +66,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
     def map(self, f: Callable[[_A], _B]) -> "StateT[_F, _S, _B]":
         """Transform the produced value without touching state.
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.pure(5, Option).map(lambda x: x * 2).run(0)
         Some((0, 10))
         """
@@ -104,7 +104,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
         Each `yield` extracts the value from a StateT.
         State threads through, short-circuits on inner monad failure.
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> def pipeline():
         ...     x = yield StateT(lambda s: Right((s + 1, s)))
         ...     y = yield StateT(lambda s: Right((s + 1, s)))
@@ -140,7 +140,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
     def pure(cls, value, monad: type) -> "StateT":
         """Lift a value into StateT. State unchanged.
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.pure("hello", Option).run(99)
         Some((99, 'hello'))
         """
@@ -159,7 +159,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
     def get(cls, monad: type) -> "StateT":
         """Produce current state as the value.
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.get(Option).run(42)
         Some((42, 42))
         """
@@ -171,7 +171,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
 
         Cats: ``StateT.set``
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.set(99, Option).run(0)
         Some((99, None))
         """
@@ -183,7 +183,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
 
         Cats: ``StateT.inspect``
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.inspect(lambda s: s * 2, Option).run(5)
         Some((5, 10))
         """
@@ -193,7 +193,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
     def modify(cls, f: Callable[..., object], monad: type) -> "StateT":
         """Modify state, produce None.
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.modify(lambda s: s + 1, Option).run(5)
         Some((6, None))
         """
@@ -205,7 +205,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
 
         Haskell equivalent: ``lift :: m a -> StateT s m a``
 
-        >>> from funstruct.monad.option import Option, Some, Nothing
+        >>> from funstruct.types.option import Option, Some, Nothing
         >>> StateT.lift_f(Some(42)).run(0)
         Some((0, 42))
         >>> StateT.lift_f(Nothing()).run(0)
@@ -219,7 +219,7 @@ class StateT(MonadTransformer, Generic[_F, _S, _A]):
 
         Use when you have the inner state function but not the outer monad.
 
-        >>> from funstruct.monad.option import Option, Some
+        >>> from funstruct.types.option import Option, Some
         >>> StateT.from_state(lambda s: (s + 1, s), Option).run(0)
         Some((1, 0))
         """

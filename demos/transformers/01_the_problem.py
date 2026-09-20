@@ -27,8 +27,8 @@ import asyncio
 from dataclasses import dataclass
 
 from demos._util import header
-from funstruct.monad.future import Future
-from funstruct.monad.option import Nothing, Option, Some
+from funstruct.types.future import Future
+from funstruct.types.option import Nothing, Option, Some
 
 
 @dataclass

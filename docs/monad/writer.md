@@ -1,3 +1,0 @@
-# Writer
-
-::: funstruct.monad.writer

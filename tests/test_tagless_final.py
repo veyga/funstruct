@@ -10,10 +10,10 @@ The caller provides F via summon(Monad, Option).
 """
 
 
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.result import Err, Ok, Result
 from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 
 class TestGenericFunctions:

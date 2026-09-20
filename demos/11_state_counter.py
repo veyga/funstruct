@@ -16,7 +16,7 @@ Run: uv run python demos/11_state_counter.py
 """
 
 from demos._util import header
-from funstruct.monad.state import State
+from funstruct.types.state import State
 
 # ── Example 1: Counter (state = int) ────────────────────────────────
 

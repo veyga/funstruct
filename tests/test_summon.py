@@ -9,10 +9,6 @@ Demonstrates:
 
 import pytest
 
-from funstruct.collections.cons import CList, Cons
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.result import Err, Ok, Result
 from funstruct.typeclasses import (
     Alternative,
     Applicative,
@@ -23,6 +19,10 @@ from funstruct.typeclasses import (
     summon,
     typeclass_of,
 )
+from funstruct.types.cons import CList, Cons
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 
 class TestDirectResolution:

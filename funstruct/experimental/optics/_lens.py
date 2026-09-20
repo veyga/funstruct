@@ -32,7 +32,7 @@ _B = TypeVar("_B")
 class Lens(Generic[_S, _A]):
     """A composable getter/setter pair.
 
-    >>> from funstruct.collections.frozendict import frozendict
+    >>> from funstruct.types.frozendict import frozendict
     >>> fd = frozendict({"a": frozendict({"b": 1})})
     >>> lens = at("a") >> at("b")
     >>> lens.get(fd)
@@ -71,14 +71,14 @@ def at(key) -> Lens:
 
     Works with frozendict (uses put) and plain dicts (uses spread).
 
-    >>> from funstruct.collections.frozendict import frozendict
+    >>> from funstruct.types.frozendict import frozendict
     >>> lens = at("x")
     >>> lens.get(frozendict({"x": 42}))
     42
     >>> lens.set(frozendict({"x": 42}), 99)["x"]
     99
     """
-    from funstruct.collections.frozendict import frozendict
+    from funstruct.types.frozendict import frozendict
 
     def _set(s, value):
         match s:

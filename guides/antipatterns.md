@@ -135,7 +135,7 @@ def collect(x):
 Some(10).map(collect)  # side effect hidden inside "functional" code
 
 # GOOD — use Writer for accumulation
-from funstruct.monad.writer import ListWriter
+from funstruct.types.writer import ListWriter
 
 @ListWriter.do
 def pipeline():

@@ -7,7 +7,7 @@ For async code that can fail, use `AsyncResult`. It's essentially
 `Ok(value)` or `Err(exception)`.
 
 ```python
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
+from funstruct.types.result import AsyncResult, Ok, Err, TryAsync
 
 # Wrap async functions that might throw
 @TryAsync

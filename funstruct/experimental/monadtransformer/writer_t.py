@@ -5,7 +5,7 @@ WriterT[F, W, A] wraps F[(A, W)].
 
 Examples:
     >>> from funstruct.experimental.monadtransformer.writer_t import WriterT
-    >>> from funstruct.monad.either import Either, Right, Left
+    >>> from funstruct.types.either import Either, Right, Left
     >>> from funstruct.typeclasses import Monoid
 
     >>> list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
@@ -99,7 +99,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
     def pure(cls, value, monad: type) -> WriterT:
         """Lift a value with empty output.
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses.monoid import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LT(WriterT):
@@ -113,7 +113,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
     def tell(cls, output: _W, monad: type) -> WriterT:
         """Produce output with no meaningful value.
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses.monoid import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LT(WriterT):
@@ -129,7 +129,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         Use when you have the inner writer value but not the outer monad.
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LT(WriterT):
@@ -151,7 +151,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
     def do(cls, gen_fn) -> Callable[..., WriterT]:
         """Do-notation via generators. Accumulates output across yields. Returns a callable.
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LogT(WriterT):
@@ -198,7 +198,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         Cats: ``WriterT.listen``
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LT(WriterT):
@@ -212,7 +212,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
     def written(self) -> Any:
         """Extract just the output, discarding the value. Returns F[W].
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
         >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
         >>> class LT(WriterT):

@@ -22,7 +22,7 @@ import asyncio
 from dataclasses import dataclass
 
 from demos._util import header
-from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
+from funstruct.types.result import AsyncResult, Ok, Result, TryAsync
 
 
 @dataclass

@@ -36,7 +36,7 @@ class Order:
 # Approach 1: Reader monad
 # ══════════════════════════════════════════════════════════════════════
 
-from funstruct.monad.reader import Reader
+from funstruct.types.reader import Reader
 
 
 @dataclass(frozen=True)

@@ -3,7 +3,7 @@ from parametrization import Parametrization as P
 
 import funstruct.monoid as monoid
 import funstruct.semigroup as semigroup
-from funstruct.collections.cons import CList, Cons, Nil
+from funstruct.types.cons import CList, Cons, Nil
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,
@@ -902,10 +902,10 @@ class TestDoNotation:
 
 # ── Instance tests via summon ────────────────────────────────────────
 
-from funstruct.monad.option import Nothing, Option, Some
 from funstruct.typeclasses import Alternative, Monad, summon
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.traversable import Traversable
+from funstruct.types.option import Nothing, Option, Some
 
 
 class TestCListMonadInstance:

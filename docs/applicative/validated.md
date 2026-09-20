@@ -1,3 +1,0 @@
-# Validated
-
-::: funstruct.applicative.validated

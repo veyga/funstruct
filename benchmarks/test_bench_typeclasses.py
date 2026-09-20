@@ -7,9 +7,6 @@ Measures the cost of:
     - Monad law operations (pure → bind → map)
 """
 
-from funstruct.monad.either import Right
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.result import Err, Ok, Result
 from funstruct.typeclasses import (
     Alternative,
     Functor,
@@ -18,6 +15,9 @@ from funstruct.typeclasses import (
     summon,
     typeclass_of,
 )
+from funstruct.types.either import Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 
 class TestDotNotationOverhead:

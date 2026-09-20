@@ -1,8 +1,8 @@
 import pytest
 from parametrization import Parametrization as P
 
-from funstruct.collections.frozendict import FrozendictEncoder, frozendict
 from funstruct.typeclasses import Monoid
+from funstruct.types.frozendict import FrozendictEncoder, frozendict
 from tests.laws import (
     assert_functor_laws,
     assert_monoid_laws,

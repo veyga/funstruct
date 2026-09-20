@@ -1,3 +1,0 @@
-# Either
-
-::: funstruct.monad.either

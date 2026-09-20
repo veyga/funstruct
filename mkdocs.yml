@@ -42,24 +42,19 @@ nav:
       - Foldable: typeclass/foldable.md
       - Traversable: typeclass/traversable.md
       - Bifunctor: typeclass/bifunctor.md
-  - Monads:
-      - Overview: monad/index.md
-      - Option: monad/option.md
-      - Either: monad/either.md
-      - Result: monad/result.md
-      - Reader: monad/reader.md
-      - Writer: monad/writer.md
-      - State: monad/state.md
-      - Future: monad/future.md
-  - Applicatives:
-      - Overview: applicative/index.md
-      - Validated: applicative/validated.md
-      - ZipList: applicative/ziplist.md
-  - Collections:
-      - Overview: collections/index.md
-      - CList: collections/cons.md
-      - frozendict: collections/frozendict.md
-      - Tree: collections/tree.md
+  - Types:
+      - Option: types/option.md
+      - Either: types/either.md
+      - Result: types/result.md
+      - State: types/state.md
+      - Reader: types/reader.md
+      - Writer: types/writer.md
+      - Future: types/future.md
+      - Validated: types/validated.md
+      - ZipList: types/ziplist.md
+      - CList: types/cons.md
+      - Tree: types/tree.md
+      - frozendict: types/frozendict.md
   - Utilities:
       - tailrec: util/tailrec.md
       - CapturesCreationSiteMixin: util/created_at.md

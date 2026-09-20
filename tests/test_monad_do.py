@@ -7,14 +7,14 @@ do implementations are not needed.
 
 import asyncio
 
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.future import Future
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.reader import Reader
-from funstruct.monad.result import AsyncResult, Err, Ok, Result
-from funstruct.monad.state import State
-from funstruct.monad.writer import ListWriter
 from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.future import Future
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.reader import Reader
+from funstruct.types.result import AsyncResult, Err, Ok, Result
+from funstruct.types.state import State
+from funstruct.types.writer import ListWriter
 
 
 def run_async(ar):

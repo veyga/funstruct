@@ -4,9 +4,9 @@ import asyncio
 
 import pytest
 
-from funstruct.monad.either import Left, Right
-from funstruct.monad.future import Future
-from funstruct.monad.result import AsyncResult, Err, Ok, TryAsync
+from funstruct.types.either import Left, Right
+from funstruct.types.future import Future
+from funstruct.types.result import AsyncResult, Err, Ok, TryAsync
 
 
 def run(future):

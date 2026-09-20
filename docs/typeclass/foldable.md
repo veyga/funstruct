@@ -10,7 +10,7 @@ accumulating a result. Defined on the `Foldable` typeclass.
 ```python
 from funstruct.typeclasses import summon
 from funstruct.typeclasses.foldable import Foldable
-from funstruct.monad.option import Some, Nothing
+from funstruct.types.option import Some, Nothing
 
 F = summon(Foldable, Option)
 F.fold_left(Some(10), 0, lambda acc, x: acc + x)   # 10
@@ -22,7 +22,7 @@ It handles each variant, like a structured `match`. Defined directly on
 the data type, not on a typeclass.
 
 ```python
-from funstruct.monad.option import Some, Nothing
+from funstruct.types.option import Some, Nothing
 
 Some(10).fold(on_nothing=lambda: "empty", on_some=lambda x: f"got {x}")
 # "got 10"

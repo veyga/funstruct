@@ -2,10 +2,10 @@
 
 from parametrization import Parametrization as P
 
-from funstruct.collections.cons import CList, Cons
-from funstruct.collections.tree import Branch, Leaf, Tree
 from funstruct.typeclasses import Functor, summon
 from funstruct.typeclasses.foldable import Foldable
+from funstruct.types.cons import CList, Cons
+from funstruct.types.tree import Branch, Leaf, Tree
 
 
 class TestLeaf:

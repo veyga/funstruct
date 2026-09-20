@@ -1,12 +1,12 @@
 """Tests for Traversable — traverse and sequence on CList and Tree."""
 
-from funstruct.collections.cons import CList, Nil
-from funstruct.collections.tree import Branch, Leaf, Tree
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Nothing, Option, Some
 from funstruct.typeclasses import summon
 from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.traversable import Traversable
+from funstruct.types.cons import CList, Nil
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.tree import Branch, Leaf, Tree
 
 
 class TestCListTraverse:

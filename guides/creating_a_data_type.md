@@ -182,7 +182,7 @@ result = fetch_and_transform(F, lambda: Success(42), lambda x: x * 2)
 # Success(84)
 
 # Same function with Result
-from funstruct.monad.result import Result, Ok
+from funstruct.types.result import Result, Ok
 G = summon(Monad, Result)
 result = fetch_and_transform(G, lambda: Ok(42), lambda x: x * 2)
 # Ok(84)

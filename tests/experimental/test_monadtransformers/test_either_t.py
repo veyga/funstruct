@@ -3,8 +3,8 @@
 import pytest
 
 from funstruct.experimental.monadtransformer.either_t import EitherT
-from funstruct.monad.either import Left, Right
-from funstruct.monad.option import Nothing, Option, Some
+from funstruct.types.either import Left, Right
+from funstruct.types.option import Nothing, Option, Some
 from tests.laws import assert_functor_laws, assert_monad_laws
 
 

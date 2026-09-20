@@ -16,8 +16,6 @@ from dataclasses import dataclass
 
 import pytest
 
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.result import Err, Ok, Result
 from funstruct.typeclasses import (
     Alternative,
     Applicative,
@@ -29,6 +27,8 @@ from funstruct.typeclasses import (
     typeclass_of,
 )
 from funstruct.typeclasses.utils.registry import register
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 # ── Custom typeclasses for testing ──────────────────────────────────
 

@@ -3,8 +3,8 @@
 import pytest
 
 from funstruct.experimental.monadtransformer.option_t import OptionT
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Nothing, Some
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Some
 
 
 class TestMap:

@@ -1,3 +1,0 @@
-# Tree
-
-::: funstruct.collections.tree

@@ -24,8 +24,8 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from demos._util import header
-from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
 from funstruct.typeclasses import Monad, summon
+from funstruct.types.result import AsyncResult, Ok, Result, TryAsync
 
 
 @dataclass

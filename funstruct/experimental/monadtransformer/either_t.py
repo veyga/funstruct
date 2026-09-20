@@ -4,8 +4,8 @@
 
 Examples:
     >>> from funstruct.experimental.monadtransformer.either_t import EitherT
-    >>> from funstruct.monad.option import Option, Some, Nothing
-    >>> from funstruct.monad.either import Right, Left
+    >>> from funstruct.types.option import Option, Some, Nothing
+    >>> from funstruct.types.either import Right, Left
 
     EitherT over Option — combines "might not exist" with "might fail":
 
@@ -48,7 +48,7 @@ from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
-from funstruct.monad.either import Either, Left, Right
+from funstruct.types.either import Either, Left, Right
 
 _F = TypeVar("_F")
 _E = TypeVar("_E")
@@ -106,8 +106,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
     def left_map(self, f: Callable[[_E], _E]) -> EitherT:
         """Transform the error value. No-op on Right.
 
-        >>> from funstruct.monad.option import Some
-        >>> from funstruct.monad.either import Left
+        >>> from funstruct.types.option import Some
+        >>> from funstruct.types.either import Left
         >>> EitherT(Some(Left("err"))).left_map(str.upper).run()
         Some(Left('ERR'))
         """
@@ -116,8 +116,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
     def bimap(self, on_left: Callable[[_E], Any], on_right: Callable[[_A], _B]) -> EitherT:
         """Transform both sides.
 
-        >>> from funstruct.monad.option import Some
-        >>> from funstruct.monad.either import Right, Left
+        >>> from funstruct.types.option import Some
+        >>> from funstruct.types.either import Right, Left
         >>> EitherT(Some(Right(5))).bimap(str, lambda x: x * 2).run()
         Some(Right(10))
         >>> EitherT(Some(Left("err"))).bimap(str.upper, lambda x: x * 2).run()
@@ -128,8 +128,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
     def fold(self, on_left: Callable[[_E], _B], on_right: Callable[[_A], _B]) -> _F:
         """Eliminate the Either inside F, returning F[B].
 
-        >>> from funstruct.monad.option import Some
-        >>> from funstruct.monad.either import Right, Left
+        >>> from funstruct.types.option import Some
+        >>> from funstruct.types.either import Right, Left
         >>> EitherT(Some(Right(5))).fold(lambda e: 0, lambda x: x * 2)
         Some(10)
         >>> EitherT(Some(Left("err"))).fold(lambda e: -1, lambda x: x * 2)
@@ -140,8 +140,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
     def swap(self) -> EitherT:
         """Swap Left and Right inside F.
 
-        >>> from funstruct.monad.option import Some
-        >>> from funstruct.monad.either import Right, Left
+        >>> from funstruct.types.option import Some
+        >>> from funstruct.types.either import Right, Left
         >>> EitherT(Some(Right(1))).swap().run()
         Some(Left(1))
         >>> EitherT(Some(Left("err"))).swap().run()
@@ -152,8 +152,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
     def get_or_else(self, default: _A) -> _F:
         """Extract the Right value or return default, inside F.
 
-        >>> from funstruct.monad.option import Some
-        >>> from funstruct.monad.either import Right, Left
+        >>> from funstruct.types.option import Some
+        >>> from funstruct.types.either import Right, Left
         >>> EitherT(Some(Right(42))).get_or_else(0)
         Some(42)
         >>> EitherT(Some(Left("err"))).get_or_else(0)
@@ -195,8 +195,8 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         Each ``yield`` extracts the Right value from an EitherT.
         Short-circuits on Left (propagated through F).
 
-        >>> from funstruct.monad.option import Some
-        >>> from funstruct.monad.either import Right
+        >>> from funstruct.types.option import Some
+        >>> from funstruct.types.either import Right
         >>> def pipeline():
         ...     x = yield EitherT(Some(Right(1)))
         ...     y = yield EitherT(Some(Right(x + 10)))

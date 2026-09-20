@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from funstruct.collections.cons import CList
 from funstruct.typeclasses import Semigroup
+from funstruct.types.cons import CList
 
 IntAddition: Semigroup[int] = Semigroup(typ=int, combine=lambda a, b: a + b)
 IntMultiplication: Semigroup[int] = Semigroup(typ=int, combine=lambda a, b: a * b)
