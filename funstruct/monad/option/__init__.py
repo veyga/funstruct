@@ -40,7 +40,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -94,37 +94,6 @@ class Option(DataType, ABC, Generic[A]):
     @classmethod
     def traverse(cls, values: CList[A], f: Callable[[A], Option]) -> Option[CList]:
         return cls.sequence(values.map(f))
-
-    @classmethod
-    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Option]:
-        """Do-notation. Short-circuits on Nothing. Returns a callable.
-
-        # TODO: do-notation is ~2x slower than raw bind chains due to generator
-        # protocol overhead. Consider optimizing the generator loop or providing
-        # a bind-chain builder as an alternative for performance-sensitive code.
-
-        >>> def pipeline():
-        ...     x = yield Some(1)
-        ...     y = yield Some(x + 10)
-        ...     return x + y
-        >>> Option.do(pipeline)()
-        Some(12)
-        """
-
-        def _thunk(*args, **kwargs):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                monadic_val = next(gen)
-                while True:
-                    match monadic_val:
-                        case Nothing():
-                            return Nothing()
-                        case Some(value):
-                            monadic_val = gen.send(value)
-            except StopIteration as e:
-                return Some(e.value)
-
-        return _thunk
 
     @property
     @abstractmethod

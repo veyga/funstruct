@@ -21,10 +21,10 @@ Usage:
 
 from __future__ import annotations
 
-from demos._util import header
 from dataclasses import dataclass
 from typing import Protocol
 
+from demos._util import header
 from funstruct.monad.either import Either, Left, Right
 from funstruct.monad.option import Nothing, Option, Some
 from funstruct.monad.result import Err, Ok, Result

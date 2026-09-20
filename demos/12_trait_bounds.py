@@ -17,11 +17,11 @@ This demo shows:
 
 from __future__ import annotations
 
-from demos._util import header
 import functools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from demos._util import header
 from funstruct.typeclasses.utils.registry import register, summon
 
 # ═══════════════════════════════════════════════════════════════════════

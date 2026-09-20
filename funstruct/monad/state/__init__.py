@@ -48,34 +48,6 @@ class State(DataType, Generic[_S, _A]):
 
         return State(inner)
 
-    @classmethod
-    def do(cls, gen_fn) -> Callable[..., State]:
-        """Do-notation via generators. Returns a callable.
-
-        >>> def pipeline():
-        ...     x = yield State(lambda s: (s + 1, s))
-        ...     y = yield State(lambda s: (s + 1, s))
-        ...     return x + y
-        >>> State.do(pipeline)().run(0)
-        (2, 1)
-        """
-
-        def _thunk(*args, **kwargs):
-            def _run(s):
-                gen = gen_fn(*args, **kwargs)
-                try:
-                    monadic_val = next(gen)
-                    while True:
-                        new_s, result = monadic_val.run(s)
-                        s = new_s
-                        monadic_val = gen.send(result)
-                except StopIteration as e:
-                    return (s, e.value)
-
-            return cls(_run)
-
-        return _thunk
-
     @staticmethod
     def pure(value) -> State:
         """Lift a value without modifying state.

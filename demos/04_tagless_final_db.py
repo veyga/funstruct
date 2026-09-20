@@ -13,12 +13,13 @@ Run: uv run python demos/04_tagless_final_db.py
 
 from __future__ import annotations
 
-from demos._util import header
 import asyncio
 from dataclasses import dataclass
 from typing import Protocol
 
+from demos._util import header
 from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
+from funstruct.typeclasses import MonadError, summon
 
 # ── Domain ───────────────────────────────────────────────────────────
 
@@ -59,12 +60,14 @@ class OrderRepo[F](Protocol):
 def place_order[F](
     repo: OrderRepo[F], F: type[F], customer_id: str, product_id: str
 ) -> F[Order]:
-    @F.do
+    M = summon(MonadError, F)
+
+    @M.do
     def run():
         customer = yield repo.find_customer(customer_id)
         product = yield repo.find_product(product_id)
         if customer.credit < product.price:
-            yield F.raise_error(
+            yield M.raise_error(
                 ValueError(
                     f"{customer.name} has ${customer.credit:.2f}, needs ${product.price:.2f}"
                 )

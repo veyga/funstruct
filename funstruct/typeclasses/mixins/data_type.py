@@ -35,9 +35,22 @@ class DataType(TypeConstructor, DotNotation):
         - Dot-syntax dispatch to registered typeclass instances (DotNotation)
         - >> operator (bind)
         - * operator (product)
+        - do (class-level, delegates to Monad instance)
     """
 
     _type_constructor = None  # reset — DataType itself is not a type constructor
+
+    @classmethod
+    def do(cls, gen_fn):
+        """Do-notation — delegates to summon(Monad, cls).do."""
+        from funstruct.typeclasses.monad import Monad
+        from funstruct.typeclasses.utils.registry import _registry
+
+        tc = cls._type_constructor or cls
+        for (typeclass, t), instance in _registry.items():
+            if t is tc and isinstance(instance, Monad):
+                return instance.do(gen_fn)
+        raise TypeError(f"No Monad instance registered for {tc.__name__}")
 
 
 __all__ = ["DataType"]

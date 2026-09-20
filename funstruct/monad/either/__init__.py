@@ -35,7 +35,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.util.created_at import CapturesCreationSiteMixin
@@ -63,37 +63,6 @@ class Either(DataType, ABC, Generic[E, A]):
     @staticmethod
     def raise_error(error: E) -> Either[E, A]:
         return Left(error)
-
-    @classmethod
-    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Either]:
-        """Do-notation. Short-circuits on Left. Returns a callable.
-
-        # TODO: do-notation is ~2x slower than raw bind chains due to generator
-        # protocol overhead. Consider optimizing the generator loop or providing
-        # a bind-chain builder as an alternative for performance-sensitive code.
-
-        >>> def pipeline():
-        ...     x = yield Right(1)
-        ...     y = yield Right(x + 10)
-        ...     return x + y
-        >>> Either.do(pipeline)()
-        Right(12)
-        """
-
-        def _thunk(*args, **kwargs):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                monadic_val = next(gen)
-                while True:
-                    match monadic_val:
-                        case Left():
-                            return monadic_val
-                        case Right(value):
-                            monadic_val = gen.send(value)
-            except StopIteration as e:
-                return Right(e.value)
-
-        return _thunk
 
     @classmethod
     def sequence(cls, eithers: CList[Either[E, A]]) -> Either[E, CList[A]]:

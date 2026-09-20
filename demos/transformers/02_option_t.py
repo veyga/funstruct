@@ -10,11 +10,11 @@ The key operations:
     .run()                     — unwrap back to Future[Option[A]]
 """
 
-from demos._util import header
 import asyncio
 
 from funstruct.playground import User
 
+from demos._util import header
 from funstruct.experimental.monadtransformer.option_t import OptionT
 from funstruct.monad.future import Future
 from funstruct.monad.option import Option

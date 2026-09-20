@@ -61,33 +61,6 @@ class Writer(DataType, Generic[_W, _A]):
         )  # type: ignore[return-value]  # TypeVar shift in bind
 
     @classmethod
-    def do(cls, gen_fn) -> Callable[..., Writer]:
-        """Do-notation for Writer.
-
-        >>> def pipeline():
-        ...     x = yield ListWriter(1, ["init"])
-        ...     y = yield ListWriter(x + 10, ["step"])
-        ...     return x + y
-        >>> ListWriter.do(pipeline)()
-        ListWriter(value=12, output=['init', 'step'])
-        """
-
-        def _thunk(*args, **kwargs):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                first = next(gen)
-                output = first.output
-                value = first.value
-                while True:
-                    next_w = gen.send(value)
-                    output = cls._monoid.combine(output, next_w.output)
-                    value = next_w.value
-            except StopIteration as e:
-                return cls(e.value, output)
-
-        return _thunk
-
-    @classmethod
     def pure(cls, value) -> Writer:
         return cls(value, cls._monoid.empty)
 

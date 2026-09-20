@@ -62,30 +62,6 @@ class Result(DataType, ABC, Generic[_A]):
     def raise_error(error: Exception) -> Result:
         return Err(error)
 
-    @classmethod
-    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Result]:
-        """Do-notation. Short-circuits on Err. Returns a callable.
-
-        # TODO: do-notation is ~2x slower than raw bind chains due to generator
-        # protocol overhead. Consider optimizing the generator loop or providing
-        # a bind-chain builder as an alternative for performance-sensitive code.
-        """
-
-        def _thunk(*args, **kwargs):
-            gen = gen_fn(*args, **kwargs)
-            try:
-                monadic_val = next(gen)
-                while True:
-                    match monadic_val:
-                        case Err():
-                            return monadic_val
-                        case Ok(value):
-                            monadic_val = gen.send(value)
-            except StopIteration as e:
-                return Ok(e.value)
-
-        return _thunk
-
     @property
     @abstractmethod
     def is_ok(self) -> bool: ...
@@ -316,34 +292,6 @@ class AsyncResult(DataType, Generic[_A]):
             return result.fold(on_err=on_err, on_ok=on_ok)
 
         return Future(_inner())
-
-    @classmethod
-    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., AsyncResult]:
-        """Do-notation for AsyncResult.
-
-        # TODO: do-notation is ~2x slower than raw bind chains due to generator
-        # protocol overhead. Consider optimizing the generator loop or providing
-        # a bind-chain builder as an alternative for performance-sensitive code.
-        """
-
-        def _thunk(*args, **kwargs):
-            async def _run():
-                gen = gen_fn(*args, **kwargs)
-                try:
-                    monadic_val = next(gen)
-                    while True:
-                        result = await monadic_val
-                        match result:
-                            case Ok(value):
-                                monadic_val = gen.send(value)
-                            case _:
-                                return result
-                except StopIteration as e:
-                    return Ok(e.value)
-
-            return cls(_run())
-
-        return _thunk
 
     def __repr__(self) -> str:
         return f"AsyncResult({self._coro})"

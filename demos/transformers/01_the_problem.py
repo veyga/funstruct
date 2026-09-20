@@ -21,11 +21,11 @@ Composing these requires unwrapping at every layer:
 Three functions, three layers of nesting. This doesn't scale.
 """
 
-from demos._util import header
 import asyncio
 
 from funstruct.playground import User
 
+from demos._util import header
 from funstruct.monad.future import Future
 from funstruct.monad.option import Nothing, Option, Some
 

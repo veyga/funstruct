@@ -7,7 +7,7 @@ For error handling, use AsyncResult[A] from funstruct.monad.result.
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Generator
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.util._reawaitable import ReAwaitable
@@ -37,32 +37,6 @@ class Future(DataType, Generic[A]):
             return await f(result)
 
         return Future(_inner())
-
-    @classmethod
-    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Future]:
-        """Do-notation for Future.
-
-        >>> @Future.do
-        ... def pipeline():
-        ...     x = yield Future.pure(1)
-        ...     y = yield Future.pure(x + 10)
-        ...     return x + y
-        """
-
-        def _thunk(*args, **kwargs):
-            async def _run():
-                gen = gen_fn(*args, **kwargs)
-                try:
-                    monadic_val = next(gen)
-                    while True:
-                        value = await monadic_val
-                        monadic_val = gen.send(value)
-                except StopIteration as e:
-                    return e.value
-
-            return cls(_run())
-
-        return _thunk
 
     @staticmethod
     def pure(value: A) -> Future[A]:

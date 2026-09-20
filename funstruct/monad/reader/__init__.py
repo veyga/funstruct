@@ -20,7 +20,7 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -43,33 +43,6 @@ class Reader(DataType, Generic[_Ctx, _A]):
 
     def bind(self, f: Callable[[_A], Reader[_Ctx, _B]]) -> Reader[_Ctx, _B]:
         return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
-
-    @classmethod
-    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Reader]:
-        """Do-notation via generators. Returns a callable.
-
-        >>> def pipeline():
-        ...     x = yield Reader(lambda ctx: ctx["x"])
-        ...     y = yield Reader(lambda ctx: ctx["y"])
-        ...     return x + y
-        >>> Reader.do(pipeline)().run({"x": 1, "y": 10})
-        11
-        """
-
-        def _thunk(*args, **kwargs):
-            def _run(ctx):
-                gen = gen_fn(*args, **kwargs)
-                try:
-                    monadic_val = next(gen)
-                    while True:
-                        result = monadic_val.run(ctx)
-                        monadic_val = gen.send(result)
-                except StopIteration as e:
-                    return e.value
-
-            return cls(_run)
-
-        return _thunk
 
     @staticmethod
     def pure(value) -> Reader:

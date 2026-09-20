@@ -25,6 +25,7 @@ from typing import Protocol, runtime_checkable
 
 from demos._util import header
 from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
+from funstruct.typeclasses import Monad, summon
 
 
 @dataclass
@@ -46,7 +47,9 @@ class UserRepo[F](Protocol):
 
 
 def get_profile[F](repo: UserRepo[F], F: type[F], username: str) -> F[str]:
-    @F.do
+    M = summon(Monad, F)
+
+    @M.do
     def run():
         user = yield repo.get_user(username)
         age = yield repo.get_age(user)

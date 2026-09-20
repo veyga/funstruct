@@ -22,10 +22,10 @@ Usage:
 
 from __future__ import annotations
 
-from demos._util import header
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
 
+from demos._util import header
 from funstruct.typeclasses import register, summon
 
 # ── Typeclass (the interface) ────────────────────────────────────────

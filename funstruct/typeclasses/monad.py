@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import Any, TypeVar, final
 
 from funstruct.typeclasses.applicative import Applicative
 
@@ -33,6 +33,28 @@ class Monad(Applicative):
 
     def map2(self, fa, fb, f: Callable[[_A, _B], _C]) -> Any:
         return self.bind(fa, lambda a: self.map(fb, lambda b: f(a, b)))  # type: ignore[arg-type]  # HKT limitation
+
+    @final
+    def do(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
+        """Do-notation via generators. Desugars to bind/pure."""
+
+        def _thunk(*args, **kwargs):
+            gen = gen_fn(*args, **kwargs)
+            try:
+                monadic_val = next(gen)
+            except StopIteration as e:
+                return self.pure(e.value)
+
+            def step(value):
+                try:
+                    next_val = gen.send(value)
+                    return self.bind(next_val, step)
+                except StopIteration as e:
+                    return self.pure(e.value)
+
+            return self.bind(monadic_val, step)
+
+        return _thunk
 
 
 __all__ = ["Monad"]

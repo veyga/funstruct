@@ -31,11 +31,11 @@ Usage:
 
 from __future__ import annotations
 
-from demos._util import header
 import json
 from abc import abstractmethod
 from dataclasses import dataclass, fields
 
+from demos._util import header
 from funstruct.typeclasses import BaseTypeclass
 from funstruct.typeclasses.utils.registry import register, summon
 

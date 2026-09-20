@@ -19,11 +19,11 @@ This is often simpler than transformers for real applications.
 No lifting, no transformers, no .run(). Just bind.
 """
 
-from demos._util import header
 import asyncio
 
 from funstruct.playground import User
 
+from demos._util import header
 from funstruct.monad.result import AsyncResult, TryAsync
 
 

@@ -12,8 +12,9 @@ Usage:
 
 from __future__ import annotations
 
-from demos._util import header
 from dataclasses import dataclass
+
+from demos._util import header
 
 # ── Shared domain ────────────────────────────────────────────────────
 
