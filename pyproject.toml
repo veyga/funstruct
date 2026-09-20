@@ -9,6 +9,9 @@ requires-python = ">=3.10"
 keywords = ["functional", "immutable", "fp", "data structures", "cons"]
 dependencies = []
 
+[project.scripts]
+funstruct-check = "funstruct.check:main"
+
 [project.urls]
 Homepage = "https://veyga.github.io/funstruct/"
 Documentation = "https://veyga.github.io/funstruct/"

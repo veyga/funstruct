@@ -62,6 +62,10 @@ playground:
   uv run python scripts/generate_playground.py
   open demoplayground/index.html
 
+# verify all summon() calls can resolve
+check-summon:
+  uv run python scripts/check_summon.py
+
 # generate and open typeclass hierarchy diagram
 diagram:
   uv run python scripts/generate_diagram.py

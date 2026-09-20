@@ -36,7 +36,7 @@ writer = summon(JSONWrite, dict)  # → TypeError: No instance of JSONWrite for 
 ### Step 2: use the instance
 
 ```python
-def jsonify(item) -> str:
+def jsonify[T: JSONWrite](item: T) -> str:
     writer = summon(JSONWrite, type(item))  # resolve
     return writer.to_json_string(item)      # use
 ```
@@ -58,8 +58,7 @@ error message is just as clear.
 ### Single bound
 
 ```python
-# Scala: def double[F[_]: Monad](fa: F[Int]): F[Int]
-def double(F: Monad, fa):
+def double[F: Monad](F: Monad, fa: F):
     return F.map(fa, lambda x: x * 2)
 
 double(summon(Monad, Option), Some(21))  # Some(42)
@@ -69,8 +68,7 @@ double(summon(Monad, Result), Ok(21))    # Ok(42)
 ### Multiple bounds
 
 ```python
-# Scala: def show_sorted[A: Ordering: Showable](items: List[A]): List[String]
-def show_sorted(items: list) -> list[str]:
+def show_sorted[A: Ordering, A: Showable](items: list[A]) -> list[str]:
     O = summon(Ordering, type(items[0]))   # bound 1: Ordering
     S = summon(Showable, type(items[0]))   # bound 2: Showable
     sorted_items = sorted(items, key=functools.cmp_to_key(O.compare))
@@ -80,26 +78,26 @@ def show_sorted(items: list) -> list[str]:
 Both bounds must be satisfied. If either is missing, `summon` raises
 `TypeError`.
 
-### Auto-resolved bounds (tc_of)
+### Auto-resolved bounds (typeclass_of)
 
 For functions that receive a monadic value and need to resolve its
 type constructor:
 
 ```python
-from funstruct.typeclasses import tc_of
+from funstruct.typeclasses import typeclass_of
 
-# tc_of(Some(42)) → Option
-# tc_of(Ok(10))   → Result
+# typeclass_of(Some(42)) → Option
+# typeclass_of(Ok(10))   → Result
 
-def double(fa):
-    F = summon(Monad, tc_of(fa))   # auto-resolve from the value
-    return F.map(fa, lambda x: x * 2)
+def double[F: Monad](fa: F):
+    M = summon(Monad, typeclass_of(fa))   # auto-resolve from the value
+    return M.map(fa, lambda x: x * 2)
 
 double(Some(21))  # Some(42) — auto-resolved
 double(Ok(21))    # Ok(42)   — auto-resolved
 ```
 
-`tc_of` reads `_type_constructor` from the value's class. No explicit
+`typeclass_of` reads `_type_constructor` from the value's class. No explicit
 type parameter needed.
 
 ### Composition via bounds
@@ -120,12 +118,12 @@ it delegates via the registry.
 
 ## Comparison
 
-| | Haskell | Scala | Python/funstruct |
-|---|---|---|---|
-| Bound syntax | `Show a =>` | `[A: Show]` | `summon(Show, type(a))` |
-| Resolution | Compile time | Compile time | Runtime |
-| Error | Won't compile | Won't compile | `TypeError` at call site |
-| Composition | Implicit | Implicit | Explicit via `summon` |
+|              | Haskell       | Scala         | Python/funstruct         |
+| ------------ | ------------- | ------------- | ------------------------ |
+| Bound syntax | `Show a =>`   | `[A: Show]`   | `summon(Show, type(a))`  |
+| Resolution   | Compile time  | Compile time  | Runtime                  |
+| Error        | Won't compile | Won't compile | `TypeError` at call site |
+| Composition  | Implicit      | Implicit      | Explicit via `summon`    |
 
 The mechanism is identical — a dictionary of operations looked up by
 type. The difference is WHEN the lookup happens and WHO does it

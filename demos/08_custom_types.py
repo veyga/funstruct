@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
 from typing import Protocol, runtime_checkable
 
-from funstruct.typeclasses.utils.registry import register, summon, tc_of
+from funstruct.typeclasses.utils.registry import register, summon, typeclass_of
 
 
 # ═══════════════════════════════════════════════════════════════════════

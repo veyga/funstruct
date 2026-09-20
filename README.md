@@ -400,7 +400,7 @@ the same effect at runtime through the typeclass instance pattern:
 
 - **Type constructors** are represented by the class itself (`Option`,
   `Result`, `Either`). Each data type sets `_type_constructor` so
-  variants resolve to their base: `tc_of(Some(42))` → `Option`.
+  variants resolve to their base: `typeclass_of(Some(42))` → `Option`.
 - **Typeclass resolution** via `summon(Monad, Option)` returns the
   registered instance, just like Scala's `summon[Monad[Option]]`.
 - **Generic functions** use the instance directly:
