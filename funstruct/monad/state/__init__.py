@@ -14,21 +14,22 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
+_S = TypeVar("_S")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class State(DataType, Generic[_A]):
+class State(DataType, Generic[_S, _A]):
     """Pure State monad: ``S -> (S, A)``."""
 
-    def __init__(self, run: Callable[[Any], tuple[Any, _A]]) -> None:
+    def __init__(self, run: Callable[[_S], tuple[_S, _A]]) -> None:
         self._run = run
 
-    def run(self, initial_state) -> tuple:
+    def run(self, initial_state: _S) -> tuple[_S, _A]:
         """Execute with initial state. Returns ``(final_state, value)``.
 
         >>> State.pure(10).run("any")
@@ -36,7 +37,7 @@ class State(DataType, Generic[_A]):
         """
         return self._run(initial_state)
 
-    def bind(self, f: Callable[[_A], State[_B]]) -> State[_B]:
+    def bind(self, f: Callable[[_A], State[_S, _B]]) -> State[_S, _B]:
         """>>> State.pure(1).bind(lambda x: State.pure(x + 10)).run(0)
         (0, 11)
         """
@@ -84,23 +85,23 @@ class State(DataType, Generic[_A]):
         """
         return cls(lambda s: (s, value))
 
-    @classmethod
-    def get(cls) -> State:
+    @staticmethod
+    def get() -> State[_S, _S]:
         """Produce current state as the value.
 
         >>> State.get().run(42)
         (42, 42)
         """
-        return cls(lambda s: (s, s))
+        return State(lambda s: (s, s))
 
-    @classmethod
-    def modify(cls, f: Callable[[Any], Any]) -> State:
+    @staticmethod
+    def modify(f: Callable[[_S], _S]) -> State[_S, None]:
         """Modify state, produce None.
 
         >>> State.modify(lambda s: s + 1).run(5)
         (6, None)
         """
-        return cls(lambda s: (f(s), None))  # type: ignore[arg-type,return-value]  # value is None
+        return State(lambda s: (f(s), None))
 
     def __repr__(self) -> str:
         return f"State({self._run})"

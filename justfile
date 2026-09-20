@@ -20,7 +20,11 @@ mypy:
 
 # Serve docs locally at http://127.0.0.1:8000
 docs:
+  just docs-build
   uv run --group docs mkdocs serve
+
+docs-build:
+  uv run mkdocs build
 
 # Format markdown docs
 fmt-docs:
@@ -75,5 +79,3 @@ diagram:
   uv run python scripts/generate_diagram.py
   open docs/typeclasses.svg
 
-docs-build:
-  uv run mkdocs build

@@ -24,13 +24,12 @@ def _pure(monad_cls, value):
 
 
 _F = TypeVar("_F")
+_S = TypeVar("_S")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 
-# class StateT(MonadTransformer[_F, _A, _B]):
 
-
-class StateT(MonadTransformer, Generic[_F, _A]):
+class StateT(MonadTransformer, Generic[_F, _S, _A]):
     """Generic state transformer: ``S -> F[(S, A)]``.
 
     ``F`` is the wrapping monad (Result, FutureResult, Maybe, etc.).
@@ -41,7 +40,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
     Scala:   ``StateT[F[_], S, A]``
     """
 
-    def __init__(self, run: Callable[..., _F]) -> None:
+    def __init__(self, run: Callable[[_S], _F]) -> None:
         self._run = run
 
     def run(self, initial_state):
@@ -51,7 +50,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         """
         return self._run(initial_state)
 
-    def bind(self, f: Callable[[_A], "StateT[_F, _B]"]) -> "StateT[_F, _B]":
+    def bind(self, f: Callable[[_A], "StateT[_F, _S, _B]"]) -> "StateT[_F, _S, _B]":
         """FlatMap: thread state, pass value to ``f``.
 
         >>> from funstruct.monad.option import Option, Some
@@ -64,7 +63,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
 
         return StateT(inner)
 
-    def map(self, f: Callable[[_A], _B]) -> "StateT[_F, _B]":
+    def map(self, f: Callable[[_A], _B]) -> "StateT[_F, _S, _B]":
         """Transform the produced value without touching state.
 
         >>> from funstruct.monad.option import Option, Some

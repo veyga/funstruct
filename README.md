@@ -239,7 +239,7 @@ class MonadTransformer(ABC):
 | `Option[A]`        | Monad, Alternative              |
 | `Either[E, A]`     | MonadError, Bifunctor           |
 | `Result[A]`        | MonadError, Bifunctor           |
-| `AsyncResult[A]`   | MonadError, Bifunctor           |
+| `AsyncResult[A]`   | MonadError                      |
 | `CList[A]`         | Monad, Traversable, Alternative |
 | `Tree[A]`          | Functor, Foldable               |
 | `frozendict[K, V]` | Functor, Foldable               |
@@ -262,7 +262,7 @@ class MonadTransformer(ABC):
 | `Reader[Ctx, A]`   | Shared environment                              |
 | `Writer[W, A]`     | Accumulated output                              |
 | `Validated[E, A]`  | Error accumulation (applicative, not monad)     |
-| `Future[A]`        | Lazy async computation                          |
+| `Future[A]`        | A value that will be resolved later              |
 | `CList[A]`         | Persistent singly-linked list                   |
 | `Tree[A]`          | Immutable binary tree (functor only)            |
 | `frozendict[K, V]` | Persistent HAMT dictionary                      |
