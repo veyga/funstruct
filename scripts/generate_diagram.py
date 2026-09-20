@@ -10,7 +10,20 @@ Usage:
 
 from __future__ import annotations
 
-# Force all modules to load so instances register
+import importlib
+import pkgutil
+
+import funstruct
+
+# Force all submodules to load so instances auto-register
+for _importer, _modname, _ispkg in pkgutil.walk_packages(
+    funstruct.__path__, prefix="funstruct."
+):
+    try:
+        importlib.import_module(_modname)
+    except Exception:
+        pass
+
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.typeclasses.typeclass import BaseTypeclass
 from funstruct.typeclasses.utils.registry import _registry

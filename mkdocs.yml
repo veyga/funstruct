@@ -73,6 +73,12 @@ nav:
           - WriterT: experimental/monadtransformer/writer_t.md
       - Optics (Lenses): experimental/optics/index.md
 
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+
 extra:
   version:
     provider: mike

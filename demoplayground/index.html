@@ -24,17 +24,17 @@
 
 <h1>funstruct playground</h1>
 <p>All demo scripts from the funstruct repo, runnable in the browser via Pyodide.</p>
-<div class="todo">Requires <code>funstruct >= 2.0.0</code> on PyPI.</div>
-<div id="status">⏳ Loading Python + funstruct...</div>
+<div class="todo">Using bundled <code>funstruct-2.0.0a2-py3-none-any.whl</code> (localhost:8042)</div>
+<div id="status">✅ Click ▶ on any block to run.</div>
 
 <h2>Demo: AsyncResult pipeline — composing async operations that can fail</h2>
 <p>Shows two equivalent ways to build a pipeline:     1. Bind chains: .bind(lambda x: ...).map(lambda x: ...)     2. >> operator: pipeline >> next_step  Both short-circuit on the first Err.  Run: uv run </p>
 <div class="demo-source">source: <code>demos/01_result_pipeline.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/01_result_pipeline.py</code></p>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
-from funstruct.monad.result import AsyncResult, Err, Ok, TryAsync
+from funstruct.monad.result import AsyncResult, TryAsync
 
 async def run():
     print("=== Bind chain ===")
@@ -52,10 +52,10 @@ asyncio.run(run())
 <p>@do turns a generator function into a monadic pipeline. yield extracts the value from each monadic step; short-circuits on failure.  Key rules:     - @Result.do / @Option.do uses generators (def + yie</p>
 <div class="demo-source">source: <code>demos/02_do_notation.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/02_do_notation.py</code></p>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
-from funstruct.monad.result import AsyncResult, Ok, Err, Result, Try, TryAsync
+from funstruct.monad.result import AsyncResult, Ok, Result, Try, TryAsync
 
 async def run():
     print("=== @AsyncResult.do (decorator) ===")
@@ -80,11 +80,11 @@ asyncio.run(run())
 <p>Tagless final abstracts over the effect type via a Protocol (algebra). The program is written once against the protocol. Swap the interpreter to change the effect — AsyncResult in prod, plain Result i</p>
 <div class="demo-source">source: <code>demos/03_tagless_final_intro.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/03_tagless_final_intro.py</code></p>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
+from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
 
 print("=== Production (AsyncResult) ===")
 repo = AsyncResultUserRepo()
@@ -93,6 +93,7 @@ async def run_async():
     print(f"  alice: {await get_profile(repo, AsyncResult, 'alice')}")
     print(f"  bob:   {await get_profile(repo, AsyncResult, 'bob')}")
     print(f"  nobody: {await get_profile(repo, AsyncResult, 'nobody')}")
+
 asyncio.run(run_async())
 
 print("\n=== Testing (Result, sync, no IO) ===")
@@ -105,18 +106,26 @@ print(f"  bob:   {get_profile(test_repo, Result, 'bob')}")
 <p>The real payoff: business logic (place_order) doesn't know or care whether it's talking to Postgres, an in-memory dict, or a test stub.  Three interpreters, same program:     PostgresOrderRepo  — "rea</p>
 <div class="demo-source">source: <code>demos/04_tagless_final_db.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/04_tagless_final_db.py</code></p>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
 
 print("=== Async 'Postgres' ===")
+
 async def run_async():
     repo = PostgresOrderRepo()
-    print(f"  alice+widget: {await place_order(repo, AsyncResult, 'alice', 'widget')}")
-    print(f"  bob+laptop:   {await place_order(repo, AsyncResult, 'bob', 'laptop')}")
-    print(f"  nobody+widget: {await place_order(repo, AsyncResult, 'nobody', 'widget')}")
+    print(
+        f"  alice+widget: {await place_order(repo, AsyncResult, 'alice', 'widget')}"
+    )
+    print(
+        f"  bob+laptop:   {await place_order(repo, AsyncResult, 'bob', 'laptop')}"
+    )
+    print(
+        f"  nobody+widget: {await place_order(repo, AsyncResult, 'nobody', 'widget')}"
+    )
+
 asyncio.run(run_async())
 
 print("\n=== Sync in-memory ===")
@@ -126,13 +135,15 @@ print(f"  nobody+widget: {place_order(repo, Result, 'nobody', 'widget')}")
 print(f"  saved orders: {len(repo.orders)}")
 
 print("\n=== Failing (DB down) ===")
-print(f"  alice+widget: {place_order(FailingOrderRepo(), Result, 'alice', 'widget')}")
+print(
+    f"  alice+widget: {place_order(FailingOrderRepo(), Result, 'alice', 'widget')}"
+)
 </script>
 
 <h2>Demo: JSON encoder — typeclass composition and derivation</h2>
 <p>Demonstrates the "implicit typeclass" pattern using a JSON encoder. The architecture is the same as Scala's given/using or Haskell's typeclasses.  The key insight: generic functions with "trait bounds</p>
 <div class="demo-source">source: <code>demos/05_json_encoder.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
@@ -184,23 +195,29 @@ print("  5. The dot syntax (Some(10).map(f)) is just sugar over this same patter
 <h2>Demo: generic functions with trait bounds (F: Monad)</h2>
 <p>This is the canonical way to write effect-polymorphic programs in funstruct v2.  Two ways to use the library:     1. Dot syntax (default, like Haskell) — Some(10).map(f).bind(g)     2. Typeclass insta</p>
 <div class="demo-source">source: <code>demos/06_generic_functions.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
+from funstruct.monad.either import Either, Left, Right
+from funstruct.monad.option import Nothing, Option, Some
+from funstruct.monad.result import Err, Ok, Result
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err
-from funstruct.monad.either import Either, Right, Left
 
 print("=== Generic functions (F: Monad is the constraint) ===\n")
 
 print("  double with Option:")
-print(f"    double(summon(Monad, Option), Some(21))  = {double(summon(Monad, Option), Some(21))}")
-print(f"    double(summon(Monad, Option), Nothing()) = {double(summon(Monad, Option), Nothing())}")
+print(
+    f"    double(summon(Monad, Option), Some(21))  = {double(summon(Monad, Option), Some(21))}"
+)
+print(
+    f"    double(summon(Monad, Option), Nothing()) = {double(summon(Monad, Option), Nothing())}"
+)
 
 print("\n  double with Result:")
-print(f"    double(summon(Monad, Result), Ok(21))    = {double(summon(Monad, Result), Ok(21))}")
+print(
+    f"    double(summon(Monad, Result), Ok(21))    = {double(summon(Monad, Result), Ok(21))}"
+)
 
 print("\n  Same function, three different effects:")
 for name, T in [("Option", Option), ("Result", Result), ("Either", Either)]:
@@ -232,16 +249,22 @@ print(f"  summon(Monad, Option).map(Some(10), f) = {explicit}")
 print(f"  equal? {dot == explicit}")
 
 print("\n=== Summary ===\n")
-print("  Dot syntax:     Some(10).map(f)           — for everyday use (like Haskell)")
-print("  Typeclass inst: F.map(fa, f)              — for generic programs (tagless final)")
-print("  F: Monad        is the constraint          — the type hint IS the trait bound")
+print(
+    "  Dot syntax:     Some(10).map(f)           — for everyday use (like Haskell)"
+)
+print(
+    "  Typeclass inst: F.map(fa, f)              — for generic programs (tagless final)"
+)
+print(
+    "  F: Monad        is the constraint          — the type hint IS the trait bound"
+)
 print("  summon(Monad, Option) provides the F       — the caller resolves, once")
 </script>
 
 <h2>Demo: Reader monad vs Cake pattern for dependency injection</h2>
 <p>Both solve the same problem: threading dependencies through a pipeline without passing them explicitly at every call site.  Reader monad:  runtime DI — context threaded monadically Cake pattern:  defi</p>
 <div class="demo-source">source: <code>demos/07_reader_vs_cake.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
 from funstruct.monad.reader import Reader
@@ -295,12 +318,12 @@ print("    - Dependencies resolved at class definition, not runtime")
 <h2>Demo: extending funstruct with your own types and typeclasses</h2>
 <p>This shows how to:     1. Define a typeclass (interface)     2. Create a custom data type     3. Implement the typeclass for your type     4. Write generic functions with trait bounds  This is the Sca</p>
 <div class="demo-source">source: <code>demos/08_custom_types.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
-from funstruct.typeclasses.utils.registry import register, summon, tc_of
+from funstruct.typeclasses.utils.registry import register, summon
 
 import json
 
@@ -325,7 +348,9 @@ print(f"  show(team)    = {show(team)}")
 print(f"  show(alice.email)   = {show(alice.email)}")
 print(f"  show(alice.address) = {show(alice.address)}")
 
-print("\n=== Part 2: serialize() — generic function, auto-resolves Serializable ===\n")
+print(
+    "\n=== Part 2: serialize() — generic function, auto-resolves Serializable ===\n"
+)
 print(f"  serialize(alice) = {json.dumps(serialize(alice), indent=2)}")
 
 print("\n=== Part 3: deserialize() — generic round-trip ===\n")
@@ -361,28 +386,30 @@ print("  6. Multiple bounds = multiple summon calls")
 <h2>Lenses: composable getters and setters for immutable data</h2>
 <p>The problem: updating deeply nested immutable structures requires rebuilding the entire path manually.      # Without lenses:     config.put("app", config["app"].put("db", config["app"]["db"].put("hos</p>
 <div class="demo-source">source: <code>demos/09_lenses.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from funstruct.collections.frozendict import frozendict
-from funstruct.experimental.optics import Lens, at
+from funstruct.experimental.optics import at
 
-config = frozendict({
-    "app": {
-        "name": "myservice",
-        "db": {
-            "host": "localhost",
-            "port": 5432,
-            "pool_size": 10,
+config = frozendict(
+    {
+        "app": {
+            "name": "myservice",
+            "db": {
+                "host": "localhost",
+                "port": 5432,
+                "pool_size": 10,
+            },
+            "cache": {
+                "ttl": 300,
+                "backend": "redis",
+            },
         },
-        "cache": {
-            "ttl": 300,
-            "backend": "redis",
+        "deploy": {
+            "region": "us-east-1",
+            "replicas": 3,
         },
-    },
-    "deploy": {
-        "region": "us-east-1",
-        "replicas": 3,
-    },
-})
+    }
+)
 
 print("=== Lenses: composable getters/setters ===\n")
 
@@ -402,13 +429,13 @@ print(f"  port_lens.get(config) = {port_lens.get(config)}")
 
 # Set — returns new config with the change, original untouched
 new_config = host_lens.set(config, "prod-db.internal")
-print(f"\n  host_lens.set(config, 'prod-db.internal'):")
+print("\n  host_lens.set(config, 'prod-db.internal'):")
 print(f"    new host = {host_lens.get(new_config)}")
 print(f"    old host = {host_lens.get(config)}  (unchanged)")
 
 # Modify — apply a function to the focused value
 scaled = pool_lens.modify(config, lambda n: n * 2)
-print(f"\n  pool_lens.modify(config, lambda n: n * 2):")
+print("\n  pool_lens.modify(config, lambda n: n * 2):")
 print(f"    pool_size = {pool_lens.get(scaled)}")
 
 # Multiple modifications — each returns a new config
@@ -419,7 +446,7 @@ prod_config = pool_lens.modify(prod_config, lambda n: n * 4)
 prod_config = ttl_lens.set(prod_config, 60)
 prod_config = replicas_lens.modify(prod_config, lambda n: n * 3)
 
-print(f"\n  Production config (5 lens operations):")
+print("\n  Production config (5 lens operations):")
 print(f"    db.host      = {host_lens.get(prod_config)}")
 print(f"    db.port      = {port_lens.get(prod_config)}")
 print(f"    db.pool_size = {pool_lens.get(prod_config)}")
@@ -427,13 +454,14 @@ print(f"    cache.ttl    = {ttl_lens.get(prod_config)}")
 print(f"    replicas     = {replicas_lens.get(prod_config)}")
 
 # Original is completely untouched
-print(f"\n  Original config still intact:")
+print("\n  Original config still intact:")
 print(f"    db.host      = {host_lens.get(config)}")
 print(f"    replicas     = {replicas_lens.get(config)}")
 
 # JSON round-trip with lenses
 import json
-print(f"\n  JSON round-trip:")
+
+print("\n  JSON round-trip:")
 s = json.dumps(prod_config.to_dict(), indent=2)
 print(f"    {s[:60]}...")
 </script>
@@ -441,15 +469,14 @@ print(f"    {s[:60]}...")
 <h2>Writer monad: accumulate a call trace alongside computation</h2>
 <p>Writer[W, A] = (value: A, output: W) where W is a Monoid.  The Writer monad lets you accumulate output (logs, traces, metrics) alongside a computation without passing a mutable log around.  This demo </p>
 <div class="demo-source">source: <code>demos/10_writer_stacktrace.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from funstruct.monad.writer import ListWriter
-from funstruct.typeclasses import Monoid
 
 print("=== Writer monad: call trace accumulation ===\n")
 
 result = pipeline("alice")
 print(f"  Value:  {result.value}")
-print(f"  Trace:")
+print("  Trace:")
 for entry in result.output:
     print(f"    → {entry}")
 
@@ -457,7 +484,7 @@ print()
 
 result = pipeline("nobody")
 print(f"  Value:  {result.value}")
-print(f"  Trace:")
+print("  Trace:")
 for entry in result.output:
     print(f"    → {entry}")
 
@@ -466,12 +493,7 @@ print("  No mutable state, no global logger, no context passing.")
 
 # You can also use bind chains
 print("\n=== Bind chain (equivalent) ===\n")
-result = (
-    lookup_user("bob")
-    .bind(get_email)
-    .bind(normalize)
-    .bind(validate)
-)
+result = lookup_user("bob").bind(get_email).bind(normalize).bind(validate)
 print(f"  Value:  {result.value}")
 print(f"  Trace:  {result.output}")
 </script>
@@ -479,7 +501,7 @@ print(f"  Trace:  {result.output}")
 <h2>State monad: pure stateful computation without mutation</h2>
 <p>State[S, A] = S → (S, A)  The State monad threads state through a pipeline without mutation. Each step reads and/or modifies the state, and the final state is returned alongside the result.  Use cases</p>
 <div class="demo-source">source: <code>demos/11_state_counter.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from funstruct.monad.state import State
 
 print("=== State monad: pure stateful computation ===\n")
@@ -501,10 +523,7 @@ print("  Each step is a pure function S → (S, A).")
 
 # Compose with bind
 print("\n=== Bind chain ===\n")
-result = (
-    next_id()
-    .bind(lambda a: next_id().map(lambda b: (a, b)))
-)
+result = next_id().bind(lambda a: next_id().map(lambda b: (a, b)))
 state, pair = result.run(0)
 print(f"  Two IDs: {pair}, counter = {state}")
 </script>
@@ -512,11 +531,11 @@ print(f"  Two IDs: {pair}, counter = {state}")
 <h2>Trait bounds: constraining generic functions to types with specific capabilities</h2>
 <p>In Scala:   def sort[A: Ordering](xs: List[A]): List[A] In Rust:    fn sort<A: Ord>(xs: &mut [A]) In Haskell: sort :: Ord a => [a] -> [a] In Python:  summon enforces the bound at runtime  The bound sa</p>
 <div class="demo-source">source: <code>demos/12_trait_bounds.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
+import functools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import functools
 from funstruct.typeclasses.utils.registry import register, summon
 
 users = [User("Charlie", 20), User("Alice", 30), User("Bob", 25)]
@@ -570,26 +589,25 @@ print("  The message tells you exactly what's missing")
 <h2>Embedded DSL via tagless final — no parser needed</h2>
 <p>A DSL (Domain Specific Language) is a small language for a specific problem. Tagless final lets you build one embedded in Python:      1. Define the algebra (what operations exist)     2. Write progra</p>
 <div class="demo-source">source: <code>demos/13_dsl.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 print("=== DSL 1: Arithmetic expressions ===\n")
-print(f"  Program: 1 + (2 * (-3))")
+print("  Program: 1 + (2 * (-3))")
 print(f"  Evaluate:     {math_program(Evaluate())}")
 print(f"  PrettyPrint:  {math_program(PrettyPrint())}")
 print(f"  CountOps:     {math_program(CountOps())} operations")
 
 print("\n=== DSL 2: Query builder ===\n")
 print(f"  SQL:      {find_active_users(ToSQL())}")
-print(f"  DryRun:")
+print("  DryRun:")
 for step in find_active_users(DryRun()):
     print(f"    → {step}")
 
 print("\n=== DSL 3: Workflow ===\n")
 print(f"  Plan: {deploy_pipeline(PlanOnly())}")
-print(f"  Execute:")
+print("  Execute:")
 deploy_pipeline(Execute())
 
 print("\n=== The pattern ===\n")
@@ -602,7 +620,7 @@ print("  4. Same program, different meanings — no parser needed")
 <h2>Two ways to build a DSL: initial encoding vs tagless final</h2>
 <p>Same arithmetic DSL, two fundamentally different approaches.  Initial (AST-based):     Build a data tree, then walk it with interpreters.     + Can inspect/optimize the tree before running     + Patte</p>
 <div class="demo-source">source: <code>demos/14_dsl_initial_vs_final.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -640,13 +658,14 @@ print("    - Can't serialize the program")
 </script>
 
 <h2>The typeclass pattern — explained with JSON serialization</h2>
-<p>This is the canonical example of how typeclasses work:      1. Define the typeclass (JSONWrite — the interface)     2. Create instances for primitives (str, int, bool, None)     3. Create COMPOSABLE i</p>
+<p>Typeclasses are ad-hoc polymorphism: we add behavior to types we don't own, without modifying them. The behavior isn't ON the type — instead, we provide a mechanism for the runtime to LOOK UP the beha</p>
 <div class="demo-source">source: <code>demos/15_typeclass_pattern_json.py</code></div>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from __future__ import annotations
 import json
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from dataclasses import dataclass, fields
+from funstruct.typeclasses import BaseTypeclass
 from funstruct.typeclasses.utils.registry import register, summon
 
 print("=== The typeclass pattern: JSON serialization ===\n")
@@ -654,10 +673,10 @@ print("=== The typeclass pattern: JSON serialization ===\n")
 # Primitives
 print("Primitives:")
 print(f'  jsonify("hello")  = {jsonify("hello")}')
-print(f'  jsonify(42)       = {jsonify(42)}')
-print(f'  jsonify(3.14)     = {jsonify(3.14)}')
-print(f'  jsonify(True)     = {jsonify(True)}')
-print(f'  jsonify(None)     = {jsonify(None)}')
+print(f"  jsonify(42)       = {jsonify(42)}")
+print(f"  jsonify(3.14)     = {jsonify(3.14)}")
+print(f"  jsonify(True)     = {jsonify(True)}")
+print(f"  jsonify(None)     = {jsonify(None)}")
 
 # Composed — list uses element instance
 print("\nComposed (list summons element instance):")
@@ -666,7 +685,7 @@ print(f'  jsonify(["a","b","c"])   = {jsonify(["a", "b", "c"])}')
 
 # Derived — dataclass uses field instances
 person = Person("Alice", 30)
-print(f"\nDerived (dataclass uses field instances):")
+print("\nDerived (dataclass uses field instances):")
 print(f"  jsonify(Person)    = {jsonify(person)}")
 
 address = Address("123 Main St", "NYC", "10001")
@@ -674,12 +693,12 @@ print(f"  jsonify(Address)   = {jsonify(address)}")
 
 # Nested — Employee has Person AND Address fields
 emp = Employee(person, address, 120000.0)
-print(f"\nNested (Employee → Person + Address):")
+print("\nNested (Employee → Person + Address):")
 print(f"  jsonify(Employee)  = {jsonify(emp)}")
 
 # List of dataclasses — composition all the way down
 people = [Person("Alice", 30), Person("Bob", 25)]
-print(f"\nList of dataclasses:")
+print("\nList of dataclasses:")
 print(f"  jsonify([Person])  = {jsonify(people)}")
 
 # Error — no instance
@@ -702,16 +721,17 @@ print("  6. Person             = plain dataclass (no JSON knowledge)")
 <p>When your functions return different monadic types, you end up with nested pattern matching at every step.      get_user(name) -> Future[Option[User]]   # might not exist, async     get_age(user)  -> </p>
 <div class="demo-source">source: <code>demos/transformers/01_the_problem.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/01_the_problem.py</code></p>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from funstruct.playground import User
+from funstruct.monad.future import Future
+from funstruct.monad.option import Nothing, Option, Some
 
 import asyncio
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
 from funstruct.playground import User
+
+from funstruct.monad.future import Future
+from funstruct.monad.option import Nothing, Option, Some
 
 
 def get_user(name: str) -> Future[Option[User]]:
@@ -765,18 +785,19 @@ if __name__ == "__main__":
 <p>Instead of nested pattern matching, OptionT lets you write a flat pipeline that short-circuits on Nothing and awaits Futures automatically.  The key operations:     OptionT(future_option)     — wrap a</p>
 <div class="demo-source">source: <code>demos/transformers/02_option_t.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/02_option_t.py</code></p>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
-from funstruct.experimental.monadtransformer.option_t import OptionT
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from funstruct.playground import User
+from funstruct.experimental.monadtransformer.option_t import OptionT
+from funstruct.monad.future import Future
+from funstruct.monad.option import Option
 
 import asyncio
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
-from funstruct.experimental.monadtransformer.option_t import OptionT
 from funstruct.playground import User
+
+from funstruct.experimental.monadtransformer.option_t import OptionT
+from funstruct.monad.future import Future
+from funstruct.monad.option import Option
 
 
 def get_user(name: str) -> Future[Option[User]]:
@@ -842,14 +863,15 @@ if __name__ == "__main__":
 <p>Instead of composing Future[Option[A]] with OptionT, make ALL functions return the same type — AsyncResult[A]. Then composition is just .bind().  This is often simpler than transformers for real appli</p>
 <div class="demo-source">source: <code>demos/transformers/03_alternative.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/03_alternative.py</code></p>
-<script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
 from funstruct.playground import User
+from funstruct.monad.result import AsyncResult, TryAsync
 
 import asyncio
 
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
 from funstruct.playground import User
+
+from funstruct.monad.result import AsyncResult, TryAsync
 
 
 @TryAsync
@@ -881,11 +903,10 @@ def get_profile():
 
 def get_profile_bind() -> AsyncResult[str]:
     """Same thing with explicit bind chains."""
-    return (
-        get_user("me")
-        .bind(lambda user: get_age(user)
-        .bind(lambda age: get_nick(user)
-        .map(lambda nick: f"{nick}{age}")))
+    return get_user("me").bind(
+        lambda user: get_age(user).bind(
+            lambda age: get_nick(user).map(lambda nick: f"{nick}{age}")
+        )
     )
 
 
@@ -908,13 +929,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-</script>
-
-<script type="py" config='{"packages":["funstruct"]}'>
-from pyscript import document
-el = document.getElementById("status")
-el.innerHTML = "✅ Ready! Click ▶ on any block to run."
-el.style.color = "#93c763"
 </script>
 
 <p style="margin-top:3rem; text-align:center; color:#404040; font-size:0.85rem;">

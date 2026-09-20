@@ -113,7 +113,7 @@ Three distinct class hierarchies, connected by instances:
 
 **Semigroup** — associative combine (`+` being the canonical 'combine' operation)
 
-```python
+```text
 A ─┐
     ├──( + )──> A
 A ─┘
@@ -121,7 +121,7 @@ A ─┘
 
 **Monoid** — semigroup with an identity element
 
-```
+```text
 A ─┐
     ├──( + )──> A       (+ identity = A)
 A ─┘
@@ -129,13 +129,13 @@ A ─┘
 
 **Functor** — transform the value inside a context
 
-```
+```text
 F[A] ---( f: A -> B )---> F[B]
 ```
 
 **Applicative** — apply a function in context to a value in context
 
-```
+```text
 F[A → B]  ─┐
            ├──ap──> F[B]
 F[A] ──────┘
@@ -143,7 +143,7 @@ F[A] ──────┘
 
 **Monad** — sequence computations that produce new contexts
 
-```
+```text
 F[A] ---( f: A -> F[B] )---> F[B]
 ```
 
@@ -430,7 +430,7 @@ For most use cases, plain monads with `do`-notation and `fold` are
 sufficient. Reach for transformers only when you need to combine
 multiple effects in a single pipeline.
 
-```
+```text
 ReaderT[F, Ctx, A]  =  Ctx -> F[A]         (environment + F's effects)
 StateT[F, S, A]     =  S -> F[(S, A)]      (state + F's effects)
 EitherT[F, E, A]    =  F[Either[E, A]]     (errors + F's effects)
@@ -480,4 +480,4 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 - **Effects system** — algebraic effects as an alternative to monad transformer stacks.
 - **Stream** — infinite streams, lazy evaluation.
 - **Pydantic integration** — more native integration with BaseModel, frozendict, lens, validated, etc
-- **Compiler plugin step for checking implicit resolution** - make a summons calls verifiable by mypy/ty
+- **Compiler plugin step for checking implicit resolution** - make `summon` calls verifiable by mypy/ty

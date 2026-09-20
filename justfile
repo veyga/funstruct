@@ -65,10 +65,10 @@ bench *args:
 nox *args:
   uv run nox {{args}}
 
-# generate and open browser playground (PyScript + Pyodide)
+# generate and serve browser playground (PyScript + Pyodide)
 playground:
   uv run python scripts/generate_playground.py
-  open demoplayground/index.html
+  uv run python scripts/serve_playground.py
 
 # verify all summon() calls can resolve
 check-summon:
