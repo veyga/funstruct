@@ -24,19 +24,21 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import final
+from typing import TypeVar, final
+
+_A = TypeVar("_A")
 
 from funstruct.typeclasses.semigroup import Semigroup
 
 
 @final
 @dataclass(frozen=True)
-class Monoid(Semigroup):
+class Monoid(Semigroup[_A]):
     """A Semigroup with an identity element (empty)."""
 
-    typ: type
-    combine: Callable
-    empty: object
+    typ: type[_A]
+    combine: Callable[[_A, _A], _A]
+    empty: _A
 
 
 __all__ = [

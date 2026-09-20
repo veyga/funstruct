@@ -34,7 +34,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -68,8 +68,8 @@ class _Empty:
 
 @dataclass(frozen=True, slots=True)
 class _Leaf:
-    key: object
-    value: object
+    key: Any
+    value: Any
 
     def get(self, key, hash_val, shift):
         return self.value if self.key == key else None

@@ -81,18 +81,6 @@ class TestPure:
         result = run(AsyncResult.raise_error(err))
         assert result == Err(err)
 
-    def test_from_either_right(self):
-        assert run(AsyncResult.from_either(Right(1))) == Right(1)
-
-    def test_from_either_left(self):
-        assert run(AsyncResult.from_either(Left("err"))) == Left("err")
-
-    def test_from_result_ok(self):
-        assert run(AsyncResult.from_result(Ok(1))) == Ok(1)
-
-    def test_from_result_err(self):
-        err = ValueError("bad")
-        assert run(AsyncResult.from_result(Err(err))) == Err(err)
 
 
 class TestTryAsyncWrapping:
@@ -349,20 +337,20 @@ class TestAsyncResultDo:
 
         assert run(AsyncResult.do(pipeline)(5)) == Ok(15)
 
-    def test_accepts_lifted_result(self):
+    def test_accepts_pure_value(self):
         @AsyncResult.do
         def pipeline():
             x = yield AsyncResult.pure(1)
-            y = yield AsyncResult.from_result(Ok(10))
+            y = yield AsyncResult.pure(10)
             return x + y
 
         assert run(pipeline()) == Ok(11)
 
-    def test_short_circuits_on_lifted_err(self):
+    def test_short_circuits_on_raise_error(self):
         @AsyncResult.do
         def pipeline():
             x = yield AsyncResult.pure(1)
-            y = yield AsyncResult.from_result(Err(ValueError("sync error")))
+            y = yield AsyncResult.raise_error(ValueError("sync error"))
             return x + y
 
         result = run(pipeline())

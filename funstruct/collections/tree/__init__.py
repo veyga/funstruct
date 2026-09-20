@@ -36,7 +36,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.collections.cons import CList, Cons
 from funstruct.typeclasses.mixins.data_type import DataType
@@ -84,9 +84,9 @@ class Tree(DataType, Generic[A]):
         return False
 
     @abstractmethod
-    def traverse(self, f: Callable, pure_fn: Callable) -> object: ...
+    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any: ...
 
-    def sequence(self, pure_fn: Callable) -> object:
+    def sequence(self, pure_fn: Callable[[Any], Any]) -> Any:
         return self.traverse(lambda x: x, pure_fn)
 
 
@@ -114,7 +114,7 @@ class Leaf(Tree[A]):
     def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
         return f(self.value, acc)
 
-    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any:
         return f(self.value).map(Leaf)
 
     def to_list(self) -> CList[A]:
@@ -164,7 +164,7 @@ class Branch(Tree[A]):
         acc = self.left.fold_right(acc, f)
         return acc
 
-    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any:
         fv = f(self.value)
         fl = self.left.traverse(f, pure_fn)
         fr = self.right.traverse(f, pure_fn)

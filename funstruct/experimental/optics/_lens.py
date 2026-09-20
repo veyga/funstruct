@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 _S = TypeVar("_S")
 _A = TypeVar("_A")
@@ -29,7 +29,7 @@ _B = TypeVar("_B")
 
 
 @dataclass(frozen=True)
-class Lens:
+class Lens(Generic[_S, _A]):
     """A composable getter/setter pair.
 
     >>> from funstruct.collections.frozendict import frozendict
@@ -43,8 +43,8 @@ class Lens:
     2
     """
 
-    _get: Callable
-    _set: Callable
+    _get: Callable[[_S], _A]
+    _set: Callable[[_S, _A], _S]
 
     def get(self, s):
         return self._get(s)
@@ -52,7 +52,7 @@ class Lens:
     def set(self, s, value):
         return self._set(s, value)
 
-    def modify(self, s, f: Callable):
+    def modify(self, s, f: Callable[[_A], _A]):
         return self.set(s, f(self.get(s)))
 
     def __rshift__(self, other: Lens) -> Lens:

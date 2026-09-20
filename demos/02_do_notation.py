@@ -7,7 +7,7 @@ Key rules:
     - @Result.do / @Option.do uses generators (def + yield), NOT async/await
     - You cannot decorate an async def with @do
     - @AsyncResult.do handles async values (awaits internally)
-    - To mix sync Result into @AsyncResult.do, use AsyncResult.from_result()
+    - To mix sync values into @AsyncResult.do, use AsyncResult.pure()
 
 Equivalent styles:
     @AsyncResult.do         — decorator style (recommended)
@@ -93,7 +93,7 @@ def sync_pipeline():
 @AsyncResult.do
 def mixed_pipeline():
     user = yield get_user("alice")
-    age = yield AsyncResult.from_result(get_age_sync(user))  # lift sync → async
+    age = yield get_age(user)
     nickname = yield get_nickname(user)
     return f"{nickname} (age {age})"
 

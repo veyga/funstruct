@@ -34,7 +34,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.util.created_at import CapturesCreationSiteMixin
@@ -64,7 +64,7 @@ class Either(DataType, Generic[E, A]):
         return Left(error)
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Callable[..., Either]:
+    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Either]:
         """Do-notation. Short-circuits on Left. Returns a callable.
 
         # TODO: do-notation is ~2x slower than raw bind chains due to generator

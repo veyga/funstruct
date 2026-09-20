@@ -54,7 +54,7 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 
@@ -115,7 +115,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def local(self, f: Callable) -> ReaderT:
+    def local(self, f: Callable[[_Ctx], _Ctx]) -> ReaderT:
         """Transform the environment before running.
 
         Cats: ``Kleisli.local``

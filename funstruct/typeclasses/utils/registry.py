@@ -43,15 +43,17 @@ When NOT to use these:
 
 from __future__ import annotations
 
-_registry: dict[tuple[type, type], object] = {}
+from typing import Any
+
+_registry: dict[tuple[type, type], Any] = {}
 
 
-def register(typeclass: type, type_constructor: type, instance: object) -> None:
+def register(typeclass: type, type_constructor: type, instance: Any) -> None:
     """Register a typeclass instance for a type constructor."""
     _registry[(typeclass, type_constructor)] = instance
 
 
-def summon(typeclass: type, type_constructor: type) -> object:
+def summon(typeclass: type, type_constructor: type) -> Any:
     """Resolve a typeclass instance for a type constructor.
 
     Resolution:

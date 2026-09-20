@@ -20,7 +20,7 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -45,7 +45,7 @@ class Reader(DataType, Generic[_Ctx, _A]):
         return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Callable[..., Reader]:
+    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Reader]:
         """Do-notation via generators. Returns a callable.
 
         >>> def pipeline():

@@ -13,7 +13,7 @@ Examples:
 """
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 
@@ -175,7 +175,7 @@ class StateT(MonadTransformer, Generic[_F, _A]):
         return cls(lambda _: _pure(monad, (state, None)))
 
     @classmethod
-    def inspect(cls, f: Callable, monad: type) -> "StateT":
+    def inspect(cls, f: Callable[[Any], _A], monad: type) -> "StateT":
         """Get a function of the state as the value, without modifying state.
 
         Cats: ``StateT.inspect``

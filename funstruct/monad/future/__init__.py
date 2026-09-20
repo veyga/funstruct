@@ -1,4 +1,4 @@
-"""Future — lazy async computation.
+"""Future — a value that will be resolved later.
 
 Future[A] wraps Awaitable[A]. A generic async monad — no error semantics built in.
 For error handling, use AsyncResult[A] from funstruct.monad.result.
@@ -7,7 +7,7 @@ For error handling, use AsyncResult[A] from funstruct.monad.result.
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Generator
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.util._reawaitable import ReAwaitable
@@ -17,7 +17,7 @@ B = TypeVar("B")
 
 
 class Future(DataType, Generic[A]):
-    """Lazy async computation that produces A when awaited."""
+    """A value that will be resolved later."""
 
     def __init__(self, coro: Awaitable[A]) -> None:
         self._coro = ReAwaitable(coro) if not isinstance(coro, ReAwaitable) else coro
@@ -39,7 +39,7 @@ class Future(DataType, Generic[A]):
         return Future(_inner())
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Callable[..., Future]:
+    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Future]:
         """Do-notation for Future.
 
         >>> @Future.do

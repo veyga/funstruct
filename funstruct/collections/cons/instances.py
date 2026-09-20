@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from funstruct.collections.cons import CList, Cons, Nil
 from funstruct.typeclasses.alternative import Alternative
@@ -33,9 +33,9 @@ class _CListTraversable(Traversable, for_type=CList):
     def traverse(
         self,
         fa: CList[_A],
-        f: Callable[[_A], object],
+        f: Callable[[_A], Any],
         G: Applicative,
-    ) -> object:
+    ) -> Any:
         return fa.fold_right(
             G.pure(Nil()),
             lambda a, acc: G.map2(f(a), acc, lambda b, bs: Cons(b, bs)),

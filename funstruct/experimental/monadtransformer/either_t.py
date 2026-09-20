@@ -45,7 +45,7 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 from funstruct.monad.either import Either, Left, Right
@@ -113,7 +113,7 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         """
         return EitherT(self._value.map(lambda either: either.left_map(f)))
 
-    def bimap(self, on_left: Callable, on_right: Callable) -> EitherT:
+    def bimap(self, on_left: Callable[[_E], Any], on_right: Callable[[_A], _B]) -> EitherT:
         """Transform both sides.
 
         >>> from funstruct.monad.option import Some

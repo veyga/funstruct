@@ -118,8 +118,6 @@ match await pipeline:
 ```python
 AsyncResult.pure(42)                     # Ok(42) wrapped in async
 AsyncResult.raise_error(ValueError("x")) # Err wrapped in async
-AsyncResult.from_result(Ok(42))          # lift sync Result
-AsyncResult.from_either(Right(42))       # lift sync Either
 ```
 
 ## When to use which

@@ -16,7 +16,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -94,13 +94,13 @@ class CList(DataType, Generic[A]):
     def bind(self, f: Callable[[A], CList]) -> CList:
         return self.fold_right(Nil(), lambda a, acc: f(a).append(acc))
 
-    def traverse(self, f: Callable, pure_fn: Callable) -> object:
+    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any:
         return self.fold_right(
             pure_fn(Nil()),
             lambda a, acc: f(a).map2(acc, lambda b, bs: Cons(b, bs)),
         )
 
-    def sequence(self, pure_fn: Callable) -> object:
+    def sequence(self, pure_fn: Callable[[Any], Any]) -> Any:
         return self.traverse(lambda x: x, pure_fn)
 
     def sorted(self, cmp: Callable[[A, A], int]) -> CList:

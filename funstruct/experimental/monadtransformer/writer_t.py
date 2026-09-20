@@ -42,7 +42,7 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 from funstruct.typeclasses.monoid import Monoid
@@ -209,7 +209,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         cls = self.__class__
         return cls(self._run.map(lambda aw: ((aw[0], aw[1]), aw[1])))
 
-    def written(self) -> object:
+    def written(self) -> Any:
         """Extract just the output, discarding the value. Returns F[W].
 
         >>> from funstruct.monad.either import Either, Right

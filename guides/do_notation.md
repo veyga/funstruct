@@ -139,13 +139,13 @@ def pipeline():
 
 ## Mixing sync and async
 
-To use a sync `Result` inside `@AsyncResult.do`, lift it:
+To use a sync value inside `@AsyncResult.do`, lift it with `pure`:
 
 ```python
 @AsyncResult.do
 def pipeline():
-    x = yield AsyncResult.from_result(Ok(10))  # lift sync Result
-    y = yield AsyncResult.pure(20)              # async value
+    x = yield AsyncResult.pure(10)   # lift sync value
+    y = yield AsyncResult.pure(20)   # async value
     return x + y
 ```
 

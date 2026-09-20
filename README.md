@@ -480,3 +480,4 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 - **Effects system** — algebraic effects as an alternative to monad transformer stacks.
 - **Stream** — infinite streams, lazy evaluation.
 - **Pydantic integration** — more native integration with BaseModel, frozendict, lens, validated, etc
+- **Compiler plugin step for checking implicit resolution** - make a summons calls verifiable by mypy/ty

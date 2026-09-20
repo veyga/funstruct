@@ -62,7 +62,7 @@ class Result(DataType, Generic[_A]):
         return Err(error)
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Callable[..., Result]:
+    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Result]:
         """Do-notation. Short-circuits on Err. Returns a callable.
 
         # TODO: do-notation is ~2x slower than raw bind chains due to generator
@@ -116,7 +116,7 @@ class Ok(Result[_A]):
     def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
         return self
 
-    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
+    def bimap(self, on_err: Callable[[Exception], Exception], on_ok: Callable[[_A], _B]) -> Result[_B]:
         return Ok(on_ok(self.value))
 
     def get_or_else(self, default: _A) -> _A:
@@ -158,7 +158,7 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
     def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
         return f(self.error)
 
-    def bimap(self, on_err: Callable, on_ok: Callable) -> Result:
+    def bimap(self, on_err: Callable[[Exception], Exception], on_ok: Callable[[_A], _B]) -> Result[_B]:
         return Err(on_err(self.error))
 
     def get_or_else(self, default: _A) -> _A:
@@ -187,7 +187,6 @@ class AsyncResult(DataType, Generic[_A]):
     Create with:
         AsyncResult.pure(42)                     # Ok(42) wrapped in async
         AsyncResult.raise_error(ValueError())    # Err wrapped in async
-        AsyncResult.from_result(Ok(42))          # lift sync Result
         @TryAsync decorator                      # catch exceptions
 
     Compose (lazy — nothing executes until awaited):
@@ -268,8 +267,8 @@ class AsyncResult(DataType, Generic[_A]):
         return AsyncResult(_inner())
 
     def bimap(
-        self, on_err: Callable[[Exception], Exception], on_ok: Callable
-    ) -> AsyncResult:
+        self, on_err: Callable[[Exception], Exception], on_ok: Callable[[_A], _B]
+    ) -> AsyncResult[_B]:
         async def _inner():
             result = await self._coro
             match result:
@@ -307,19 +306,6 @@ class AsyncResult(DataType, Generic[_A]):
 
         return cls(_inner())
 
-    @classmethod
-    def from_result(cls, result: Result) -> AsyncResult:
-        async def _inner():
-            return result
-
-        return cls(_inner())
-
-    @classmethod
-    def from_either(cls, either: Either) -> AsyncResult:
-        async def _inner():
-            return either
-
-        return cls(_inner())
 
     def fold(
         self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
@@ -331,7 +317,7 @@ class AsyncResult(DataType, Generic[_A]):
         return Future(_inner())
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Callable[..., AsyncResult]:
+    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., AsyncResult]:
         """Do-notation for AsyncResult.
 
         # TODO: do-notation is ~2x slower than raw bind chains due to generator

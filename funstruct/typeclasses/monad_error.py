@@ -11,6 +11,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 
+from typing import Any
+
 from funstruct.typeclasses.monad import Monad
 
 
@@ -18,10 +20,10 @@ class MonadError(Monad):
     """raise_error + handle_error_with."""
 
     @abstractmethod
-    def raise_error(self, error) -> object: ...
+    def raise_error(self, error) -> Any: ...
 
     @abstractmethod
-    def handle_error_with(self, fa, f: Callable) -> object: ...
+    def handle_error_with(self, fa, f: Callable[[Any], Any]) -> Any: ...
 
 
 __all__ = ["MonadError"]

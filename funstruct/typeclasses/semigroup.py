@@ -21,14 +21,17 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Generic, TypeVar
+
+_A = TypeVar("_A")
 
 
 @dataclass(frozen=True)
-class Semigroup:
+class Semigroup(Generic[_A]):
     """An associative binary operation over a type."""
 
-    typ: type
-    combine: Callable
+    typ: type[_A]
+    combine: Callable[[_A, _A], _A]
 
 
 __all__ = [

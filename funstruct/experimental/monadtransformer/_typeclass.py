@@ -74,7 +74,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 _F = TypeVar("_F")
 _A = TypeVar("_A")
@@ -102,10 +102,10 @@ class MonadTransformer(ABC, Generic[_F, _A]):
     """
 
     @abstractmethod
-    def bind(self, f: Callable) -> MonadTransformer: ...
+    def bind(self, f: Callable[[_A], MonadTransformer]) -> MonadTransformer: ...
 
     @abstractmethod
-    def map(self, f: Callable) -> MonadTransformer: ...
+    def map(self, f: Callable[[_A], _B]) -> MonadTransformer: ...
 
     @classmethod
     @abstractmethod
@@ -117,13 +117,13 @@ class MonadTransformer(ABC, Generic[_F, _A]):
 
     @classmethod
     @abstractmethod
-    def do(cls, gen_fn: Callable) -> Callable[..., MonadTransformer]: ...
+    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., MonadTransformer]: ...
 
     def ap(self, other: MonadTransformer) -> MonadTransformer:
         """Derived from bind + map."""
         return self.bind(lambda f: other.map(f))
 
-    def map2(self, other: MonadTransformer, f: Callable) -> MonadTransformer:
+    def map2(self, other: MonadTransformer, f: Callable[[_A, Any], _B]) -> MonadTransformer:
         """Combine two values with a function."""
         return self.bind(lambda a: other.map(lambda b: f(a, b)))
 
@@ -139,7 +139,7 @@ class MonadTransformer(ABC, Generic[_F, _A]):
         """Alias for product."""
         return self.product(other)
 
-    def __rshift__(self, f: Callable) -> MonadTransformer:
+    def __rshift__(self, f: Callable[[_A], MonadTransformer]) -> MonadTransformer:
         """Alias for bind."""
         return self.bind(f)
 

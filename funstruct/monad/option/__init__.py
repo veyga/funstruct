@@ -39,7 +39,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -95,7 +95,7 @@ class Option(DataType, Generic[A]):
         return cls.sequence(values.map(f))
 
     @classmethod
-    def do(cls, gen_fn: Callable) -> Callable[..., Option]:
+    def do(cls, gen_fn: Callable[..., Any]) -> Callable[..., Option]:
         """Do-notation. Short-circuits on Nothing. Returns a callable.
 
         # TODO: do-notation is ~2x slower than raw bind chains due to generator

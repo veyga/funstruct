@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
+from typing import Any
+
 from funstruct.typeclasses.applicative import Applicative
 
 
@@ -15,10 +17,10 @@ class Alternative(Applicative):
     """empty + or_else."""
 
     @abstractmethod
-    def empty(self) -> object: ...
+    def empty(self) -> Any: ...
 
     @abstractmethod
-    def or_else(self, fa, fb) -> object: ...
+    def or_else(self, fa, fb) -> Any: ...
 
 
 __all__ = ["Alternative"]
