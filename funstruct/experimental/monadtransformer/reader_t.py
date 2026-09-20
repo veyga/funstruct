@@ -54,7 +54,7 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
 

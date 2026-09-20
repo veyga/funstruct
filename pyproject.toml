@@ -99,6 +99,7 @@ ignore = [
     "N802", # Function name should be lowercase — Try/TryAsync are constructor-like decorators
     "N803", # Argument name should be lowercase — we use G for Applicative instances (type constructor)
     "N805", # First argument of a method should be named `self` — we use fa/ff/fb for typeclass ops
+    "N806", # Variable in function should be lowercase — we use F/M/S for typeclass/monad instances
 ]
 
 

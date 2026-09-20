@@ -22,7 +22,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
+from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
 
 
 @dataclass

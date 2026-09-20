@@ -135,10 +135,12 @@ def collect(x):
 Some(10).map(collect)  # side effect hidden inside "functional" code
 
 # GOOD — use Writer for accumulation
-@TraceWriter.do
+from funstruct.monad.writer import ListWriter
+
+@ListWriter.do
 def pipeline():
-    x = yield TraceWriter(10, ["started"])
-    y = yield TraceWriter(x + 1, ["incremented"])
+    x = yield ListWriter(10, ["started"])
+    y = yield ListWriter(x + 1, ["incremented"])
     return y
 ```
 

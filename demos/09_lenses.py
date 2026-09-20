@@ -19,7 +19,7 @@ Compose with >> to focus deeper.
 """
 
 from funstruct.collections.frozendict import frozendict
-from funstruct.experimental.optics import Lens, at
+from funstruct.experimental.optics import at
 
 
 def main():
@@ -62,13 +62,13 @@ def main():
 
     # Set — returns new config with the change, original untouched
     new_config = host_lens.set(config, "prod-db.internal")
-    print(f"\n  host_lens.set(config, 'prod-db.internal'):")
+    print("\n  host_lens.set(config, 'prod-db.internal'):")
     print(f"    new host = {host_lens.get(new_config)}")
     print(f"    old host = {host_lens.get(config)}  (unchanged)")
 
     # Modify — apply a function to the focused value
     scaled = pool_lens.modify(config, lambda n: n * 2)
-    print(f"\n  pool_lens.modify(config, lambda n: n * 2):")
+    print("\n  pool_lens.modify(config, lambda n: n * 2):")
     print(f"    pool_size = {pool_lens.get(scaled)}")
 
     # Multiple modifications — each returns a new config
@@ -79,7 +79,7 @@ def main():
     prod_config = ttl_lens.set(prod_config, 60)
     prod_config = replicas_lens.modify(prod_config, lambda n: n * 3)
 
-    print(f"\n  Production config (5 lens operations):")
+    print("\n  Production config (5 lens operations):")
     print(f"    db.host      = {host_lens.get(prod_config)}")
     print(f"    db.port      = {port_lens.get(prod_config)}")
     print(f"    db.pool_size = {pool_lens.get(prod_config)}")
@@ -87,14 +87,14 @@ def main():
     print(f"    replicas     = {replicas_lens.get(prod_config)}")
 
     # Original is completely untouched
-    print(f"\n  Original config still intact:")
+    print("\n  Original config still intact:")
     print(f"    db.host      = {host_lens.get(config)}")
     print(f"    replicas     = {replicas_lens.get(config)}")
 
     # JSON round-trip with lenses
     import json
 
-    print(f"\n  JSON round-trip:")
+    print("\n  JSON round-trip:")
     s = json.dumps(prod_config.to_dict(), indent=2)
     print(f"    {s[:60]}...")
 

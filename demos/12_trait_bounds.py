@@ -17,12 +17,11 @@ This demo shows:
 
 from __future__ import annotations
 
+import functools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import functools
 
 from funstruct.typeclasses.utils.registry import register, summon
-
 
 # ═══════════════════════════════════════════════════════════════════════
 # Part 1: Define the typeclass

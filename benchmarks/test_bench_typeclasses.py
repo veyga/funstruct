@@ -7,11 +7,17 @@ Measures the cost of:
     - Monad law operations (pure → bind → map)
 """
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err, AsyncResult
-from funstruct.monad.either import Either, Right, Left
-from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.typeclasses import Alternative, Functor, Monad, MonadError, summon, typeclass_of
+from funstruct.monad.either import Right
+from funstruct.monad.option import Nothing, Option, Some
+from funstruct.monad.result import Err, Ok, Result
+from funstruct.typeclasses import (
+    Alternative,
+    Functor,
+    Monad,
+    MonadError,
+    summon,
+    typeclass_of,
+)
 
 
 class TestDotNotationOverhead:

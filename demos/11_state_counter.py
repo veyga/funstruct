@@ -15,7 +15,6 @@ Use cases:
 
 from funstruct.monad.state import State
 
-
 # ── Example 1: Counter (state = int) ────────────────────────────────
 
 

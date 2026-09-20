@@ -22,8 +22,6 @@ Usage:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-
 
 # ═══════════════════════════════════════════════════════════════════════
 # DSL 1: Arithmetic expressions
@@ -223,20 +221,20 @@ class PlanOnly(Workflow):
 
 def main():
     print("=== DSL 1: Arithmetic expressions ===\n")
-    print(f"  Program: 1 + (2 * (-3))")
+    print("  Program: 1 + (2 * (-3))")
     print(f"  Evaluate:     {math_program(Evaluate())}")
     print(f"  PrettyPrint:  {math_program(PrettyPrint())}")
     print(f"  CountOps:     {math_program(CountOps())} operations")
 
     print("\n=== DSL 2: Query builder ===\n")
     print(f"  SQL:      {find_active_users(ToSQL())}")
-    print(f"  DryRun:")
+    print("  DryRun:")
     for step in find_active_users(DryRun()):
         print(f"    → {step}")
 
     print("\n=== DSL 3: Workflow ===\n")
     print(f"  Plan: {deploy_pipeline(PlanOnly())}")
-    print(f"  Execute:")
+    print("  Execute:")
     deploy_pipeline(Execute())
 
     print("\n=== The pattern ===\n")

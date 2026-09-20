@@ -11,28 +11,24 @@ These tests verify:
     - Derived bounds (Monad registered → Functor resolved)
 """
 
-import pytest
-
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+import pytest
+
+from funstruct.monad.option import Nothing, Option, Some
+from funstruct.monad.result import Err, Ok, Result
 from funstruct.typeclasses import (
     Alternative,
     Applicative,
     Bifunctor,
-    Foldable,
     Functor,
     Monad,
     MonadError,
     summon,
     typeclass_of,
 )
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.either import Either, Right, Left
-from funstruct.monad.result import Result, Ok, Err
-from funstruct.collections.cons import CList
 from funstruct.typeclasses.utils.registry import register
-
 
 # ── Custom typeclasses for testing ──────────────────────────────────
 

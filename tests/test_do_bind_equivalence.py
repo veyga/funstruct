@@ -6,11 +6,11 @@ verify both paths give the same result for success AND failure cases.
 
 import asyncio
 
-from funstruct.monad.either import Either, Right, Left
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err, AsyncResult
-from funstruct.monad.state import State
+from funstruct.monad.either import Either, Left, Right
+from funstruct.monad.option import Nothing, Option, Some
 from funstruct.monad.reader import Reader
+from funstruct.monad.result import AsyncResult, Err, Ok, Result
+from funstruct.monad.state import State
 
 
 class TestEitherEquivalence:

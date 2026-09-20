@@ -902,10 +902,10 @@ class TestDoNotation:
 
 # ── Instance tests via summon ────────────────────────────────────────
 
-from funstruct.typeclasses import Monad, Alternative, summon
-from funstruct.typeclasses.traversable import Traversable
+from funstruct.monad.option import Nothing, Option, Some
+from funstruct.typeclasses import Alternative, Monad, summon
 from funstruct.typeclasses.applicative import Applicative
-from funstruct.monad.option import Option, Some, Nothing
+from funstruct.typeclasses.traversable import Traversable
 
 
 class TestCListMonadInstance:

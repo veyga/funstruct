@@ -17,11 +17,10 @@ Usage:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
-from funstruct.typeclasses.utils.registry import register, summon, typeclass_of
-
+from funstruct.typeclasses.utils.registry import register, summon
 
 # ═══════════════════════════════════════════════════════════════════════
 # Part 1: Define a typeclass (the interface / trait)

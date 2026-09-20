@@ -279,18 +279,18 @@ class TestToResult:
     """
 
     def test_valid_fold_to_ok(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.monad.result import Err, Ok
 
         assert Valid(42).fold(Err, Ok) == Ok(42)
 
     def test_valid_fold_is_ok(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.monad.result import Err, Ok
 
         result = Valid(42).fold(Err, Ok)
         assert type(result) is Ok
 
     def test_valid_falsey_values_still_ok(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.monad.result import Err, Ok
 
         assert Valid(0).fold(Err, Ok) == Ok(0)
         assert Valid(None).fold(Err, Ok) == Ok(None)
@@ -310,7 +310,7 @@ class TestToResult:
         assert type(result) is Err
 
     def test_valid_fold_then_left_map(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.monad.result import Err, Ok
 
         result = Valid(1).fold(Err, Ok).left_map(lambda errs: ValueError(str(errs)))
         assert result == Ok(1)

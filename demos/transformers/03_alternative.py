@@ -21,8 +21,9 @@ No lifting, no transformers, no .run(). Just bind.
 
 import asyncio
 
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
 from funstruct.playground import User
+
+from funstruct.monad.result import AsyncResult, TryAsync
 
 
 @TryAsync

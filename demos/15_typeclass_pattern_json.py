@@ -38,7 +38,6 @@ from dataclasses import dataclass, fields
 from funstruct.typeclasses import BaseTypeclass
 from funstruct.typeclasses.utils.registry import register, summon
 
-
 # ═══════════════════════════════════════════════════════════════════════
 # Step 1: The typeclass — what it means to be JSON-writable
 # ═══════════════════════════════════════════════════════════════════════
@@ -203,7 +202,7 @@ def main():
 
     # Derived — dataclass uses field instances
     person = Person("Alice", 30)
-    print(f"\nDerived (dataclass uses field instances):")
+    print("\nDerived (dataclass uses field instances):")
     print(f"  jsonify(Person)    = {jsonify(person)}")
 
     address = Address("123 Main St", "NYC", "10001")
@@ -211,12 +210,12 @@ def main():
 
     # Nested — Employee has Person AND Address fields
     emp = Employee(person, address, 120000.0)
-    print(f"\nNested (Employee → Person + Address):")
+    print("\nNested (Employee → Person + Address):")
     print(f"  jsonify(Employee)  = {jsonify(emp)}")
 
     # List of dataclasses — composition all the way down
     people = [Person("Alice", 30), Person("Bob", 25)]
-    print(f"\nList of dataclasses:")
+    print("\nList of dataclasses:")
     print(f"  jsonify([Person])  = {jsonify(people)}")
 
     # Error — no instance

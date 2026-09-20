@@ -19,7 +19,6 @@ from typing import Protocol
 
 from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
 
-
 # ── Domain ───────────────────────────────────────────────────────────
 
 

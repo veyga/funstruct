@@ -7,7 +7,6 @@ or_else: try fa, if it fails/is empty try fb
 from __future__ import annotations
 
 from abc import abstractmethod
-
 from typing import Any
 
 from funstruct.typeclasses.applicative import Applicative

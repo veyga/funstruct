@@ -1,6 +1,6 @@
 """Tests for Traversable — traverse and sequence on CList and Tree."""
 
-from funstruct.collections.cons import CList, Cons, Nil
+from funstruct.collections.cons import CList, Nil
 from funstruct.collections.tree import Branch, Leaf
 from funstruct.monad.either import Either, Left, Right
 from funstruct.monad.option import Nothing, Option, Some

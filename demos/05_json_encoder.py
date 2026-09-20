@@ -27,7 +27,6 @@ from dataclasses import dataclass, fields
 
 from funstruct.typeclasses import register, summon
 
-
 # ── Typeclass (the interface) ────────────────────────────────────────
 
 

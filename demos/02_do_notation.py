@@ -21,7 +21,7 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 
-from funstruct.monad.result import AsyncResult, Ok, Err, Result, Try, TryAsync
+from funstruct.monad.result import AsyncResult, Ok, Result, Try, TryAsync
 
 
 @dataclass

@@ -2,8 +2,8 @@
 
 from funstruct.applicative.ziplist import ZipList
 from tests.laws import (
-    assert_functor_laws,
     assert_applicative_laws,
+    assert_functor_laws,
     assert_type_contract,
 )
 

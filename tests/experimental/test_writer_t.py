@@ -3,9 +3,9 @@
 import pytest
 
 from funstruct.collections.cons import CList, Cons, Nil
+from funstruct.experimental.monadtransformer.writer_t import WriterT
 from funstruct.monad.either import Either, Left, Right
 from funstruct.monad.option import Nothing, Option, Some
-from funstruct.experimental.monadtransformer.writer_t import WriterT
 from funstruct.typeclasses import Monoid, Semigroup
 
 list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])

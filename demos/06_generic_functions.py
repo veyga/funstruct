@@ -24,11 +24,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from funstruct.monad.either import Either, Left, Right
+from funstruct.monad.option import Nothing, Option, Some
+from funstruct.monad.result import Err, Ok, Result
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err
-from funstruct.monad.either import Either, Right, Left
-
 
 # ── Generic functions (the constraint is the type hint) ──────────────
 

@@ -2,9 +2,9 @@
 
 from parametrization import Parametrization as P
 
-from funstruct.monad.either import Either, Left, Right
-from funstruct.monad.option import Option, Some, Nothing
 from funstruct.experimental.monadtransformer import StateT
+from funstruct.monad.either import Either, Left, Right
+from funstruct.monad.option import Option, Some
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,

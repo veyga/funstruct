@@ -12,10 +12,11 @@ The key operations:
 
 import asyncio
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
-from funstruct.experimental.monadtransformer.option_t import OptionT
 from funstruct.playground import User
+
+from funstruct.experimental.monadtransformer.option_t import OptionT
+from funstruct.monad.future import Future
+from funstruct.monad.option import Option
 
 
 def get_user(name: str) -> Future[Option[User]]:

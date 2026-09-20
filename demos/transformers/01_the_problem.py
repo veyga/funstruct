@@ -23,9 +23,10 @@ Three functions, three layers of nesting. This doesn't scale.
 
 import asyncio
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
 from funstruct.playground import User
+
+from funstruct.monad.future import Future
+from funstruct.monad.option import Nothing, Option, Some
 
 
 def get_user(name: str) -> Future[Option[User]]:

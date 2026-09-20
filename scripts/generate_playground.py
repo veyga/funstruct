@@ -11,7 +11,6 @@ Usage:
 from __future__ import annotations
 
 import ast
-import os
 from pathlib import Path
 
 DEMOS_DIR = Path("demos")
@@ -131,7 +130,7 @@ def generate_html(demos: list[dict]) -> str:
                 + "</code></p>"
             )
         lines.append(
-            f'<script type="py-editor" config=\'{{"packages":["funstruct"]}}\'>'
+            '<script type="py-editor" config=\'{"packages":["funstruct"]}\'>'
         )
         lines.append(demo["code"])
         lines.append("</script>")

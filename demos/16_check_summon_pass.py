@@ -19,6 +19,8 @@ Or from Python::
     assert result.ok, result.report()
 """
 
+from funstruct.monad.option import Some
+from funstruct.monad.result import Ok, Result
 from funstruct.typeclasses import (
     BaseTypeclass,
     DataType,
@@ -27,8 +29,6 @@ from funstruct.typeclasses import (
     summon,
     typeclass_of,
 )
-from funstruct.monad.option import Nothing, Option, Some
-from funstruct.monad.result import Err, Ok, Result
 
 
 # ── Custom typeclass ────────────────────────────────────────────────

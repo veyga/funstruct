@@ -10,25 +10,9 @@ Usage:
 
 from __future__ import annotations
 
-import importlib
-import pkgutil
-
 # Force all modules to load so instances register
-import funstruct.monad.option
-import funstruct.monad.either
-import funstruct.monad.result
-import funstruct.monad.state
-import funstruct.monad.reader
-import funstruct.monad.writer
-import funstruct.monad.future
-import funstruct.collections.cons
-import funstruct.collections.tree
-import funstruct.collections.frozendict
-import funstruct.applicative.validated
-import funstruct.applicative.ziplist
-
-from funstruct.typeclasses.typeclass import BaseTypeclass
 from funstruct.typeclasses.mixins.data_type import DataType
+from funstruct.typeclasses.typeclass import BaseTypeclass
 from funstruct.typeclasses.utils.registry import _registry
 
 
@@ -129,8 +113,8 @@ def generate_svg() -> str:
         all_tcs.update(children)
 
     # Add Semigroup/Monoid (value-level typeclasses, not BaseTypeclass subclasses)
-    from funstruct.typeclasses.semigroup import Semigroup
     from funstruct.typeclasses.monoid import Monoid
+    from funstruct.typeclasses.semigroup import Semigroup
 
     all_tcs.add(Semigroup)
     all_tcs.add(Monoid)
@@ -175,7 +159,7 @@ def generate_svg() -> str:
     lines.append("  </defs>")
     lines.append('  <rect width="900" height="620" fill="#1a1a2e" rx="8"/>')
     lines.append(
-        f'  <text x="450" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#e0e2e4">funstruct — typeclass hierarchy</text>'
+        '  <text x="450" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#e0e2e4">funstruct — typeclass hierarchy</text>'
     )
     lines.append(
         f'  <text x="450" y="52" text-anchor="middle" font-size="11" fill="#666">auto-generated from code • {len(all_tcs) - 1} typeclasses • {len(data_types)} data types • {len(instances)} instances</text>'
@@ -264,10 +248,10 @@ def generate_svg() -> str:
 
     # Data types section
     lines.append(
-        f'  <rect x="30" y="330" width="840" height="130" rx="8" fill="#2a2520" stroke="#d0b090" filter="url(#shadow)"/>'
+        '  <rect x="30" y="330" width="840" height="130" rx="8" fill="#2a2520" stroke="#d0b090" filter="url(#shadow)"/>'
     )
     lines.append(
-        f'  <text x="450" y="350" text-anchor="middle" font-size="10" fill="#c0a070" font-weight="bold">DATA TYPES</text>'
+        '  <text x="450" y="350" text-anchor="middle" font-size="10" fill="#c0a070" font-weight="bold">DATA TYPES</text>'
     )
 
     col_width = 110
@@ -288,7 +272,7 @@ def generate_svg() -> str:
 
     # Instances section
     lines.append(
-        f'  <rect x="30" y="475" width="840" height="130" rx="8" fill="#202025" stroke="#b0b0b0" filter="url(#shadow)"/>'
+        '  <rect x="30" y="475" width="840" height="130" rx="8" fill="#202025" stroke="#b0b0b0" filter="url(#shadow)"/>'
     )
     lines.append(
         f'  <text x="450" y="495" text-anchor="middle" font-size="10" fill="#9090a0" font-weight="bold">INSTANCES ({len(instances)} registered)</text>'
@@ -305,7 +289,7 @@ def generate_svg() -> str:
         y_off += 20
 
     lines.append(
-        f'  <text x="780" y="600" text-anchor="end" font-size="9" fill="#aaa">funstruct v2 • auto-generated</text>'
+        '  <text x="780" y="600" text-anchor="end" font-size="9" fill="#aaa">funstruct v2 • auto-generated</text>'
     )
     lines.append("</svg>")
     return "\n".join(lines)
