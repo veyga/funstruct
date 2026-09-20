@@ -40,7 +40,7 @@ class _ResultMonadError(MonadError, for_type=Result):
 
 
 class _ResultBifunctor(Bifunctor, for_type=Result):
-    def bimap(  # type: ignore[return]  # exhaustive match
+    def bimap(
         self,
         fa: Result[_A],
         f: Callable[[Exception], Exception],
@@ -51,6 +51,8 @@ class _ResultBifunctor(Bifunctor, for_type=Result):
                 return Ok(g(value))
             case Err(error):
                 return Err(f(error))
+            case _:
+                raise TypeError(f"Expected Result, got {type(fa)}")
 
 
 class _AsyncResultMonadError(MonadError, for_type=AsyncResult):

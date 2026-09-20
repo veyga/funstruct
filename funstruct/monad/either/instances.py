@@ -43,7 +43,7 @@ class _EitherMonadError(MonadError, for_type=Either):
 
 
 class _EitherBifunctor(Bifunctor, for_type=Either):
-    def bimap(  # type: ignore[return]  # exhaustive match
+    def bimap(
         self,
         fa: Either[_E, _A],
         f: Callable[[_E], _B],
@@ -54,3 +54,5 @@ class _EitherBifunctor(Bifunctor, for_type=Either):
                 return Right(g(value))
             case Left(error):
                 return Left(f(error))
+            case _:
+                raise TypeError(f"Expected Either, got {type(fa)}")
