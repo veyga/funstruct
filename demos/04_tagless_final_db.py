@@ -58,10 +58,8 @@ class OrderRepo[F](Protocol):
 
 
 def place_order[F](
-    repo: OrderRepo[F], F: type[F], customer_id: str, product_id: str
-) -> F[Order]:
-    M = summon(MonadError, F)
-
+    repo: OrderRepo[F], M: MonadError[F], customer_id: str, product_id: str
+):
     @M.do
     def run():
         customer = yield repo.find_customer(customer_id)
@@ -155,28 +153,22 @@ def main():
 
     async def run_async():
         repo = PostgresOrderRepo()
-        print(
-            f"  alice+widget: {await place_order(repo, AsyncResult, 'alice', 'widget')}"
-        )
-        print(
-            f"  bob+laptop:   {await place_order(repo, AsyncResult, 'bob', 'laptop')}"
-        )
-        print(
-            f"  nobody+widget: {await place_order(repo, AsyncResult, 'nobody', 'widget')}"
-        )
+        M = summon(MonadError, AsyncResult)
+        print(f"  alice+widget: {await place_order(repo, M, 'alice', 'widget')}")
+        print(f"  bob+laptop:   {await place_order(repo, M, 'bob', 'laptop')}")
+        print(f"  nobody+widget: {await place_order(repo, M, 'nobody', 'widget')}")
 
     asyncio.run(run_async())
 
     header("Sync in-memory")
     repo = InMemoryOrderRepo()
-    print(f"  alice+widget: {place_order(repo, Result, 'alice', 'widget')}")
-    print(f"  nobody+widget: {place_order(repo, Result, 'nobody', 'widget')}")
+    M = summon(MonadError, Result)
+    print(f"  alice+widget: {place_order(repo, M, 'alice', 'widget')}")
+    print(f"  nobody+widget: {place_order(repo, M, 'nobody', 'widget')}")
     print(f"  saved orders: {len(repo.orders)}")
 
     header("Failing (DB down)")
-    print(
-        f"  alice+widget: {place_order(FailingOrderRepo(), Result, 'alice', 'widget')}"
-    )
+    print(f"  alice+widget: {place_order(FailingOrderRepo(), M, 'alice', 'widget')}")
 
 
 if __name__ == "__main__":

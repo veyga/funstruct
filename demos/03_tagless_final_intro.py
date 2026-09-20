@@ -2,7 +2,7 @@
 
 Tagless final abstracts over the effect type via a Protocol (algebra).
 The program is written once against the protocol. Swap the interpreter
-to change the effect. Tagless final style is a primary place 
+to change the effect. Tagless final style is a primary place
 where the `summon` call is utilized.
 
 When tagless final is worth it:
@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
+from typing import Protocol
 
 from demos._util import header
 from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
@@ -36,7 +36,6 @@ class User:
 # ── Algebra (the interface) ──────────────────────────────────────────
 
 
-@runtime_checkable
 class UserRepo[F](Protocol):
     def get_user(self, name: str) -> F[User]: ...
     def get_age(self, user: User) -> F[int]: ...
@@ -44,11 +43,11 @@ class UserRepo[F](Protocol):
 
 
 # ── Program (generic in F) ───────────────────────────────────────────
+# Scala:  def getProfile[F[_]: Monad](repo: UserRepo[F], username: String): F[String]
 
 
-def get_profile[F](repo: UserRepo[F], F: type[F], username: str) -> F[str]:
-    M = summon(Monad, F)
-
+# def get_profile[F](repo: UserRepo[F], M: type(F), username: str):
+def get_profile[F](repo: UserRepo[F], M: Monad[F], username: str):
     @M.do
     def run():
         user = yield repo.get_user(username)
@@ -97,16 +96,18 @@ def main():
     repo = AsyncResultUserRepo()
 
     async def run_async():
-        print(f"  alice: {await get_profile(repo, AsyncResult, 'alice')}")
-        print(f"  bob:   {await get_profile(repo, AsyncResult, 'bob')}")
-        print(f"  nobody: {await get_profile(repo, AsyncResult, 'nobody')}")
+        M = summon(Monad, AsyncResult)
+        print(f"  alice: {await get_profile(repo, M, 'alice')}")
+        print(f"  bob:   {await get_profile(repo, M, 'bob')}")
+        print(f"  nobody: {await get_profile(repo, M, 'nobody')}")
 
     asyncio.run(run_async())
 
     header("Testing (Result, sync, no IO)")
     test_repo = ResultUserRepo()
-    print(f"  alice: {get_profile(test_repo, Result, 'alice')}")
-    print(f"  bob:   {get_profile(test_repo, Result, 'bob')}")
+    M = summon(Monad, Result)
+    print(f"  alice: {get_profile(test_repo, M, 'alice')}")
+    print(f"  bob:   {get_profile(test_repo, M, 'bob')}")
 
 
 if __name__ == "__main__":
