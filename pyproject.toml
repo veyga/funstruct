@@ -102,6 +102,19 @@ ignore = [
 ]
 
 
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+# Subclasses narrow parameter types (e.g. Option.bind expects Option, not Any).
+# This is standard covariant narrowing in FP but violates Liskov in mypy's view.
+disable_error_code = ["override"]
+
+[[tool.mypy.overrides]]
+module = "funstruct.experimental.*"
+# Experimental code uses duck-typed `monad: type` params — mypy can't see the protocol.
+disable_error_code = ["override", "attr-defined"]
+
 [tool.docformatter]
 wrap-summaries = 80
 wrap-descriptions = 80

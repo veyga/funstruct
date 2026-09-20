@@ -24,16 +24,16 @@ class Monad(Applicative):
     def bind(self, fa, f: Callable[[_A], Any]) -> Any: ...
 
     def map(self, fa, f: Callable[[_A], _B]) -> Any:
-        return self.bind(fa, lambda a: self.pure(f(a)))
+        return self.bind(fa, lambda a: self.pure(f(a)))  # type: ignore[arg-type]  # HKT limitation
 
     def ap(self, ff, fa) -> Any:
-        return self.bind(ff, lambda f: self.map(fa, f))
+        return self.bind(ff, lambda f: self.map(fa, f))  # type: ignore[arg-type]  # HKT limitation
 
     def then(self, fa, fb) -> Any:
         return self.bind(fa, lambda _: fb)
 
     def map2(self, fa, fb, f: Callable[[_A, _B], _C]) -> Any:
-        return self.bind(fa, lambda a: self.map(fb, lambda b: f(a, b)))
+        return self.bind(fa, lambda a: self.map(fb, lambda b: f(a, b)))  # type: ignore[arg-type]  # HKT limitation
 
 
 __all__ = ["Monad"]

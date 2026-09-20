@@ -11,8 +11,12 @@ format:
   -uv run --group docs docformatter --in-place --config pyproject.toml funstruct/
 
 # run ty check
-check:
+ty:
   uv run --frozen ty check funstruct/
+
+# run mypy check
+mypy:
+  uv run --frozen mypy funstruct/ --ignore-missing-imports
 
 # Serve docs locally at http://127.0.0.1:8000
 docs:

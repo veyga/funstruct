@@ -36,7 +36,7 @@ from funstruct.typeclasses.semigroup import Semigroup
 class Monoid(Semigroup[_A]):
     """A Semigroup with an identity element (empty)."""
 
-    typ: type[_A]
+    typ: type
     combine: Callable[[_A, _A], _A]
     empty: _A
 

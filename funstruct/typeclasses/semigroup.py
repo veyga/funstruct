@@ -30,7 +30,7 @@ _A = TypeVar("_A")
 class Semigroup(Generic[_A]):
     """An associative binary operation over a type."""
 
-    typ: type[_A]
+    typ: type
     combine: Callable[[_A, _A], _A]
 
 

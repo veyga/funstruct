@@ -32,7 +32,7 @@ class Applicative(Functor):
         return self.ap(self.pure(f), fa)
 
     def map2(self, fa, fb, f: Callable[[_A, _B], _C]) -> Any:
-        return self.ap(self.map(fa, lambda a: lambda b: f(a, b)), fb)
+        return self.ap(self.map(fa, lambda a: lambda b: f(a, b)), fb)  # type: ignore[arg-type]  # HKT limitation
 
     def product(self, fa, fb) -> Any:
         return self.map2(fa, fb, lambda a, b: (a, b))

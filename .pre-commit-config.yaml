@@ -34,9 +34,15 @@ repos:
         language: system
         pass_filenames: false
         files: ^(funstruct/|tests/|demos/)
-      - id: typecheck
-        name: typecheck
-        entry: bash -c "just check"
+      - id: ty
+        name: ty
+        entry: bash -c "just ty"
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: mypy
+        name: mypy
+        entry: bash -c "just mypy"
         language: system
         pass_filenames: false
         stages: [pre-push]

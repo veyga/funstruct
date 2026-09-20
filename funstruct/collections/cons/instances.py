@@ -38,7 +38,7 @@ class _CListTraversable(Traversable, for_type=CList):
     ) -> Any:
         return fa.fold_right(
             G.pure(Nil()),
-            lambda a, acc: G.map2(f(a), acc, lambda b, bs: Cons(b, bs)),
+            lambda a, acc: G.map2(f(a), acc, lambda b, bs: Cons(b, bs)),  # type: ignore[arg-type]  # HKT limitation
         )
 
 
