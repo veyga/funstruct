@@ -19,7 +19,9 @@ class Functor(BaseTypeclass):
     """map: F[A] → (A → B) → F[B]"""
 
     @abstractmethod
-    def map(self, fa, f: Callable[[_A], _B]) -> Any: ...
+    def map(self, fa, f: Callable[[_A], _B]) -> Any:
+        # fa: F[A] → F[B]
+        ...
 
 
 __all__ = ["Functor"]

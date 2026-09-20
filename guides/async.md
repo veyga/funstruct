@@ -86,7 +86,7 @@ result = await fetch_user(42).map(lambda u: u.email)
 result = await fetch_user(42).bind(lambda u: fetch_email(u))
 
 # >> operator is bind
-result = await fetch_user(42) >> fetch_email
+result = await (fetch_user(42) >> fetch_email)
 ```
 
 ## Error handling

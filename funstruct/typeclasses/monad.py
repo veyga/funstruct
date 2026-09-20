@@ -20,19 +20,25 @@ class Monad(Applicative):
     """bind (flatMap), with map and ap derived."""
 
     @abstractmethod
-    def bind(self, fa, f: Callable[[_A], Any]) -> Any: ...
+    def bind(self, fa, f: Callable[[_A], Any]) -> Any:
+        # fa: F[A], f: A → F[B] → F[B]
+        ...
 
     def map(self, fa, f: Callable[[_A], _B]) -> Any:
-        return self.bind(fa, lambda a: self.pure(f(a)))  # type: ignore[arg-type]  # HKT limitation
+        # fa: F[A] → F[B]
+        return self.bind(fa, lambda a: self.pure(f(a)))  # type: ignore[arg-type]
 
     def ap(self, ff, fa) -> Any:
-        return self.bind(ff, lambda f: self.map(fa, f))  # type: ignore[arg-type]  # HKT limitation
+        # ff: F[A → B], fa: F[A] → F[B]
+        return self.bind(ff, lambda f: self.map(fa, f))  # type: ignore[arg-type]
 
     def then(self, fa, fb) -> Any:
+        # fa: F[A], fb: F[B] → F[B]
         return self.bind(fa, lambda _: fb)
 
     def map2(self, fa, fb, f: Callable[[_A, _B], _C]) -> Any:
-        return self.bind(fa, lambda a: self.map(fb, lambda b: f(a, b)))  # type: ignore[arg-type]  # HKT limitation
+        # fa: F[A], fb: F[B] → F[C]
+        return self.bind(fa, lambda a: self.map(fb, lambda b: f(a, b)))  # type: ignore[arg-type]
 
     @final
     def do(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:

@@ -8,16 +8,22 @@ The key operations:
     OptionT.lift_f(future)     — lift a Future[A] → OptionT[Future, A]
     OptionT.from_option(opt, F) — lift an Option[A] → OptionT[F, A]
     .run()                     — unwrap back to Future[Option[A]]
+
+Run: uv run python demos/transformers/02_option_t.py
 """
 
 import asyncio
-
-from funstruct.playground import User
+from dataclasses import dataclass
 
 from demos._util import header
 from funstruct.experimental.monadtransformer.option_t import OptionT
 from funstruct.monad.future import Future
 from funstruct.monad.option import Option
+
+
+@dataclass
+class User:
+    name: str
 
 
 def get_user(name: str) -> Future[Option[User]]:

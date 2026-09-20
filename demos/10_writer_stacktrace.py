@@ -11,6 +11,8 @@ it was called and what it did, producing a complete trace at the end.
     result = pipeline("alice")
     result.value   # "ALICE@EXAMPLE.COM"
     result.output  # ["lookup_user(alice)", "get_email(User(alice))", "normalize(alice@...)"]
+
+Run: uv run python demos/10_writer_stacktrace.py
 """
 
 from demos._util import header

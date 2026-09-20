@@ -16,6 +16,8 @@ A Lens[S, A] focuses on a value of type A inside a structure S:
     modify(s, f)  → S  (applies f to the focused value)
 
 Compose with >> to focus deeper.
+
+Run: uv run python demos/09_lenses.py
 """
 
 from demos._util import header

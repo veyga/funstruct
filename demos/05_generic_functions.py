@@ -12,7 +12,7 @@ For the tagless final pattern (algebras + swappable interpreters), see:
     demos/03_tagless_final_intro.py
     demos/04_tagless_final_db.py
 
-Run: uv run python demos/06_generic_functions.py
+Run: uv run python demos/05_generic_functions.py
 """
 
 from __future__ import annotations
@@ -22,7 +22,6 @@ from funstruct.monad.either import Either, Right
 from funstruct.monad.option import Nothing, Option, Some
 from funstruct.monad.result import Ok, Result
 from funstruct.typeclasses import Monad, MonadError, summon
-
 
 # ── Generic functions (the constraint is the type hint) ──────────────
 

@@ -15,8 +15,7 @@ This demo builds three DSLs:
     - A query builder (SQL generation, in-memory execution)
     - A workflow/pipeline DSL (execute, dry-run)
 
-Usage:
-    uv run python demos/13_dsl.py
+Run: uv run python demos/12_dsl.py
 """
 
 from __future__ import annotations

@@ -10,15 +10,13 @@ This is the Scala/Rust pattern: define capabilities as typeclasses,
 implement them per type, then write generic code constrained by those
 capabilities.
 
-Usage:
-    uv run python -m funstruct.playground.mt13
+Run: uv run python demos/08_custom_types.py
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
 
 from demos._util import header
 from funstruct.typeclasses.utils.registry import register, summon
@@ -227,22 +225,6 @@ def log_and_serialize[A](value: A) -> tuple[str, dict]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# Protocol-based trait bound (compile-time checkable with type checkers)
-# ═══════════════════════════════════════════════════════════════════════
-
-
-@runtime_checkable
-class HasShowable(Protocol):
-    """Protocol that checks if a type has a Showable instance registered.
-
-    This is the closest Python gets to Scala's context bounds.
-    Use isinstance(value, HasShowable) to check at runtime.
-    """
-
-    ...
-
-
-# ═══════════════════════════════════════════════════════════════════════
 # Demo
 # ═══════════════════════════════════════════════════════════════════════
 
@@ -271,9 +253,7 @@ def main():
     print(f"  show(alice.email)   = {show(alice.email)}")
     print(f"  show(alice.address) = {show(alice.address)}")
 
-    print(
-        "\n=== Part 2: serialize() — generic function, auto-resolves Serializable ===\n"
-    )
+    header("Part 2: serialize() — generic function, auto-resolves Serializable")
     print(f"  serialize(alice) = {json.dumps(serialize(alice), indent=2)}")
 
     header("Part 3: deserialize() — generic round-trip")

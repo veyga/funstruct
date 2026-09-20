@@ -13,6 +13,8 @@ This demo shows:
     2. Implementing it for specific types
     3. Writing generic functions with trait bounds
     4. What happens when the bound is NOT met
+
+Run: uv run python demos/06_trait_bounds.py
 """
 
 from __future__ import annotations

@@ -68,7 +68,7 @@ double(summon(Monad, Result), Ok(21))    # Ok(42)
 ### Multiple bounds
 
 ```python
-def show_sorted[A: Ordering, A: Showable](items: list[A]) -> list[str]:
+def show_sorted[A: (Ordering, Showable)](items: list[A]) -> list[str]:
     O = summon(Ordering, type(items[0]))   # bound 1: Ordering
     S = summon(Showable, type(items[0]))   # bound 2: Showable
     sorted_items = sorted(items, key=functools.cmp_to_key(O.compare))

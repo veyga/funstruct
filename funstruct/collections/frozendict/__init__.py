@@ -32,7 +32,8 @@ Examples:
 
 from __future__ import annotations
 
-from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
+import json as _json
+from collections.abc import Callable, ItemsView, Iterator, KeysView, Mapping, ValuesView
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
@@ -404,8 +405,31 @@ class frozendict(DataType, Generic[K, V]):
         return self.__size > 0
 
 
+# makes frozendict pass isinstance(fd, Mapping)
+Mapping.register(frozendict)
+
+
+class FrozendictEncoder(_json.JSONEncoder):
+    """JSON encoder that serializes frozendict as a plain dict.
+
+    Usage:
+        json.dumps(fd, cls=FrozendictEncoder)
+
+    Or install globally:
+        json._default_encoder = FrozendictEncoder()
+    """
+
+    def default(self, obj):  # type: ignore[no-untyped-def]
+        match obj:
+            case frozendict():
+                return obj.to_dict()
+            case _:
+                return super().default(obj)
+
+
 import funstruct.collections.frozendict.instances  # noqa: E402, F401
 
 __all__ = [
     "frozendict",
+    "FrozendictEncoder",
 ]

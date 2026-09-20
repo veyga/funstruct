@@ -17,14 +17,20 @@ This is often simpler than transformers for real applications.
         return f"{nick}{age}"
 
 No lifting, no transformers, no .run(). Just bind.
+
+Run: uv run python demos/transformers/03_alternative.py
 """
 
 import asyncio
-
-from funstruct.playground import User
+from dataclasses import dataclass
 
 from demos._util import header
 from funstruct.monad.result import AsyncResult, TryAsync
+
+
+@dataclass
+class User:
+    name: str
 
 
 @TryAsync

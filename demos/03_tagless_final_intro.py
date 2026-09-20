@@ -46,7 +46,6 @@ class UserRepo[F](Protocol):
 # Scala:  def getProfile[F[_]: Monad](repo: UserRepo[F], username: String): F[String]
 
 
-# def get_profile[F](repo: UserRepo[F], M: type(F), username: str):
 def get_profile[F](repo: UserRepo[F], M: Monad[F], username: str):
     @M.do
     def run():

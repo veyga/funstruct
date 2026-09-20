@@ -52,7 +52,7 @@ All funstruct collections are fully strict:
 ```python
 CList.new(1, 2, 3)      # all 3 cons cells exist immediately
 frozendict({"a": 1})     # entire HAMT built immediately
-Tree(Leaf(1), Leaf(2))   # entire tree exists immediately
+Branch(1, Leaf(2), Leaf(3))  # entire tree exists immediately
 ```
 
 There are no infinite data structures. You cannot write:

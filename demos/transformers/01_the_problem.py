@@ -19,15 +19,21 @@ Composing these requires unwrapping at every layer:
         case Nothing(): ...
 
 Three functions, three layers of nesting. This doesn't scale.
+
+Run: uv run python demos/transformers/01_the_problem.py
 """
 
 import asyncio
-
-from funstruct.playground import User
+from dataclasses import dataclass
 
 from demos._util import header
 from funstruct.monad.future import Future
 from funstruct.monad.option import Nothing, Option, Some
+
+
+@dataclass
+class User:
+    name: str
 
 
 def get_user(name: str) -> Future[Option[User]]:

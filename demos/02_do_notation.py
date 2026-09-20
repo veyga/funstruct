@@ -22,7 +22,7 @@ import asyncio
 from dataclasses import dataclass
 
 from demos._util import header
-from funstruct.monad.result import AsyncResult, Ok, Result, Try, TryAsync
+from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
 
 
 @dataclass
@@ -41,10 +41,6 @@ def get_user(name: str) -> User:
 def get_age(user: User) -> AsyncResult[int]:
     return AsyncResult.pure(30 if user.name == "alice" else 0)
 
-
-@Try
-def get_age_sync(user: User) -> int:
-    return 30 if user.name == "alice" else 0
 
 
 @TryAsync
@@ -99,17 +95,6 @@ def sync_pipeline():
     return z
 
 
-# ── Style 5: mixing sync Result into async do ───────────────────────
-
-
-@AsyncResult.do
-def mixed_pipeline():
-    user = yield get_user("alice")
-    age = yield get_age(user)
-    nickname = yield get_nickname(user)
-    return f"{nickname} (age {age})"
-
-
 # ── Short-circuit on error ───────────────────────────────────────────
 
 
@@ -134,9 +119,6 @@ def main():
 
         header("@Result.do (sync)")
         print(f"  {sync_pipeline()}")
-
-        header("Mixed sync/async")
-        print(f"  {await mixed_pipeline()}")
 
         header("Short-circuit on error")
         print(f"  {await failing_pipeline()}")

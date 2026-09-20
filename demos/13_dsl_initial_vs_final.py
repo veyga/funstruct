@@ -14,8 +14,7 @@ Final (tagless):
     + No intermediate allocation
     - Can't inspect the "program" (it's just function calls)
 
-Usage:
-    uv run python demos/14_dsl_initial_vs_final.py
+Run: uv run python demos/13_dsl_initial_vs_final.py
 """
 
 from __future__ import annotations

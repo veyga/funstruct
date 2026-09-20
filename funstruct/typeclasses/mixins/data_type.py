@@ -25,6 +25,8 @@ from __future__ import annotations
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
 from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.monad import Monad
+from funstruct.typeclasses.utils.registry import summon
 
 
 class DataType(TypeConstructor, DotNotation):
@@ -43,14 +45,8 @@ class DataType(TypeConstructor, DotNotation):
     @classmethod
     def do(cls, gen_fn):
         """Do-notation — delegates to summon(Monad, cls).do."""
-        from funstruct.typeclasses.monad import Monad
-        from funstruct.typeclasses.utils.registry import _registry
-
         tc = cls._type_constructor or cls
-        for (typeclass, t), instance in _registry.items():
-            if t is tc and isinstance(instance, Monad):
-                return instance.do(gen_fn)
-        raise TypeError(f"No Monad instance registered for {tc.__name__}")
+        return summon(Monad, tc).do(gen_fn)
 
 
 __all__ = ["DataType"]

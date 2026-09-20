@@ -11,6 +11,8 @@ Use cases:
     - Interpreters (state = variable bindings)
     - ID generators (state = counter)
     - Game logic (state = game world)
+
+Run: uv run python demos/11_state_counter.py
 """
 
 from demos._util import header

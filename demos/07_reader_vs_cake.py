@@ -6,8 +6,7 @@ without passing them explicitly at every call site.
 Reader monad:  runtime DI — context threaded monadically
 Cake pattern:  definition-time DI — dependencies composed via mixins
 
-Usage:
-    uv run python -m funstruct.playground.mt12
+Run: uv run python demos/07_reader_vs_cake.py
 """
 
 from __future__ import annotations

@@ -25,8 +25,7 @@ The five steps:
 
 Translated from Scala (scala-advanced-part-2/module09/05-type-classes.sc).
 
-Usage:
-    uv run python demos/15_typeclass_pattern_json.py
+Run: uv run python demos/14_typeclass_pattern_json.py
 """
 
 from __future__ import annotations
