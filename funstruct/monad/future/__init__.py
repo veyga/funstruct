@@ -6,7 +6,7 @@ For error handling, use AsyncResult[A] from funstruct.monad.result.
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, Generator
+from collections.abc import Awaitable, Generator
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
@@ -30,13 +30,6 @@ class Future(DataType, Generic[A]):
 
     async def _awaitable(self) -> A:
         return await self._coro
-
-    def bind(self, f: Callable[[A], Future[B]]) -> Future[B]:
-        async def _inner():
-            result = await self._coro
-            return await f(result)
-
-        return Future(_inner())
 
     @staticmethod
     def pure(value: A) -> Future[A]:

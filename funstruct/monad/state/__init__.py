@@ -37,17 +37,6 @@ class State(DataType, Generic[_S, _A]):
         """
         return self._run(initial_state)
 
-    def bind(self, f: Callable[[_A], State[_S, _B]]) -> State[_S, _B]:
-        """>>> State.pure(1).bind(lambda x: State.pure(x + 10)).run(0)
-        (0, 11)
-        """
-
-        def inner(s):
-            new_s, a = self._run(s)
-            return f(a).run(new_s)
-
-        return State(inner)
-
     @staticmethod
     def pure(value) -> State:
         """Lift a value without modifying state.

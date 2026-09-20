@@ -17,4 +17,8 @@ class _FutureMonad(Monad, for_type=Future):
         return Future.pure(value)
 
     def bind(self, fa: Future[_A], f: Callable[[_A], Future[_B]]) -> Future[_B]:
-        return fa.bind(f)
+        async def _inner():
+            result = await fa._coro
+            return await f(result)
+
+        return Future(_inner())

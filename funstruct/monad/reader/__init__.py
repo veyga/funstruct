@@ -41,9 +41,6 @@ class Reader(DataType, Generic[_Ctx, _A]):
     def __call__(self, ctx):
         return self.run(ctx)
 
-    def bind(self, f: Callable[[_A], Reader[_Ctx, _B]]) -> Reader[_Ctx, _B]:
-        return Reader(lambda ctx: f(self._run(ctx)).run(ctx))
-
     @staticmethod
     def pure(value) -> Reader:
         return Reader(lambda _: value)

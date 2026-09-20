@@ -70,6 +70,31 @@ class Result(DataType, ABC, Generic[_A]):
     def is_err(self) -> bool:
         return not self.is_ok
 
+    def get_or_else(self, default: _A) -> _A:
+        match self:
+            case Ok(v):
+                return v
+            case _:
+                return default
+
+    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
+        match self:
+            case Ok(v):
+                return on_ok(v)
+            case Err(e):
+                return on_err(e)
+            case _:
+                raise TypeError(f"Expected Result, got {type(self)}")
+
+    def swap(self) -> Result:
+        match self:
+            case Ok(v):
+                return Err(v)  # type: ignore[arg-type]
+            case Err(e):
+                return Ok(e)
+            case _:
+                raise TypeError(f"Expected Result, got {type(self)}")
+
 
 @dataclass(frozen=True, eq=False)
 class Ok(Result[_A]):
@@ -80,27 +105,6 @@ class Ok(Result[_A]):
     @property
     def is_ok(self) -> bool:
         return True
-
-    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
-        return f(self.value)
-
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
-        return on_ok(self.value)
-
-    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
-        return self
-
-    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
-        return self
-
-    def bimap(self, on_err: Callable[[Exception], Exception], on_ok: Callable[[_A], _B]) -> Result[_B]:
-        return Ok(on_ok(self.value))
-
-    def get_or_else(self, default: _A) -> _A:
-        return self.value
-
-    def swap(self) -> Result:
-        return Err(self.value)  # type: ignore[arg-type]  # swap inverts types
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -122,27 +126,6 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
     @property
     def is_ok(self) -> bool:
         return False
-
-    def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
-        return self  # type: ignore[return-value]  # Err is polymorphic in A
-
-    def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
-        return on_err(self.error)
-
-    def left_map(self, f: Callable[[Exception], Exception]) -> Result[_A]:
-        return Err(f(self.error))
-
-    def handle_error_with(self, f: Callable[[Exception], Result[_A]]) -> Result[_A]:
-        return f(self.error)
-
-    def bimap(self, on_err: Callable[[Exception], Exception], on_ok: Callable[[_A], _B]) -> Result[_B]:
-        return Err(on_err(self.error))
-
-    def get_or_else(self, default: _A) -> _A:
-        return default
-
-    def swap(self) -> Result:
-        return Ok(self.error)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -175,31 +158,6 @@ class AsyncResult(DataType, Generic[_A]):
     Execute (one await at the boundary):
         value = await result                     # Result[A]
 
-    Do-notation — all of these are equivalent::
-
-        # 1. Decorator style (recommended)
-        @AsyncResult.do
-        def pipeline():
-            x = yield AsyncResult.pure(10)
-            return x + 1
-
-        await pipeline()
-
-        # 2. Manual do — no args
-        await AsyncResult.do(gen_fn)()
-        #     do(gen_fn) → thunk
-        #     thunk()    → AsyncResult
-        #     await      → Result
-
-        # 3. Manual do — with args
-        await AsyncResult.do(gen_fn_with_args)("yo")
-        #     do(gen_fn) → thunk
-        #     thunk(arg) → AsyncResult  ← NOT thunk(arg)() !
-        #     await      → Result
-
-        # 4. WRONG — extra () causes TypeError
-        # await AsyncResult.do(gen_fn)("yo")()  # TypeError: AsyncResult not callable
-
     Important: @do uses generators (yield), NOT async/await.
     You cannot decorate an async def with @do.
     """
@@ -218,7 +176,7 @@ class AsyncResult(DataType, Generic[_A]):
         if inspect.isawaitable(value):
             value = await value
         if isinstance(value, (Either, Result)):
-            return value  # type: ignore[return-value]  # Either is treated as Result here
+            return value  # type: ignore[return-value]
         return Ok(value)
 
     def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
@@ -282,7 +240,6 @@ class AsyncResult(DataType, Generic[_A]):
             return Err(error)
 
         return AsyncResult(_inner())
-
 
     def fold(
         self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]

@@ -54,6 +54,17 @@ class _ResultBifunctor(Bifunctor, for_type=Result):
             case _:
                 raise TypeError(f"Expected Result, got {type(fa)}")
 
+    def left_map(
+        self,
+        fa: Result[_A],
+        f: Callable[[Exception], Exception],
+    ) -> Result[_A]:
+        match fa:
+            case Err(error):
+                return Err(f(error))
+            case _:
+                return fa
+
 
 class _AsyncResultMonadError(MonadError, for_type=AsyncResult):
     def pure(self, value: _A) -> AsyncResult[_A]:

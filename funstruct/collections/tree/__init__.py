@@ -36,7 +36,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Cons
 from funstruct.typeclasses.mixins.data_type import DataType
@@ -67,27 +67,11 @@ class Tree(DataType, Generic[A]):
     @abstractmethod
     def to_list(self) -> CList[A]: ...
 
-    @abstractmethod
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B: ...
-
-    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
-        items: list = []
-        self.fold_right(None, lambda a, _: items.append(a))
-        for item in items:
-            acc = f(acc, item)
-        return acc
-
     def length(self) -> int:
-        return self.fold_right(0, lambda _, acc: acc + 1)
+        return self.fold(lambda _: 1, lambda _, l, r: 1 + l + r)
 
     def is_empty(self) -> bool:
         return False
-
-    @abstractmethod
-    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any: ...
-
-    def sequence(self, pure_fn: Callable[[Any], Any]) -> Any:
-        return self.traverse(lambda x: x, pure_fn)
 
 
 @dataclass(frozen=True, eq=False)
@@ -110,12 +94,6 @@ class Leaf(Tree[A]):
         on_branch: Callable[[A, C, C], C],
     ) -> C:
         return on_leaf(self.value)
-
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        return f(self.value, acc)
-
-    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any:
-        return f(self.value).map(Leaf)
 
     def to_list(self) -> CList[A]:
         return Cons.pure(self.value)
@@ -156,20 +134,6 @@ class Branch(Tree[A]):
             self.value,
             self.left.fold(on_leaf, on_branch),
             self.right.fold(on_leaf, on_branch),
-        )
-
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        acc = self.right.fold_right(acc, f)
-        acc = f(self.value, acc)
-        acc = self.left.fold_right(acc, f)
-        return acc
-
-    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any:
-        fv = f(self.value)
-        fl = self.left.traverse(f, pure_fn)
-        fr = self.right.traverse(f, pure_fn)
-        return (
-            pure_fn(lambda v: lambda l: lambda r: Branch(v, l, r)).ap(fv).ap(fl).ap(fr)
         )
 
     def to_list(self) -> CList[A]:

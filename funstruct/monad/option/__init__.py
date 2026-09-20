@@ -63,10 +63,6 @@ class Option(DataType, ABC, Generic[A]):
     def empty() -> Option:
         return Nothing()
 
-    @staticmethod
-    def raise_error(error) -> Option:
-        return Nothing()
-
     @classmethod
     def from_optional(cls, value: A | None) -> Option[A]:
         return Nothing() if value is None else Some(value)
@@ -103,6 +99,27 @@ class Option(DataType, ABC, Generic[A]):
     def is_nothing(self) -> bool:
         return not self.is_some
 
+    def get_or_else(self, default: A) -> A:
+        match self:
+            case Some(v):
+                return v
+            case _:
+                return default
+
+    def filter(self, f: Callable[[A], bool]) -> Option[A]:
+        match self:
+            case Some(v) if f(v):
+                return self
+            case _:
+                return Nothing()
+
+    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
+        match self:
+            case Some(v):
+                return on_some(v)
+            case _:
+                return on_nothing()
+
 
 @dataclass(frozen=True, eq=False)
 class Some(Option[A]):
@@ -113,21 +130,6 @@ class Some(Option[A]):
     @property
     def is_some(self) -> bool:
         return True
-
-    def get_or_else(self, default: A) -> A:
-        return self.value
-
-    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
-        return self
-
-    def or_else(self, fb: Option[A]) -> Option[A]:
-        return self
-
-    def filter(self, f: Callable[[A], bool]) -> Option[A]:
-        return self if f(self.value) else Nothing()
-
-    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
-        return on_some(self.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -156,21 +158,6 @@ class Nothing(Option):
     @property
     def is_some(self) -> bool:
         return False
-
-    def get_or_else(self, default: A) -> A:
-        return default
-
-    def handle_error_with(self, fallback: Callable[[], Option[A]]) -> Option[A]:
-        return fallback()
-
-    def or_else(self, fb: Option[A]) -> Option[A]:
-        return fb
-
-    def filter(self, f: Callable[[A], bool]) -> Option:
-        return self
-
-    def fold(self, on_nothing: Callable[[], C], on_some: Callable[[A], C]) -> C:
-        return on_nothing()
 
     def __eq__(self, other: object) -> bool:
         match other:

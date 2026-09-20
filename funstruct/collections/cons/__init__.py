@@ -16,7 +16,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -91,18 +91,6 @@ class CList(DataType, Generic[A]):
     def flatten(self) -> CList:
         return CList.flatten_(self)  # type: ignore[arg-type]  # A may be CList
 
-    def bind(self, f: Callable[[A], CList]) -> CList:
-        return self.fold_right(Nil(), lambda a, acc: f(a).append(acc))
-
-    def traverse(self, f: Callable[[A], Any], pure_fn: Callable[[Any], Any]) -> Any:
-        return self.fold_right(
-            pure_fn(Nil()),
-            lambda a, acc: f(a).map2(acc, lambda b, bs: Cons(b, bs)),
-        )
-
-    def sequence(self, pure_fn: Callable[[Any], Any]) -> Any:
-        return self.traverse(lambda x: x, pure_fn)
-
     def sorted(self, cmp: Callable[[A, A], int]) -> CList:
         def merge(left: CList, right: CList) -> CList:
             match left, right:
@@ -160,9 +148,6 @@ class CList(DataType, Generic[A]):
     @classmethod
     def empty(cls) -> CList:
         return Nil()
-
-    def or_else(self, fb: CList) -> CList:
-        return self.append(fb)
 
     @staticmethod
     def new(*xs: A) -> CList:

@@ -32,7 +32,6 @@ Examples:
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.collections.cons import CList, Nil
@@ -52,13 +51,6 @@ class Writer(DataType, Generic[_W, _A]):
     def __init__(self, value: _A, output: _W) -> None:
         object.__setattr__(self, "value", value)
         object.__setattr__(self, "output", output)
-
-    def bind(self, f: Callable[[_A], Writer[_W, _B]]) -> Writer[_W, _B]:
-        result = f(self.value)
-        return self.__class__(
-            result.value,
-            self._monoid.combine(self.output, result.output),
-        )  # type: ignore[return-value]  # TypeVar shift in bind
 
     @classmethod
     def pure(cls, value) -> Writer:
@@ -101,6 +93,16 @@ class Writer(DataType, Generic[_W, _A]):
             },
         )
         new_cls._type_constructor = new_cls  # type: ignore[attr-defined]  # dynamic class
+
+        try:
+            from funstruct.monad.writer.instances import _WriterMonad
+            from funstruct.typeclasses.monad import Monad
+            from funstruct.typeclasses.utils.registry import register
+
+            register(Monad, new_cls, _WriterMonad(new_cls))
+        except ImportError:
+            pass  # built-in writers registered later by instances.py
+
         return new_cls
 
 

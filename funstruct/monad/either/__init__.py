@@ -96,6 +96,31 @@ class Either(DataType, ABC, Generic[E, A]):
     def is_left(self) -> bool:
         return not self.is_right
 
+    def get_or_else(self, default: A) -> A:
+        match self:
+            case Right(v):
+                return v
+            case _:
+                return default
+
+    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
+        match self:
+            case Right(v):
+                return on_right(v)
+            case Left(e):
+                return on_left(e)
+            case _:
+                raise TypeError(f"Expected Either, got {type(self)}")
+
+    def swap(self) -> Either[A, E]:
+        match self:
+            case Right(v):
+                return Left(v)
+            case Left(e):
+                return Right(e)
+            case _:
+                raise TypeError(f"Expected Either, got {type(self)}")
+
 
 @dataclass(frozen=True, eq=False)
 class Right(Either[E, A]):
@@ -106,27 +131,6 @@ class Right(Either[E, A]):
     @property
     def is_right(self) -> bool:
         return True
-
-    def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
-        return f(self.value)
-
-    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
-        return self
-
-    def handle_error_with(self, f: Callable[[E], Either]) -> Either[E, A]:
-        return self
-
-    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
-        return Right(on_right(self.value))
-
-    def get_or_else(self, default: A) -> A:
-        return self.value
-
-    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
-        return on_right(self.value)
-
-    def swap(self) -> Either[A, E]:
-        return Left(self.value)
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -148,33 +152,6 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
     @property
     def is_right(self) -> bool:
         return False
-
-    def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
-        return self  # type: ignore[return-value]  # Left is polymorphic in A
-
-    def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
-        """>>> Left("oops").left_map(lambda e: e.upper())
-        Left('OOPS')
-        """
-        return Left(f(self.error))
-
-    def handle_error_with(self, f: Callable[[E], Either]) -> Either:
-        """>>> Left("oops").handle_error_with(lambda e: Right(f"recovered: {e}"))
-        Right('recovered: oops')
-        """
-        return f(self.error)
-
-    def bimap(self, on_left: Callable[[E], E], on_right: Callable[[A], B]) -> Either:
-        return Left(on_left(self.error))
-
-    def get_or_else(self, default: A) -> A:
-        return default
-
-    def fold(self, on_left: Callable[[E], C], on_right: Callable[[A], C]) -> C:
-        return on_left(self.error)
-
-    def swap(self) -> Either[A, E]:
-        return Right(self.error)
 
     def __eq__(self, other: object) -> bool:
         match other:
