@@ -174,8 +174,8 @@ class CList(DataType, Generic[A]):
 
         return _thunk
 
-    @classmethod
-    def pure(cls, value) -> CList:
+    @staticmethod
+    def pure(value) -> CList:
         return Cons(value)
 
     @staticmethod

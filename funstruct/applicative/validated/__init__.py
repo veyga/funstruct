@@ -14,7 +14,7 @@ Examples:
 
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, TypeVar
@@ -28,7 +28,7 @@ _C = TypeVar("_C")
 _E = TypeVar("_E")
 
 
-class Validated(DataType, Generic[_E, _A]):
+class Validated(DataType, ABC, Generic[_E, _A]):
     """Base class for Valid/Invalid. Bifunctor over error and value types."""
 
     @property
@@ -45,8 +45,8 @@ class Validated(DataType, Generic[_E, _A]):
     def __mul__(self, other: Validated) -> Validated:
         return self.product(other)
 
-    @classmethod
-    def pure(cls, value: _A) -> Validated:
+    @staticmethod
+    def pure(value: _A) -> Validated:
         return Valid(value)
 
     @staticmethod

@@ -32,6 +32,7 @@ Examples:
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
@@ -48,19 +49,19 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Either(DataType, Generic[E, A]):
+class Either(DataType, ABC, Generic[E, A]):
     """Either[E, A]: Right(value) or Left(error).
 
     Right-biased monad. bind/map/>> operate on the Right value
     and short-circuit on Left.
     """
 
-    @classmethod
-    def pure(cls, value: A) -> Either[E, A]:
+    @staticmethod
+    def pure(value: A) -> Either[E, A]:
         return Right(value)
 
-    @classmethod
-    def raise_error(cls, error: E) -> Either[E, A]:
+    @staticmethod
+    def raise_error(error: E) -> Either[E, A]:
         return Left(error)
 
     @classmethod
@@ -119,8 +120,8 @@ class Either(DataType, Generic[E, A]):
         return cls.sequence(values.map(f))
 
     @property
-    def is_right(self) -> bool:
-        return False
+    @abstractmethod
+    def is_right(self) -> bool: ...
 
     @property
     def is_left(self) -> bool:

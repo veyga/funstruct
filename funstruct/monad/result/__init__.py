@@ -35,6 +35,7 @@ Examples:
 from __future__ import annotations
 
 import inspect
+from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable, Coroutine
 from dataclasses import dataclass
 from functools import wraps
@@ -50,15 +51,15 @@ _A = TypeVar("_A")
 _B = TypeVar("_B")
 
 
-class Result(DataType, Generic[_A]):
+class Result(DataType, ABC, Generic[_A]):
     """Result[A] = Ok(value) | Err(exception)."""
 
-    @classmethod
-    def pure(cls, value: _A) -> Result[_A]:
+    @staticmethod
+    def pure(value: _A) -> Result[_A]:
         return Ok(value)
 
-    @classmethod
-    def raise_error(cls, error: Exception) -> Result:
+    @staticmethod
+    def raise_error(error: Exception) -> Result:
         return Err(error)
 
     @classmethod
@@ -86,8 +87,8 @@ class Result(DataType, Generic[_A]):
         return _thunk
 
     @property
-    def is_ok(self) -> bool:
-        return False
+    @abstractmethod
+    def is_ok(self) -> bool: ...
 
     @property
     def is_err(self) -> bool:
@@ -292,19 +293,19 @@ class AsyncResult(DataType, Generic[_A]):
 
         return AsyncResult(_inner())
 
-    @classmethod
-    def pure(cls, value: _A) -> AsyncResult[_A]:
+    @staticmethod
+    def pure(value: _A) -> AsyncResult[_A]:
         async def _inner():
             return Ok(value)
 
-        return cls(_inner())
+        return AsyncResult(_inner())
 
-    @classmethod
-    def raise_error(cls, error: Exception) -> AsyncResult:
+    @staticmethod
+    def raise_error(error: Exception) -> AsyncResult:
         async def _inner():
             return Err(error)
 
-        return cls(_inner())
+        return AsyncResult(_inner())
 
 
     def fold(

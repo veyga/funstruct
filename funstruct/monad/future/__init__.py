@@ -64,12 +64,12 @@ class Future(DataType, Generic[A]):
 
         return _thunk
 
-    @classmethod
-    def pure(cls, value: A) -> Future[A]:
+    @staticmethod
+    def pure(value: A) -> Future[A]:
         async def _inner():
             return value
 
-        return cls(_inner())
+        return Future(_inner())
 
     def __repr__(self) -> str:
         return f"Future({self._coro})"

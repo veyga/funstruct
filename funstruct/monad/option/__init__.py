@@ -37,6 +37,7 @@ Examples:
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
@@ -51,19 +52,19 @@ B = TypeVar("B")
 C = TypeVar("C")
 
 
-class Option(DataType, Generic[A]):
+class Option(DataType, ABC, Generic[A]):
     """Option[A]: either Some(value) or Nothing."""
 
-    @classmethod
-    def pure(cls, value: A) -> Option[A]:
+    @staticmethod
+    def pure(value: A) -> Option[A]:
         return Some(value)
 
-    @classmethod
-    def empty(cls) -> Option:
+    @staticmethod
+    def empty() -> Option:
         return Nothing()
 
-    @classmethod
-    def raise_error(cls, error) -> Option:
+    @staticmethod
+    def raise_error(error) -> Option:
         return Nothing()
 
     @classmethod
@@ -126,8 +127,8 @@ class Option(DataType, Generic[A]):
         return _thunk
 
     @property
-    def is_some(self) -> bool:
-        return False
+    @abstractmethod
+    def is_some(self) -> bool: ...
 
     @property
     def is_nothing(self) -> bool:

@@ -71,9 +71,9 @@ class Reader(DataType, Generic[_Ctx, _A]):
 
         return _thunk
 
-    @classmethod
-    def pure(cls, value, *args, **kwargs) -> Reader:
-        return cls(lambda _: value)
+    @staticmethod
+    def pure(value) -> Reader:
+        return Reader(lambda _: value)
 
     @classmethod
     def ask(cls) -> Reader:

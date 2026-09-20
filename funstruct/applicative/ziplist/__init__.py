@@ -31,9 +31,9 @@ class ZipList(DataType, Generic[_A]):
     def __init__(self, values: Iterable[_A]) -> None:
         self._values = list(values)
 
-    @classmethod
-    def pure(cls, value: _A) -> ZipList[_A]:
-        return cls([value])
+    @staticmethod
+    def pure(value: _A) -> ZipList[_A]:
+        return ZipList([value])
 
     def __mul__(self, other: ZipList) -> ZipList:
         return self.product(other)

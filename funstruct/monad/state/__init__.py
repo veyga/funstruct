@@ -76,14 +76,14 @@ class State(DataType, Generic[_S, _A]):
 
         return _thunk
 
-    @classmethod
-    def pure(cls, value) -> State:
+    @staticmethod
+    def pure(value) -> State:
         """Lift a value without modifying state.
 
         >>> State.pure("hello").run(99)
         (99, 'hello')
         """
-        return cls(lambda s: (s, value))
+        return State(lambda s: (s, value))
 
     @staticmethod
     def get() -> State[_S, _S]:
