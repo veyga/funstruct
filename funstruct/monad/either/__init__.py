@@ -64,30 +64,6 @@ class Either(DataType, ABC, Generic[E, A]):
     def raise_error(error: E) -> Either[E, A]:
         return Left(error)
 
-    @classmethod
-    def sequence(cls, eithers: CList[Either[E, A]]) -> Either[E, CList[A]]:
-        """CList[Either[E, A]] -> Either[E, CList[A]]."""
-        from funstruct.collections.cons import Cons, Nil
-        from funstruct.util.tailrec import tail_call, tco
-
-        @tco
-        def _go(remaining, acc):
-            match remaining:
-                case Nil():
-                    return Right(acc.reversed())
-                case Cons(head, tail):
-                    match head:
-                        case Left():
-                            return head
-                        case Right(v):
-                            return tail_call(_go)(tail, Cons(v, acc))
-
-        return _go(eithers, Nil())
-
-    @classmethod
-    def traverse(cls, values, f: Callable[[A], Either[E, B]]) -> Either:
-        return cls.sequence(values.map(f))
-
     @property
     @abstractmethod
     def is_right(self) -> bool: ...

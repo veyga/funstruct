@@ -1,5 +1,8 @@
 from funstruct.collections.cons import CList, Cons, Nil
 from funstruct.monad.either import Either, Left, Right
+from funstruct.typeclasses import summon
+from funstruct.typeclasses.applicative import Applicative
+from funstruct.typeclasses.traversable import Traversable
 from tests.laws import assert_functor_laws, assert_monad_laws, assert_type_contract
 
 
@@ -157,28 +160,32 @@ class TestDo:
 
 
 class TestSequenceTraverse:
+    T = summon(Traversable, CList)
+    G = summon(Applicative, Either)
+
     def test_sequence_all_right(self):
         items = Cons(Right(1), Cons(Right(2), Cons(Right(3), Nil())))
-        assert Either.sequence(items) == Right(CList.from_iterable([1, 2, 3]))
+        assert self.T.sequence(items, self.G) == Right(CList.from_iterable([1, 2, 3]))
 
     def test_sequence_with_left(self):
         items = Cons(Right(1), Cons(Left("err"), Cons(Right(3), Nil())))
-        assert Either.sequence(items) == Left("err")
+        assert self.T.sequence(items, self.G) == Left("err")
 
     def test_sequence_first_left_wins(self):
         items = Cons(Left("first"), Cons(Left("second"), Nil()))
-        assert Either.sequence(items) == Left("first")
+        assert self.T.sequence(items, self.G) == Left("first")
 
     def test_traverse_all_succeed(self):
         values = CList.from_iterable([1, 2, 3])
-        result = Either.traverse(values, lambda x: Right(x * 10))
+        result = self.T.traverse(values, lambda x: Right(x * 10), self.G)
         assert result == Right(CList.from_iterable([10, 20, 30]))
 
     def test_traverse_short_circuits(self):
         values = CList.from_iterable([1, 0, 3])
-        result = Either.traverse(
+        result = self.T.traverse(
             values,
             lambda x: Right(x) if x != 0 else Left("zero"),
+            self.G,
         )
         assert result == Left("zero")
 

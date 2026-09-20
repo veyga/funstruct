@@ -2,6 +2,9 @@
 
 from funstruct.collections.cons import CList, Cons, Nil
 from funstruct.monad.option import Nothing, Option, Some
+from funstruct.typeclasses import summon
+from funstruct.typeclasses.applicative import Applicative
+from funstruct.typeclasses.traversable import Traversable
 from tests.laws import assert_type_contract
 
 
@@ -160,27 +163,33 @@ class TestFromOptional:
 
 
 class TestSequence:
+    T = summon(Traversable, CList)
+    G = summon(Applicative, Option)
+
     def test_all_some(self):
         items = Cons(Some(1), Cons(Some(2), Cons(Some(3), Nil())))
-        assert Option.sequence(items) == Some(CList.from_iterable([1, 2, 3]))
+        assert self.T.sequence(items, self.G) == Some(CList.from_iterable([1, 2, 3]))
 
     def test_with_nothing(self):
         items = Cons(Some(1), Cons(Nothing(), Cons(Some(3), Nil())))
-        assert Option.sequence(items) == Nothing()
+        assert self.T.sequence(items, self.G) == Nothing()
 
     def test_empty_list(self):
-        assert Option.sequence(Nil()) == Some(Nil())
+        assert self.T.sequence(Nil(), self.G) == Some(Nil())
 
 
 class TestTraverse:
+    T = summon(Traversable, CList)
+    G = summon(Applicative, Option)
+
     def test_all_succeed(self):
         values = CList.from_iterable([1, 2, 3])
-        result = Option.traverse(values, lambda x: Some(x * 10))
+        result = self.T.traverse(values, lambda x: Some(x * 10), self.G)
         assert result == Some(CList.from_iterable([10, 20, 30]))
 
     def test_short_circuits(self):
         values = CList.from_iterable([1, 0, 3])
-        result = Option.traverse(values, lambda x: Some(x) if x != 0 else Nothing())
+        result = self.T.traverse(values, lambda x: Some(x) if x != 0 else Nothing(), self.G)
         assert result == Nothing()
 
 

@@ -67,30 +67,6 @@ class Option(DataType, ABC, Generic[A]):
     def from_optional(cls, value: A | None) -> Option[A]:
         return Nothing() if value is None else Some(value)
 
-    @classmethod
-    def sequence(cls, options: CList[Option[A]]) -> Option[CList[A]]:
-        """CList[Option[A]] → Option[CList[A]]."""
-        from funstruct.collections.cons import Cons, Nil
-        from funstruct.util.tailrec import tail_call, tco
-
-        @tco
-        def _go(remaining, acc):
-            match remaining:
-                case Nil():
-                    return Some(acc.reversed())
-                case Cons(head, tail):
-                    match head:
-                        case Nothing():
-                            return Nothing()
-                        case Some(v):
-                            return tail_call(_go)(tail, Cons(v, acc))
-
-        return _go(options, Nil())
-
-    @classmethod
-    def traverse(cls, values: CList[A], f: Callable[[A], Option]) -> Option[CList]:
-        return cls.sequence(values.map(f))
-
     @property
     @abstractmethod
     def is_some(self) -> bool: ...
