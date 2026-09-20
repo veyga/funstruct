@@ -16,7 +16,7 @@ ty:
 
 # run mypy check
 mypy:
-  uv run --frozen mypy funstruct/ --ignore-missing-imports
+  uv run --frozen mypy funstruct/
 
 # Serve docs locally at http://127.0.0.1:8000
 docs:
