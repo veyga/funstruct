@@ -31,13 +31,6 @@ class Future(DataType, Generic[A]):
     async def _awaitable(self) -> A:
         return await self._coro
 
-    @staticmethod
-    def pure(value: A) -> Future[A]:
-        async def _inner():
-            return value
-
-        return Future(_inner())
-
     def __repr__(self) -> str:
         return f"Future({self._coro})"
 

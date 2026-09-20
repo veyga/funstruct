@@ -25,7 +25,7 @@ class _WriterMonad(Monad):
         self._cls = writer_cls
 
     def pure(self, value: _A) -> Writer[_W, _A]:
-        return self._cls.pure(value)
+        return self._cls(value, self._cls._monoid.empty)
 
     def bind(
         self,

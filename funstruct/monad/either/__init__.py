@@ -35,13 +35,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.util.created_at import CapturesCreationSiteMixin
-
-if TYPE_CHECKING:
-    from funstruct.collections.cons import CList
 
 E = TypeVar("E")
 A = TypeVar("A")
@@ -55,14 +52,6 @@ class Either(DataType, ABC, Generic[E, A]):
     Right-biased monad. bind/map/>> operate on the Right value
     and short-circuit on Left.
     """
-
-    @staticmethod
-    def pure(value: A) -> Either[E, A]:
-        return Right(value)
-
-    @staticmethod
-    def raise_error(error: E) -> Either[E, A]:
-        return Left(error)
 
     @property
     @abstractmethod

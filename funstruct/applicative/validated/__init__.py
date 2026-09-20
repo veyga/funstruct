@@ -46,10 +46,6 @@ class Validated(DataType, ABC, Generic[_E, _A]):
         return self.product(other)
 
     @staticmethod
-    def pure(value: _A) -> Validated:
-        return Valid(value)
-
-    @staticmethod
     def valid(value: _A) -> Validated:
         return Valid(value)
 

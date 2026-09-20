@@ -41,10 +41,6 @@ class Reader(DataType, Generic[_Ctx, _A]):
     def __call__(self, ctx):
         return self.run(ctx)
 
-    @staticmethod
-    def pure(value) -> Reader:
-        return Reader(lambda _: value)
-
     @classmethod
     def ask(cls) -> Reader:
         return cls(lambda ctx: ctx)  # type: ignore[arg-type,return-value]  # ask returns Reader[Ctx, Ctx]

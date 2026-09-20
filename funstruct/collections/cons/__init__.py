@@ -138,16 +138,8 @@ class CList(DataType, Generic[A]):
         return flatten(lst)
 
     @staticmethod
-    def pure(value) -> CList:
-        return Cons(value)
-
-    @staticmethod
     def cons(a: A) -> CList:
         return Cons(a)
-
-    @classmethod
-    def empty(cls) -> CList:
-        return Nil()
 
     @staticmethod
     def new(*xs: A) -> CList:

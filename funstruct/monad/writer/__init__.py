@@ -53,10 +53,6 @@ class Writer(DataType, Generic[_W, _A]):
         object.__setattr__(self, "output", output)
 
     @classmethod
-    def pure(cls, value) -> Writer:
-        return cls(value, cls._monoid.empty)
-
-    @classmethod
     def tell(cls, output: _W) -> Writer:
         return cls(None, output)  # type: ignore[arg-type]  # tell has no value
 

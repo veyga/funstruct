@@ -54,14 +54,6 @@ _B = TypeVar("_B")
 class Result(DataType, ABC, Generic[_A]):
     """Result[A] = Ok(value) | Err(exception)."""
 
-    @staticmethod
-    def pure(value: _A) -> Result[_A]:
-        return Ok(value)
-
-    @staticmethod
-    def raise_error(error: Exception) -> Result:
-        return Err(error)
-
     @property
     @abstractmethod
     def is_ok(self) -> bool: ...
@@ -178,68 +170,6 @@ class AsyncResult(DataType, Generic[_A]):
         if isinstance(value, (Either, Result)):
             return value  # type: ignore[return-value]
         return Ok(value)
-
-    def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
-        async def _inner():
-            result = await self._coro
-            match result:
-                case Ok(value):
-                    return await AsyncResult._resolve(f(value))
-                case _:
-                    return result
-
-        return AsyncResult(_inner())
-
-    def left_map(self, f: Callable[[Exception], Exception]) -> AsyncResult[_A]:
-        async def _inner():
-            result = await self._coro
-            match result:
-                case Err(error):
-                    return Err(f(error))
-                case _:
-                    return result
-
-        return AsyncResult(_inner())
-
-    def bimap(
-        self, on_err: Callable[[Exception], Exception], on_ok: Callable[[_A], _B]
-    ) -> AsyncResult[_B]:
-        async def _inner():
-            result = await self._coro
-            match result:
-                case Ok(value):
-                    return Ok(on_ok(value))
-                case Err(error):
-                    return Err(on_err(error))
-                case _:
-                    return result
-
-        return AsyncResult(_inner())
-
-    def handle_error_with(self, f: Callable[[Exception], Any]) -> AsyncResult:
-        async def _inner():
-            result = await self._coro
-            match result:
-                case Err(error):
-                    return await AsyncResult._resolve(f(error))
-                case _:
-                    return result
-
-        return AsyncResult(_inner())
-
-    @staticmethod
-    def pure(value: _A) -> AsyncResult[_A]:
-        async def _inner():
-            return Ok(value)
-
-        return AsyncResult(_inner())
-
-    @staticmethod
-    def raise_error(error: Exception) -> AsyncResult:
-        async def _inner():
-            return Err(error)
-
-        return AsyncResult(_inner())
 
     def fold(
         self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]

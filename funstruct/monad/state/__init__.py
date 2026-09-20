@@ -38,15 +38,6 @@ class State(DataType, Generic[_S, _A]):
         return self._run(initial_state)
 
     @staticmethod
-    def pure(value) -> State:
-        """Lift a value without modifying state.
-
-        >>> State.pure("hello").run(99)
-        (99, 'hello')
-        """
-        return State(lambda s: (s, value))
-
-    @staticmethod
     def get() -> State[_S, _S]:
         """Produce current state as the value.
 

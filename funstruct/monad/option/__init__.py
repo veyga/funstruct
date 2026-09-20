@@ -19,20 +19,6 @@ Examples:
     >>> Some(2).map2(Nothing(), lambda a, b: a + b)
     Nothing()
 
-    sequence — CList[Option[A]] → Option[CList[A]]:
-
-    >>> Option.sequence(Cons(Some(1), Cons(Some(2), Cons(Some(3), Nil()))))
-    Some(Cons(1, Cons(2, Cons(3, Nil()))))
-    >>> Option.sequence(Cons(Some(1), Cons(Nothing(), Cons(Some(3), Nil()))))
-    Nothing()
-
-    traverse — map then sequence:
-
-    >>> Option.traverse(CList.from_iterable([1, 2, 3]), lambda x: Some(x * 10))
-    Some(Cons(10, Cons(20, Cons(30, Nil()))))
-    >>> safe = lambda x: Some(x) if x != 0 else Nothing()
-    >>> Option.traverse(CList.from_iterable([1, 0, 3]), safe)
-    Nothing()
 """
 
 from __future__ import annotations
@@ -40,12 +26,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
-
-if TYPE_CHECKING:
-    from funstruct.collections.cons import CList
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -54,14 +37,6 @@ C = TypeVar("C")
 
 class Option(DataType, ABC, Generic[A]):
     """Option[A]: either Some(value) or Nothing."""
-
-    @staticmethod
-    def pure(value: A) -> Option[A]:
-        return Some(value)
-
-    @staticmethod
-    def empty() -> Option:
-        return Nothing()
 
     @classmethod
     def from_optional(cls, value: A | None) -> Option[A]:
