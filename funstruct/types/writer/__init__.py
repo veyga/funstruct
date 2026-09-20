@@ -15,8 +15,11 @@ StrWriter, IntWriter each need their own Monad instance.
 Create custom Writers with Writer.for_monoid:
 
     >>> from funstruct.types.writer import Writer
-    >>> from funstruct.typeclasses import Monoid
-    >>> SetWriter = Writer.for_monoid(Monoid(typ=set, combine=lambda a, b: a | b, empty=set()))
+    >>> from funstruct.typeclasses.monoid import Monoid
+    >>> class SetMonoid(Monoid):
+    ...     def combine(self, a, b): return a | b
+    ...     def empty(self): return set()
+    >>> SetWriter = Writer.for_monoid(SetMonoid())
 
 Examples:
 
@@ -36,7 +39,8 @@ from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.typeclasses.monoid import Monoid
-from funstruct.types.cons import CList, Nil
+from funstruct.types.builtins.instances.monoid import IntAddition, ListConcat, StrConcat
+from funstruct.types.cons.instances.monoid import CListConcat
 
 _W = TypeVar("_W")
 _A = TypeVar("_A")
@@ -80,10 +84,10 @@ class Writer(DataType, Generic[_W, _A]):
         Python has no implicits, so each output type needs its own concrete
         class with a registered Monad instance.
 
-            ListWriter = Writer.for_monoid(list_monoid)
-            CListWriter = Writer.for_monoid(clist_monoid)
+            ListWriter = Writer.for_monoid(ListConcat())
+            CListWriter = Writer.for_monoid(CListConcat())
         """
-        cls_name = name or f"{monoid.typ.__name__.title()}Writer"
+        cls_name = name or f"{type(monoid).__name__}Writer"
         new_cls = type(
             cls_name,
             (cls,),
@@ -97,7 +101,7 @@ class Writer(DataType, Generic[_W, _A]):
         try:
             from funstruct.typeclasses.monad import Monad
             from funstruct.typeclasses.utils.registry import register
-            from funstruct.types.writer.instances import _WriterMonad
+            from funstruct.types.writer.instances.monad import _WriterMonad
 
             register(Monad, new_cls, _WriterMonad(new_cls))
         except ImportError:
@@ -106,22 +110,10 @@ class Writer(DataType, Generic[_W, _A]):
         return new_cls
 
 
-ListWriter = Writer.for_monoid(
-    Monoid(typ=list, combine=lambda a, b: a + b, empty=[]),
-    "ListWriter",
-)
-CListWriter = Writer.for_monoid(
-    Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil()),
-    "CListWriter",
-)
-StrWriter = Writer.for_monoid(
-    Monoid(typ=str, combine=lambda a, b: a + b, empty=""),
-    "StrWriter",
-)
-IntWriter = Writer.for_monoid(
-    Monoid(typ=int, combine=lambda a, b: a + b, empty=0),
-    "IntWriter",
-)
+ListWriter = Writer.for_monoid(ListConcat, "ListWriter")
+CListWriter = Writer.for_monoid(CListConcat, "CListWriter")
+StrWriter = Writer.for_monoid(StrConcat, "StrWriter")
+IntWriter = Writer.for_monoid(IntAddition, "IntWriter")
 
 
 import funstruct.types.writer.instances  # noqa: E402, F401

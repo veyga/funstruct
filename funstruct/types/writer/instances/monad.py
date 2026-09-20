@@ -1,5 +1,3 @@
-"""Typeclass instances for Writer variants."""
-
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -25,7 +23,7 @@ class _WriterMonad(Monad):
         self._cls = writer_cls
 
     def pure(self, value: _A) -> Writer[_W, _A]:
-        return self._cls(value, self._cls._monoid.empty)
+        return self._cls(value, self._cls._monoid.empty())
 
     def bind(
         self,

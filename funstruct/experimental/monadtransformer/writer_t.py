@@ -8,9 +8,11 @@ Examples:
     >>> from funstruct.types.either import Either, Right, Left
     >>> from funstruct.typeclasses import Monoid
 
-    >>> list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+    >>> class ListMonoid(Monoid):
+    ...     def combine(self, a, b): return a + b
+    ...     def empty(self): return []
     >>> class LogT(WriterT):
-    ...     _monoid = list_monoid
+    ...     _monoid = ListMonoid()
 
     bind accumulates output:
 
@@ -101,13 +103,15 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses.monoid import Monoid
-        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LM(Monoid):
+        ...     def combine(self, a, b): return a + b
+        ...     def empty(self): return []
         >>> class LT(WriterT):
-        ...     _monoid = list_m
+        ...     _monoid = LM()
         >>> LT.pure(42, Either).run()
         Right((42, []))
         """
-        return cls(monad.pure((value, cls._monoid.empty)))
+        return cls(monad.pure((value, cls._monoid.empty())))
 
     @classmethod
     def tell(cls, output: _W, monad: type) -> WriterT:
@@ -115,9 +119,11 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses.monoid import Monoid
-        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LM(Monoid):
+        ...     def combine(self, a, b): return a + b
+        ...     def empty(self): return []
         >>> class LT(WriterT):
-        ...     _monoid = list_m
+        ...     _monoid = LM()
         >>> LT.tell(["hello"], Either).run()
         Right((None, ['hello']))
         """
@@ -131,9 +137,11 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
-        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LM(Monoid):
+        ...     def combine(self, a, b): return a + b
+        ...     def empty(self): return []
         >>> class LT(WriterT):
-        ...     _monoid = list_m
+        ...     _monoid = LM()
         >>> LT.from_writer(42, ["init"], Either).run()
         Right((42, ['init']))
         """
@@ -145,7 +153,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         Haskell equivalent: ``lift :: m a -> WriterT w m a``
         """
-        return cls(fa.map(lambda a: (a, cls._monoid.empty)))
+        return cls(fa.map(lambda a: (a, cls._monoid.empty())))
 
     @classmethod
     def do(cls, gen_fn) -> Callable[..., WriterT]:
@@ -200,9 +208,11 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
-        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LM(Monoid):
+        ...     def combine(self, a, b): return a + b
+        ...     def empty(self): return []
         >>> class LT(WriterT):
-        ...     _monoid = list_m
+        ...     _monoid = LM()
         >>> LT(Right((42, ["log"]))).listen().run()
         Right(((42, ['log']), ['log']))
         """
@@ -214,9 +224,11 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
 
         >>> from funstruct.types.either import Either, Right
         >>> from funstruct.typeclasses import Monoid
-        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> class LM(Monoid):
+        ...     def combine(self, a, b): return a + b
+        ...     def empty(self): return []
         >>> class LT(WriterT):
-        ...     _monoid = list_m
+        ...     _monoid = LM()
         >>> LT(Right((42, ["log"]))).written()
         Right(['log'])
         """

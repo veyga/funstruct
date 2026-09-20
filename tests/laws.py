@@ -93,11 +93,11 @@ def assert_monoid_laws(a: A, sg: Monoid) -> None:
          / \\                  / \\
         ε   a  →  a          a   ε  →  a
 
-    Counterexample: Monoid(int, +, empty=1) violates identity:
+    Counterexample: a Monoid with empty()=1 violates identity:
         combine(1, 5) = 6 != 5
     """
-    assert sg.combine(sg.empty, a) == a, "Monoid left identity violated"
-    assert sg.combine(a, sg.empty) == a, "Monoid right identity violated"
+    assert sg.combine(sg.empty(), a) == a, "Monoid left identity violated"
+    assert sg.combine(a, sg.empty()) == a, "Monoid right identity violated"
 
 
 def assert_functor_laws(fa, eq: Eq | None = None) -> None:

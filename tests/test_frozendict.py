@@ -9,7 +9,13 @@ from tests.laws import (
     assert_semigroup_laws,
 )
 
-FrozenDictMerge = Monoid(typ=frozendict, combine=lambda a, b: a + b, empty=frozendict())
+
+class _FrozendictMerge(Monoid):
+    def combine(self, a, b): return a + b
+    def empty(self): return frozendict()
+
+
+FrozenDictMerge = _FrozendictMerge()
 
 
 class TestFrozendictLaws:

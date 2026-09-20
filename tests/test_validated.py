@@ -8,7 +8,12 @@ from funstruct.types.frozendict import frozendict
 from funstruct.types.validated import Invalid, Valid, Validated
 from tests.laws import assert_functor_laws, assert_semigroup_laws
 
-invalid_concat = Semigroup(typ=Invalid, combine=lambda a, b: a.product(b))
+
+class _InvalidConcat(Semigroup):
+    def combine(self, a, b): return a.product(b)
+
+
+invalid_concat = _InvalidConcat()
 
 
 class TestValidatedLaws:

@@ -8,8 +8,28 @@ from funstruct.types.cons import CList, Cons, Nil
 from funstruct.types.either import Either, Left, Right
 from funstruct.types.option import Nothing, Option, Some
 
-list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
-clist_monoid = Monoid(typ=CList, combine=lambda a, b: a + b, empty=Nil())
+
+class _ListMonoid(Monoid):
+    def combine(self, a, b): return a + b
+    def empty(self): return []
+
+
+class _CListMonoid(Monoid):
+    def combine(self, a, b): return a + b
+    def empty(self): return Nil()
+
+
+class _IntAddSemigroup(Semigroup):
+    def combine(self, a, b): return a + b
+
+
+class _IntAddMonoid(Monoid):
+    def combine(self, a, b): return a + b
+    def empty(self): return 0
+
+
+list_monoid = _ListMonoid()
+clist_monoid = _CListMonoid()
 
 
 class LogT(WriterT):
@@ -181,28 +201,22 @@ class TestSemigroupVsMonoid:
     """WriterT requires Monoid — Semigroup breaks pure/lift."""
 
     def test_semigroup_breaks_pure(self):
-        int_add_sg = Semigroup(typ=int, combine=lambda a, b: a + b)
-
         class BadWriterT(WriterT):
-            _monoid = int_add_sg
+            _monoid = _IntAddSemigroup()
 
         with pytest.raises(AttributeError):
             BadWriterT.pure(42, Either)
 
     def test_semigroup_breaks_lift(self):
-        int_add_sg = Semigroup(typ=int, combine=lambda a, b: a + b)
-
         class BadWriterT(WriterT):
-            _monoid = int_add_sg
+            _monoid = _IntAddSemigroup()
 
         with pytest.raises(AttributeError):
             BadWriterT.lift_f(Right(42))
 
     def test_monoid_satisfies_all(self):
-        int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
-
         class IntLogT(WriterT):
-            _monoid = int_add
+            _monoid = _IntAddMonoid()
 
         w = IntLogT.pure(42, Either).bind(lambda x: IntLogT(Right((x + 1, 5))))
         assert w.run() == Right((43, 5))
