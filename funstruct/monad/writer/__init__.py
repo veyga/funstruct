@@ -77,8 +77,12 @@ class Writer(DataType, Generic[_W, _A]):
     def for_monoid(cls, monoid: Monoid, name: str | None = None) -> type:
         """Create a Writer subclass for a specific Monoid.
 
-        Each returned class is its own type constructor with auto-registered
-        Monad instance.
+        Writer is unique among funstruct types — its Monad instance depends
+        on another typeclass (Monoid). ``bind`` needs ``Monoid.combine``,
+        ``pure`` needs ``Monoid.empty``. In Cats/Scala this is resolved via
+        implicits: ``given writerMonad[W: Monoid]: Monad[Writer[W, *]]``.
+        Python has no implicits, so each output type needs its own concrete
+        class with a registered Monad instance.
 
             ListWriter = Writer.for_monoid(list_monoid)
             CListWriter = Writer.for_monoid(clist_monoid)

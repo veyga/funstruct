@@ -77,8 +77,7 @@ class TestWriterRequiresMonoid:
     def test_writer_with_monoid_succeeds(self):
         int_add_monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
 
-        class GoodWriter(Writer):
-            _monoid = int_add_monoid
+        GoodWriter = Writer.for_monoid(int_add_monoid, "GoodWriter")
 
         w = GoodWriter.pure(42)
         assert w.value == 42
@@ -88,8 +87,7 @@ class TestWriterRequiresMonoid:
         """pure(a).bind(f) == f(a) only holds when output starts at empty."""
         int_add_monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
 
-        class CountWriter(Writer):
-            _monoid = int_add_monoid
+        CountWriter = Writer.for_monoid(int_add_monoid, "CountWriter")
 
         f = lambda x: CountWriter(x + 1, 1)
 
@@ -136,15 +134,13 @@ class TestSemigroupVsMonoidOnWriter:
     Writer demands a Monoid at the type level.
     """
 
-    def test_bind_only_uses_combine(self):
-        """bind works with just combine — doesn't touch empty."""
-        int_add = Semigroup(typ=int, combine=lambda a, b: a + b)
+    def test_bind_uses_combine(self):
+        """bind combines output from both steps."""
+        int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
+        IntWriter = Writer.for_monoid(int_add, "IntWriter_test")
 
-        class SemigroupWriter(Writer):
-            _monoid = int_add
-
-        w1 = SemigroupWriter(1, 10)
-        w2 = w1.bind(lambda x: SemigroupWriter(x + 1, 20))
+        w1 = IntWriter(1, 10)
+        w2 = w1.bind(lambda x: IntWriter(x + 1, 20))
         assert w2.value == 2
         assert w2.output == 30
 
@@ -161,9 +157,7 @@ class TestSemigroupVsMonoidOnWriter:
     def test_monoid_satisfies_both(self):
         """Monoid has combine AND empty — everything works."""
         int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
-
-        class MonoidWriter(Writer):
-            _monoid = int_add
+        MonoidWriter = Writer.for_monoid(int_add, "MonoidWriter_test")
 
         w = MonoidWriter.pure(42)
         assert w.value == 42
