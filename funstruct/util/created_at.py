@@ -85,6 +85,8 @@ class CapturesCreationSiteMixin:
     where it was created, with negligible overhead.
     """
 
+    _created_at: CreatedAt
+
     def __post_init__(self):
         object.__setattr__(self, "_created_at", capture_created_at())
 

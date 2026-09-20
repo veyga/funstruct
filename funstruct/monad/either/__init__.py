@@ -180,7 +180,7 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
         return False
 
     def bind(self, f: Callable[[A], Either[E, B]]) -> Either[E, B]:
-        return self
+        return self  # type: ignore[return-value]  # Left is polymorphic in A
 
     def left_map(self, f: Callable[[E], E]) -> Either[E, A]:
         """>>> Left("oops").left_map(lambda e: e.upper())

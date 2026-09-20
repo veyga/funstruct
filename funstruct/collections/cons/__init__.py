@@ -89,7 +89,7 @@ class CList(DataType, Generic[A]):
         return self.fold_right(Nil(), lambda a, acc: Cons(a, acc) if f(a) else acc)
 
     def flatten(self) -> CList:
-        return CList.flatten_(self)
+        return CList.flatten_(self)  # type: ignore[arg-type]  # A may be CList
 
     def bind(self, f: Callable[[A], CList]) -> CList:
         return self.fold_right(Nil(), lambda a, acc: f(a).append(acc))

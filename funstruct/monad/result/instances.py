@@ -40,7 +40,7 @@ class _ResultMonadError(MonadError, for_type=Result):
 
 
 class _ResultBifunctor(Bifunctor, for_type=Result):
-    def bimap(
+    def bimap(  # type: ignore[return]  # exhaustive match
         self,
         fa: Result[_A],
         f: Callable[[Exception], Exception],

@@ -77,7 +77,7 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
     def map(self, f: Callable[[_A], _B]) -> WriterT[_F, _W, _B]:
         """Transform the value, keep the output."""
         cls = self.__class__
-        return cls(self._run.map(lambda aw: (f(aw[0]), aw[1])))
+        return cls(self._run.map(lambda aw: (f(aw[0]), aw[1])))  # type: ignore[return-value]  # covariant narrowing
 
     def bind(self, f: Callable[[_A], WriterT]) -> WriterT:
         """Chain: run f on the value, combine outputs via monoid."""

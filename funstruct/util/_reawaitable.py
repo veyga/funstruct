@@ -42,7 +42,7 @@ class ReAwaitable:
     async def _awaitable(self) -> _A:
         if self._cache is _SENTINEL:
             self._cache = await self._coro
-        return self._cache
+        return self._cache  # type: ignore[return-value]  # sentinel pattern
 
 
 __all__ = [

@@ -123,7 +123,7 @@ class Ok(Result[_A]):
         return self.value
 
     def swap(self) -> Result:
-        return Err(self.value)
+        return Err(self.value)  # type: ignore[arg-type]  # swap inverts types
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -147,7 +147,7 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
         return False
 
     def bind(self, f: Callable[[_A], Result[_B]]) -> Result[_B]:
-        return self
+        return self  # type: ignore[return-value]  # Err is polymorphic in A
 
     def fold(self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]) -> _B:
         return on_err(self.error)
@@ -241,7 +241,7 @@ class AsyncResult(DataType, Generic[_A]):
         if inspect.isawaitable(value):
             value = await value
         if isinstance(value, (Either, Result)):
-            return value
+            return value  # type: ignore[return-value]  # Either is treated as Result here
         return Ok(value)
 
     def bind(self, f: Callable[[_A], Any]) -> AsyncResult:
@@ -371,7 +371,7 @@ def TryAsync(
 def TryAsync(
     f: Callable[_P, _A],
 ) -> Callable[_P, AsyncResult[_A]]: ...
-def TryAsync(
+def TryAsync(  # type: ignore[misc]  # overload TypeVar limitation
     f: Callable[_P, _A],
 ) -> Callable[_P, AsyncResult[_A]]:
     """Decorator: wraps a function so exceptions become Err."""

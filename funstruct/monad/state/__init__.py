@@ -100,7 +100,7 @@ class State(DataType, Generic[_A]):
         >>> State.modify(lambda s: s + 1).run(5)
         (6, None)
         """
-        return cls(lambda s: (f(s), None))
+        return cls(lambda s: (f(s), None))  # type: ignore[arg-type,return-value]  # value is None
 
     def __repr__(self) -> str:
         return f"State({self._run})"

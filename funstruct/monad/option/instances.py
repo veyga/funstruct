@@ -49,7 +49,7 @@ class _OptionAlternative(Alternative, for_type=Option):
     def empty(self) -> Option:
         return Nothing()
 
-    def or_else(self, fa: Option[_A], fb: Option[_A]) -> Option[_A]:
+    def or_else(self, fa: Option[_A], fb: Option[_A]) -> Option[_A]:  # type: ignore[return]  # exhaustive match
         match fa:
             case Some():
                 return fa

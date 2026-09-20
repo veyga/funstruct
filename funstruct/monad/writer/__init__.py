@@ -58,7 +58,7 @@ class Writer(DataType, Generic[_W, _A]):
         return self.__class__(
             result.value,
             self._monoid.combine(self.output, result.output),
-        )
+        )  # type: ignore[return-value]  # TypeVar shift in bind
 
     @classmethod
     def do(cls, gen_fn) -> Callable[..., Writer]:
@@ -93,7 +93,7 @@ class Writer(DataType, Generic[_W, _A]):
 
     @classmethod
     def tell(cls, output: _W) -> Writer:
-        return cls(None, output)
+        return cls(None, output)  # type: ignore[arg-type]  # tell has no value
 
     def __eq__(self, other: object) -> bool:
         match other:
@@ -127,7 +127,7 @@ class Writer(DataType, Generic[_W, _A]):
                 "_type_constructor": None,
             },
         )
-        new_cls._type_constructor = new_cls
+        new_cls._type_constructor = new_cls  # type: ignore[attr-defined]  # dynamic class
         return new_cls
 
 

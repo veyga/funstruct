@@ -43,7 +43,7 @@ class _EitherMonadError(MonadError, for_type=Either):
 
 
 class _EitherBifunctor(Bifunctor, for_type=Either):
-    def bimap(
+    def bimap(  # type: ignore[return]  # exhaustive match
         self,
         fa: Either[_E, _A],
         f: Callable[[_E], _B],
