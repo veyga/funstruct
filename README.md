@@ -236,12 +236,12 @@ class MonadTransformer(ABC):
 
 | Data Type          | Typeclasses                     |
 | ------------------ | ------------------------------- |
-| `Option[A]`        | Monad, Alternative              |
-| `Either[E, A]`     | MonadError, Bifunctor           |
+| `Option[A]`        | Monad, Traversable, Alternative |
+| `Either[E, A]`     | MonadError, Traversable, Bifunctor |
 | `Result[A]`        | MonadError, Bifunctor           |
-| `AsyncResult[A]`   | MonadError                      |
+| `AsyncResult[A]`   | MonadError, Bifunctor           |
 | `CList[A]`         | Monad, Traversable, Alternative |
-| `Tree[A]`          | Functor, Foldable               |
+| `Tree[A]`          | Functor, Traversable            |
 | `frozendict[K, V]` | Functor, Foldable               |
 | `Validated[E, A]`  | Applicative, Bifunctor          |
 | `ZipList[A]`       | Applicative                     |

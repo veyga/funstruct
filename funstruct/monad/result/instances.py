@@ -71,3 +71,13 @@ class _AsyncResultMonadError(MonadError, for_type=AsyncResult):
         self, fa: AsyncResult[_A], f: Callable[[Exception], AsyncResult[_A]]
     ) -> AsyncResult[_A]:
         return fa.handle_error_with(f)
+
+
+class _AsyncResultBifunctor(Bifunctor, for_type=AsyncResult):
+    def bimap(
+        self,
+        fa: AsyncResult[_A],
+        f: Callable[[Exception], Exception],
+        g: Callable[[_A], _B],
+    ) -> AsyncResult[_B]:
+        return fa.bimap(f, g)

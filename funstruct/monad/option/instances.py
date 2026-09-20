@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from funstruct.monad.option import Nothing, Option, Some
 from funstruct.typeclasses.alternative import Alternative
+from funstruct.typeclasses.applicative import Applicative
 from funstruct.typeclasses.monad import Monad
+from funstruct.typeclasses.traversable import Traversable
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -57,3 +59,28 @@ class _OptionAlternative(Alternative, for_type=Option):
                 return fb
             case _:
                 raise TypeError(f"Expected Option, got {type(fa)}")
+
+
+class _OptionTraversable(Traversable, for_type=Option):
+    def fold_left(self, fa: Option[_A], acc: _B, f: Callable[[_B, _A], _B]) -> _B:
+        match fa:
+            case Some(value):
+                return f(acc, value)
+            case _:
+                return acc
+
+    def fold_right(self, fa: Option[_A], acc: _B, f: Callable[[_A, _B], _B]) -> _B:
+        match fa:
+            case Some(value):
+                return f(value, acc)
+            case _:
+                return acc
+
+    def traverse(self, fa: Option[_A], f: Callable[[_A], Any], G: Applicative) -> Any:
+        # Some(a) → f(a).map(Some)
+        # Nothing → G.pure(Nothing())
+        match fa:
+            case Some(value):
+                return G.map(f(value), Some)
+            case _:
+                return G.pure(Nothing())
