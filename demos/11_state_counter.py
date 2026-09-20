@@ -13,6 +13,7 @@ Use cases:
     - Game logic (state = game world)
 """
 
+from demos._util import header
 from funstruct.monad.state import State
 
 # ── Example 1: Counter (state = int) ────────────────────────────────
@@ -82,7 +83,7 @@ def interpreter():
 
 
 def main():
-    print("=== State monad: pure stateful computation ===\n")
+    header("State monad: pure stateful computation")
 
     # Counter
     final_state, ids = allocate_three().run(100)
@@ -100,7 +101,7 @@ def main():
     print("  Each step is a pure function S → (S, A).")
 
     # Compose with bind
-    print("\n=== Bind chain ===\n")
+    header("Bind chain")
     result = next_id().bind(lambda a: next_id().map(lambda b: (a, b)))
     state, pair = result.run(0)
     print(f"  Two IDs: {pair}, counter = {state}")

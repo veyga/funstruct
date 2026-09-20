@@ -13,6 +13,7 @@ Run: uv run python demos/04_tagless_final_db.py
 
 from __future__ import annotations
 
+from demos._util import header
 import asyncio
 from dataclasses import dataclass
 from typing import Protocol
@@ -147,7 +148,7 @@ class FailingOrderRepo:
 
 
 def main():
-    print("=== Async 'Postgres' ===")
+    header("Async 'Postgres'")
 
     async def run_async():
         repo = PostgresOrderRepo()
@@ -163,13 +164,13 @@ def main():
 
     asyncio.run(run_async())
 
-    print("\n=== Sync in-memory ===")
+    header("Sync in-memory")
     repo = InMemoryOrderRepo()
     print(f"  alice+widget: {place_order(repo, Result, 'alice', 'widget')}")
     print(f"  nobody+widget: {place_order(repo, Result, 'nobody', 'widget')}")
     print(f"  saved orders: {len(repo.orders)}")
 
-    print("\n=== Failing (DB down) ===")
+    header("Failing (DB down)")
     print(
         f"  alice+widget: {place_order(FailingOrderRepo(), Result, 'alice', 'widget')}"
     )

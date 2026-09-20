@@ -21,6 +21,7 @@ Usage:
 
 from __future__ import annotations
 
+from demos._util import header
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -108,7 +109,7 @@ class EitherAccountService:
 
 
 def main():
-    print("=== Generic functions (F: Monad is the constraint) ===\n")
+    header("Generic functions (F: Monad is the constraint)")
 
     print("  double with Option:")
     print(
@@ -128,13 +129,13 @@ def main():
         F = summon(Monad, T)
         print(f"    increment({name}): {increment(F, F.pure(41))}")
 
-    print("\n=== MonadError constraint ===\n")
+    header("MonadError constraint")
 
     F = summon(MonadError, Result)
     print(f"  safe_divide(10, 2) = {safe_divide(F, 10, 2)}")
     print(f"  safe_divide(10, 0) = {safe_divide(F, 10, 0)}")
 
-    print("\n=== Tagless final — checkout service ===\n")
+    header("Tagless final — checkout service")
 
     F = summon(MonadError, Result)
     svc = ResultAccountService()
@@ -143,7 +144,7 @@ def main():
     print(f"  checkout bob $49.99   = {checkout(F, svc, 'bob', 49.99)}")
     print(f"  checkout nobody $1    = {checkout(F, svc, 'nobody', 1.0)}")
 
-    print("\n=== Dot syntax vs summon — same thing ===\n")
+    header("Dot syntax vs summon — same thing")
 
     f = lambda x: x + 1
     dot = Some(10).map(f)
@@ -152,7 +153,7 @@ def main():
     print(f"  summon(Monad, Option).map(Some(10), f) = {explicit}")
     print(f"  equal? {dot == explicit}")
 
-    print("\n=== Summary ===\n")
+    header("Summary")
     print(
         "  Dot syntax:     Some(10).map(f)           — for everyday use (like Haskell)"
     )

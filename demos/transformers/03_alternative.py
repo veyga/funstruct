@@ -19,6 +19,7 @@ This is often simpler than transformers for real applications.
 No lifting, no transformers, no .run(). Just bind.
 """
 
+from demos._util import header
 import asyncio
 
 from funstruct.playground import User
@@ -63,7 +64,7 @@ def get_profile_bind() -> AsyncResult[str]:
 
 
 async def main():
-    print("=== Alternative: one monad type everywhere ===\n")
+    header("Alternative: one monad type everywhere")
 
     result = await get_profile()
     print(f"  @do style:   {result}")

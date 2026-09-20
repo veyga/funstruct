@@ -18,6 +18,7 @@ A Lens[S, A] focuses on a value of type A inside a structure S:
 Compose with >> to focus deeper.
 """
 
+from demos._util import header
 from funstruct.collections.frozendict import frozendict
 from funstruct.experimental.optics import at
 
@@ -44,7 +45,7 @@ def main():
         }
     )
 
-    print("=== Lenses: composable getters/setters ===\n")
+    header("Lenses: composable getters/setters")
 
     # Single-level lens
     app_lens = at("app")

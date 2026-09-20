@@ -21,6 +21,7 @@ Composing these requires unwrapping at every layer:
 Three functions, three layers of nesting. This doesn't scale.
 """
 
+from demos._util import header
 import asyncio
 
 from funstruct.playground import User
@@ -44,7 +45,7 @@ def get_nick(user: User) -> Option[str]:
 
 
 async def main():
-    print("=== The nested monad problem ===\n")
+    header("The nested monad problem")
 
     # Composing these is painful — nested pattern matching at every step
     user_opt = await get_user("me")

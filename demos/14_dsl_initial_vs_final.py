@@ -20,6 +20,7 @@ Usage:
 
 from __future__ import annotations
 
+from demos._util import header
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -198,7 +199,7 @@ class Count(Arith):
 
 
 def main():
-    print("=== Initial encoding (AST) ===\n")
+    header("Initial encoding (AST)")
     print(f"  Program:      {initial_program}")
     print(f"  Evaluate:     {evaluate(initial_program)}")
     print(f"  PrettyPrint:  {pretty_print(initial_program)}")
@@ -210,12 +211,12 @@ def main():
     mul_zero = Mul(Lit(0), Add(Lit(100), Lit(200)))
     print(f"  Optimize {pretty_print(mul_zero)} → {pretty_print(optimize(mul_zero))}")
 
-    print("\n=== Tagless final encoding ===\n")
+    header("Tagless final encoding")
     print(f"  Evaluate:     {final_program(Eval())}")
     print(f"  PrettyPrint:  {final_program(Pretty())}")
     print(f"  CountOps:     {final_program(Count())}")
 
-    print("\n=== Trade-offs ===\n")
+    header("Trade-offs")
     print("  Initial (AST):")
     print("    + Can inspect the tree (optimize, transform, compile)")
     print("    + Pattern matching is natural")

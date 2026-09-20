@@ -22,6 +22,7 @@ Usage:
 
 from __future__ import annotations
 
+from demos._util import header
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
 
@@ -172,22 +173,22 @@ def main():
 
     team = Team(name="Backend", members=[alice, bob])
 
-    print("=== Primitive types ===")
+    header("Primitive types")
     print(f"  to_json(42)       = {to_json(42)}")
     print(f"  to_json('hello')  = {to_json('hello')}")
     print(f"  to_json(True)     = {to_json(True)}")
     print(f"  to_json(None)     = {to_json(None)}")
 
-    print("\n=== Composed types ===")
+    header("Composed types")
     print(f"  to_json([1,2,3])  = {to_json([1, 2, 3])}")
 
-    print("\n=== Dataclass (derived from fields) ===")
+    header("Dataclass (derived from fields)")
     print(f"  to_json(alice)    = {json.dumps(to_json(alice), indent=2)}")
 
-    print("\n=== Nested composition ===")
+    header("Nested composition")
     print(f"  to_json(team)     = {json.dumps(to_json(team), indent=2)}")
 
-    print("\n=== Why this matters ===")
+    header("Why this matters")
     print("  1. to_json is GENERIC — it works for any type with a JsonEncoder")
     print("  2. ListEncoder COMPOSES — it summons JsonEncoder for elements")
     print("  3. DataclassEncoder DERIVES — it walks fields and summons per-field")

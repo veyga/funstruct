@@ -31,6 +31,7 @@ Usage:
 
 from __future__ import annotations
 
+from demos._util import header
 import json
 from abc import abstractmethod
 from dataclasses import dataclass, fields
@@ -185,7 +186,7 @@ register(JSONWrite, Employee, DataclassJSONWrite())
 
 
 def main():
-    print("=== The typeclass pattern: JSON serialization ===\n")
+    header("The typeclass pattern: JSON serialization")
 
     # Primitives
     print("Primitives:")
@@ -225,7 +226,7 @@ def main():
     except TypeError as e:
         print(f"  jsonify(dict) → TypeError: {e}")
 
-    print("\n=== How it works ===")
+    header("How it works")
     print("  1. JSONWrite          = the typeclass (interface)")
     print("  2. _StringJSONWrite   = instance for str")
     print("  3. _ListJSONWrite     = COMPOSABLE instance (summons element instance)")

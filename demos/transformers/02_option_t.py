@@ -10,6 +10,7 @@ The key operations:
     .run()                     — unwrap back to Future[Option[A]]
 """
 
+from demos._util import header
 import asyncio
 
 from funstruct.playground import User
@@ -61,7 +62,7 @@ def get_profile_missing() -> OptionT[Future, str]:
 
 
 async def main():
-    print("=== OptionT: flat pipeline over Future[Option[A]] ===\n")
+    header("OptionT: flat pipeline over Future[Option[A]]")
 
     result = await get_profile().run()
     print(f"  get_profile()         = {result}")

@@ -16,6 +16,7 @@ Usage:
 
 from __future__ import annotations
 
+from demos._util import header
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
@@ -263,7 +264,7 @@ def main():
     )
     team = Team(name="Backend", members=[alice, bob])
 
-    print("=== Part 1: show() — generic function, auto-resolves Showable ===\n")
+    header("Part 1: show() — generic function, auto-resolves Showable")
     print(f"  show(alice)   = {show(alice)}")
     print(f"  show(bob)     = {show(bob)}")
     print(f"  show(team)    = {show(team)}")
@@ -275,18 +276,18 @@ def main():
     )
     print(f"  serialize(alice) = {json.dumps(serialize(alice), indent=2)}")
 
-    print("\n=== Part 3: deserialize() — generic round-trip ===\n")
+    header("Part 3: deserialize() — generic round-trip")
     data = serialize(alice)
     alice2 = deserialize(User, data)
     print(f"  serialize → deserialize round-trip: {alice2}")
     print(f"  round-trip matches? {alice == alice2}")
 
-    print("\n=== Part 4: log_and_serialize() — multiple trait bounds ===\n")
+    header("Part 4: log_and_serialize() — multiple trait bounds")
     displayed, serialized = log_and_serialize(team)
     print(f"  displayed:  {displayed}")
     print(f"  serialized: {json.dumps(serialized, indent=2)}")
 
-    print("\n=== Part 5: Error when trait bound not satisfied ===\n")
+    header("Part 5: Error when trait bound not satisfied")
     try:
         show(42)  # int has no Showable instance
     except TypeError as e:
@@ -296,7 +297,7 @@ def main():
     except TypeError as e:
         print(f'  serialize("hello") → TypeError: {e}')
 
-    print("\n=== Summary ===\n")
+    header("Summary")
     print("  1. Define a typeclass (ABC with abstract methods)")
     print("  2. Create your data types (plain dataclasses)")
     print("  3. Implement the typeclass (class + register)")

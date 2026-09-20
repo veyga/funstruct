@@ -12,6 +12,7 @@ Usage:
 
 from __future__ import annotations
 
+from demos._util import header
 from dataclasses import dataclass
 
 # ── Shared domain ────────────────────────────────────────────────────
@@ -165,21 +166,21 @@ def main():
 
     ctx = AppContext(db=db, email_service="SendGrid")
 
-    print("=== Reader monad ===\n")
+    header("Reader monad")
     print(f"  {reader_pipeline(1).run(ctx)}")
     print(f"  {reader_pipeline(2).run(ctx)}")
 
-    print("\n=== Cake pattern (production) ===\n")
+    header("Cake pattern (production)")
     prod = ProductionApp(db=db, email_service="SendGrid")
     print(f"  {prod.run(1)}")
     print(f"  {prod.run(2)}")
 
-    print("\n=== Cake pattern (test — swapped implementations) ===\n")
+    header("Cake pattern (test — swapped implementations)")
     test = TestApp()
     print(f"  {test.run(1)}")
     print(f"  {test.run(2)}")
 
-    print("\n=== Comparison ===\n")
+    header("Comparison")
     print("  Reader monad:")
     print("    + Composable (bind/map/do-notation)")
     print("    + Context is a value — easy to modify mid-pipeline")

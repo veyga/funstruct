@@ -21,6 +21,7 @@ Usage:
 
 from __future__ import annotations
 
+from demos._util import header
 from abc import ABC, abstractmethod
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -220,24 +221,24 @@ class PlanOnly(Workflow):
 
 
 def main():
-    print("=== DSL 1: Arithmetic expressions ===\n")
+    header("DSL 1: Arithmetic expressions")
     print("  Program: 1 + (2 * (-3))")
     print(f"  Evaluate:     {math_program(Evaluate())}")
     print(f"  PrettyPrint:  {math_program(PrettyPrint())}")
     print(f"  CountOps:     {math_program(CountOps())} operations")
 
-    print("\n=== DSL 2: Query builder ===\n")
+    header("DSL 2: Query builder")
     print(f"  SQL:      {find_active_users(ToSQL())}")
     print("  DryRun:")
     for step in find_active_users(DryRun()):
         print(f"    → {step}")
 
-    print("\n=== DSL 3: Workflow ===\n")
+    header("DSL 3: Workflow")
     print(f"  Plan: {deploy_pipeline(PlanOnly())}")
     print("  Execute:")
     deploy_pipeline(Execute())
 
-    print("\n=== The pattern ===\n")
+    header("The pattern")
     print("  1. Define an algebra (ABC with abstract methods)")
     print("  2. Write programs against it (functions taking the algebra)")
     print("  3. Provide interpreters (classes implementing the algebra)")

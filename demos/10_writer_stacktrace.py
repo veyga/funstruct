@@ -13,6 +13,7 @@ it was called and what it did, producing a complete trace at the end.
     result.output  # ["lookup_user(alice)", "get_email(User(alice))", "normalize(alice@...)"]
 """
 
+from demos._util import header
 from funstruct.monad.writer import ListWriter
 
 
@@ -55,7 +56,7 @@ def pipeline(name: str):
 
 
 def main():
-    print("=== Writer monad: call trace accumulation ===\n")
+    header("Writer monad: call trace accumulation")
 
     result = pipeline("alice")
     print(f"  Value:  {result.value}")
@@ -75,7 +76,7 @@ def main():
     print("  No mutable state, no global logger, no context passing.")
 
     # You can also use bind chains
-    print("\n=== Bind chain (equivalent) ===\n")
+    header("Bind chain (equivalent)")
     result = lookup_user("bob").bind(get_email).bind(normalize).bind(validate)
     print(f"  Value:  {result.value}")
     print(f"  Trace:  {result.output}")

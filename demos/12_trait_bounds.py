@@ -17,6 +17,7 @@ This demo shows:
 
 from __future__ import annotations
 
+from demos._util import header
 import functools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -162,7 +163,7 @@ def main():
     temps = [Temperature(100), Temperature(0), Temperature(37)]
     colors = [Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255)]
 
-    print("=== Trait bounds: enforced at runtime via summon ===\n")
+    header("Trait bounds: enforced at runtime via summon")
 
     # Sorting users — Ordering[User] exists
     print("  auto_sort(users):")
@@ -180,7 +181,7 @@ def main():
     print(f"\n  show_all(colors): {show_all(colors)}")
 
     # ═══ TRAIT BOUND NOT MET ═══
-    print("\n=== What happens when the bound is NOT met ===\n")
+    header("What happens when the bound is NOT met")
 
     # Sorting colors — NO Ordering[Color] instance!
     try:
@@ -200,7 +201,7 @@ def main():
     except TypeError as e:
         print(f"  auto_sort([3,1,2]) → TypeError: {e}")
 
-    print("\n=== The error is clear and immediate ===")
+    header("The error is clear and immediate")
     print("  Scala/Rust: caught at compile time")
     print("  Python/funstruct: caught at runtime via summon")
     print("  The message tells you exactly what's missing")

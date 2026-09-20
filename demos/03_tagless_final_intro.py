@@ -2,7 +2,8 @@
 
 Tagless final abstracts over the effect type via a Protocol (algebra).
 The program is written once against the protocol. Swap the interpreter
-to change the effect — AsyncResult in prod, plain Result in tests.
+to change the effect. Tagless final style is a primary place 
+where the `summon` call is utilized.
 
 When tagless final is worth it:
     - Swapping infrastructure (DB, cache, HTTP) without touching logic
@@ -22,6 +23,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
+from demos._util import header
 from funstruct.monad.result import AsyncResult, Ok, Result, TryAsync
 
 
@@ -88,7 +90,7 @@ class ResultUserRepo:
 
 
 def main():
-    print("=== Production (AsyncResult) ===")
+    header("Production (AsyncResult)")
     repo = AsyncResultUserRepo()
 
     async def run_async():
@@ -98,7 +100,7 @@ def main():
 
     asyncio.run(run_async())
 
-    print("\n=== Testing (Result, sync, no IO) ===")
+    header("Testing (Result, sync, no IO)")
     test_repo = ResultUserRepo()
     print(f"  alice: {get_profile(test_repo, Result, 'alice')}")
     print(f"  bob:   {get_profile(test_repo, Result, 'bob')}")
