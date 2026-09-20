@@ -1,6 +1,6 @@
 [project]
 name = "funstruct"
-version = "2.0.0a1"
+version = "2.0.0a2"
 description = "Fun & functional structures for Python"
 authors = [{name = "Andrew Stefanich", email = "andrewstefanich@gmail.com"}]
 license = {text = "MIT"}
@@ -84,6 +84,7 @@ doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 
 [tool.ruff]
 line-length = 88
+target-version = "py312"
 extend-exclude = ["*.md"]
 
 [tool.ruff.format]
@@ -100,6 +101,11 @@ ignore = [
     "N803", # Argument name should be lowercase — we use G for Applicative instances (type constructor)
     "N805", # First argument of a method should be named `self` — we use fa/ff/fb for typeclass ops
     "N806", # Variable in function should be lowercase — we use F/M/S for typeclass/monad instances
+    "N817", # CamelCase imported as acronym — we use `Parametrization as P` throughout tests
+    "N818", # Exception name should end with Error — test-local exceptions use domain names
+    "E402", # Module-level import not at top — intentional in demos, tests, and circular-import breaks
+    "UP046", # Use type parameter syntax — we support 3.10+ so Generic[] is required in library code
+    "UP047", # Use type parameter syntax for functions — same reason as UP046
 ]
 
 
