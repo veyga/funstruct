@@ -15,3 +15,6 @@ class _ZipListEq(Eq, for_type=ZipList):
                 return a._values == b
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        return hash(tuple(a._values))

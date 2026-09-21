@@ -15,3 +15,12 @@ class _ResultEq(Eq, for_type=Result):
                 return ea == eb
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        match a:
+            case Ok(v):
+                return hash(("Ok", v))
+            case Err(e):
+                return hash(("Err", e))
+            case _:
+                return hash(id(a))

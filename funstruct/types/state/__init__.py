@@ -55,9 +55,6 @@ class State(DataType, Generic[_S, _A]):
         """
         return State(lambda s: (f(s), None))
 
-    def __repr__(self) -> str:
-        return f"State({self._run})"
-
 
 import funstruct.types.state.instances  # noqa: E402, F401
 

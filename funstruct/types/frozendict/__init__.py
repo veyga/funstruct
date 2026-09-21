@@ -235,8 +235,8 @@ class frozendict(DataType, Generic[K, V]):
 
         match args:
             case (frozendict() as other, *_):
-                object.__setattr__(self, "_frozendict__root", other.__root)
-                object.__setattr__(self, "_frozendict__size", other.__size)
+                object.__setattr__(self, "_root", other._root)
+                object.__setattr__(self, "_size", other._size)
             case _:
                 from funstruct.util.tailrec import tail_call, tco
 
@@ -252,9 +252,9 @@ class frozendict(DataType, Generic[K, V]):
                         idx + 1, root.put(k, v if shallow else _freeze(v), hash(k), 0)
                     )
 
-                object.__setattr__(self, "_frozendict__root", _build(0, _EMPTY))
-                object.__setattr__(self, "_frozendict__size", len(items))
-        object.__setattr__(self, "_frozendict__hash_cache", None)
+                object.__setattr__(self, "_root", _build(0, _EMPTY))
+                object.__setattr__(self, "_size", len(items))
+        object.__setattr__(self, "_hash_cache", None)
 
     def __setattr__(self, name, value):
         raise AttributeError("frozendict is immutable")
@@ -263,22 +263,22 @@ class frozendict(DataType, Generic[K, V]):
         raise AttributeError("frozendict is immutable")
 
     def __getitem__(self, key: K) -> V:
-        result = self.__root.get(key, hash(key), 0)
+        result = self._root.get(key, hash(key), 0)
         if result is None and not self.__contains__(key):
             raise KeyError(key)
         return result
 
     def get(self, key: K) -> V | None:
-        return self.__root.get(key, hash(key), 0)
+        return self._root.get(key, hash(key), 0)
 
     def __contains__(self, key) -> bool:
-        for k, _ in self.__root.items_iter():
+        for k, _ in self._root.items_iter():
             if k == key:
                 return True
         return False
 
     def __len__(self) -> int:
-        return self.__size
+        return self._size
 
     def keys(self) -> KeysView[K]:
         return dict(self.items()).keys()
@@ -287,42 +287,34 @@ class frozendict(DataType, Generic[K, V]):
         return dict(self.items()).values()
 
     def items(self) -> ItemsView[K, V]:
-        return dict(self.__root.items_iter()).items()
+        return dict(self._root.items_iter()).items()
 
     def __iter__(self) -> Iterator[K]:
-        for k, _ in self.__root.items_iter():
+        for k, _ in self._root.items_iter():
             yield k
 
-    def __hash__(self) -> int:
-        if self.__hash_cache is None:
-            h = 0
-            for k, v in self.__root.items_iter():
-                h ^= hash((k, v))
-            object.__setattr__(self, "_frozendict__hash_cache", h)
-        return self.__hash_cache
-
     def put(self, k: K, v: V) -> frozendict[K, V]:
-        new_root = self.__root.put(k, v, hash(k), 0)
+        new_root = self._root.put(k, v, hash(k), 0)
         new_fd = object.__new__(frozendict)
-        new_size = self.__size if k in self else self.__size + 1
-        object.__setattr__(new_fd, "_frozendict__root", new_root)
-        object.__setattr__(new_fd, "_frozendict__size", new_size)
-        object.__setattr__(new_fd, "_frozendict__hash_cache", None)
+        new_size = self._size if k in self else self._size + 1
+        object.__setattr__(new_fd, "_root", new_root)
+        object.__setattr__(new_fd, "_size", new_size)
+        object.__setattr__(new_fd, "_hash_cache", None)
         return new_fd
 
     def remove(self, k: K) -> frozendict[K, V]:
         if k not in self:
             return self
-        new_root = self.__root.remove(k, hash(k), 0)
+        new_root = self._root.remove(k, hash(k), 0)
         new_fd = object.__new__(frozendict)
-        object.__setattr__(new_fd, "_frozendict__root", new_root)
-        object.__setattr__(new_fd, "_frozendict__size", self.__size - 1)
-        object.__setattr__(new_fd, "_frozendict__hash_cache", None)
+        object.__setattr__(new_fd, "_root", new_root)
+        object.__setattr__(new_fd, "_size", self._size - 1)
+        object.__setattr__(new_fd, "_hash_cache", None)
         return new_fd
 
     def combine(self, other: frozendict[K, V]) -> frozendict[K, V]:
         result = self
-        for k, v in other.__root.items_iter():
+        for k, v in other._root.items_iter():
             result = result.put(k, v)
         return result
 
@@ -332,22 +324,22 @@ class frozendict(DataType, Generic[K, V]):
     def _map_internal(self, f: Callable[[V], V2]) -> frozendict[K, V2]:
         root = _EMPTY
         size = 0
-        for k, v in self.__root.items_iter():
+        for k, v in self._root.items_iter():
             root = root.put(k, f(v), hash(k), 0)
             size += 1
         new_fd = object.__new__(frozendict)
-        object.__setattr__(new_fd, "_frozendict__root", root)
-        object.__setattr__(new_fd, "_frozendict__size", size)
-        object.__setattr__(new_fd, "_frozendict__hash_cache", None)
+        object.__setattr__(new_fd, "_root", root)
+        object.__setattr__(new_fd, "_size", size)
+        object.__setattr__(new_fd, "_hash_cache", None)
         return new_fd
 
     def _fold_left_internal(self, acc: B, f: Callable[[B, V], B]) -> B:
-        for _, v in self.__root.items_iter():
+        for _, v in self._root.items_iter():
             acc = f(acc, v)
         return acc
 
     def _fold_right_internal(self, acc: B, f: Callable[[V, B], B]) -> B:
-        items = list(self.__root.items_iter())
+        items = list(self._root.items_iter())
         for _, v in reversed(items):
             acc = f(v, acc)
         return acc
@@ -368,7 +360,7 @@ class frozendict(DataType, Generic[K, V]):
                 case _:
                     return v
 
-        return {k: _thaw(v) for k, v in self.__root.items_iter()}
+        return {k: _thaw(v) for k, v in self._root.items_iter()}
 
     @classmethod
     def fromkeys(cls, *args, **kwargs) -> frozendict:
@@ -381,9 +373,6 @@ class frozendict(DataType, Generic[K, V]):
     @staticmethod
     def combine_dicts(fd1: frozendict, fd2: frozendict) -> frozendict:
         return fd1.combine(fd2)
-
-    def __bool__(self) -> bool:
-        return self.__size > 0
 
 
 # makes frozendict pass isinstance(fd, Mapping)

@@ -60,17 +60,6 @@ class Writer(DataType, Generic[_W, _A]):
     def tell(cls, output: _W) -> Writer:
         return cls(None, output)  # type: ignore[arg-type]  # tell has no value
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Writer(v, o):
-                return self.value == v and self.output == o
-            case _:
-                return False
-
-    def __repr__(self) -> str:
-        cls = self.__class__.__name__
-        return f"{cls}(value={repr(self.value)}, output={repr(self.output)})"
-
     __match_args__ = ("value", "output")
 
     @classmethod
@@ -104,6 +93,16 @@ class Writer(DataType, Generic[_W, _A]):
             from funstruct.types.writer.instances.monad import _WriterMonad
 
             register(Monad, new_cls, _WriterMonad(new_cls))
+
+            from funstruct.typeclasses.eq import Eq
+            from funstruct.typeclasses.representable import Representable
+            from funstruct.types.writer.instances.eq import _WriterEq
+            from funstruct.types.writer.instances.representable import (
+                _WriterRepresentable,
+            )
+
+            register(Eq, new_cls, _WriterEq(new_cls))
+            register(Representable, new_cls, _WriterRepresentable(new_cls))
         except ImportError:
             pass  # built-in writers registered later by instances.py
 

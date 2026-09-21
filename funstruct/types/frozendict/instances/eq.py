@@ -19,3 +19,11 @@ class _FrozendictEq(Eq, for_type=frozendict):
                 return all(b.get(k) == v for k, v in a.items())
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        if a._hash_cache is None:
+            h = 0
+            for k, v in a._root.items_iter():
+                h ^= hash((k, v))
+            object.__setattr__(a, "_hash_cache", h)
+        return a._hash_cache

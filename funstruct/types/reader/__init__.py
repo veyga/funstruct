@@ -45,9 +45,6 @@ class Reader(DataType, Generic[_Ctx, _A]):
     def ask(cls) -> Reader:
         return cls(lambda ctx: ctx)  # type: ignore[arg-type,return-value]  # ask returns Reader[Ctx, Ctx]
 
-    def __repr__(self) -> str:
-        return f"Reader({self._run})"
-
 
 import funstruct.types.reader.instances  # noqa: E402, F401
 

@@ -31,9 +31,6 @@ class Future(DataType, Generic[A]):
     async def _awaitable(self) -> A:
         return await self._coro
 
-    def __repr__(self) -> str:
-        return f"Future({self._coro})"
-
 
 import funstruct.types.future.instances  # noqa: E402, F401
 

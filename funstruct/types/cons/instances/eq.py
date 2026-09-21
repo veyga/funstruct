@@ -17,3 +17,6 @@ class _CListEq(Eq, for_type=CList):
                 return list(a) == b
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        return hash(tuple(a))

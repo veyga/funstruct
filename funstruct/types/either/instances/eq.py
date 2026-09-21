@@ -15,3 +15,12 @@ class _EitherEq(Eq, for_type=Either):
                 return ea == eb
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        match a:
+            case Right(v):
+                return hash(("Right", v))
+            case Left(e):
+                return hash(("Left", e))
+            case _:
+                return hash(id(a))

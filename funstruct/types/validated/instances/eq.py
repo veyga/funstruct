@@ -15,3 +15,12 @@ class _ValidatedEq(Eq, for_type=Validated):
                 return ea == eb
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        match a:
+            case Valid(v):
+                return hash(("Valid", v))
+            case Invalid(e):
+                return hash(("Invalid", e))
+            case _:
+                return hash(id(a))

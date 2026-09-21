@@ -33,6 +33,18 @@ from abc import ABCMeta
 
 from funstruct.typeclasses.mixins.dot_notation import DotNotation
 from funstruct.typeclasses.mixins.type_constructor import TypeConstructor
+from funstruct.typeclasses.utils.registry import _registry
+
+_MISSING = object()
+
+
+def _dispatch(self, typeclass_type, method_name, *args):
+    """Dispatch a dunder to the registered typeclass instance, or return _MISSING."""
+    tc = type(self)._type_constructor or type(self)
+    for (_, t), instance in _registry.items():
+        if t is tc and isinstance(instance, typeclass_type):
+            return getattr(instance, method_name)(self, *args)
+    return _MISSING
 
 
 class HKTMeta(ABCMeta):
@@ -67,19 +79,13 @@ class HKTMeta(ABCMeta):
                     break
 
         if tc is None:
-            raise AttributeError(
-                f"'{cls.__name__}' has no _type_constructor"
-            )
+            raise AttributeError(f"'{cls.__name__}' has no _type_constructor")
 
-        from funstruct.typeclasses.utils.registry import _registry
-
-        for (typeclass, t), instance in _registry.items():
+        for (_, t), instance in _registry.items():
             if t is tc and hasattr(instance, name):
                 return getattr(instance, name)
 
-        raise AttributeError(
-            f"'{cls.__name__}' has no typeclass class method '{name}'"
-        )
+        raise AttributeError(f"'{cls.__name__}' has no typeclass class method '{name}'")
 
 
 class DataType(TypeConstructor, DotNotation, metaclass=HKTMeta):
@@ -89,54 +95,40 @@ class DataType(TypeConstructor, DotNotation, metaclass=HKTMeta):
         - Auto _type_constructor detection (TypeConstructor)
         - Instance-level dispatch to typeclass instances (DotNotation)
         - Class-level dispatch to typeclass instances (HKTMeta)
+        - Python dunder dispatch to Eq/Representable/Stringable/Truthable
         - >> operator (bind)
         - * operator (product)
+
+    Dunders delegate to typeclass instances when available,
+    with sensible fallbacks when no instance is registered.
     """
 
-    _type_constructor = None  # reset — DataType itself is not a type constructor
+    _type_constructor = None
 
     def __eq__(self, other: object) -> bool:
         from funstruct.typeclasses.eq import Eq
-        from funstruct.typeclasses.utils.registry import _registry
+        result = _dispatch(self, Eq, "eq", other)
+        return result if result is not _MISSING else NotImplemented
 
-        tc = type(self)._type_constructor or type(self)
-        for (_, t), instance in _registry.items():
-            if t is tc and isinstance(instance, Eq):
-                return instance.eq(self, other)
-        return NotImplemented
-
-    def __hash__(self):
-        return id(self)
+    def __hash__(self) -> int:
+        from funstruct.typeclasses.eq import Eq
+        result = _dispatch(self, Eq, "hash")
+        return result if result is not _MISSING else id(self)
 
     def __repr__(self) -> str:
         from funstruct.typeclasses.representable import Representable
-        from funstruct.typeclasses.utils.registry import _registry
-
-        tc = type(self)._type_constructor or type(self)
-        for (_, t), instance in _registry.items():
-            if t is tc and isinstance(instance, Representable):
-                return instance.represent(self)
-        return f"{type(self).__name__}(...)"
+        result = _dispatch(self, Representable, "represent")
+        return result if result is not _MISSING else f"{type(self).__name__}(...)"
 
     def __str__(self) -> str:
         from funstruct.typeclasses.stringable import Stringable
-        from funstruct.typeclasses.utils.registry import _registry
-
-        tc = type(self)._type_constructor or type(self)
-        for (_, t), instance in _registry.items():
-            if t is tc and isinstance(instance, Stringable):
-                return instance.string(self)
-        return repr(self)
+        result = _dispatch(self, Stringable, "string")
+        return result if result is not _MISSING else repr(self)
 
     def __bool__(self) -> bool:
         from funstruct.typeclasses.truthable import Truthable
-        from funstruct.typeclasses.utils.registry import _registry
-
-        tc = type(self)._type_constructor or type(self)
-        for (_, t), instance in _registry.items():
-            if t is tc and isinstance(instance, Truthable):
-                return instance.is_truthy(self)
-        return True
+        result = _dispatch(self, Truthable, "is_truthy")
+        return result if result is not _MISSING else True
 
 
 __all__ = ["DataType"]

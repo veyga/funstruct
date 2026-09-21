@@ -15,3 +15,12 @@ class _TreeEq(Eq, for_type=Tree):
                 return va == vb and la == lb and ra == rb
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        match a:
+            case Leaf(v):
+                return hash(("Leaf", v))
+            case Branch(v, l, r):
+                return hash(("Branch", v, hash(l), hash(r)))
+            case _:
+                return hash(id(a))

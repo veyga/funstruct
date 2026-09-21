@@ -15,3 +15,12 @@ class _OptionEq(Eq, for_type=Option):
                 return True
             case _:
                 return False
+
+    def hash(self, a) -> int:
+        match a:
+            case Some(v):
+                return hash(("Some", v))
+            case Nothing():
+                return hash(("Nothing",))
+            case _:
+                return hash(id(a))
