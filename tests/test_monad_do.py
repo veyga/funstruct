@@ -8,6 +8,7 @@ do implementations are not needed.
 import asyncio
 
 from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.types.cons import CList, Cons, Nil
 from funstruct.types.either import Either, Left, Right
 from funstruct.types.future import Future
 from funstruct.types.option import Nothing, Option, Some
@@ -227,3 +228,53 @@ class TestDoWithArgs:
 
         assert divide(10, 2) == Ok(5.0)
         assert divide(10, 0).is_err
+
+
+class TestCListDo:
+    """do-notation works for the list monad (CList) via generator replay."""
+
+    def test_cartesian_product(self):
+        @CList.do
+        def pipeline():
+            x = yield CList.from_iterable([1, 2])
+            y = yield CList.from_iterable(["a", "b"])
+            return (x, y)
+
+        assert pipeline() == CList.from_iterable([(1, "a"), (1, "b"), (2, "a"), (2, "b")])
+
+    def test_dependent_values(self):
+        @CList.do
+        def pipeline():
+            x = yield CList.from_iterable([1, 2, 3])
+            y = yield CList.from_iterable([x, x * 10])
+            return (x, y)
+
+        assert pipeline() == CList.from_iterable([(1, 1), (1, 10), (2, 2), (2, 20), (3, 3), (3, 30)])
+
+    def test_single_step(self):
+        @CList.do
+        def pipeline():
+            x = yield CList.from_iterable([10, 20, 30])
+            return x + 1
+
+        assert pipeline() == CList.from_iterable([11, 21, 31])
+
+    def test_three_steps(self):
+        @CList.do
+        def pipeline():
+            x = yield CList.from_iterable([1, 2])
+            y = yield CList.from_iterable([10, 20])
+            z = yield CList.from_iterable([100, 200])
+            return x + y + z
+
+        assert pipeline() == CList.from_iterable([
+            111, 211, 121, 221, 112, 212, 122, 222,
+        ])
+
+    def test_with_args(self):
+        @CList.do
+        def pipeline(base):
+            x = yield CList.from_iterable([base, base * 2])
+            return x + 1
+
+        assert pipeline(5) == CList.from_iterable([6, 11])

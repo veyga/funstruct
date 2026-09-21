@@ -42,25 +42,66 @@ class Monad(Applicative):
 
     @final
     def do(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
-        """Do-notation via generators. Desugars to bind/pure."""
+        """Do-notation via generators. Desugars to bind/pure.
+
+        Replays the generator from scratch for each bind path. 
+        Each bind creates a fresh generator + replays previous sends 
+        to reach the current point.
+        """
+        monad = self
 
         def _thunk(*args, **kwargs):
-            gen = gen_fn(*args, **kwargs)
+            def go(history):
+                gen = gen_fn(*args, **kwargs)
+                mv = next(gen)
+                for sv in history:
+                    mv = gen.send(sv)
+
+                def step(value):
+                    try:
+                        test = gen_fn(*args, **kwargs)
+                        next(test)
+                        for sv in history:
+                            test.send(sv)
+                        test.send(value)
+                        return go(history + [value])
+                    except StopIteration as e:
+                        return monad.pure(e.value)
+
+                return monad.bind(mv, step)
+
             try:
-                monadic_val = next(gen)
+                return go([])
             except StopIteration as e:
-                return self.pure(e.value)
-
-            def step(value):
-                try:
-                    next_val = gen.send(value)
-                    return self.bind(next_val, step)
-                except StopIteration as e:
-                    return self.pure(e.value)
-
-            return self.bind(monadic_val, step)
+                return monad.pure(e.value)
 
         return _thunk
+
+    # def do_single(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
+    #     """Fast do-notation for monads where bind calls the continuation exactly once.
+    #
+    #     ~3x faster than do() but INCORRECT for CList (list monad) where bind
+    #     calls the continuation multiple times. Use when performance matters
+    #     and you know the monad is deterministic (Option, Result, Either, State, etc.).
+    #     """
+    #
+    #     def _thunk(*args, **kwargs):
+    #         gen = gen_fn(*args, **kwargs)
+    #         try:
+    #             monadic_val = next(gen)
+    #         except StopIteration as e:
+    #             return self.pure(e.value)
+    #
+    #         def step(value):
+    #             try:
+    #                 next_val = gen.send(value)
+    #                 return self.bind(next_val, step)
+    #             except StopIteration as e:
+    #                 return self.pure(e.value)
+    #
+    #         return self.bind(monadic_val, step)
+    #
+    #     return _thunk
 
 
 __all__ = ["Monad"]

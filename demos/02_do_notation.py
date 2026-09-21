@@ -105,6 +105,39 @@ def failing_pipeline():
     return f"age: {age}"
 
 
+# ── Style 5: CList do-notation (list comprehension) ────────────────
+
+from dataclasses import dataclass as dc
+
+from funstruct.types.cons import CList
+
+
+@dc(frozen=True)
+class UserRow:
+    id: int
+    name: str
+
+
+@dc(frozen=True)
+class OrderRow:
+    user_id: int
+    total: float
+
+
+users = CList.from_iterable([UserRow(1, "Alice"), UserRow(2, "Bob")])
+orders = CList.from_iterable([
+    OrderRow(1, 49.99), OrderRow(1, 12.00), OrderRow(2, 99.99),
+])
+
+
+@CList.do
+def user_orders():
+    user = yield users
+    order = yield orders
+    yield CList.from_iterable([()] if order.user_id == user.id else [])
+    return f"{user.name}: ${order.total:.2f}"
+
+
 def main():
     async def run():
         header("@AsyncResult.do (decorator)")
@@ -124,6 +157,10 @@ def main():
         print(f"  {await failing_pipeline()}")
 
     asyncio.run(run())
+
+    header("CList.do (list comprehension / join)")
+    for row in user_orders():
+        print(f"  {row}")
 
 
 if __name__ == "__main__":

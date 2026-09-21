@@ -78,21 +78,25 @@ Pattern matching exhaustively handles all cases.
 Three distinct class hierarchies, connected by instances:
 
 ```text
-  BaseTypeclass                    DataType
+  BaseTypeclass                    DataType (with HKTMeta metaclass)
   (abstract capabilities)          (concrete data)
-  ─────────────────                ────────────────
+  ─────────────────                ──────────────────────────────────
   Semigroup → Monoid               Option[A]
   Foldable → Traversable           Either[E, A]
   Bifunctor                        Result[A], AsyncResult[A]
   Functor → Applicative            CList[A], Tree[A]
        ├→ Alternative              frozendict[K, V]
        └→ Monad → MonadError       State[S, A], Reader[R, A]
-                                   Writer[W, A], Future[A]
-                                   Validated[E, A], ZipList[A]
+  Eq (eq + hash)                   Writer[W, A], Future[A]
+  Representable (__repr__)         Validated[E, A], ZipList[A]
+  Stringable (__str__)
+  Truthable (__bool__)
 
   INSTANCES (connect them)
   ────────────────────────
   _OptionMonad(Monad, for_type=Option)         — auto-registered
+  _OptionEq(Eq, for_type=Option)               — equality + hash
+  _OptionRepresentable(Representable, for_type=Option)  — __repr__
   _ResultMonadError(MonadError, for_type=Result)
   _CListAlternative(Alternative, for_type=CList)
   _EitherBifunctor(Bifunctor, for_type=Either)
@@ -102,7 +106,10 @@ Three distinct class hierarchies, connected by instances:
 - **`BaseTypeclass`** — root of all typeclasses. Provides AutoRegister
   (`for_type=` keyword for automatic instance registration).
 - **`DataType`** — root of all data types. Provides TypeConstructor
-  (auto `_type_constructor` detection) and DotNotation (dot-syntax dispatch).
+  (auto `_type_constructor` detection), DotNotation (instance-level dispatch
+  via `__getattr__`), HKTMeta (class-level dispatch via metaclass), and
+  Python dunder delegates (`__eq__` → Eq, `__repr__` → Representable,
+  `__bool__` → Truthable, etc.).
 - **Instances** — separate classes that implement a typeclass for a data type.
   Only implement primitives (pure + bind); derived ops (map, ap) come from
   the typeclass hierarchy.
@@ -155,16 +162,13 @@ Heavily influenced by [Scalaz](https://github.com/scalaz/scalaz) and
 # In v2, typeclasses are INSTANCE classes (self = instance, fa = data).
 # Data types extend DataType, NOT typeclasses.
 
-# ── Value-level typeclasses (instantiated per use) ──
+# ── Value-level typeclasses (ABC, not dataclass) ──
 
-@dataclass(frozen=True)
-class Semigroup[A]:
-    typ: type
-    combine: Callable[[A, A], A]
+class Semigroup(BaseTypeclass):
+    def combine(self, a, b): ...
 
-@dataclass(frozen=True)
-class Monoid[A](Semigroup[A]):
-    empty: A
+class Monoid(Semigroup):
+    def empty(self): ...
 
 # ── Typeclass hierarchy (instance classes) ──
 # F is the type constructor (Option, Result, etc.)
@@ -234,21 +238,26 @@ class MonadTransformer(ABC):
 
 ### Instances (which data types implement which typeclasses)
 
-| Data Type          | Typeclasses                     |
-| ------------------ | ------------------------------- |
-| `Option[A]`        | Monad, Traversable, Alternative |
-| `Either[E, A]`     | MonadError, Traversable, Bifunctor |
-| `Result[A]`        | MonadError, Bifunctor           |
-| `AsyncResult[A]`   | MonadError, Bifunctor           |
-| `CList[A]`         | Monad, Traversable, Alternative |
-| `Tree[A]`          | Functor, Traversable            |
-| `frozendict[K, V]` | Functor, Foldable               |
-| `Validated[E, A]`  | Applicative, Bifunctor          |
-| `ZipList[A]`       | Applicative                     |
-| `State[S, A]`      | Monad                           |
-| `Reader[R, A]`     | Monad                           |
-| `Writer[W, A]`     | Monad                           |
-| `Future[A]`        | Monad                           |
+| Type | Eq | Repr | Truth | Semi | Monoid | Func | App | Monad | MErr | Alt | Fold | Trav | Bifu | Str |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Option | ✓ | ✓ | ✓ | | | | | ✓ | | ✓ | | ✓ | | |
+| Either | ✓ | ✓ | | | | | | | ✓ | | | ✓ | ✓ | |
+| Result | ✓ | ✓ | | | | | | | ✓ | | | | ✓ | |
+| AsyncResult | | ✓ | | | | | | | ✓ | | | | ✓ | |
+| CList | ✓ | ✓ | ✓ | | ✓ | | | ✓ | | ✓ | | ✓ | | ✓ |
+| Tree | ✓ | ✓ | | | | ✓ | | | | | ✓ | ✓ | | |
+| frozendict | ✓ | ✓ | ✓ | ✓ | | ✓ | | | | | ✓ | | | |
+| Validated | ✓ | ✓ | ✓ | | | | ✓ | | | | | | ✓ | |
+| ZipList | ✓ | ✓ | | | | | ✓ | | | | ✓ | | | |
+| State | | ✓ | | | | | | ✓ | | | | | | |
+| Reader | | ✓ | | | | | | ✓ | | | | | | |
+| Writer | ✓ | ✓ | | | | | | ✓ | | | | | | |
+| Future | | ✓ | | | | | | ✓ | | | | | | |
+
+**Key:** Eq = equality + hash, Repr = `__repr__`, Truth = `__bool__`, Str = `__str__`,
+Func = Functor, App = Applicative, MErr = MonadError, Alt = Alternative,
+Fold = Foldable, Trav = Traversable, Bifu = Bifunctor.
+Types without Eq (State, Reader, Future, AsyncResult) use identity comparison.
 
 ### Data Types
 
@@ -409,9 +418,10 @@ the same effect at runtime through the typeclass instance pattern:
   `Some(10).map(f)` → `summon(Functor, Option).map(Some(10), f)`
 
 This gives funstruct Haskell-style typeclass resolution and Scala-style
-tagless final — without HKT encoding tricks, metaclass magic, or
-compiler plugins. The tradeoff: trait bounds are enforced at runtime
-(via `summon`), not at compile time.
+tagless final — without HKT encoding tricks or compiler plugins. A
+metaclass (`HKTMeta`) provides class-level dispatch (e.g. `Option.pure`,
+`Result.do`). The tradeoff: trait bounds are enforced at runtime (via
+`summon`), not at compile time.
 
 ## Experimental
 
