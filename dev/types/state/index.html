@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../applicative/">
+        <link rel="prev" href="../result/">
       
       
-        <link rel="next" href="../monad/">
+        <link rel="next" href="../reader/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Alternative - funstruct</title>
+        <title>State - funstruct</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#alternative" class="md-skip">
+        <a href="#state" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Alternative
+              State
             
           </span>
         </div>
@@ -653,20 +653,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -687,7 +685,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -705,7 +703,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../typeclass/" class="md-nav__link">
         
   
   
@@ -733,7 +731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../semigroup/" class="md-nav__link">
+      <a href="../../typeclass/semigroup/" class="md-nav__link">
         
   
   
@@ -761,7 +759,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../monoid/" class="md-nav__link">
+      <a href="../../typeclass/monoid/" class="md-nav__link">
         
   
   
@@ -789,7 +787,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../functor/" class="md-nav__link">
+      <a href="../../typeclass/functor/" class="md-nav__link">
         
   
   
@@ -817,7 +815,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../applicative/" class="md-nav__link">
+      <a href="../../typeclass/applicative/" class="md-nav__link">
         
   
   
@@ -825,6 +823,314 @@
     
   
     Applicative
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/alternative/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alternative
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/monad/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monad
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/monad_error/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MonadError
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/foldable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foldable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/traversable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traversable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typeclass/bifunctor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bifunctor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Types
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Types
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../option/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Option
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../either/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Either
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../result/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result
   
 
     
@@ -861,7 +1167,7 @@
   <span class="md-ellipsis">
     
   
-    Alternative
+    State
   
 
     
@@ -879,7 +1185,7 @@
   <span class="md-ellipsis">
     
   
-    Alternative
+    State
   
 
     
@@ -905,25 +1211,64 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.alternative" class="md-nav__link">
+  <a href="#funstruct.types.state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        alternative
+        state
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="alternative">
+    <nav class="md-nav" aria-label="state">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.alternative.Alternative" class="md-nav__link">
+  <a href="#funstruct.types.state.State" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternative
+        State
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#funstruct.types.state.State.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funstruct.types.state.State.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funstruct.types.state.State.modify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modify
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -948,313 +1293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../monad/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Monad
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../monad_error/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MonadError
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../foldable/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Foldable
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../traversable/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Traversable
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../bifunctor/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bifunctor
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Types
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Types
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../types/option/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Option
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../types/either/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Either
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../types/result/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Result
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../types/state/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    State
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../types/reader/" class="md-nav__link">
+      <a href="../reader/" class="md-nav__link">
         
   
   
@@ -1282,7 +1321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../types/writer/" class="md-nav__link">
+      <a href="../writer/" class="md-nav__link">
         
   
   
@@ -1310,7 +1349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../types/future/" class="md-nav__link">
+      <a href="../future/" class="md-nav__link">
         
   
   
@@ -1338,7 +1377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../types/validated/" class="md-nav__link">
+      <a href="../validated/" class="md-nav__link">
         
   
   
@@ -1366,7 +1405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../types/ziplist/" class="md-nav__link">
+      <a href="../ziplist/" class="md-nav__link">
         
   
   
@@ -1394,7 +1433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../types/cons/" class="md-nav__link">
+      <a href="../cons/" class="md-nav__link">
         
   
   
@@ -1422,7 +1461,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../types/tree/" class="md-nav__link">
+      <a href="../tree/" class="md-nav__link">
         
   
   
@@ -1450,7 +1489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../types/frozendict/" class="md-nav__link">
+      <a href="../frozendict/" class="md-nav__link">
         
   
   
@@ -1948,25 +1987,64 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.alternative" class="md-nav__link">
+  <a href="#funstruct.types.state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        alternative
+        state
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="alternative">
+    <nav class="md-nav" aria-label="state">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#funstruct.typeclasses.alternative.Alternative" class="md-nav__link">
+  <a href="#funstruct.types.state.State" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternative
+        State
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#funstruct.types.state.State.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funstruct.types.state.State.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funstruct.types.state.State.modify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modify
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1992,46 +2070,33 @@
 
 
 
-<h1 id="alternative">Alternative</h1>
+<h1 id="state">State</h1>
 
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="funstruct.typeclasses.alternative" class="doc doc-heading">
-            <code>funstruct.typeclasses.alternative</code>
+<h2 id="funstruct.types.state" class="doc doc-heading">
+            <code>funstruct.types.state</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-        <p>Alternative — a monoid on applicative functors.</p>
-<p>empty:   F[A]             — the zero/identity element
-or_else: F[A] → F[A] → F[A] — try fa, if it's empty/failed try fb</p>
-<p>Laws (same as Monoid, lifted into F):
-    or_else(empty, fa) == fa        (left identity)
-    or_else(fa, empty) == fa        (right identity)
-    or_else(a, or_else(b, c)) == or_else(or_else(a, b), c)  (associativity)</p>
-<p>Examples:</p>
-<div class="highlight"><pre><span></span><code>Option — fallback chains:
+        <p>State monad — pure stateful computation without mutation.</p>
 
-&gt;&gt;&gt; from funstruct.types.option import Some, Nothing
-&gt;&gt;&gt; Some(1).or_else(Some(2))
-Some(1)
-&gt;&gt;&gt; Nothing().or_else(Some(2))
-Some(2)
-&gt;&gt;&gt; Nothing().or_else(Nothing()).or_else(Some(3))
-Some(3)
 
-CList — concatenation (Alternative for lists is append):
-
-&gt;&gt;&gt; from funstruct.types.cons import CList, Nil
-&gt;&gt;&gt; CList.new(1, 2).or_else(CList.new(3, 4)).to_list()
-[1, 2, 3, 4]
-&gt;&gt;&gt; Nil().or_else(CList.new(1)).to_list()
-[1]
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.types.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">State</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">inc</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">inc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">(1, 0)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">inc</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">inc</span><span class="p">))</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">(2, 1)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">State</span><span class="o">.</span><span class="n">pure</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="go">(99, 42)</span>
 </code></pre></div>
 
 
@@ -2057,8 +2122,8 @@ CList — concatenation (Alternative for lists is append):
 
 
 
-<h3 id="funstruct.typeclasses.alternative.Alternative" class="doc doc-heading">
-            <code>Alternative</code>
+<h3 id="funstruct.types.state.State" class="doc doc-heading">
+            <code>State</code>
 
 
 </h3>
@@ -2066,11 +2131,11 @@ CList — concatenation (Alternative for lists is append):
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="Applicative (funstruct.typeclasses.applicative.Applicative)" href="../applicative/#funstruct.typeclasses.applicative.Applicative">Applicative</a></code></p>
+              Bases: <code><span title="funstruct.typeclasses.mixins.data_type.DataType">DataType</span></code>, <code><span title="typing.Generic">Generic</span>[<span title="funstruct.types.state._S">_S</span>, <span title="funstruct.types.state._A">_A</span>]</code></p>
 
 
 
-        <p>empty + or_else — a monoid on applicative functors.</p>
+        <p>Pure State monad: <code>S -&gt; (S, A)</code>.</p>
 
 
 
@@ -2080,8 +2145,22 @@ CList — concatenation (Alternative for lists is append):
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>funstruct/typeclasses/alternative.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-40">40</a></span>
+                <summary>Source code in <code>funstruct/types/state/__init__.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#__codelineno-0-38">38</a></span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span>
+<span class="normal"><a href="#__codelineno-0-40">40</a></span>
 <span class="normal"><a href="#__codelineno-0-41">41</a></span>
 <span class="normal"><a href="#__codelineno-0-42">42</a></span>
 <span class="normal"><a href="#__codelineno-0-43">43</a></span>
@@ -2092,18 +2171,42 @@ CList — concatenation (Alternative for lists is append):
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
 <span class="normal"><a href="#__codelineno-0-50">50</a></span>
-<span class="normal"><a href="#__codelineno-0-51">51</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="k">class</span><span class="w"> </span><span class="nc">Alternative</span><span class="p">(</span><span class="n">Applicative</span><span class="p">):</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="sd">"""empty + or_else — a monoid on applicative functors."""</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a>    <span class="nd">@abstractmethod</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>        <span class="c1"># → F[A]</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>        <span class="o">...</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>    <span class="nd">@abstractmethod</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">or_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fa</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>        <span class="c1"># fa: F[A], fb: F[A] → F[A]</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>        <span class="o">...</span>
+<span class="normal"><a href="#__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="k">class</span><span class="w"> </span><span class="nc">State</span><span class="p">(</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="n">_A</span><span class="p">]):</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">"""Pure State monad: ``S -&gt; (S, A)``."""</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_S</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="n">_A</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_run</span> <span class="o">=</span> <span class="n">run</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">:</span> <span class="n">_S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="n">_A</span><span class="p">]:</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">        </span><span class="sd">"""Execute with initial state. Returns ``(final_state, value)``.</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        &gt;&gt;&gt; State.pure(10).run("any")</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">        ('any', 10)</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">        """</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="n">initial_state</span><span class="p">)</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">State</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="n">_S</span><span class="p">]:</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">        </span><span class="sd">"""Produce current state as the value.</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">        &gt;&gt;&gt; State.get().run(42)</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">        (42, 42)</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">        """</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>        <span class="k">return</span> <span class="n">State</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_S</span><span class="p">],</span> <span class="n">_S</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">State</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="w">        </span><span class="sd">"""Modify state, produce None.</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">        &gt;&gt;&gt; State.modify(lambda s: s + 1).run(5)</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">        (6, None)</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">        """</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>        <span class="k">return</span> <span class="n">State</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="kc">None</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -2119,6 +2222,147 @@ CList — concatenation (Alternative for lists is append):
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="funstruct.types.state.State.run" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">run</span><span class="p">(</span><span class="n">initial_state</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Execute with initial state. Returns <code>(final_state, value)</code>.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>State.pure(10).run("any")
+('any', 10)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>funstruct/types/state/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#__codelineno-0-38">38</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">:</span> <span class="n">_S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="n">_A</span><span class="p">]:</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="sd">"""Execute with initial state. Returns ``(final_state, value)``.</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">    &gt;&gt;&gt; State.pure(10).run("any")</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    ('any', 10)</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    """</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="n">initial_state</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="funstruct.types.state.State.get" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Produce current state as the value.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>State.get().run(42)
+(42, 42)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>funstruct/types/state/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-40">40</a></span>
+<span class="normal"><a href="#__codelineno-0-41">41</a></span>
+<span class="normal"><a href="#__codelineno-0-42">42</a></span>
+<span class="normal"><a href="#__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="nd">@staticmethod</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">State</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="n">_S</span><span class="p">]:</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">    </span><span class="sd">"""Produce current state as the value.</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    &gt;&gt;&gt; State.get().run(42)</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    (42, 42)</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    """</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="k">return</span> <span class="n">State</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="funstruct.types.state.State.modify" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">modify</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Modify state, produce None.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>State.modify(lambda s: s + 1).run(5)
+(6, None)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>funstruct/types/state/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#__codelineno-0-50">50</a></span>
+<span class="normal"><a href="#__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="nd">@staticmethod</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_S</span><span class="p">],</span> <span class="n">_S</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">State</span><span class="p">[</span><span class="n">_S</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="w">    </span><span class="sd">"""Modify state, produce None.</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    &gt;&gt;&gt; State.modify(lambda s: s + 1).run(5)</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    (6, None)</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    """</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="k">return</span> <span class="n">State</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="kc">None</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 

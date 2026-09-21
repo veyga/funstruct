@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#creating-your-own-data-type" class="md-skip">
+        <a href="#creating-your-own-higher-kinded-type" class="md-skip">
           Skip to content
         </a>
       
@@ -685,6 +685,67 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Step 2: Create typeclass instances">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instancesmonad_errorpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/monad_error.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instanceseqpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/eq.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instancesrepresentablepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/representable.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instancestruthablepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/truthable.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instancesinitpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/init.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -714,17 +775,6 @@
     <span class="md-ellipsis">
       
         Step 5: Test it
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-6-file-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 6: File structure
       
     </span>
   </a>
@@ -1173,7 +1223,7 @@
   <span class="md-ellipsis">
     
   
-    Monads
+    Types
   
 
     
@@ -1189,7 +1239,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Monads
+    Types
   
 
           </label>
@@ -1202,35 +1252,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monad/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../monad/option/" class="md-nav__link">
+      <a href="../../types/option/" class="md-nav__link">
         
   
   
@@ -1258,7 +1280,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monad/either/" class="md-nav__link">
+      <a href="../../types/either/" class="md-nav__link">
         
   
   
@@ -1286,7 +1308,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monad/result/" class="md-nav__link">
+      <a href="../../types/result/" class="md-nav__link">
         
   
   
@@ -1314,63 +1336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monad/reader/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reader
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../monad/writer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../monad/state/" class="md-nav__link">
+      <a href="../../types/state/" class="md-nav__link">
         
   
   
@@ -1398,7 +1364,63 @@
   
   
     <li class="md-nav__item">
-      <a href="../../monad/future/" class="md-nav__link">
+      <a href="../../types/reader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../types/writer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../types/future/" class="md-nav__link">
         
   
   
@@ -1406,6 +1428,146 @@
     
   
     Future
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../types/validated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validated
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../types/ziplist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ZipList
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../types/cons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CList
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../types/tree/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tree
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../types/frozendict/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    frozendict
   
 
     
@@ -1451,7 +1613,7 @@
   <span class="md-ellipsis">
     
   
-    Applicatives
+    Utilities
   
 
     
@@ -1464,310 +1626,6 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Applicatives
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../applicative/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../applicative/validated/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Validated
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../applicative/ziplist/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ZipList
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Collections
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Collections
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../collections/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../collections/cons/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CList
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../collections/frozendict/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    frozendict
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../collections/tree/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Tree
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utilities
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1855,10 +1713,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
             
   
   
@@ -1876,8 +1734,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1902,10 +1760,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1" >
         
           
-          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7_1" id="__nav_7_1_label" tabindex="0">
             
   
   
@@ -1923,8 +1781,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_9_1">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2138,6 +1996,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experimental/do_ast/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AST Do-Notation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2202,6 +2088,67 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Step 2: Create typeclass instances">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instancesmonad_errorpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/monad_error.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instanceseqpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/eq.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instancesrepresentablepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/representable.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instancestruthablepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/truthable.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instancesinitpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instances/init.py
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2238,17 +2185,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-file-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 6: File structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2276,246 +2212,266 @@
 
 
 
-<h1 id="creating-your-own-data-type">Creating Your Own Data Type</h1>
+<h1 id="creating-your-own-higher-kinded-type">Creating Your Own Higher-Kinded Type</h1>
 <p>This guide walks through creating a complete funstruct-compatible
-data type from scratch: the ADT, typeclass instances, tests, and usage.</p>
+higher-kinded type from scratch: the ADT, typeclass instances, tests,
+and usage.</p>
+<p><strong>This is for creating type constructors</strong> like <code>Option[A]</code>, <code>Result[A]</code>,
+or <code>RemoteData[A]</code> — types that participate in the typeclass system
+(Monad, Eq, Representable, etc.). If you just need a plain data class
+like <code>User</code> or <code>Config</code>, use standard Python <code>@dataclass</code> — no funstruct
+machinery needed.</p>
 <h2 id="the-example-remotedata">The example: RemoteData</h2>
 <p><code>RemoteData[A]</code> models the state of an async request — common in
 UIs and API clients:</p>
-<pre><code class="language-text">RemoteData[A] = NotAsked | Loading | Failure(error) | Success(value)
-</code></pre>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>RemoteData[A] = NotAsked | Loading | Failure(error) | Success(value)
+</code></pre></div>
 <p>Four states, one type. This is useful because it distinguishes
 "haven't asked yet" from "asked and failed" from "asked and waiting."</p>
 <h2 id="step-1-define-the-data-type">Step 1: Define the data type</h2>
-<pre><code class="language-python">from __future__ import annotations
-
-from dataclasses import dataclass
-from typing import Generic, TypeVar
-
-from funstruct.typeclasses import DataType
-
-A = TypeVar(&quot;A&quot;)
-
-
-class RemoteData(DataType, Generic[A]):
-    &quot;&quot;&quot;RemoteData[A] = NotAsked | Loading | Failure(error) | Success(value).
-
-    Models the lifecycle of an async request.
-    &quot;&quot;&quot;
-
-    @classmethod
-    def pure(cls, value: A) -&gt; RemoteData[A]:
-        return Success(value)
-
-    @property
-    def is_success(self) -&gt; bool:
-        return False
-
-
-class NotAsked(RemoteData):
-    _instance = None
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-    def __repr__(self): return &quot;NotAsked()&quot;
-    def __eq__(self, other): return isinstance(other, NotAsked)
-    def __bool__(self): return False
-
-
-class Loading(RemoteData):
-    _instance = None
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-    def __repr__(self): return &quot;Loading()&quot;
-    def __eq__(self, other): return isinstance(other, Loading)
-    def __bool__(self): return False
-
-
-@dataclass(frozen=True, eq=False)
-class Failure(RemoteData[A]):
-    error: Exception
-    def __eq__(self, other):
-        return isinstance(other, Failure) and self.error == other.error
-    def __repr__(self): return f&quot;Failure({self.error!r})&quot;
-    def __bool__(self): return False
-
-
-@dataclass(frozen=True, eq=False)
-class Success(RemoteData[A]):
-    value: A
-    @property
-    def is_success(self) -&gt; bool: return True
-    def __eq__(self, other):
-        return isinstance(other, Success) and self.value == other.value
-    def __repr__(self): return f&quot;Success({self.value!r})&quot;
-    def __bool__(self): return True
-</code></pre>
+<p>Data types extend <code>DataType</code> and use <code>@variant</code> (or <code>@final</code> + <code>@dataclass</code>)
+for sealed variants. Data types are <strong>pure data</strong> — no typeclass operations.
+All behavior comes from typeclass instances.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">final</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.typeclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataType</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">A</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">class</span><span class="w"> </span><span class="nc">RemoteData</span><span class="p">(</span><span class="n">DataType</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">A</span><span class="p">]):</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="sd">"""RemoteData[A] = NotAsked | Loading | Failure(error) | Success(value)."""</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="nd">@property</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="nd">@abstractmethod</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_success</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="nd">@final</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="k">class</span><span class="w"> </span><span class="nc">NotAsked</span><span class="p">(</span><span class="n">RemoteData</span><span class="p">):</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="nd">@final</span>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="k">class</span><span class="w"> </span><span class="nc">Loading</span><span class="p">(</span><span class="n">RemoteData</span><span class="p">):</span>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>    <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span>
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="nd">@final</span>
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="k">class</span><span class="w"> </span><span class="nc">Failure</span><span class="p">(</span><span class="n">RemoteData</span><span class="p">[</span><span class="n">A</span><span class="p">]):</span>
+<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>    <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span>
+<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>
+<a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>    <span class="nd">@property</span>
+<a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_success</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>
+<a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>
+<a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a><span class="nd">@final</span>
+<a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="k">class</span><span class="w"> </span><span class="nc">Success</span><span class="p">(</span><span class="n">RemoteData</span><span class="p">[</span><span class="n">A</span><span class="p">]):</span>
+<a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a>    <span class="n">value</span><span class="p">:</span> <span class="n">A</span>
+<a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a>
+<a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a>    <span class="nd">@property</span>
+<a id="__codelineno-1-53" name="__codelineno-1-53" href="#__codelineno-1-53"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_success</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div>
 <p>Key points:
-- Extends <code>DataType</code> — gets TypeConstructor + DotNotation automatically
-- <code>Generic[A]</code> — parameterized over the success value type
-- Singleton variants (<code>NotAsked</code>, <code>Loading</code>) — like <code>Nothing</code>
-- Frozen dataclass variants (<code>Failure</code>, <code>Success</code>) — like <code>Err</code>/<code>Ok</code>
-- <code>pure</code> classmethod — creates <code>Success(value)</code></p>
+- Extends <code>DataType</code> + <code>ABC</code> — gets HKTMeta + DotNotation, can't instantiate base
+- <code>@final</code> on all variants — sealed, no subclassing (like Scala sealed traits)
+- <code>@dataclass(frozen=True, eq=False, repr=False)</code> — immutable, no auto <code>__eq__</code>/<code>__repr__</code>
+- NO typeclass operations on the type — no <code>bind</code>, <code>map</code>, <code>pure</code>, <code>__eq__</code>, <code>__repr__</code>
+- DataType delegates <code>__eq__</code>, <code>__repr__</code>, <code>__str__</code>, <code>__bool__</code> to typeclass instances</p>
 <h2 id="step-2-create-typeclass-instances">Step 2: Create typeclass instances</h2>
-<pre><code class="language-python">from funstruct.typeclasses.monad import Monad
-from funstruct.typeclasses.monad_error import MonadError
-
-
-class _RemoteDataMonadError(MonadError, for_type=RemoteData):
-    &quot;&quot;&quot;MonadError instance — only implements primitives.
-
-    map, ap, product, then, map2 are all inherited from the
-    Monad → Applicative → Functor hierarchy.
-    &quot;&quot;&quot;
-
-    def pure(self, value):
-        return Success(value)
-
-    def bind(self, fa: RemoteData, f):
-        match fa:
-            case Success(value):
-                return f(value)
-            case _:
-                return fa  # NotAsked, Loading, Failure — short-circuit
-
-    def raise_error(self, error):
-        return Failure(error)
-
-    def handle_error_with(self, fa: RemoteData, f):
-        match fa:
-            case Failure(error):
-                return f(error)
-            case _:
-                return fa
-</code></pre>
-<p>Key points:
-- Extends <code>MonadError</code> (which extends <code>Monad → Applicative → Functor</code>)
-- <code>for_type=RemoteData</code> — auto-registered, no manual <code>register()</code> call
-- Only implements <code>pure</code>, <code>bind</code>, <code>raise_error</code>, <code>handle_error_with</code>
-- <code>map</code>, <code>ap</code>, <code>product</code>, <code>then</code>, <code>map2</code> come for free from the hierarchy</p>
+<p>Each typeclass gets its own file under <code>instances/</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>remote_data/
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    __init__.py
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    instances/
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        __init__.py          # imports all submodules
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        monad_error.py       # MonadError instance
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        eq.py                # Eq instance
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        representable.py     # Representable instance (__repr__)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        truthable.py         # Truthable instance (__bool__)
+</code></pre></div>
+<h3 id="instancesmonad_errorpy">instances/monad_error.py</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.typeclasses.monad_error</span><span class="w"> </span><span class="kn">import</span> <span class="n">MonadError</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">_RemoteDataMonadError</span><span class="p">(</span><span class="n">MonadError</span><span class="p">,</span> <span class="n">for_type</span><span class="o">=</span><span class="n">RemoteData</span><span class="p">):</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">pure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="k">return</span> <span class="n">Success</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fa</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="k">match</span> <span class="n">fa</span><span class="p">:</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>            <span class="k">case</span> <span class="n">Success</span><span class="p">(</span><span class="n">value</span><span class="p">):</span> <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span> <span class="k">return</span> <span class="n">fa</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">raise_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="k">return</span> <span class="n">Failure</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">handle_error_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fa</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>        <span class="k">match</span> <span class="n">fa</span><span class="p">:</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>            <span class="k">case</span> <span class="n">Failure</span><span class="p">(</span><span class="n">error</span><span class="p">):</span> <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span> <span class="k">return</span> <span class="n">fa</span>
+</code></pre></div>
+<h3 id="instanceseqpy">instances/eq.py</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.typeclasses.eq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Eq</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">_RemoteDataEq</span><span class="p">(</span><span class="n">Eq</span><span class="p">,</span> <span class="n">for_type</span><span class="o">=</span><span class="n">RemoteData</span><span class="p">):</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="k">match</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>            <span class="k">case</span> <span class="n">NotAsked</span><span class="p">(),</span> <span class="n">NotAsked</span><span class="p">():</span> <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>            <span class="k">case</span> <span class="n">Loading</span><span class="p">(),</span> <span class="n">Loading</span><span class="p">():</span> <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>            <span class="k">case</span> <span class="n">Failure</span><span class="p">(</span><span class="n">e1</span><span class="p">),</span> <span class="n">Failure</span><span class="p">(</span><span class="n">e2</span><span class="p">):</span> <span class="k">return</span> <span class="n">e1</span> <span class="o">==</span> <span class="n">e2</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>            <span class="k">case</span> <span class="n">Success</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span> <span class="n">Success</span><span class="p">(</span><span class="n">v2</span><span class="p">):</span> <span class="k">return</span> <span class="n">v1</span> <span class="o">==</span> <span class="n">v2</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>        <span class="k">match</span> <span class="n">a</span><span class="p">:</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>            <span class="k">case</span> <span class="n">NotAsked</span><span class="p">():</span> <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">"NotAsked"</span><span class="p">,))</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>            <span class="k">case</span> <span class="n">Loading</span><span class="p">():</span> <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">"Loading"</span><span class="p">,))</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>            <span class="k">case</span> <span class="n">Failure</span><span class="p">(</span><span class="n">e</span><span class="p">):</span> <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">"Failure"</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>            <span class="k">case</span> <span class="n">Success</span><span class="p">(</span><span class="n">v</span><span class="p">):</span> <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">"Success"</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+</code></pre></div>
+<h3 id="instancesrepresentablepy">instances/representable.py</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.typeclasses.representable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Representable</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">_RemoteDataRepresentable</span><span class="p">(</span><span class="n">Representable</span><span class="p">,</span> <span class="n">for_type</span><span class="o">=</span><span class="n">RemoteData</span><span class="p">):</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">represent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="k">match</span> <span class="n">a</span><span class="p">:</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>            <span class="k">case</span> <span class="n">NotAsked</span><span class="p">():</span> <span class="k">return</span> <span class="s2">"NotAsked()"</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>            <span class="k">case</span> <span class="n">Loading</span><span class="p">():</span> <span class="k">return</span> <span class="s2">"Loading()"</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>            <span class="k">case</span> <span class="n">Failure</span><span class="p">(</span><span class="n">e</span><span class="p">):</span> <span class="k">return</span> <span class="sa">f</span><span class="s2">"Failure(</span><span class="si">{</span><span class="n">e</span><span class="si">!r}</span><span class="s2">)"</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>            <span class="k">case</span> <span class="n">Success</span><span class="p">(</span><span class="n">v</span><span class="p">):</span> <span class="k">return</span> <span class="sa">f</span><span class="s2">"Success(</span><span class="si">{</span><span class="n">v</span><span class="si">!r}</span><span class="s2">)"</span>
+</code></pre></div>
+<h3 id="instancestruthablepy">instances/truthable.py</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.typeclasses.truthable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Truthable</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">_RemoteDataTruthable</span><span class="p">(</span><span class="n">Truthable</span><span class="p">,</span> <span class="n">for_type</span><span class="o">=</span><span class="n">RemoteData</span><span class="p">):</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_truthy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="k">match</span> <span class="n">a</span><span class="p">:</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>            <span class="k">case</span> <span class="n">Success</span><span class="p">():</span> <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div>
+<h3 id="instancesinitpy">instances/<strong>init</strong>.py</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">mylib.remote_data.instances.monad_error</span>  <span class="c1"># noqa: F401</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">mylib.remote_data.instances.eq</span>  <span class="c1"># noqa: F401</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">mylib.remote_data.instances.representable</span>  <span class="c1"># noqa: F401</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">mylib.remote_data.instances.truthable</span>  <span class="c1"># noqa: F401</span>
+</code></pre></div>
+<p>At the bottom of the main <code>__init__.py</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">mylib.remote_data.instances</span>  <span class="c1"># triggers auto-registration</span>
+</code></pre></div></p>
 <h2 id="step-3-what-you-get-for-free">Step 3: What you get for free</h2>
-<p>With just those two primitives (<code>pure</code> + <code>bind</code>), you get:</p>
-<pre><code class="language-python"># map — transform the success value
-Success(10).map(lambda x: x * 2)           # Success(20)
-NotAsked().map(lambda x: x * 2)            # NotAsked()
-Loading().map(lambda x: x * 2)             # Loading()
-Failure(err).map(lambda x: x * 2)          # Failure(err)
-
-# bind — chain operations that might change state
-Success(10).bind(lambda x: Success(x + 1)) # Success(11)
-Success(10).bind(lambda x: Failure(err))   # Failure(err)
-NotAsked().bind(lambda x: Success(99))     # NotAsked()
-
-# &gt;&gt; operator (bind alias)
-Success(10) &gt;&gt; (lambda x: Success(x + 1))  # Success(11)
-
-# * operator (product)
-Success(1) * Success(2)                    # Success((1, 2))
-
-# ap — apply a function in context
-Success(lambda x: x + 1).ap(Success(10))   # Success(11)
-
-# handle_error_with — recover from Failure
-Failure(err).handle_error_with(lambda e: Success(&quot;default&quot;))  # Success(&quot;default&quot;)
-
-# raise_error — create a Failure
-RemoteData.raise_error(ValueError(&quot;timeout&quot;))  # Failure(ValueError(&quot;timeout&quot;))
-</code></pre>
-<p>All derived from <code>pure</code> + <code>bind</code> via the typeclass hierarchy.</p>
+<p>With <code>pure</code> + <code>bind</code> implemented, the Monad hierarchy derives everything else:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># map — derived from bind + pure</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">Success</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>           <span class="c1"># Success(20)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">NotAsked</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>            <span class="c1"># NotAsked()</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># &gt;&gt; operator — bind alias (from DotNotation)</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">Success</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Success</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># Success(11)</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="c1"># * operator — product (from DotNotation)</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">Success</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Success</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>                    <span class="c1"># Success((1, 2))</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="c1"># ap, map2, then, do — all derived from bind + pure</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="c1"># Class-level dispatch via HKTMeta:</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="n">RemoteData</span><span class="o">.</span><span class="n">pure</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>                        <span class="c1"># Success(42)</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="n">RemoteData</span><span class="o">.</span><span class="n">raise_error</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x"</span><span class="p">))</span>    <span class="c1"># Failure(ValueError("x"))</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="n">RemoteData</span><span class="o">.</span><span class="n">do</span><span class="p">(</span><span class="n">gen_fn</span><span class="p">)</span>                      <span class="c1"># do-notation</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="c1"># Python dunders via typeclass instances:</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="n">Success</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">Success</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                   <span class="c1"># True (Eq)</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="nb">repr</span><span class="p">(</span><span class="n">Success</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>                          <span class="c1"># "Success(42)" (Representable)</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="nb">bool</span><span class="p">(</span><span class="n">NotAsked</span><span class="p">())</span>                           <span class="c1"># False (Truthable)</span>
+</code></pre></div>
 <h2 id="step-4-use-with-summon-tagless-final">Step 4: Use with summon (tagless final)</h2>
-<pre><code class="language-python">from funstruct.typeclasses import Monad, MonadError, summon
-
-# Generic function — works with RemoteData, Result, Either, etc.
-def fetch_and_transform(F: Monad, fetch_fn, transform_fn):
-    return F.bind(fetch_fn(), lambda data: F.pure(transform_fn(data)))
-
-# Use with RemoteData
-F = summon(Monad, RemoteData)
-result = fetch_and_transform(F, lambda: Success(42), lambda x: x * 2)
-# Success(84)
-
-# Same function with Result
-from funstruct.monad.result import Result, Ok
-G = summon(Monad, Result)
-result = fetch_and_transform(G, lambda: Ok(42), lambda x: x * 2)
-# Ok(84)
-</code></pre>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.typeclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">Monad</span><span class="p">,</span> <span class="n">MonadError</span><span class="p">,</span> <span class="n">summon</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_and_transform</span><span class="p">(</span><span class="n">M</span><span class="p">:</span> <span class="n">Monad</span><span class="p">,</span> <span class="n">fetch_fn</span><span class="p">,</span> <span class="n">transform_fn</span><span class="p">):</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="k">return</span> <span class="n">M</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">fetch_fn</span><span class="p">(),</span> <span class="k">lambda</span> <span class="n">data</span><span class="p">:</span> <span class="n">M</span><span class="o">.</span><span class="n">pure</span><span class="p">(</span><span class="n">transform_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="c1"># Works with RemoteData</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">M</span> <span class="o">=</span> <span class="n">summon</span><span class="p">(</span><span class="n">Monad</span><span class="p">,</span> <span class="n">RemoteData</span><span class="p">)</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">result</span> <span class="o">=</span> <span class="n">fetch_and_transform</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">Success</span><span class="p">(</span><span class="mi">42</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="c1"># Success(84)</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="c1"># Same function with Result</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.types.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span><span class="p">,</span> <span class="n">Ok</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="n">M</span> <span class="o">=</span> <span class="n">summon</span><span class="p">(</span><span class="n">Monad</span><span class="p">,</span> <span class="n">Result</span><span class="p">)</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="n">result</span> <span class="o">=</span> <span class="n">fetch_and_transform</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">Ok</span><span class="p">(</span><span class="mi">42</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="c1"># Ok(84)</span>
+</code></pre></div>
 <h2 id="step-5-test-it">Step 5: Test it</h2>
-<pre><code class="language-python">import pytest
-from funstruct.typeclasses import Monad, MonadError, Functor, summon
-
-class TestRemoteDataInstances:
-    def test_pure(self):
-        assert RemoteData.pure(42) == Success(42)
-
-    def test_map_success(self):
-        assert Success(10).map(lambda x: x * 2) == Success(20)
-
-    def test_map_not_asked(self):
-        assert NotAsked().map(lambda x: x * 2) == NotAsked()
-
-    def test_map_loading(self):
-        assert Loading().map(lambda x: x * 2) == Loading()
-
-    def test_bind_success(self):
-        assert Success(10).bind(lambda x: Success(x + 1)) == Success(11)
-
-    def test_bind_short_circuits(self):
-        assert NotAsked().bind(lambda x: Success(99)) == NotAsked()
-        assert Loading().bind(lambda x: Success(99)) == Loading()
-
-    def test_raise_error(self):
-        F = summon(MonadError, RemoteData)
-        assert isinstance(F.raise_error(ValueError(&quot;x&quot;)), Failure)
-
-    def test_handle_error_with(self):
-        err = Failure(ValueError(&quot;timeout&quot;))
-        result = err.handle_error_with(lambda e: Success(&quot;cached&quot;))
-        assert result == Success(&quot;cached&quot;)
-
-    # Dot syntax == summon equivalence
-    def test_dot_equals_summon(self):
-        f = lambda x: x + 1
-        assert Success(10).map(f) == summon(Monad, RemoteData).map(Success(10), f)
-
-    # Monad laws
-    def test_left_identity(self):
-        f = lambda x: Success(x + 1)
-        assert RemoteData.pure(10).bind(f) == f(10)
-
-    def test_right_identity(self):
-        m = Success(10)
-        assert m.bind(Success) == m
-
-    def test_associativity(self):
-        f = lambda x: Success(x + 1)
-        g = lambda x: Success(x * 2)
-        m = Success(5)
-        assert m.bind(f).bind(g) == m.bind(lambda x: f(x).bind(g))
-</code></pre>
-<h2 id="step-6-file-structure">Step 6: File structure</h2>
-<pre><code class="language-text">mylib/
-    remote_data/
-        __init__.py      # RemoteData, NotAsked, Loading, Failure, Success
-        instances.py     # _RemoteDataMonadError(MonadError, for_type=RemoteData)
-</code></pre>
-<p>At the bottom of <code>__init__.py</code>:</p>
-<pre><code class="language-python">import mylib.remote_data.instances  # triggers auto-registration
-</code></pre>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">funstruct.typeclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">Monad</span><span class="p">,</span> <span class="n">MonadError</span><span class="p">,</span> <span class="n">summon</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">TestRemoteData</span><span class="p">:</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_pure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>        <span class="k">assert</span> <span class="n">RemoteData</span><span class="o">.</span><span class="n">pure</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span> <span class="o">==</span> <span class="n">Success</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_map_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>        <span class="k">assert</span> <span class="n">Success</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">Success</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_map_not_asked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>        <span class="k">assert</span> <span class="n">NotAsked</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">NotAsked</span><span class="p">()</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_bind_short_circuits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>        <span class="k">assert</span> <span class="n">NotAsked</span><span class="p">()</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Success</span><span class="p">(</span><span class="mi">99</span><span class="p">))</span> <span class="o">==</span> <span class="n">NotAsked</span><span class="p">()</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="n">Success</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span> <span class="o">==</span> <span class="s2">"Success(42)"</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_truthiness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>        <span class="k">assert</span> <span class="nb">bool</span><span class="p">(</span><span class="n">Success</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>        <span class="k">assert</span> <span class="nb">bool</span><span class="p">(</span><span class="n">NotAsked</span><span class="p">())</span> <span class="ow">is</span> <span class="kc">False</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a>
+<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_dot_equals_summon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a>        <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a>        <span class="n">M</span> <span class="o">=</span> <span class="n">summon</span><span class="p">(</span><span class="n">Monad</span><span class="p">,</span> <span class="n">RemoteData</span><span class="p">)</span>
+<a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a>        <span class="k">assert</span> <span class="n">Success</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">M</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">Success</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+<a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a>
+<a id="__codelineno-11-28" name="__codelineno-11-28" href="#__codelineno-11-28"></a>    <span class="c1"># Monad laws</span>
+<a id="__codelineno-11-29" name="__codelineno-11-29" href="#__codelineno-11-29"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_left_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-30" name="__codelineno-11-30" href="#__codelineno-11-30"></a>        <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Success</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-11-31" name="__codelineno-11-31" href="#__codelineno-11-31"></a>        <span class="k">assert</span> <span class="n">RemoteData</span><span class="o">.</span><span class="n">pure</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">f</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<a id="__codelineno-11-32" name="__codelineno-11-32" href="#__codelineno-11-32"></a>
+<a id="__codelineno-11-33" name="__codelineno-11-33" href="#__codelineno-11-33"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_right_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-34" name="__codelineno-11-34" href="#__codelineno-11-34"></a>        <span class="n">m</span> <span class="o">=</span> <span class="n">Success</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<a id="__codelineno-11-35" name="__codelineno-11-35" href="#__codelineno-11-35"></a>        <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">Success</span><span class="p">)</span> <span class="o">==</span> <span class="n">m</span>
+<a id="__codelineno-11-36" name="__codelineno-11-36" href="#__codelineno-11-36"></a>
+<a id="__codelineno-11-37" name="__codelineno-11-37" href="#__codelineno-11-37"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_associativity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-38" name="__codelineno-11-38" href="#__codelineno-11-38"></a>        <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Success</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-11-39" name="__codelineno-11-39" href="#__codelineno-11-39"></a>        <span class="n">g</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Success</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-11-40" name="__codelineno-11-40" href="#__codelineno-11-40"></a>        <span class="n">m</span> <span class="o">=</span> <span class="n">Success</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-11-41" name="__codelineno-11-41" href="#__codelineno-11-41"></a>        <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+</code></pre></div>
 <h2 id="checklist">Checklist</h2>
 <ul>
-<li>[ ] Data type extends <code>DataType</code> + <code>Generic[A]</code></li>
-<li>[ ] Variants are frozen dataclasses (or singletons for empty cases)</li>
-<li>[ ] <code>pure</code> classmethod on the base type</li>
-<li>[ ] Instance class extends the appropriate typeclass with <code>for_type=</code></li>
-<li>[ ] Only implement primitives — let the hierarchy derive the rest</li>
-<li>[ ] <code>import instances</code> at the bottom of <code>__init__.py</code></li>
-<li>[ ] Test monad laws (left identity, right identity, associativity)</li>
-<li>[ ] Test dot syntax == summon equivalence</li>
-<li>[ ] Test short-circuit behavior for each variant</li>
+<li>[ ] Data type extends <code>DataType</code> + <code>ABC</code> + <code>Generic[A]</code></li>
+<li>[ ] <code>@final</code> on all variants — sealed</li>
+<li>[ ] <code>@dataclass(frozen=True, eq=False, repr=False)</code> for data-carrying variants</li>
+<li>[ ] Singleton pattern for empty variants (NotAsked, Loading)</li>
+<li>[ ] NO typeclass ops on data types — no <code>bind</code>, <code>map</code>, <code>__eq__</code>, <code>__repr__</code>, <code>__bool__</code></li>
+<li>[ ] Instance per typeclass in <code>instances/</code> directory:<ul>
+<li><code>monad_error.py</code> — <code>pure</code>, <code>bind</code>, <code>raise_error</code>, <code>handle_error_with</code></li>
+<li><code>eq.py</code> — <code>eq</code> (pattern matching)</li>
+<li><code>representable.py</code> — <code>represent</code> (pattern matching)</li>
+<li><code>truthable.py</code> — <code>is_truthy</code> (pattern matching)</li>
+</ul>
+</li>
+<li>[ ] <code>instances/__init__.py</code> imports all submodules</li>
+<li>[ ] <code>__init__.py</code> imports instances at the bottom</li>
+<li>[ ] Test monad laws, dot-equals-summon equivalence, short-circuit behavior</li>
 </ul>
 
 

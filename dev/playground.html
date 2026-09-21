@@ -34,7 +34,7 @@
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
-from funstruct.monad.result import AsyncResult, Err, Ok, TryAsync
+from funstruct.types.result import AsyncResult, Err, Ok, TryAsync
 
 async def run():
     print("=== Bind chain ===")
@@ -55,7 +55,7 @@ asyncio.run(run())
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
-from funstruct.monad.result import AsyncResult, Ok, Err, Result, Try, TryAsync
+from funstruct.types.result import AsyncResult, Ok, Err, Result, Try, TryAsync
 
 async def run():
     print("=== @AsyncResult.do (decorator) ===")
@@ -84,7 +84,7 @@ asyncio.run(run())
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
+from funstruct.types.result import AsyncResult, Err, Ok, Result, TryAsync
 
 print("=== Production (AsyncResult) ===")
 repo = AsyncResultUserRepo()
@@ -109,7 +109,7 @@ print(f"  bob:   {get_profile(test_repo, Result, 'bob')}")
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
+from funstruct.types.result import AsyncResult, Err, Ok, Result, TryAsync
 
 print("=== Async 'Postgres' ===")
 async def run_async():
@@ -189,9 +189,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err
-from funstruct.monad.either import Either, Right, Left
+from funstruct.types.option import Option, Some, Nothing
+from funstruct.types.result import Result, Ok, Err
+from funstruct.types.either import Either, Right, Left
 
 print("=== Generic functions (F: Monad is the constraint) ===\n")
 
@@ -244,7 +244,7 @@ print("  summon(Monad, Option) provides the F       — the caller resolves, onc
 <script type="py-editor" config='{"packages":["funstruct"]}'>
 from __future__ import annotations
 from dataclasses import dataclass
-from funstruct.monad.reader import Reader
+from funstruct.types.reader import Reader
 from abc import ABC, abstractmethod
 
 db = {
@@ -362,7 +362,7 @@ print("  6. Multiple bounds = multiple summon calls")
 <p>The problem: updating deeply nested immutable structures requires rebuilding the entire path manually.      # Without lenses:     config.put("app", config["app"].put("db", config["app"]["db"].put("hos</p>
 <div class="demo-source">source: <code>demos/09_lenses.py</code></div>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.collections.frozendict import frozendict
+from funstruct.types.frozendict import frozendict
 from funstruct.experimental.optics import Lens, at
 
 config = frozendict({
@@ -442,7 +442,7 @@ print(f"    {s[:60]}...")
 <p>Writer[W, A] = (value: A, output: W) where W is a Monoid.  The Writer monad lets you accumulate output (logs, traces, metrics) alongside a computation without passing a mutable log around.  This demo </p>
 <div class="demo-source">source: <code>demos/10_writer_stacktrace.py</code></div>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.writer import ListWriter
+from funstruct.types.writer import ListWriter
 from funstruct.typeclasses import Monoid
 
 print("=== Writer monad: call trace accumulation ===\n")
@@ -480,7 +480,7 @@ print(f"  Trace:  {result.output}")
 <p>State[S, A] = S → (S, A)  The State monad threads state through a pipeline without mutation. Each step reads and/or modifies the state, and the final state is returned alongside the result.  Use cases</p>
 <div class="demo-source">source: <code>demos/11_state_counter.py</code></div>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.state import State
+from funstruct.types.state import State
 
 print("=== State monad: pure stateful computation ===\n")
 
@@ -703,14 +703,14 @@ print("  6. Person             = plain dataclass (no JSON knowledge)")
 <div class="demo-source">source: <code>demos/transformers/01_the_problem.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/01_the_problem.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
+from funstruct.types.option import Option, Some, Nothing
+from funstruct.types.future import Future
 from funstruct.playground import User
 
 import asyncio
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
+from funstruct.types.option import Option, Some, Nothing
+from funstruct.types.future import Future
 from funstruct.playground import User
 
 
@@ -766,15 +766,15 @@ if __name__ == "__main__":
 <div class="demo-source">source: <code>demos/transformers/02_option_t.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/02_option_t.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
+from funstruct.types.option import Option, Some, Nothing
+from funstruct.types.future import Future
 from funstruct.experimental.monadtransformer.option_t import OptionT
 from funstruct.playground import User
 
 import asyncio
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
+from funstruct.types.option import Option, Some, Nothing
+from funstruct.types.future import Future
 from funstruct.experimental.monadtransformer.option_t import OptionT
 from funstruct.playground import User
 
@@ -843,12 +843,12 @@ if __name__ == "__main__":
 <div class="demo-source">source: <code>demos/transformers/03_alternative.py</code></div>
 <p style="color:#ffcd22;font-size:0.85rem;">⚠ This demo uses async — view-only in browser. Run locally: <code>uv run python demos/transformers/03_alternative.py</code></p>
 <script type="py-editor" config='{"packages":["funstruct"]}'>
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
+from funstruct.types.result import AsyncResult, Ok, Err, TryAsync
 from funstruct.playground import User
 
 import asyncio
 
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
+from funstruct.types.result import AsyncResult, Ok, Err, TryAsync
 from funstruct.playground import User
 
 
