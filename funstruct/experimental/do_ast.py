@@ -35,7 +35,8 @@ def do_ast(fn: Callable[..., Any]) -> Callable[..., Any]:
     """Compile do-notation into bind/map chains via AST transformation."""
     source = textwrap.dedent(inspect.getsource(fn))
     tree = ast.parse(source)
-    func: ast.FunctionDef = tree.body[0]  # type: ignore[assignment]
+    func = tree.body[0]
+    assert isinstance(func, ast.FunctionDef)
 
     func.decorator_list = []
     func.body = _transform_do_body(func.body)

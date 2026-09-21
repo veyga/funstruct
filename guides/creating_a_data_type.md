@@ -1,7 +1,14 @@
-# Creating Your Own Data Type
+# Creating Your Own Higher-Kinded Type
 
 This guide walks through creating a complete funstruct-compatible
-data type from scratch: the ADT, typeclass instances, tests, and usage.
+higher-kinded type from scratch: the ADT, typeclass instances, tests,
+and usage.
+
+**This is for creating type constructors** like `Option[A]`, `Result[A]`,
+or `RemoteData[A]` — types that participate in the typeclass system
+(Monad, Eq, Representable, etc.). If you just need a plain data class
+like `User` or `Config`, use standard Python `@dataclass` — no funstruct
+machinery needed.
 
 ## The example: RemoteData
 
@@ -135,6 +142,13 @@ class _RemoteDataEq(Eq, for_type=RemoteData):
             case Failure(e1), Failure(e2): return e1 == e2
             case Success(v1), Success(v2): return v1 == v2
             case _: return False
+
+    def hash(self, a) -> int:
+        match a:
+            case NotAsked(): return hash(("NotAsked",))
+            case Loading(): return hash(("Loading",))
+            case Failure(e): return hash(("Failure", e))
+            case Success(v): return hash(("Success", v))
 ```
 
 ### instances/representable.py

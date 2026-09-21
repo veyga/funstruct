@@ -107,19 +107,17 @@ def failing_pipeline():
 
 # ── Style 5: CList do-notation (list comprehension) ────────────────
 
-from dataclasses import dataclass as dc
-
 from funstruct.experimental.do_ast import do_ast
 from funstruct.types.cons import CList
 
 
-@dc(frozen=True)
+@dataclass(frozen=True)
 class UserRow:
     id: int
     name: str
 
 
-@dc(frozen=True)
+@dataclass(frozen=True)
 class OrderRow:
     user_id: int
     total: float

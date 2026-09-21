@@ -67,6 +67,7 @@ nav:
           - OptionT: experimental/monadtransformer/option_t.md
           - WriterT: experimental/monadtransformer/writer_t.md
       - Optics (Lenses): experimental/optics/index.md
+      - AST Do-Notation: experimental/do_ast.md
 
 markdown_extensions:
   - pymdownx.highlight:

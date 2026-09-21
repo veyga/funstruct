@@ -35,7 +35,7 @@ demo file:
   uv run python demos/{{file}}
 
 # debug demo script
-ddemo file:
+demod file:
   PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client demos/{{file}}
 
 # run pytest with coverage (pass 'html' to open browser report)
@@ -49,7 +49,11 @@ cover *args:
   fi
 
 # debug a pytest
-dtest *args:
+test *args:
+  uv run pytest {{args}} 
+
+# debug a pytest
+testd *args:
   PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest {{args}}
 
 # run benchmarks (pass 'html' to generate histogram and open in browser)
