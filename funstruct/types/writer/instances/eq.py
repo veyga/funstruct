@@ -18,9 +18,11 @@ class _WriterEq(Eq):
         self._cls = writer_cls
 
     def eq(self, a, b) -> bool:
-        if not isinstance(b, Writer):
-            return False
-        return a.value == b.value and a.output == b.output
+        match b:
+            case Writer():
+                return a.value == b.value and a.output == b.output
+            case _:
+                return False
 
     def hash(self, a) -> int:
         return hash((a.value, a.output))

@@ -149,9 +149,11 @@ class AsyncResult(DataType, Generic[_A]):
     async def _resolve(value: Any) -> Result:
         if inspect.isawaitable(value):
             value = await value
-        if isinstance(value, (Either, Result)):
-            return value  # type: ignore[return-value]
-        return Ok(value)
+        match value:
+            case Either() | Result():
+                return value  # type: ignore[return-value]
+            case _:
+                return Ok(value)
 
     def fold(
         self, on_err: Callable[[Exception], _B], on_ok: Callable[[_A], _B]
