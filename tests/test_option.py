@@ -189,7 +189,9 @@ class TestTraverse:
 
     def test_short_circuits(self):
         values = CList.from_iterable([1, 0, 3])
-        result = self.T.traverse(values, lambda x: Some(x) if x != 0 else Nothing(), self.G)
+        result = self.T.traverse(
+            values, lambda x: Some(x) if x != 0 else Nothing(), self.G
+        )
         assert result == Nothing()
 
 

@@ -42,7 +42,6 @@ def get_age(user: User) -> AsyncResult[int]:
     return AsyncResult.pure(30 if user.name == "alice" else 0)
 
 
-
 @TryAsync
 def get_nickname(user: User) -> str:
     nicknames = {"alice": "ally"}
@@ -124,9 +123,13 @@ class OrderRow:
 
 
 users = CList.from_iterable([UserRow(1, "Alice"), UserRow(2, "Bob")])
-orders = CList.from_iterable([
-    OrderRow(1, 49.99), OrderRow(1, 12.00), OrderRow(2, 99.99),
-])
+orders = CList.from_iterable(
+    [
+        OrderRow(1, 49.99),
+        OrderRow(1, 12.00),
+        OrderRow(2, 99.99),
+    ]
+)
 
 
 @do_ast

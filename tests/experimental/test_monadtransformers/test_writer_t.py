@@ -10,22 +10,32 @@ from funstruct.types.option import Nothing, Option, Some
 
 
 class _ListMonoid(Monoid):
-    def combine(self, a, b): return a + b
-    def empty(self): return []
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return []
 
 
 class _CListMonoid(Monoid):
-    def combine(self, a, b): return a + b
-    def empty(self): return Nil()
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return Nil()
 
 
 class _IntAddSemigroup(Semigroup):
-    def combine(self, a, b): return a + b
+    def combine(self, a, b):
+        return a + b
 
 
 class _IntAddMonoid(Monoid):
-    def combine(self, a, b): return a + b
-    def empty(self): return 0
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return 0
 
 
 list_monoid = _ListMonoid()

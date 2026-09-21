@@ -52,7 +52,9 @@ class CheckResult:
             return f"All summon() calls resolve. ({self.registered_count} instances registered)"
         lines = [f"Found {len(self.errors)} unresolvable summon() calls:\n"]
         for path, line, tc, typ in self.errors:
-            lines.append(f"  {path}:{line}: summon({tc}, {typ}) — no instance registered")
+            lines.append(
+                f"  {path}:{line}: summon({tc}, {typ}) — no instance registered"
+            )
         return "\n".join(lines)
 
     def exit(self) -> None:
@@ -62,7 +64,7 @@ class CheckResult:
 
 def _get_registered_pairs() -> set[tuple[str, str]]:
     pairs = set()
-    for (tc, t) in _registry:
+    for tc, t in _registry:
         pairs.add((tc.__name__, t.__name__))
         for base in tc.__mro__[1:]:
             if hasattr(base, "__abstractmethods__"):
@@ -185,7 +187,8 @@ def main():
         help="Directories or files to scan for summon() calls",
     )
     parser.add_argument(
-        "--import", "-i",
+        "--import",
+        "-i",
         dest="imports",
         action="append",
         default=[],

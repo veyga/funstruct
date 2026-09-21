@@ -229,7 +229,6 @@ class TestDoWithArgs:
         assert divide(10, 2) == Ok(5.0)
         assert divide(10, 0).is_err
 
-
     # CList do-notation tests are in tests/experimental/test_do_ast.py
     # because CList requires the AST-based do (experimental) — the single-pass
     # generator is incorrect for the list monad where bind calls the

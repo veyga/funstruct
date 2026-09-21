@@ -107,46 +107,56 @@ class DataType(TypeConstructor, DotNotation, metaclass=HKTMeta):
 
     def __eq__(self, other: object) -> bool:
         from funstruct.typeclasses.eq import Eq
+
         result = _dispatch(self, Eq, "eq", other)
         return result if result is not _MISSING else NotImplemented
 
     def __hash__(self) -> int:
         from funstruct.typeclasses.eq import Eq
+
         result = _dispatch(self, Eq, "hash")
         return result if result is not _MISSING else id(self)
 
     def __repr__(self) -> str:
         from funstruct.typeclasses.representable import Representable
+
         result = _dispatch(self, Representable, "represent")
         return result if result is not _MISSING else f"{type(self).__name__}(...)"
 
     def __str__(self) -> str:
         from funstruct.typeclasses.stringable import Stringable
+
         result = _dispatch(self, Stringable, "string")
         return result if result is not _MISSING else repr(self)
 
     def __bool__(self) -> bool:
         from funstruct.typeclasses.truthable import Truthable
+
         result = _dispatch(self, Truthable, "is_truthy")
         return result if result is not _MISSING else True
 
     def __add__(self, other):
         from funstruct.typeclasses.semigroup import Semigroup
+
         result = _dispatch(self, Semigroup, "combine", other)
         return result if result is not _MISSING else NotImplemented
 
     def __iter__(self):
         from funstruct.typeclasses.foldable import Foldable
+
         tc = type(self)._type_constructor or type(self)
         for (_, t), instance in _registry.items():
             if t is tc and isinstance(instance, Foldable):
                 result = []
                 instance.fold_left(self, None, lambda _, a: result.append(a))
                 return iter(result)
-        raise TypeError(f"'{type(self).__name__}' is not iterable (no Foldable instance)")
+        raise TypeError(
+            f"'{type(self).__name__}' is not iterable (no Foldable instance)"
+        )
 
     def __len__(self) -> int:
         from funstruct.typeclasses.foldable import Foldable
+
         tc = type(self)._type_constructor or type(self)
         for (_, t), instance in _registry.items():
             if t is tc and isinstance(instance, Foldable):

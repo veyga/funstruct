@@ -188,7 +188,6 @@ class CList(DataType, Generic[A]):
         return list(self)
 
 
-
 @final
 class Nil(CList):
     """Empty list (singleton)."""

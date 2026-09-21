@@ -35,7 +35,6 @@ class ZipList(DataType, Generic[_A]):
         return list(self._values)
 
 
-
 import funstruct.types.ziplist.instances  # noqa: E402, F401
 
 __all__ = [

@@ -12,6 +12,7 @@ class _CListStringable(Stringable, for_type=CList):
             case Nil():
                 return "Nil"
             case Cons():
+
                 def _fmt(elem) -> str:
                     match elem:
                         case CList():

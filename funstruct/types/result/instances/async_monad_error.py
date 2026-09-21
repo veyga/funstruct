@@ -16,9 +16,7 @@ class _AsyncResultMonadError(MonadError, for_type=AsyncResult):
 
         return AsyncResult(_inner())
 
-    def bind(
-        self, fa: AsyncResult[_A], f: Callable[[_A], Any]
-    ) -> AsyncResult:
+    def bind(self, fa: AsyncResult[_A], f: Callable[[_A], Any]) -> AsyncResult:
         async def _inner():
             result = await fa._coro
             match result:

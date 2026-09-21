@@ -10,7 +10,8 @@ from tests.laws import assert_functor_laws, assert_semigroup_laws
 
 
 class _InvalidConcat(Semigroup):
-    def combine(self, a, b): return a.product(b)
+    def combine(self, a, b):
+        return a.product(b)
 
 
 invalid_concat = _InvalidConcat()

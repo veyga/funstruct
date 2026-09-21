@@ -11,8 +11,11 @@ from tests.laws import (
 
 
 class _FrozendictMerge(Monoid):
-    def combine(self, a, b): return a + b
-    def empty(self): return frozendict()
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return frozendict()
 
 
 FrozenDictMerge = _FrozendictMerge()
@@ -884,13 +887,20 @@ class TestNetworkSerialization:
 
         fd = frozendict({"aud": "api", "depth": 0, "tags": ["a", "b"]})
         serialized = json.dumps(fd.to_dict(), sort_keys=True)
-        expected = json.dumps({"aud": "api", "depth": 0, "tags": ["a", "b"]}, sort_keys=True)
+        expected = json.dumps(
+            {"aud": "api", "depth": 0, "tags": ["a", "b"]}, sort_keys=True
+        )
         assert serialized == expected
 
     def test_json_roundtrip_preserves_types(self):
         import json
 
-        original = {"int_val": 42, "str_val": "hello", "bool_val": True, "null_val": None}
+        original = {
+            "int_val": 42,
+            "str_val": "hello",
+            "bool_val": True,
+            "null_val": None,
+        }
         fd = frozendict(original)
         roundtripped = json.loads(json.dumps(fd.to_dict()))
         assert roundtripped == original
@@ -931,7 +941,9 @@ class TestNetworkSerialization:
         import json
 
         fd = frozendict({"scope": "admin"})
-        result = json.dumps({"claims": fd, "ok": True}, cls=FrozendictEncoder, sort_keys=True)
+        result = json.dumps(
+            {"claims": fd, "ok": True}, cls=FrozendictEncoder, sort_keys=True
+        )
         assert result == '{"claims": {"scope": "admin"}, "ok": true}'
 
     def test_frozendict_encoder_deeply_nested(self):
@@ -945,7 +957,12 @@ class TestNetworkSerialization:
     def test_frozendict_encoder_matches_dict_output(self):
         import json
 
-        data = {"email": "a@b.com", "depth": 0, "tags": ["x", "y"], "nested": {"k": "v"}}
+        data = {
+            "email": "a@b.com",
+            "depth": 0,
+            "tags": ["x", "y"],
+            "nested": {"k": "v"},
+        }
         fd = frozendict(data)
         fd_json = json.loads(json.dumps(fd, cls=FrozendictEncoder))
         dict_json = json.loads(json.dumps(data))

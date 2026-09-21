@@ -154,9 +154,7 @@ def generate_html(demos: list[dict], *, pkg_spec: str, banner: str) -> str:
                 + demo["path"]
                 + "</code></p>"
             )
-        lines.append(
-            f'<script type="py-editor" config=\'{pkg_config}\'>'
-        )
+        lines.append(f"<script type=\"py-editor\" config='{pkg_config}'>")
         lines.append(demo["code"])
         lines.append("</script>")
 

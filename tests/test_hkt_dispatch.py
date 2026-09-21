@@ -60,7 +60,9 @@ class TestInstanceLevelDispatch:
         assert Ok(10).bind(lambda x: Ok(x + 1)) == Ok(11)
 
     def test_result_handle_error_with(self):
-        assert Err(ValueError("x")).handle_error_with(lambda e: Ok("recovered")) == Ok("recovered")
+        assert Err(ValueError("x")).handle_error_with(lambda e: Ok("recovered")) == Ok(
+            "recovered"
+        )
 
     def test_either_bimap(self):
         assert Right(10).bimap(lambda e: e, lambda x: x * 2) == Right(20)

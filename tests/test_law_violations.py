@@ -43,25 +43,34 @@ from tests.laws import (
 
 
 class _IntSubtract(Semigroup):
-    def combine(self, a, b): return a - b
+    def combine(self, a, b):
+        return a - b
 
 
 class _FloatDivide(Semigroup):
-    def combine(self, a, b): return a / b
+    def combine(self, a, b):
+        return a / b
 
 
 class _IntAdd(Semigroup):
-    def combine(self, a, b): return a + b
+    def combine(self, a, b):
+        return a + b
 
 
 class _IntAddMonoid(Monoid):
-    def combine(self, a, b): return a + b
-    def empty(self): return 0
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return 0
 
 
 class _BadIntMonoid(Monoid):
-    def combine(self, a, b): return a + b
-    def empty(self): return 1  # WRONG: 1 is not identity for addition
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return 1  # WRONG: 1 is not identity for addition
 
 
 class TestAssociativityViolation:

@@ -165,7 +165,6 @@ class AsyncResult(DataType, Generic[_A]):
         return Future(_inner())
 
 
-
 def Try(
     f: Callable[_P, _A],
 ) -> Callable[_P, Result[_A]]:

@@ -27,7 +27,9 @@ class _EitherTraversable(Traversable, for_type=Either):
             case _:
                 return acc
 
-    def traverse(self, fa: Either[_E, _A], f: Callable[[_A], Any], G: Applicative) -> Any:
+    def traverse(
+        self, fa: Either[_E, _A], f: Callable[[_A], Any], G: Applicative
+    ) -> Any:
         match fa:
             case Right(value):
                 return G.map(f(value), Right)

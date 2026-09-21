@@ -123,7 +123,9 @@ class MonadTransformer(ABC, Generic[_F, _A]):
         """Derived from bind + map."""
         return self.bind(lambda f: other.map(f))  # type: ignore[arg-type]  # HKT limitation
 
-    def map2(self, other: MonadTransformer, f: Callable[[_A, Any], _B]) -> MonadTransformer:
+    def map2(
+        self, other: MonadTransformer, f: Callable[[_A, Any], _B]
+    ) -> MonadTransformer:
         """Combine two values with a function."""
         return self.bind(lambda a: other.map(lambda b: f(a, b)))
 

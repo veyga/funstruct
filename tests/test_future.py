@@ -82,7 +82,6 @@ class TestPure:
         assert result == Err(err)
 
 
-
 class TestTryAsyncWrapping:
     def test_success(self):
         @TryAsync

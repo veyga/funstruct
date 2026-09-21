@@ -113,7 +113,9 @@ class EitherT(MonadTransformer, Generic[_F, _E, _A]):
         """
         return EitherT(self._value.map(lambda either: either.left_map(f)))
 
-    def bimap(self, on_left: Callable[[_E], Any], on_right: Callable[[_A], _B]) -> EitherT:
+    def bimap(
+        self, on_left: Callable[[_E], Any], on_right: Callable[[_A], _B]
+    ) -> EitherT:
         """Transform both sides.
 
         >>> from funstruct.types.option import Some

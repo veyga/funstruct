@@ -21,9 +21,7 @@ class TestCListTraverse:
         T = summon(Traversable, CList)
         G = summon(Applicative, Either)
         xs = CList.from_iterable([1, 2, 3])
-        result = T.traverse(
-            xs, lambda x: Left("fail") if x == 2 else Right(x), G
-        )
+        result = T.traverse(xs, lambda x: Left("fail") if x == 2 else Right(x), G)
         assert result == Left("fail")
 
     def test_traverse_empty_list(self):

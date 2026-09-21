@@ -63,7 +63,9 @@ class TestDoAstCList:
             y = yield CList.from_iterable(["a", "b"])
             return (x, y)
 
-        assert pipeline() == CList.from_iterable([(1, "a"), (1, "b"), (2, "a"), (2, "b")])
+        assert pipeline() == CList.from_iterable(
+            [(1, "a"), (1, "b"), (2, "a"), (2, "b")]
+        )
 
     def test_dependent_values(self):
         @do_ast
@@ -72,7 +74,9 @@ class TestDoAstCList:
             y = yield CList.from_iterable([x, x * 10])
             return (x, y)
 
-        assert pipeline() == CList.from_iterable([(1, 1), (1, 10), (2, 2), (2, 20), (3, 3), (3, 30)])
+        assert pipeline() == CList.from_iterable(
+            [(1, 1), (1, 10), (2, 2), (2, 20), (3, 3), (3, 30)]
+        )
 
     def test_three_steps(self):
         @do_ast
@@ -82,7 +86,9 @@ class TestDoAstCList:
             z = yield CList.from_iterable([100, 200])
             return x + y + z
 
-        assert pipeline() == CList.from_iterable([111, 211, 121, 221, 112, 212, 122, 222])
+        assert pipeline() == CList.from_iterable(
+            [111, 211, 121, 221, 112, 212, 122, 222]
+        )
 
     def test_guard(self):
         @do_ast

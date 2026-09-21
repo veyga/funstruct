@@ -9,7 +9,6 @@ The type hint F: Monad is the constraint (like Haskell's Functor f =>).
 The caller provides F via summon(Monad, Option).
 """
 
-
 from funstruct.typeclasses import Monad, MonadError, summon
 from funstruct.types.either import Either, Left, Right
 from funstruct.types.option import Nothing, Option, Some
