@@ -36,7 +36,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.types.cons import CList, Cons
@@ -74,7 +74,8 @@ class Tree(DataType, Generic[A]):
         return False
 
 
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Leaf(Tree[A]):
     """Terminal node holding a single value."""
 
@@ -98,18 +99,9 @@ class Leaf(Tree[A]):
     def to_list(self) -> CList[A]:
         return Cons.pure(self.value)
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Leaf(v):
-                return self.value == v
-            case _:
-                return False
 
-    def __repr__(self) -> str:
-        return f"Leaf({repr(self.value)})"
-
-
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Branch(Tree[A]):
     """Internal node with a value and two children."""
 
@@ -138,16 +130,6 @@ class Branch(Tree[A]):
 
     def to_list(self) -> CList[A]:
         return self.left.to_list() + Cons(self.value, self.right.to_list())
-
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Branch(v, l, r):
-                return self.value == v and self.left == l and self.right == r
-            case _:
-                return False
-
-    def __repr__(self) -> str:
-        return f"Branch({repr(self.value)}, {repr(self.left)}, {repr(self.right)})"
 
 
 import funstruct.types.tree.instances  # noqa: E402, F401

@@ -43,17 +43,6 @@ class ZipList(DataType, Generic[_A]):
     def __len__(self) -> int:
         return len(self._values)
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case ZipList():
-                return self._values == other._values
-            case list():
-                return self._values == other
-            case _:
-                return False
-
-    def __repr__(self) -> str:
-        return f"ZipList({self._values})"
 
 
 import funstruct.types.ziplist.instances  # noqa: E402, F401

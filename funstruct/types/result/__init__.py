@@ -39,7 +39,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable, Coroutine
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Generic, ParamSpec, TypeVar, overload
+from typing import Any, Generic, ParamSpec, TypeVar, final, overload
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.types.either import Either
@@ -88,7 +88,8 @@ class Result(DataType, ABC, Generic[_A]):
                 raise TypeError(f"Expected Result, got {type(self)}")
 
 
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Ok(Result[_A]):
     """Success case of Result."""
 
@@ -98,18 +99,9 @@ class Ok(Result[_A]):
     def is_ok(self) -> bool:
         return True
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Ok(val):
-                return self.value == val
-            case _:
-                return False
 
-    def __repr__(self) -> str:
-        return f"Ok({repr(self.value)})"
-
-
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Err(CapturesCreationSiteMixin, Result[_A]):
     """Error case of Result. Captures creation site automatically."""
 
@@ -118,16 +110,6 @@ class Err(CapturesCreationSiteMixin, Result[_A]):
     @property
     def is_ok(self) -> bool:
         return False
-
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Err(err):
-                return self.error == err
-            case _:
-                return False
-
-    def __repr__(self) -> str:
-        return f"Err({repr(self.error)})"
 
 
 _P = ParamSpec("_P")
@@ -180,8 +162,6 @@ class AsyncResult(DataType, Generic[_A]):
 
         return Future(_inner())
 
-    def __repr__(self) -> str:
-        return f"AsyncResult({self._coro})"
 
 
 def Try(

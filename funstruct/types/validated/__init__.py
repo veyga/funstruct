@@ -17,7 +17,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.types.cons import Cons
@@ -60,7 +60,8 @@ class Validated(DataType, ABC, Generic[_E, _A]):
         return Invalid(Cons.pure(error))
 
 
-@dataclass(frozen=True)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Valid(Validated, Generic[_A]):
     """Success case."""
 
@@ -68,9 +69,6 @@ class Valid(Validated, Generic[_A]):
 
     @property
     def is_valid(self) -> bool:
-        return True
-
-    def __bool__(self) -> bool:
         return True
 
     def fold(
@@ -81,7 +79,8 @@ class Valid(Validated, Generic[_A]):
         return on_valid(self.value)
 
 
-@dataclass(frozen=True)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Invalid(Validated, Generic[_E]):
     """Failure case — accumulated errors."""
 
@@ -89,9 +88,6 @@ class Invalid(Validated, Generic[_E]):
 
     @property
     def is_valid(self) -> bool:
-        return False
-
-    def __bool__(self) -> bool:
         return False
 
     def fold(

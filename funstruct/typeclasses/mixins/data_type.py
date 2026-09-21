@@ -95,5 +95,48 @@ class DataType(TypeConstructor, DotNotation, metaclass=HKTMeta):
 
     _type_constructor = None  # reset — DataType itself is not a type constructor
 
+    def __eq__(self, other: object) -> bool:
+        from funstruct.typeclasses.eq import Eq
+        from funstruct.typeclasses.utils.registry import _registry
+
+        tc = type(self)._type_constructor or type(self)
+        for (_, t), instance in _registry.items():
+            if t is tc and isinstance(instance, Eq):
+                return instance.eq(self, other)
+        return NotImplemented
+
+    def __hash__(self):
+        return id(self)
+
+    def __repr__(self) -> str:
+        from funstruct.typeclasses.representable import Representable
+        from funstruct.typeclasses.utils.registry import _registry
+
+        tc = type(self)._type_constructor or type(self)
+        for (_, t), instance in _registry.items():
+            if t is tc and isinstance(instance, Representable):
+                return instance.represent(self)
+        return f"{type(self).__name__}(...)"
+
+    def __str__(self) -> str:
+        from funstruct.typeclasses.stringable import Stringable
+        from funstruct.typeclasses.utils.registry import _registry
+
+        tc = type(self)._type_constructor or type(self)
+        for (_, t), instance in _registry.items():
+            if t is tc and isinstance(instance, Stringable):
+                return instance.string(self)
+        return repr(self)
+
+    def __bool__(self) -> bool:
+        from funstruct.typeclasses.truthable import Truthable
+        from funstruct.typeclasses.utils.registry import _registry
+
+        tc = type(self)._type_constructor or type(self)
+        for (_, t), instance in _registry.items():
+            if t is tc and isinstance(instance, Truthable):
+                return instance.is_truthy(self)
+        return True
+
 
 __all__ = ["DataType"]

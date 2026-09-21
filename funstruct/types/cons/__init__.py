@@ -16,7 +16,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -206,21 +206,9 @@ class CList(DataType, Generic[A]):
             yield current.head
             current = current.tail
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case list():
-                return list(self) == other
-            case _:
-                pass
-        match self, other:
-            case Cons(sh, st), Cons(oh, ot):
-                return sh == oh and st == ot
-            case Nil(), Nil():
-                return True
-            case _:
-                return False
 
 
+@final
 class Nil(CList):
     """Empty list (singleton)."""
 
@@ -230,15 +218,6 @@ class Nil(CList):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
-
-    def __repr__(self) -> str:
-        return "Nil()"
-
-    def __str__(self) -> str:
-        return "Nil"
-
-    def __bool__(self) -> bool:
-        return False
 
     def append(self, other: CList) -> CList:
         return other
@@ -268,28 +247,13 @@ class Nil(CList):
         return Cons(value, Nil())
 
 
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Cons(CList[A]):
     """Non-empty list with head and tail."""
 
     head: A
     tail: CList[A] = field(default_factory=Nil)
-
-    def __bool__(self) -> bool:
-        return True
-
-    def __repr__(self) -> str:
-        return f"Cons({repr(self.head)}, {repr(self.tail)})"
-
-    def __str__(self) -> str:
-        def _fmt(elem) -> str:
-            match elem:
-                case CList():
-                    return f"[{', '.join(_fmt(e) for e in elem)}]"
-                case _:
-                    return str(elem)
-
-        return f"CList([{', '.join(_fmt(e) for e in self)}])"
 
     def append(self, other: CList) -> CList:
         return self.reversed().fold_left(other, lambda acc, h: Cons(h, acc))

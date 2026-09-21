@@ -35,7 +35,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses.mixins.data_type import DataType
 from funstruct.util.created_at import CapturesCreationSiteMixin
@@ -87,7 +87,8 @@ class Either(DataType, ABC, Generic[E, A]):
                 raise TypeError(f"Expected Either, got {type(self)}")
 
 
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Right(Either[E, A]):
     """Success case."""
 
@@ -97,18 +98,9 @@ class Right(Either[E, A]):
     def is_right(self) -> bool:
         return True
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Right(val):
-                return self.value == val
-            case _:
-                return False
 
-    def __repr__(self) -> str:
-        return f"Right({repr(self.value)})"
-
-
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Left(CapturesCreationSiteMixin, Either[E, A]):
     """Error case. Captures creation site automatically."""
 
@@ -117,16 +109,6 @@ class Left(CapturesCreationSiteMixin, Either[E, A]):
     @property
     def is_right(self) -> bool:
         return False
-
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Left(err):
-                return self.error == err
-            case _:
-                return False
-
-    def __repr__(self) -> str:
-        return f"Left({repr(self.error)})"
 
 
 import funstruct.types.either.instances  # noqa: E402, F401

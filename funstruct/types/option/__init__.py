@@ -26,7 +26,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
@@ -72,7 +72,8 @@ class Option(DataType, ABC, Generic[A]):
                 return on_nothing()
 
 
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Some(Option[A]):
     """Presence of a value."""
 
@@ -82,20 +83,8 @@ class Some(Option[A]):
     def is_some(self) -> bool:
         return True
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Some(val):
-                return self.value == val
-            case _:
-                return False
 
-    def __bool__(self) -> bool:
-        return True
-
-    def __repr__(self) -> str:
-        return f"Some({repr(self.value)})"
-
-
+@final
 class Nothing(Option):
     """Absence of a value (singleton)."""
 
@@ -109,19 +98,6 @@ class Nothing(Option):
     @property
     def is_some(self) -> bool:
         return False
-
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case Nothing():
-                return True
-            case _:
-                return False
-
-    def __bool__(self) -> bool:
-        return False
-
-    def __repr__(self) -> str:
-        return "Nothing()"
 
 
 import funstruct.types.option.instances  # noqa: E402, F401 — register typeclass instances

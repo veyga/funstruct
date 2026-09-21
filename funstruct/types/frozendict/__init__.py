@@ -271,19 +271,6 @@ class frozendict(DataType, Generic[K, V]):
     def get(self, key: K) -> V | None:
         return self.__root.get(key, hash(key), 0)
 
-    def __eq__(self, other: object) -> bool:
-        match other:
-            case frozendict():
-                if self.__size != other.__size:
-                    return False
-                return all(other.get(k) == v for k, v in self.items())
-            case dict():
-                if self.__size != len(other):
-                    return False
-                return all(other.get(k) == v for k, v in self.items())
-            case _:
-                return False
-
     def __contains__(self, key) -> bool:
         for k, _ in self.__root.items_iter():
             if k == key:
@@ -305,12 +292,6 @@ class frozendict(DataType, Generic[K, V]):
     def __iter__(self) -> Iterator[K]:
         for k, _ in self.__root.items_iter():
             yield k
-
-    def __repr__(self) -> str:
-        return f"frozendict({dict(self.__root.items_iter())})"
-
-    def __str__(self) -> str:
-        return self.__repr__()
 
     def __hash__(self) -> int:
         if self.__hash_cache is None:
