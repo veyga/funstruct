@@ -42,12 +42,38 @@ class Monad(Applicative):
 
     @final
     def do(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
-        """Do-notation via generators. Desugars to bind/pure.
+        """Do-notation — compiles yield statements to bind/map chains.
 
-        Replays the generator from scratch for each bind path. 
-        Each bind creates a fresh generator + replays previous sends 
-        to reach the current point.
+        ``yield`` is a syntactic marker for monadic bind, NOT a generator.
+        At decoration time, the function's AST is parsed and each
+        ``x = yield expr`` is rewritten to ``expr.bind(lambda x: ...)``.
+        No generator runs at call time — the result is a plain function
+        of nested bind/map calls.
+
+        Falls back to generator replay when source is unavailable (REPL).
+
+        Works for ALL monads including CList (list monad).
+
+        Example::
+
+            @Result.do
+            def pipeline():
+                x = yield Ok(10)      # x = yield ... → bind
+                y = yield Ok(x + 1)   # same
+                return x + y           # final value → map
+
+            # Compiles to:
+            # Ok(10).bind(lambda x: Ok(x + 1).map(lambda y: x + y))
         """
+        try:
+            from funstruct.typeclasses.do_ast import do_ast
+
+            return do_ast(gen_fn)
+        except (OSError, TypeError, SyntaxError):
+            return self._do_generator(gen_fn)
+
+    def _do_generator(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
+        """Fallback: generator replay for when AST source is unavailable."""
         monad = self
 
         def _thunk(*args, **kwargs):

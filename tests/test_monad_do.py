@@ -8,7 +8,7 @@ do implementations are not needed.
 import asyncio
 
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.types.cons import CList, Cons, Nil
+from funstruct.types.cons import CList
 from funstruct.types.either import Either, Left, Right
 from funstruct.types.future import Future
 from funstruct.types.option import Nothing, Option, Some
