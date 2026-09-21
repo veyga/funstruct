@@ -160,10 +160,12 @@ class WriterT(MonadTransformer, Generic[_F, _W, _A]):
         """Do-notation via generators. Accumulates output across yields. Returns a callable.
 
         >>> from funstruct.types.either import Either, Right
-        >>> from funstruct.typeclasses import Monoid
-        >>> list_m = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
+        >>> from funstruct.typeclasses.monoid import Monoid
+        >>> class ListMonoid(Monoid):
+        ...     def combine(self, a, b): return a + b
+        ...     def empty(self): return []
         >>> class LogT(WriterT):
-        ...     _monoid = list_m
+        ...     _monoid = ListMonoid()
         >>> def pipeline():
         ...     x = yield LogT(Right((1, ["init"])))
         ...     y = yield LogT(Right((x + 10, ["step"])))

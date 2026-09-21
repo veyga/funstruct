@@ -3,13 +3,13 @@
 Examples:
     >>> from funstruct.types.validated import Validated, Valid, Invalid
     >>> Validated.cond(True, 42, "err")
-    Valid(value=42)
+    Valid(42)
     >>> Validated.cond(False, 42, "err")
-    Invalid(errors=Cons('err', Nil()))
+    Invalid(Cons('err', Nil()))
     >>> Valid(1) * Valid(2)
-    Valid(value=(1, 2))
+    Valid((1, 2))
     >>> Invalid("a:") * Invalid("b")
-    Invalid(errors='a:b')
+    Invalid('a:b')
 """
 
 from __future__ import annotations
