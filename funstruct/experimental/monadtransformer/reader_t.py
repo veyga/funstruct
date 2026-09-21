@@ -11,7 +11,7 @@ and_then: pipe output forward as the next context (Kleisli composition).
 
 Examples:
     >>> from funstruct.experimental.monadtransformer import ReaderT
-    >>> from funstruct.monad.either import Either, Right, Left
+    >>> from funstruct.types.either import Either, Right, Left
 
     bind — shared context, with failure:
 
@@ -115,12 +115,12 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         return ReaderT(inner)
 
-    def local(self, f: Callable) -> ReaderT:
+    def local(self, f: Callable[[_Ctx], _Ctx]) -> ReaderT:
         """Transform the environment before running.
 
         Cats: ``Kleisli.local``
 
-        >>> from funstruct.monad.either import Right
+        >>> from funstruct.types.either import Right
         >>> r = ReaderT(lambda ctx: Right(ctx["name"]))
         >>> r.local(lambda outer: {"name": outer}).run("Alice")
         Right('Alice')
@@ -133,7 +133,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         Cats: ``Kleisli.ask``
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> ReaderT.ask(Either).run(42)
         Right(42)
         """
@@ -157,7 +157,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
         Each `yield` extracts the value from a ReaderT (shared ctx).
         Short-circuits on inner monad failure.
 
-        >>> from funstruct.monad.either import Right
+        >>> from funstruct.types.either import Right
         >>> def pipeline():
         ...     x = yield ReaderT(lambda ctx: Right(ctx))
         ...     y = yield ReaderT(lambda ctx: Right(x + ctx))
@@ -198,7 +198,7 @@ class ReaderT(MonadTransformer, Generic[_Ctx, _M, _A]):
 
         Use when you have the inner reader function but not the outer monad.
 
-        >>> from funstruct.monad.either import Either, Right
+        >>> from funstruct.types.either import Either, Right
         >>> ReaderT.from_reader(lambda ctx: ctx["name"], Either).run({"name": "Alice"})
         Right('Alice')
         """

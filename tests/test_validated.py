@@ -2,13 +2,19 @@
 
 from parametrization import Parametrization as P
 
-from funstruct.applicative.validated import Invalid, Valid, Validated
-from funstruct.collections.cons import Cons, Nil
-from funstruct.collections.frozendict import frozendict
 from funstruct.typeclasses import Semigroup
+from funstruct.types.cons import Cons, Nil
+from funstruct.types.frozendict import frozendict
+from funstruct.types.validated import Invalid, Valid, Validated
 from tests.laws import assert_functor_laws, assert_semigroup_laws
 
-invalid_concat = Semigroup(typ=Invalid, combine=lambda a, b: a.product(b))
+
+class _InvalidConcat(Semigroup):
+    def combine(self, a, b):
+        return a.product(b)
+
+
+invalid_concat = _InvalidConcat()
 
 
 class TestValidatedLaws:
@@ -279,18 +285,18 @@ class TestToResult:
     """
 
     def test_valid_fold_to_ok(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.types.result import Err, Ok
 
         assert Valid(42).fold(Err, Ok) == Ok(42)
 
     def test_valid_fold_is_ok(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.types.result import Err, Ok
 
         result = Valid(42).fold(Err, Ok)
         assert type(result) is Ok
 
     def test_valid_falsey_values_still_ok(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.types.result import Err, Ok
 
         assert Valid(0).fold(Err, Ok) == Ok(0)
         assert Valid(None).fold(Err, Ok) == Ok(None)
@@ -299,24 +305,24 @@ class TestToResult:
         assert Valid([]).fold(Err, Ok) == Ok([])
 
     def test_invalid_fold_to_err(self):
-        from funstruct.monad.result import Err, Ok
+        from funstruct.types.result import Err, Ok
 
         assert Invalid(["err"]).fold(Err, Ok) == Err(["err"])
 
     def test_invalid_fold_is_err(self):
-        from funstruct.monad.result import Err, Ok
+        from funstruct.types.result import Err, Ok
 
         result = Invalid(["err"]).fold(Err, Ok)
         assert type(result) is Err
 
     def test_valid_fold_then_left_map(self):
-        from funstruct.monad.result import Ok, Err
+        from funstruct.types.result import Err, Ok
 
         result = Valid(1).fold(Err, Ok).left_map(lambda errs: ValueError(str(errs)))
         assert result == Ok(1)
 
     def test_invalid_fold_then_left_map(self):
-        from funstruct.monad.result import Err, Ok
+        from funstruct.types.result import Err, Ok
 
         result = (
             Invalid(["a", "b"])
@@ -330,7 +336,7 @@ class TestToResult:
                 assert "a; b" in str(e)
 
     def test_invalid_fold_then_left_map_custom(self):
-        from funstruct.monad.result import Err, Ok
+        from funstruct.types.result import Err, Ok
 
         result = (
             Invalid([1, 2, 3])
@@ -345,7 +351,7 @@ class TestToResult:
 
     def test_invalid_fold_left_map_pattern_match(self):
         """Err pattern-matches in case statements — the mint test scenario."""
-        from funstruct.monad.result import Err, Ok
+        from funstruct.types.result import Err, Ok
 
         result = (
             (

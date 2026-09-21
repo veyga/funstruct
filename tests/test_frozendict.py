@@ -1,15 +1,24 @@
 import pytest
 from parametrization import Parametrization as P
 
-from funstruct.collections.frozendict import frozendict
 from funstruct.typeclasses import Monoid
+from funstruct.types.frozendict import FrozendictEncoder, frozendict
 from tests.laws import (
     assert_functor_laws,
     assert_monoid_laws,
     assert_semigroup_laws,
 )
 
-FrozenDictMerge = Monoid(typ=frozendict, combine=lambda a, b: a + b, empty=frozendict())
+
+class _FrozendictMerge(Monoid):
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return frozendict()
+
+
+FrozenDictMerge = _FrozendictMerge()
 
 
 class TestFrozendictLaws:
@@ -845,3 +854,116 @@ class TestJsonRoundTrip:
         assert fd2["config"]["db"]["host"] == "localhost"
         assert fd2["config"]["db"]["port"] == 5432
         assert fd2["tags"] == ["prod", "us-east"]
+
+
+class TestNetworkSerialization:
+    """Verify frozendict serializes identically to dict for HTTP payloads."""
+
+    def test_is_mapping(self):
+        from collections.abc import Mapping
+
+        fd = frozendict({"a": 1})
+        assert isinstance(fd, Mapping)
+        assert issubclass(frozendict, Mapping)
+
+    def test_spread_into_dict_matches(self):
+        fd = frozendict({"email": "a@b.com", "scope": "read"})
+        spread = {**fd}
+        assert spread == {"email": "a@b.com", "scope": "read"}
+        assert isinstance(spread, dict)
+
+    def test_spread_merge_with_dict(self):
+        fd = frozendict({"extra_1": "val1", "extra_2": "val2"})
+        body = {"email": "a@b.com", "session_id": "s1", **fd}
+        assert body == {
+            "email": "a@b.com",
+            "session_id": "s1",
+            "extra_1": "val1",
+            "extra_2": "val2",
+        }
+
+    def test_json_dumps_via_to_dict(self):
+        import json
+
+        fd = frozendict({"aud": "api", "depth": 0, "tags": ["a", "b"]})
+        serialized = json.dumps(fd.to_dict(), sort_keys=True)
+        expected = json.dumps(
+            {"aud": "api", "depth": 0, "tags": ["a", "b"]}, sort_keys=True
+        )
+        assert serialized == expected
+
+    def test_json_roundtrip_preserves_types(self):
+        import json
+
+        original = {
+            "int_val": 42,
+            "str_val": "hello",
+            "bool_val": True,
+            "null_val": None,
+        }
+        fd = frozendict(original)
+        roundtripped = json.loads(json.dumps(fd.to_dict()))
+        assert roundtripped == original
+
+    def test_nested_frozendict_to_dict_is_plain(self):
+        fd = frozendict({"outer": {"inner": {"deep": 1}}})
+        d = fd.to_dict()
+        assert isinstance(d, dict)
+        assert isinstance(d["outer"], dict)
+        assert isinstance(d["outer"]["inner"], dict)
+        assert d["outer"]["inner"]["deep"] == 1
+
+    def test_spread_overrides_correctly(self):
+        defaults = frozendict({"timeout": 30, "retries": 3})
+        overrides = frozendict({"timeout": 60})
+        body = {**defaults, **overrides}
+        assert body == {"timeout": 60, "retries": 3}
+
+    def test_empty_frozendict_spreads_to_empty_dict(self):
+        fd = frozendict({})
+        assert {**fd} == {}
+
+    def test_or_fallback_pattern(self):
+        """The (extra_claims or {}) pattern used in HTTP client code."""
+        none_claims = None
+        some_claims = frozendict({"scope": "admin"})
+        assert {**(none_claims or {})} == {}
+        assert {**(some_claims or {})} == {"scope": "admin"}
+
+    def test_frozendict_encoder_direct(self):
+        import json
+
+        fd = frozendict({"a": 1, "b": "hello"})
+        result = json.dumps(fd, cls=FrozendictEncoder, sort_keys=True)
+        assert result == '{"a": 1, "b": "hello"}'
+
+    def test_frozendict_encoder_nested_in_dict(self):
+        import json
+
+        fd = frozendict({"scope": "admin"})
+        result = json.dumps(
+            {"claims": fd, "ok": True}, cls=FrozendictEncoder, sort_keys=True
+        )
+        assert result == '{"claims": {"scope": "admin"}, "ok": true}'
+
+    def test_frozendict_encoder_deeply_nested(self):
+        import json
+
+        fd = frozendict({"config": {"db": {"host": "localhost"}}})
+        result = json.dumps(fd, cls=FrozendictEncoder)
+        parsed = json.loads(result)
+        assert parsed["config"]["db"]["host"] == "localhost"
+
+    def test_frozendict_encoder_matches_dict_output(self):
+        import json
+
+        data = {
+            "email": "a@b.com",
+            "depth": 0,
+            "tags": ["x", "y"],
+            "nested": {"k": "v"},
+        }
+        fd = frozendict(data)
+        fd_json = json.loads(json.dumps(fd, cls=FrozendictEncoder))
+        dict_json = json.loads(json.dumps(data))
+        assert fd_json == dict_json

@@ -78,21 +78,25 @@ Pattern matching exhaustively handles all cases.
 Three distinct class hierarchies, connected by instances:
 
 ```text
-  BaseTypeclass                    DataType
+  BaseTypeclass                    DataType (with HKTMeta metaclass)
   (abstract capabilities)          (concrete data)
-  ─────────────────                ────────────────
+  ─────────────────                ──────────────────────────────────
   Semigroup → Monoid               Option[A]
   Foldable → Traversable           Either[E, A]
   Bifunctor                        Result[A], AsyncResult[A]
   Functor → Applicative            CList[A], Tree[A]
        ├→ Alternative              frozendict[K, V]
        └→ Monad → MonadError       State[S, A], Reader[R, A]
-                                   Writer[W, A], Future[A]
-                                   Validated[E, A], ZipList[A]
+  Eq (eq + hash)                   Writer[W, A], Future[A]
+  Representable (__repr__)         Validated[E, A], ZipList[A]
+  Stringable (__str__)
+  Truthable (__bool__)
 
   INSTANCES (connect them)
   ────────────────────────
   _OptionMonad(Monad, for_type=Option)         — auto-registered
+  _OptionEq(Eq, for_type=Option)               — equality + hash
+  _OptionRepresentable(Representable, for_type=Option)  — __repr__
   _ResultMonadError(MonadError, for_type=Result)
   _CListAlternative(Alternative, for_type=CList)
   _EitherBifunctor(Bifunctor, for_type=Either)
@@ -102,7 +106,10 @@ Three distinct class hierarchies, connected by instances:
 - **`BaseTypeclass`** — root of all typeclasses. Provides AutoRegister
   (`for_type=` keyword for automatic instance registration).
 - **`DataType`** — root of all data types. Provides TypeConstructor
-  (auto `_type_constructor` detection) and DotNotation (dot-syntax dispatch).
+  (auto `_type_constructor` detection), DotNotation (instance-level dispatch
+  via `__getattr__`), HKTMeta (class-level dispatch via metaclass), and
+  Python dunder delegates (`__eq__` → Eq, `__repr__` → Representable,
+  `__bool__` → Truthable, etc.).
 - **Instances** — separate classes that implement a typeclass for a data type.
   Only implement primitives (pure + bind); derived ops (map, ap) come from
   the typeclass hierarchy.
@@ -113,7 +120,7 @@ Three distinct class hierarchies, connected by instances:
 
 **Semigroup** — associative combine (`+` being the canonical 'combine' operation)
 
-```python
+```text
 A ─┐
     ├──( + )──> A
 A ─┘
@@ -121,7 +128,7 @@ A ─┘
 
 **Monoid** — semigroup with an identity element
 
-```
+```text
 A ─┐
     ├──( + )──> A       (+ identity = A)
 A ─┘
@@ -129,13 +136,13 @@ A ─┘
 
 **Functor** — transform the value inside a context
 
-```
+```text
 F[A] ---( f: A -> B )---> F[B]
 ```
 
 **Applicative** — apply a function in context to a value in context
 
-```
+```text
 F[A → B]  ─┐
            ├──ap──> F[B]
 F[A] ──────┘
@@ -143,7 +150,7 @@ F[A] ──────┘
 
 **Monad** — sequence computations that produce new contexts
 
-```
+```text
 F[A] ---( f: A -> F[B] )---> F[B]
 ```
 
@@ -155,16 +162,13 @@ Heavily influenced by [Scalaz](https://github.com/scalaz/scalaz) and
 # In v2, typeclasses are INSTANCE classes (self = instance, fa = data).
 # Data types extend DataType, NOT typeclasses.
 
-# ── Value-level typeclasses (instantiated per use) ──
+# ── Value-level typeclasses (ABC, not dataclass) ──
 
-@dataclass(frozen=True)
-class Semigroup[A]:
-    typ: type
-    combine: Callable[[A, A], A]
+class Semigroup(BaseTypeclass):
+    def combine(self, a, b): ...
 
-@dataclass(frozen=True)
-class Monoid[A](Semigroup[A]):
-    empty: A
+class Monoid(Semigroup):
+    def empty(self): ...
 
 # ── Typeclass hierarchy (instance classes) ──
 # F is the type constructor (Option, Result, etc.)
@@ -234,21 +238,26 @@ class MonadTransformer(ABC):
 
 ### Instances (which data types implement which typeclasses)
 
-| Data Type          | Typeclasses                     |
-| ------------------ | ------------------------------- |
-| `Option[A]`        | Monad, Alternative              |
-| `Either[E, A]`     | MonadError, Bifunctor           |
-| `Result[A]`        | MonadError, Bifunctor           |
-| `AsyncResult[A]`   | MonadError, Bifunctor           |
-| `CList[A]`         | Monad, Traversable, Alternative |
-| `Tree[A]`          | Functor, Foldable               |
-| `frozendict[K, V]` | Functor, Foldable               |
-| `Validated[E, A]`  | Applicative, Bifunctor          |
-| `ZipList[A]`       | Applicative                     |
-| `State[S, A]`      | Monad                           |
-| `Reader[R, A]`     | Monad                           |
-| `Writer[W, A]`     | Monad                           |
-| `Future[A]`        | Monad                           |
+| Type | Eq | Repr | Truth | Semi | Monoid | Func | App | Monad | MErr | Alt | Fold | Trav | Bifu | Str |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Option | ✓ | ✓ | ✓ | | | | | ✓ | | ✓ | | ✓ | | |
+| Either | ✓ | ✓ | | | | | | | ✓ | | | ✓ | ✓ | |
+| Result | ✓ | ✓ | | | | | | | ✓ | | | | ✓ | |
+| AsyncResult | | ✓ | | | | | | | ✓ | | | | ✓ | |
+| CList | ✓ | ✓ | ✓ | | ✓ | | | ✓ | | ✓ | | ✓ | | ✓ |
+| Tree | ✓ | ✓ | | | | ✓ | | | | | ✓ | ✓ | | |
+| frozendict | ✓ | ✓ | ✓ | ✓ | | ✓ | | | | | ✓ | | | |
+| Validated | ✓ | ✓ | ✓ | | | | ✓ | | | | | | ✓ | |
+| ZipList | ✓ | ✓ | | | | | ✓ | | | | ✓ | | | |
+| State | | ✓ | | | | | | ✓ | | | | | | |
+| Reader | | ✓ | | | | | | ✓ | | | | | | |
+| Writer | ✓ | ✓ | | | | | | ✓ | | | | | | |
+| Future | | ✓ | | | | | | ✓ | | | | | | |
+
+**Key:** Eq = equality + hash, Repr = `__repr__`, Truth = `__bool__`, Str = `__str__`,
+Func = Functor, App = Applicative, MErr = MonadError, Alt = Alternative,
+Fold = Foldable, Trav = Traversable, Bifu = Bifunctor.
+Types without Eq (State, Reader, Future, AsyncResult) use identity comparison.
 
 ### Data Types
 
@@ -262,7 +271,7 @@ class MonadTransformer(ABC):
 | `Reader[Ctx, A]`   | Shared environment                              |
 | `Writer[W, A]`     | Accumulated output                              |
 | `Validated[E, A]`  | Error accumulation (applicative, not monad)     |
-| `Future[A]`        | Lazy async computation                          |
+| `Future[A]`        | A value that will be resolved later              |
 | `CList[A]`         | Persistent singly-linked list                   |
 | `Tree[A]`          | Immutable binary tree (functor only)            |
 | `frozendict[K, V]` | Persistent HAMT dictionary                      |
@@ -320,8 +329,8 @@ Every implementation must satisfy these mathematical laws:
 **Dot syntax** — the default, for everyday code:
 
 ```python
-from funstruct.monad.option import Some, Nothing
-from funstruct.monad.result import Ok, Err
+from funstruct.types.option import Some, Nothing
+from funstruct.types.result import Ok, Err
 
 Some(10).map(lambda x: x * 2).bind(lambda x: Some(x + 1))  # Some(21)
 Ok(10).map(str)                                              # Ok('10')
@@ -334,8 +343,8 @@ Nothing().map(lambda x: x + 1)                               # Nothing()
 
 ```python
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.monad.option import Option, Some
-from funstruct.monad.result import Result, Ok, Err
+from funstruct.types.option import Option, Some
+from funstruct.types.result import Result, Ok, Err
 
 # F: Monad    = the typeclass instance (constraint / trait bound)
 # fa: F[A]    = a value in the monadic context (Some(21), Ok(21), etc.)
@@ -400,7 +409,7 @@ the same effect at runtime through the typeclass instance pattern:
 
 - **Type constructors** are represented by the class itself (`Option`,
   `Result`, `Either`). Each data type sets `_type_constructor` so
-  variants resolve to their base: `tc_of(Some(42))` → `Option`.
+  variants resolve to their base: `typeclass_of(Some(42))` → `Option`.
 - **Typeclass resolution** via `summon(Monad, Option)` returns the
   registered instance, just like Scala's `summon[Monad[Option]]`.
 - **Generic functions** use the instance directly:
@@ -409,9 +418,10 @@ the same effect at runtime through the typeclass instance pattern:
   `Some(10).map(f)` → `summon(Functor, Option).map(Some(10), f)`
 
 This gives funstruct Haskell-style typeclass resolution and Scala-style
-tagless final — without HKT encoding tricks, metaclass magic, or
-compiler plugins. The tradeoff: trait bounds are enforced at runtime
-(via `summon`), not at compile time.
+tagless final — without HKT encoding tricks or compiler plugins. A
+metaclass (`HKTMeta`) provides class-level dispatch (e.g. `Option.pure`,
+`Result.do`). The tradeoff: trait bounds are enforced at runtime (via
+`summon`), not at compile time.
 
 ## Experimental
 
@@ -430,7 +440,7 @@ For most use cases, plain monads with `do`-notation and `fold` are
 sufficient. Reach for transformers only when you need to combine
 multiple effects in a single pipeline.
 
-```
+```text
 ReaderT[F, Ctx, A]  =  Ctx -> F[A]         (environment + F's effects)
 StateT[F, S, A]     =  S -> F[(S, A)]      (state + F's effects)
 EitherT[F, E, A]    =  F[Either[E, A]]     (errors + F's effects)
@@ -442,7 +452,7 @@ WriterT[F, W, A]    =  F[(A, W)]           (output + F's effects)
 
 ```python
 from funstruct.experimental.optics import Lens, at
-from funstruct.collections.frozendict import frozendict
+from funstruct.types.frozendict import frozendict
 ```
 
 Lenses let you read and update deeply nested immutable structures
@@ -480,3 +490,4 @@ version_lens.modify(config, lambda v: v + 1)    # bumps to 3
 - **Effects system** — algebraic effects as an alternative to monad transformer stacks.
 - **Stream** — infinite streams, lazy evaluation.
 - **Pydantic integration** — more native integration with BaseModel, frozendict, lens, validated, etc
+- **Compiler plugin step for checking implicit resolution** - make `summon` calls verifiable by mypy/ty

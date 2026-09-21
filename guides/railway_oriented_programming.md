@@ -43,7 +43,7 @@ of nesting.
 ## With ROP (Result monad)
 
 ```python
-from funstruct.monad.result import Result, Ok, Err
+from funstruct.types.result import Result, Ok, Err
 
 @Result.do
 def process_order(order_id: str):
@@ -107,7 +107,7 @@ Err("timeout").left_map(lambda e: f"FATAL: {e}")
 Python's ecosystem uses exceptions. `@Try` bridges the gap:
 
 ```python
-from funstruct.monad.result import Try
+from funstruct.types.result import Try
 
 @Try
 def parse_int(s: str) -> int:

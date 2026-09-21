@@ -17,8 +17,9 @@ import asyncio
 from dataclasses import dataclass
 from typing import Protocol
 
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
-
+from demos._util import header
+from funstruct.typeclasses import MonadError, summon
+from funstruct.types.result import AsyncResult, Err, Ok, Result, TryAsync
 
 # ── Domain ───────────────────────────────────────────────────────────
 
@@ -57,14 +58,14 @@ class OrderRepo[F](Protocol):
 
 
 def place_order[F](
-    repo: OrderRepo[F], F: type[F], customer_id: str, product_id: str
-) -> F[Order]:
-    @F.do
+    repo: OrderRepo[F], M: MonadError[F], customer_id: str, product_id: str
+):
+    @M.do
     def run():
         customer = yield repo.find_customer(customer_id)
         product = yield repo.find_product(product_id)
         if customer.credit < product.price:
-            yield F.raise_error(
+            yield M.raise_error(
                 ValueError(
                     f"{customer.name} has ${customer.credit:.2f}, needs ${product.price:.2f}"
                 )
@@ -148,32 +149,26 @@ class FailingOrderRepo:
 
 
 def main():
-    print("=== Async 'Postgres' ===")
+    header("Async 'Postgres'")
 
     async def run_async():
         repo = PostgresOrderRepo()
-        print(
-            f"  alice+widget: {await place_order(repo, AsyncResult, 'alice', 'widget')}"
-        )
-        print(
-            f"  bob+laptop:   {await place_order(repo, AsyncResult, 'bob', 'laptop')}"
-        )
-        print(
-            f"  nobody+widget: {await place_order(repo, AsyncResult, 'nobody', 'widget')}"
-        )
+        M = summon(MonadError, AsyncResult)
+        print(f"  alice+widget: {await place_order(repo, M, 'alice', 'widget')}")
+        print(f"  bob+laptop:   {await place_order(repo, M, 'bob', 'laptop')}")
+        print(f"  nobody+widget: {await place_order(repo, M, 'nobody', 'widget')}")
 
     asyncio.run(run_async())
 
-    print("\n=== Sync in-memory ===")
+    header("Sync in-memory")
     repo = InMemoryOrderRepo()
-    print(f"  alice+widget: {place_order(repo, Result, 'alice', 'widget')}")
-    print(f"  nobody+widget: {place_order(repo, Result, 'nobody', 'widget')}")
+    M = summon(MonadError, Result)
+    print(f"  alice+widget: {place_order(repo, M, 'alice', 'widget')}")
+    print(f"  nobody+widget: {place_order(repo, M, 'nobody', 'widget')}")
     print(f"  saved orders: {len(repo.orders)}")
 
-    print("\n=== Failing (DB down) ===")
-    print(
-        f"  alice+widget: {place_order(FailingOrderRepo(), Result, 'alice', 'widget')}"
-    )
+    header("Failing (DB down)")
+    print(f"  alice+widget: {place_order(FailingOrderRepo(), M, 'alice', 'widget')}")
 
 
 if __name__ == "__main__":

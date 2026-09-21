@@ -1,0 +1,3 @@
+# Tree
+
+::: funstruct.types.tree

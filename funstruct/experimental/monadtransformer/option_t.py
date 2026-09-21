@@ -5,8 +5,8 @@ map transforms the value inside Some.
 
 Examples:
     >>> from funstruct.experimental.monadtransformer.option_t import OptionT
-    >>> from funstruct.monad.either import Either, Right, Left
-    >>> from funstruct.monad.option import Some, Nothing
+    >>> from funstruct.types.either import Either, Right, Left
+    >>> from funstruct.types.option import Some, Nothing
 
     Wrapping Either — a computation that can fail OR be absent:
 
@@ -47,7 +47,7 @@ from collections.abc import Callable
 from typing import Generic, TypeVar
 
 from funstruct.experimental.monadtransformer._typeclass import MonadTransformer
-from funstruct.monad.option import Nothing, Option, Some
+from funstruct.types.option import Nothing, Option, Some
 
 _F = TypeVar("_F")
 _A = TypeVar("_A")
@@ -75,8 +75,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def bind(self, f: Callable[[_A], OptionT[_F, _B]]) -> OptionT[_F, _B]:
         """FlatMap: unwrap F, match Option, chain on Some.
 
-        >>> from funstruct.monad.either import Right
-        >>> from funstruct.monad.option import Some, Nothing
+        >>> from funstruct.types.either import Right
+        >>> from funstruct.types.option import Some, Nothing
         >>> OptionT(Right(Some(1))).bind(
         ...     lambda x: OptionT(Right(Some(x + 10)))
         ... ).run()
@@ -99,8 +99,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def map(self, f: Callable[[_A], _B]) -> OptionT[_F, _B]:
         """Transform the value inside Some inside F.
 
-        >>> from funstruct.monad.either import Right
-        >>> from funstruct.monad.option import Some
+        >>> from funstruct.types.either import Right
+        >>> from funstruct.types.option import Some
         >>> OptionT(Right(Some(5))).map(lambda x: x * 2).run()
         Right(Some(10))
         """
@@ -117,8 +117,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def handle_error_with(self, f: Callable[[], OptionT[_F, _A]]) -> OptionT[_F, _A]:
         """Recover from Nothing: if inner is Nothing, use fallback.
 
-        >>> from funstruct.monad.either import Right
-        >>> from funstruct.monad.option import Some, Nothing
+        >>> from funstruct.types.either import Right
+        >>> from funstruct.types.option import Some, Nothing
         >>> OptionT(Right(Nothing())).handle_error_with(
         ...     lambda: OptionT(Right(Some(99)))
         ... ).run()
@@ -141,8 +141,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def fold(self, on_nothing: Callable[[], _B], on_some: Callable[[_A], _B]) -> _F:
         """Eliminate the Option inside F, returning F[B].
 
-        >>> from funstruct.monad.either import Right
-        >>> from funstruct.monad.option import Some, Nothing
+        >>> from funstruct.types.either import Right
+        >>> from funstruct.types.option import Some, Nothing
         >>> OptionT(Right(Some(5))).fold(lambda: 0, lambda x: x * 2)
         Right(10)
         >>> OptionT(Right(Nothing())).fold(lambda: 0, lambda x: x * 2)
@@ -153,8 +153,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def get_or_else(self, default: _A) -> _F:
         """Extract the Some value or return default, inside F.
 
-        >>> from funstruct.monad.either import Right
-        >>> from funstruct.monad.option import Some, Nothing
+        >>> from funstruct.types.either import Right
+        >>> from funstruct.types.option import Some, Nothing
         >>> OptionT(Right(Some(42))).get_or_else(0)
         Right(42)
         >>> OptionT(Right(Nothing())).get_or_else(0)
@@ -165,8 +165,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def filter(self, f: Callable[[_A], bool]) -> OptionT[_F, _A]:
         """Filter the value inside Some; becomes Nothing if predicate fails.
 
-        >>> from funstruct.monad.either import Right
-        >>> from funstruct.monad.option import Some, Nothing
+        >>> from funstruct.types.either import Right
+        >>> from funstruct.types.option import Some, Nothing
         >>> OptionT(Right(Some(10))).filter(lambda x: x > 5).run()
         Right(Some(10))
         >>> OptionT(Right(Some(3))).filter(lambda x: x > 5).run()
@@ -182,8 +182,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def do(cls, gen_fn) -> Callable[..., OptionT]:
         """Do-notation via generators. Short-circuits on Nothing. Returns a callable.
 
-        >>> from funstruct.monad.either import Right
-        >>> from funstruct.monad.option import Some
+        >>> from funstruct.types.either import Right
+        >>> from funstruct.types.option import Some
         >>> def pipeline():
         ...     x = yield OptionT(Right(Some(1)))
         ...     y = yield OptionT(Right(Some(x + 10)))
@@ -221,8 +221,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def pure(cls, value, monad: type) -> OptionT:
         """Lift a plain value into OptionT.
 
-        >>> from funstruct.monad.either import Either, Right
-        >>> from funstruct.monad.option import Some
+        >>> from funstruct.types.either import Either, Right
+        >>> from funstruct.types.option import Some
         >>> OptionT.pure(42, Either).run()
         Right(Some(42))
         """
@@ -232,8 +232,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
     def none(cls, monad: type) -> OptionT:
         """Construct an OptionT holding Nothing.
 
-        >>> from funstruct.monad.either import Either, Right
-        >>> from funstruct.monad.option import Nothing
+        >>> from funstruct.types.either import Either, Right
+        >>> from funstruct.types.option import Nothing
         >>> OptionT.none(Either).run()
         Right(Nothing())
         """
@@ -247,8 +247,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
 
         Haskell equivalent: ``lift :: m a -> OptionT m a``
 
-        >>> from funstruct.monad.either import Right, Left
-        >>> from funstruct.monad.option import Some
+        >>> from funstruct.types.either import Right, Left
+        >>> from funstruct.types.option import Some
         >>> OptionT.lift_f(Right(42)).run()
         Right(Some(42))
         >>> OptionT.lift_f(Left("err")).run()
@@ -262,8 +262,8 @@ class OptionT(MonadTransformer, Generic[_F, _A]):
 
         Use when you have the inner Option but not the outer monad.
 
-        >>> from funstruct.monad.either import Either, Right
-        >>> from funstruct.monad.option import Some, Nothing
+        >>> from funstruct.types.either import Either, Right
+        >>> from funstruct.types.option import Some, Nothing
         >>> OptionT.from_option(Some(42), Either).run()
         Right(Some(42))
         >>> OptionT.from_option(Nothing(), Either).run()

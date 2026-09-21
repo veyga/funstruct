@@ -1,0 +1,3 @@
+# frozendict
+
+::: funstruct.types.frozendict

@@ -10,16 +10,17 @@ pass an `eq` function that evaluates/runs the values for comparison.
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from funstruct.typeclasses import Monoid, Semigroup
 
 A = TypeVar("A")
+_M = TypeVar("_M")
 Eq = Callable[[object, object], bool]
 
 
 def assert_type_contract(
-    pure_fn: Callable,
+    pure_fn: Callable[[Any], _M],
     success_type: type,
     is_monad: bool = True,
 ) -> None:
@@ -92,11 +93,11 @@ def assert_monoid_laws(a: A, sg: Monoid) -> None:
          / \\                  / \\
         ε   a  →  a          a   ε  →  a
 
-    Counterexample: Monoid(int, +, empty=1) violates identity:
+    Counterexample: a Monoid with empty()=1 violates identity:
         combine(1, 5) = 6 != 5
     """
-    assert sg.combine(sg.empty, a) == a, "Monoid left identity violated"
-    assert sg.combine(a, sg.empty) == a, "Monoid right identity violated"
+    assert sg.combine(sg.empty(), a) == a, "Monoid left identity violated"
+    assert sg.combine(a, sg.empty()) == a, "Monoid right identity violated"
 
 
 def assert_functor_laws(fa, eq: Eq | None = None) -> None:
@@ -131,7 +132,7 @@ def assert_functor_laws(fa, eq: Eq | None = None) -> None:
 
 
 def assert_applicative_laws(
-    pure_fn: Callable,
+    pure_fn: Callable[[Any], _M],
     fa,
     fb,
     eq: Eq | None = None,
@@ -194,10 +195,10 @@ def assert_applicative_laws(
 
 
 def assert_monad_laws(
-    pure_fn: Callable,
+    pure_fn: Callable[[Any], _M],
     m,
-    f: Callable,
-    g: Callable,
+    f: Callable[[Any], _M],
+    g: Callable[[Any], _M],
     eq: Eq | None = None,
 ) -> None:
     """Monad laws: left identity, right identity, associativity, type preservation.

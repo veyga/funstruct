@@ -7,7 +7,7 @@ For async code that can fail, use `AsyncResult`. It's essentially
 `Ok(value)` or `Err(exception)`.
 
 ```python
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
+from funstruct.types.result import AsyncResult, Ok, Err, TryAsync
 
 # Wrap async functions that might throw
 @TryAsync
@@ -86,7 +86,7 @@ result = await fetch_user(42).map(lambda u: u.email)
 result = await fetch_user(42).bind(lambda u: fetch_email(u))
 
 # >> operator is bind
-result = await fetch_user(42) >> fetch_email
+result = await (fetch_user(42) >> fetch_email)
 ```
 
 ## Error handling
@@ -118,8 +118,6 @@ match await pipeline:
 ```python
 AsyncResult.pure(42)                     # Ok(42) wrapped in async
 AsyncResult.raise_error(ValueError("x")) # Err wrapped in async
-AsyncResult.from_result(Ok(42))          # lift sync Result
-AsyncResult.from_either(Right(42))       # lift sync Either
 ```
 
 ## When to use which

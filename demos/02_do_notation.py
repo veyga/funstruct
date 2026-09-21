@@ -1,13 +1,13 @@
 """Demo: do-notation — generator-based monadic sequencing.
 
 @do turns a generator function into a monadic pipeline.
-yield extracts the value from each monadic step; short-circuits on failure.
+yield extracts the value from each monadic step
 
 Key rules:
     - @Result.do / @Option.do uses generators (def + yield), NOT async/await
     - You cannot decorate an async def with @do
     - @AsyncResult.do handles async values (awaits internally)
-    - To mix sync Result into @AsyncResult.do, use AsyncResult.from_result()
+    - To mix sync values into @AsyncResult.do, use AsyncResult.pure()
 
 Equivalent styles:
     @AsyncResult.do         — decorator style (recommended)
@@ -21,7 +21,8 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 
-from funstruct.monad.result import AsyncResult, Ok, Err, Result, Try, TryAsync
+from demos._util import header
+from funstruct.types.result import AsyncResult, Ok, Result, TryAsync
 
 
 @dataclass
@@ -41,11 +42,6 @@ def get_age(user: User) -> AsyncResult[int]:
     return AsyncResult.pure(30 if user.name == "alice" else 0)
 
 
-@Try
-def get_age_sync(user: User) -> int:
-    return 30 if user.name == "alice" else 0
-
-
 @TryAsync
 def get_nickname(user: User) -> str:
     nicknames = {"alice": "ally"}
@@ -63,7 +59,18 @@ def get_profile_decorated():
     return f"{nickname} (age {age})"
 
 
-# ── Style 2: manual do (pass generator function) ────────────────────
+# ── Style 2: @do with arguments ─────────────────────────────────────
+
+
+@AsyncResult.do
+def get_profile_for(username: str):
+    user = yield get_user(username)
+    age = yield get_age(user)
+    nickname = yield get_nickname(user)
+    return f"{nickname} (age {age})"
+
+
+# ── Style 3: manual do (pass generator function) ────────────────────
 
 
 def _profile_gen():
@@ -76,7 +83,7 @@ def _profile_gen():
 get_profile_manual = AsyncResult.do(_profile_gen)
 
 
-# ── Style 3: sync do-notation with Result ────────────────────────────
+# ── Style 4: sync do-notation with Result ────────────────────────────
 
 
 @Result.do
@@ -85,17 +92,6 @@ def sync_pipeline():
     y = yield Ok(x + 1)
     z = yield Ok(y * 2)
     return z
-
-
-# ── Style 4: mixing sync Result into async do ───────────────────────
-
-
-@AsyncResult.do
-def mixed_pipeline():
-    user = yield get_user("alice")
-    age = yield AsyncResult.from_result(get_age_sync(user))  # lift sync → async
-    nickname = yield get_nickname(user)
-    return f"{nickname} (age {age})"
 
 
 # ── Short-circuit on error ───────────────────────────────────────────
@@ -108,24 +104,65 @@ def failing_pipeline():
     return f"age: {age}"
 
 
+# ── Style 5: CList do-notation (list comprehension) ────────────────
+
+from funstruct.experimental.do_ast import do_ast
+from funstruct.types.cons import CList
+
+
+@dataclass(frozen=True)
+class UserRow:
+    id: int
+    name: str
+
+
+@dataclass(frozen=True)
+class OrderRow:
+    user_id: int
+    total: float
+
+
+users = CList.from_iterable([UserRow(1, "Alice"), UserRow(2, "Bob")])
+orders = CList.from_iterable(
+    [
+        OrderRow(1, 49.99),
+        OrderRow(1, 12.00),
+        OrderRow(2, 99.99),
+    ]
+)
+
+
+@do_ast
+def user_orders():
+    user = yield users
+    order = yield orders
+    yield CList.from_iterable([()] if order.user_id == user.id else [])
+    return f"{user.name}: ${order.total:.2f}"
+
+
 def main():
     async def run():
-        print("=== @AsyncResult.do (decorator) ===")
+        header("@AsyncResult.do (decorator)")
         print(f"  {await get_profile_decorated()}")
 
-        print("\n=== AsyncResult.do(gen_fn) (manual) ===")
+        header("@AsyncResult.do with args")
+        print(f"  alice:  {await get_profile_for('alice')}")
+        print(f"  nobody: {await get_profile_for('nobody')}")
+
+        header("AsyncResult.do(gen_fn) (manual)")
         print(f"  {await get_profile_manual()}")
 
-        print("\n=== @Result.do (sync) ===")
+        header("@Result.do (sync)")
         print(f"  {sync_pipeline()}")
 
-        print("\n=== Mixed sync/async ===")
-        print(f"  {await mixed_pipeline()}")
-
-        print("\n=== Short-circuit on error ===")
+        header("Short-circuit on error")
         print(f"  {await failing_pipeline()}")
 
     asyncio.run(run())
+
+    header("CList.do (list comprehension / join)")
+    for row in user_orders():
+        print(f"  {row}")
 
 
 if __name__ == "__main__":

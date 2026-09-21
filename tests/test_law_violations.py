@@ -10,9 +10,9 @@ Summary of violations:
 
     Broken Implementation           | Law Violated          | What's Wrong
     --------------------------------+-----------------------+---------------------------------
-    Semigroup(int, subtraction)     | Associativity         | (a-b)-c != a-(b-c)
-    Semigroup(float, division)      | Associativity         | (a/b)/c != a/(b/c)
-    Monoid(int, +, empty=1)         | Identity              | combine(1, a) != a
+    IntSubtract (Semigroup)         | Associativity         | (a-b)-c != a-(b-c)
+    FloatDivide (Semigroup)         | Associativity         | (a/b)/c != a/(b/c)
+    BadIntMonoid (empty=1)          | Identity              | combine(1, a) != a
     CountingBox (increments on map) | Functor identity      | map(id) != id
     DoublingBox (applies f twice)   | Functor composition   | map(f).map(g) != map(g∘f)
     TaggedBox (pure adds a tag)     | Monad left identity   | pure(a).bind(f) != f(a)
@@ -28,12 +28,12 @@ Semigroup vs Monoid requirement:
 
 import pytest
 
-from funstruct.applicative.validated import Invalid, Valid
-from funstruct.collections.cons import Cons, Nil
-from funstruct.monad.writer import Writer
 from funstruct.typeclasses import Monoid, Semigroup
 from funstruct.typeclasses.functor import Functor
 from funstruct.typeclasses.monad import Monad
+from funstruct.types.cons import Cons, Nil
+from funstruct.types.validated import Invalid, Valid
+from funstruct.types.writer import Writer
 from tests.laws import (
     assert_functor_laws,
     assert_monad_laws,
@@ -42,18 +42,47 @@ from tests.laws import (
 )
 
 
+class _IntSubtract(Semigroup):
+    def combine(self, a, b):
+        return a - b
+
+
+class _FloatDivide(Semigroup):
+    def combine(self, a, b):
+        return a / b
+
+
+class _IntAdd(Semigroup):
+    def combine(self, a, b):
+        return a + b
+
+
+class _IntAddMonoid(Monoid):
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return 0
+
+
+class _BadIntMonoid(Monoid):
+    def combine(self, a, b):
+        return a + b
+
+    def empty(self):
+        return 1  # WRONG: 1 is not identity for addition
+
+
 class TestAssociativityViolation:
     """Ints under subtraction are NOT associative: (a - b) - c != a - (b - c)."""
 
     def test_subtraction_violates_associativity(self):
-        int_sub = Semigroup(typ=int, combine=lambda a, b: a - b)
         with pytest.raises(AssertionError, match="associativity"):
-            assert_semigroup_laws(10, 3, 1, sg=int_sub)
+            assert_semigroup_laws(10, 3, 1, sg=_IntSubtract())
 
     def test_division_violates_associativity(self):
-        float_div = Semigroup(typ=float, combine=lambda a, b: a / b)
         with pytest.raises(AssertionError, match="associativity"):
-            assert_semigroup_laws(12.0, 3.0, 2.0, sg=float_div)
+            assert_semigroup_laws(12.0, 3.0, 2.0, sg=_FloatDivide())
 
 
 class TestWriterRequiresMonoid:
@@ -66,19 +95,14 @@ class TestWriterRequiresMonoid:
     """
 
     def test_writer_with_semigroup_fails_on_pure(self):
-        int_add_semigroup = Semigroup(typ=int, combine=lambda a, b: a + b)
-
         class BadWriter(Writer):
-            _monoid = int_add_semigroup
+            _monoid = _IntAdd()
 
         with pytest.raises(AttributeError):
             BadWriter.pure(42)
 
     def test_writer_with_monoid_succeeds(self):
-        int_add_monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
-
-        class GoodWriter(Writer):
-            _monoid = int_add_monoid
+        GoodWriter = Writer.for_monoid(_IntAddMonoid(), "GoodWriter")
 
         w = GoodWriter.pure(42)
         assert w.value == 42
@@ -86,10 +110,7 @@ class TestWriterRequiresMonoid:
 
     def test_writer_pure_uses_empty_as_identity(self):
         """pure(a).bind(f) == f(a) only holds when output starts at empty."""
-        int_add_monoid = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
-
-        class CountWriter(Writer):
-            _monoid = int_add_monoid
+        CountWriter = Writer.for_monoid(_IntAddMonoid(), "CountWriter")
 
         f = lambda x: CountWriter(x + 1, 1)
 
@@ -136,39 +157,32 @@ class TestSemigroupVsMonoidOnWriter:
     Writer demands a Monoid at the type level.
     """
 
-    def test_bind_only_uses_combine(self):
-        """bind works with just combine — doesn't touch empty."""
-        int_add = Semigroup(typ=int, combine=lambda a, b: a + b)
+    def test_bind_uses_combine(self):
+        """bind combines output from both steps."""
+        TestIntWriter = Writer.for_monoid(_IntAddMonoid(), "IntWriter_test")
 
-        class SemigroupWriter(Writer):
-            _monoid = int_add
-
-        w1 = SemigroupWriter(1, 10)
-        w2 = w1.bind(lambda x: SemigroupWriter(x + 1, 20))
+        w1 = TestIntWriter(1, 10)
+        w2 = w1.bind(lambda x: TestIntWriter(x + 1, 20))
         assert w2.value == 2
         assert w2.output == 30
 
     def test_pure_crashes_without_empty(self):
         """pure needs empty — semigroup lacks it."""
-        int_add = Semigroup(typ=int, combine=lambda a, b: a + b)
 
         class SemigroupWriter(Writer):
-            _monoid = int_add
+            _monoid = _IntAdd()
 
         with pytest.raises(AttributeError):
             SemigroupWriter.pure(42)
 
     def test_monoid_satisfies_both(self):
         """Monoid has combine AND empty — everything works."""
-        int_add = Monoid(typ=int, combine=lambda a, b: a + b, empty=0)
+        TestMonoidWriter = Writer.for_monoid(_IntAddMonoid(), "MonoidWriter_test")
 
-        class MonoidWriter(Writer):
-            _monoid = int_add
-
-        w = MonoidWriter.pure(42)
+        w = TestMonoidWriter.pure(42)
         assert w.value == 42
         assert w.output == 0
-        w2 = w.bind(lambda x: MonoidWriter(x + 1, 5))
+        w2 = w.bind(lambda x: TestMonoidWriter(x + 1, 5))
         assert w2.value == 43
         assert w2.output == 5
 
@@ -183,13 +197,8 @@ class TestBrokenMonoid:
 
     def test_bad_empty_violates_identity(self):
         """combine(empty, a) != a when empty isn't neutral."""
-        bad_monoid = Monoid(
-            typ=int,
-            combine=lambda a, b: a + b,
-            empty=1,  # WRONG: 1 is not identity for addition
-        )
         with pytest.raises(AssertionError, match="identity"):
-            assert_monoid_laws(5, sg=bad_monoid)
+            assert_monoid_laws(5, sg=_BadIntMonoid())
 
 
 class TestBrokenFunctor:

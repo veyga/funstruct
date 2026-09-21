@@ -17,12 +17,12 @@ from funstruct.typeclasses import (
     Monad,
     MonadError,
     summon,
-    tc_of,
+    typeclass_of,
 )
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.either import Either, Right, Left
-from funstruct.monad.result import Result, Ok, Err, AsyncResult
-from funstruct.collections.cons import CList, Cons, Nil
+from funstruct.types.cons import CList, Cons
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 
 class TestDirectResolution:
@@ -169,44 +169,44 @@ class TestDotSyntaxEquivalence:
 
 
 class TestTcOf:
-    """tc_of resolves the type constructor from a value — Haskell-style."""
+    """typeclass_of resolves the type constructor from a value — Haskell-style."""
 
     def test_some_resolves_to_option(self):
-        assert tc_of(Some(42)) is Option
+        assert typeclass_of(Some(42)) is Option
 
     def test_nothing_resolves_to_option(self):
-        assert tc_of(Nothing()) is Option
+        assert typeclass_of(Nothing()) is Option
 
     def test_ok_resolves_to_result(self):
-        assert tc_of(Ok(1)) is Result
+        assert typeclass_of(Ok(1)) is Result
 
     def test_err_resolves_to_result(self):
-        assert tc_of(Err(ValueError("x"))) is Result
+        assert typeclass_of(Err(ValueError("x"))) is Result
 
     def test_right_resolves_to_either(self):
-        assert tc_of(Right(1)) is Either
+        assert typeclass_of(Right(1)) is Either
 
     def test_left_resolves_to_either(self):
-        assert tc_of(Left("e")) is Either
+        assert typeclass_of(Left("e")) is Either
 
     def test_cons_resolves_to_clist(self):
-        assert tc_of(Cons(1)) is CList
+        assert typeclass_of(Cons(1)) is CList
 
     def test_unknown_type_raises(self):
         with pytest.raises(TypeError, match="No _type_constructor"):
-            tc_of(42)
+            typeclass_of(42)
 
 
 class TestHaskellStyleGenericFunctions:
     """Write generic functions that auto-resolve typeclasses from values.
 
-    No @using, no given, no implicits. Just summon + tc_of.
+    No @using, no given, no implicits. Just summon + typeclass_of.
     Same as Haskell's automatic typeclass resolution, at runtime.
     """
 
     def test_generic_double(self):
         def double(fa):
-            F = summon(Monad, tc_of(fa))
+            F = summon(Monad, typeclass_of(fa))
             return F.map(fa, lambda x: x * 2)
 
         assert double(Some(21)) == Some(42)
@@ -215,7 +215,7 @@ class TestHaskellStyleGenericFunctions:
 
     def test_generic_increment(self):
         def increment(fa):
-            F = summon(Monad, tc_of(fa))
+            F = summon(Monad, typeclass_of(fa))
             return F.bind(fa, lambda x: F.pure(x + 1))
 
         assert increment(Some(41)) == Some(42)
@@ -223,7 +223,7 @@ class TestHaskellStyleGenericFunctions:
 
     def test_generic_safe_divide(self):
         def safe_divide(fa, b):
-            F = summon(MonadError, tc_of(fa))
+            F = summon(MonadError, typeclass_of(fa))
             return F.bind(
                 fa,
                 lambda a: (
@@ -240,7 +240,7 @@ class TestHaskellStyleGenericFunctions:
 
     def test_generic_pipeline(self):
         def pipeline(fa):
-            F = summon(Monad, tc_of(fa))
+            F = summon(Monad, typeclass_of(fa))
             doubled = F.bind(fa, lambda x: F.pure(x * 2))
             return F.map(doubled, lambda y: y + 1)
 

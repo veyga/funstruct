@@ -19,13 +19,21 @@ Composing these requires unwrapping at every layer:
         case Nothing(): ...
 
 Three functions, three layers of nesting. This doesn't scale.
+
+Run: uv run python demos/transformers/01_the_problem.py
 """
 
 import asyncio
+from dataclasses import dataclass
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
-from funstruct.playground import User
+from demos._util import header
+from funstruct.types.future import Future
+from funstruct.types.option import Nothing, Option, Some
+
+
+@dataclass
+class User:
+    name: str
 
 
 def get_user(name: str) -> Future[Option[User]]:
@@ -43,7 +51,7 @@ def get_nick(user: User) -> Option[str]:
 
 
 async def main():
-    print("=== The nested monad problem ===\n")
+    header("The nested monad problem")
 
     # Composing these is painful — nested pattern matching at every step
     user_opt = await get_user("me")

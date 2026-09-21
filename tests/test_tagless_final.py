@@ -9,12 +9,10 @@ The type hint F: Monad is the constraint (like Haskell's Functor f =>).
 The caller provides F via summon(Monad, Option).
 """
 
-import pytest
-
-from funstruct.typeclasses import Monad, MonadError, Functor, Alternative, summon
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err
-from funstruct.monad.either import Either, Right, Left
+from funstruct.typeclasses import Monad, MonadError, summon
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 
 class TestGenericFunctions:

@@ -10,18 +10,16 @@ This is the Scala/Rust pattern: define capabilities as typeclasses,
 implement them per type, then write generic code constrained by those
 capabilities.
 
-Usage:
-    uv run python -m funstruct.playground.mt13
+Run: uv run python demos/08_custom_types.py
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, fields
-from typing import Protocol, runtime_checkable
+from dataclasses import dataclass
 
-from funstruct.typeclasses.utils.registry import register, summon, tc_of
-
+from demos._util import header
+from funstruct.typeclasses.utils.registry import register, summon
 
 # ═══════════════════════════════════════════════════════════════════════
 # Part 1: Define a typeclass (the interface / trait)
@@ -227,22 +225,6 @@ def log_and_serialize[A](value: A) -> tuple[str, dict]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# Protocol-based trait bound (compile-time checkable with type checkers)
-# ═══════════════════════════════════════════════════════════════════════
-
-
-@runtime_checkable
-class HasShowable(Protocol):
-    """Protocol that checks if a type has a Showable instance registered.
-
-    This is the closest Python gets to Scala's context bounds.
-    Use isinstance(value, HasShowable) to check at runtime.
-    """
-
-    ...
-
-
-# ═══════════════════════════════════════════════════════════════════════
 # Demo
 # ═══════════════════════════════════════════════════════════════════════
 
@@ -264,30 +246,28 @@ def main():
     )
     team = Team(name="Backend", members=[alice, bob])
 
-    print("=== Part 1: show() — generic function, auto-resolves Showable ===\n")
+    header("Part 1: show() — generic function, auto-resolves Showable")
     print(f"  show(alice)   = {show(alice)}")
     print(f"  show(bob)     = {show(bob)}")
     print(f"  show(team)    = {show(team)}")
     print(f"  show(alice.email)   = {show(alice.email)}")
     print(f"  show(alice.address) = {show(alice.address)}")
 
-    print(
-        "\n=== Part 2: serialize() — generic function, auto-resolves Serializable ===\n"
-    )
+    header("Part 2: serialize() — generic function, auto-resolves Serializable")
     print(f"  serialize(alice) = {json.dumps(serialize(alice), indent=2)}")
 
-    print("\n=== Part 3: deserialize() — generic round-trip ===\n")
+    header("Part 3: deserialize() — generic round-trip")
     data = serialize(alice)
     alice2 = deserialize(User, data)
     print(f"  serialize → deserialize round-trip: {alice2}")
     print(f"  round-trip matches? {alice == alice2}")
 
-    print("\n=== Part 4: log_and_serialize() — multiple trait bounds ===\n")
+    header("Part 4: log_and_serialize() — multiple trait bounds")
     displayed, serialized = log_and_serialize(team)
     print(f"  displayed:  {displayed}")
     print(f"  serialized: {json.dumps(serialized, indent=2)}")
 
-    print("\n=== Part 5: Error when trait bound not satisfied ===\n")
+    header("Part 5: Error when trait bound not satisfied")
     try:
         show(42)  # int has no Showable instance
     except TypeError as e:
@@ -297,7 +277,7 @@ def main():
     except TypeError as e:
         print(f'  serialize("hello") → TypeError: {e}')
 
-    print("\n=== Summary ===\n")
+    header("Summary")
     print("  1. Define a typeclass (ABC with abstract methods)")
     print("  2. Create your data types (plain dataclasses)")
     print("  3. Implement the typeclass (class + register)")

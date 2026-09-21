@@ -1,9 +1,9 @@
 """Tests for ZipList — element-wise applicative."""
 
-from funstruct.applicative.ziplist import ZipList
+from funstruct.types.ziplist import ZipList
 from tests.laws import (
-    assert_functor_laws,
     assert_applicative_laws,
+    assert_functor_laws,
     assert_type_contract,
 )
 
@@ -71,7 +71,7 @@ class TestContrastWithCList:
     """ZipList and CList have different ap semantics on the same data."""
 
     def test_clist_ap_is_cartesian(self):
-        from funstruct.collections.cons import CList
+        from funstruct.types.cons import CList
 
         fs = CList.from_iterable([lambda x: x + 1, lambda x: x * 10])
         xs = CList.from_iterable([1, 2])

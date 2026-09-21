@@ -14,7 +14,8 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 
-from funstruct.monad.result import AsyncResult, Err, Ok, TryAsync
+from demos._util import header
+from funstruct.types.result import AsyncResult, TryAsync
 
 
 @dataclass
@@ -57,12 +58,12 @@ def get_age_only(username: str) -> AsyncResult[int]:
 
 def main():
     async def run():
-        print("=== Bind chain ===")
+        header("Bind chain")
         print(f"  alice: {await get_profile_bind('alice')}")
         print(f"  bob:   {await get_profile_bind('bob')}")
         print(f"  nobody: {await get_profile_bind('nobody')}")
 
-        print("\n=== >> operator ===")
+        header(">> operator")
         print(f"  alice age: {await get_age_only('alice')}")
 
     asyncio.run(run())

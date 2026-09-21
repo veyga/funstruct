@@ -6,11 +6,11 @@ verify both paths give the same result for success AND failure cases.
 
 import asyncio
 
-from funstruct.monad.either import Either, Right, Left
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err, AsyncResult
-from funstruct.monad.state import State
-from funstruct.monad.reader import Reader
+from funstruct.types.either import Either, Left, Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.reader import Reader
+from funstruct.types.result import AsyncResult, Err, Ok, Result
+from funstruct.types.state import State
 
 
 class TestEitherEquivalence:
@@ -161,7 +161,7 @@ class TestDoNotationLimitations:
         2. You CANNOT decorate an async def with @do — it won't work
         3. You CANNOT yield AsyncResult from @Result.do — it won't unwrap
         4. For async pipelines, use @AsyncResult.do (which awaits internally)
-        5. To mix sync Result into @AsyncResult.do, use AsyncResult.from_result()
+        5. To mix sync values into @AsyncResult.do, use AsyncResult.pure()
     """
 
     def test_do_takes_generator_not_coroutine(self):
@@ -197,12 +197,12 @@ class TestDoNotationLimitations:
         result = asyncio.run(async_pipeline()._awaitable())
         assert result == Ok(30)
 
-    def test_mixing_sync_result_into_async_do(self):
-        """Use AsyncResult.from_result() to lift sync Result into async do."""
+    def test_mixing_sync_value_into_async_do(self):
+        """Use AsyncResult.pure() to lift sync values into async do."""
 
         @AsyncResult.do
         def pipeline():
-            x = yield AsyncResult.from_result(Ok(10))
+            x = yield AsyncResult.pure(10)
             y = yield AsyncResult.pure(20)
             return x + y
 

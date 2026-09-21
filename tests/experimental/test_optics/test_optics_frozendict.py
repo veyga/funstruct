@@ -1,5 +1,5 @@
-from funstruct.collections.frozendict import frozendict
-from funstruct.experimental.optics import Lens, at
+from funstruct.experimental.optics import at
+from funstruct.types.frozendict import frozendict
 
 
 class TestAt:

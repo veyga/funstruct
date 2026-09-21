@@ -136,3 +136,4 @@ notes.txt
 .benchmarks/
 .claude
 playground/
+demoplayground/*.whl

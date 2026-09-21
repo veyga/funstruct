@@ -11,20 +11,32 @@ format:
   -uv run --group docs docformatter --in-place --config pyproject.toml funstruct/
 
 # run ty check
-check:
+ty:
   uv run --frozen ty check funstruct/
+
+# run mypy check
+mypy:
+  uv run --frozen mypy funstruct/
 
 # Serve docs locally at http://127.0.0.1:8000
 docs:
+  just docs-build
   uv run --group docs mkdocs serve
+
+docs-build:
+  uv run mkdocs build
 
 # Format markdown docs
 fmt-docs:
   uv run --group docs mdformat docs/ README.md
 
-# run pytest
-test *args:
-  uv run pytest {{args}}
+# run demo script
+demo file:
+  uv run python demos/{{file}}
+
+# debug demo script
+demod file:
+  PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client demos/{{file}}
 
 # run pytest with coverage (pass 'html' to open browser report)
 cover *args:
@@ -37,7 +49,11 @@ cover *args:
   fi
 
 # debug a pytest
-dtest *args:
+test *args:
+  uv run pytest {{args}} 
+
+# debug a pytest
+testd *args:
   PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client -m pytest {{args}}
 
 # run benchmarks (pass 'html' to generate histogram and open in browser)
@@ -57,15 +73,17 @@ bench *args:
 nox *args:
   uv run nox {{args}}
 
-# generate and open browser playground (PyScript + Pyodide)
+# generate and serve browser playground (PyScript + Pyodide)
 playground:
   uv run python scripts/generate_playground.py
-  open demoplayground/index.html
+  uv run python scripts/serve_playground.py
+
+# verify all summon() calls can resolve
+check-summon:
+  uv run python scripts/check_summon.py
 
 # generate and open typeclass hierarchy diagram
 diagram:
   uv run python scripts/generate_diagram.py
   open docs/typeclasses.svg
 
-docs-build:
-  uv run mkdocs build

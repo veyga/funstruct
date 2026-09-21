@@ -1,3 +1,0 @@
-# Future
-
-::: funstruct.monad.future

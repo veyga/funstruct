@@ -4,19 +4,29 @@ Reads each demo script, extracts its docstring and code,
 and produces an HTML page with PyScript editor blocks.
 
 Usage:
-    uv run python scripts/generate_playground.py
-    # or: just playground-gen
+    uv run python scripts/generate_playground.py            # local (bundled wheel)
+    uv run python scripts/generate_playground.py --publish   # remote (PyPI package)
 """
 
 from __future__ import annotations
 
 import ast
-import os
+import shutil
+import subprocess
+import sys
+import tomllib
 from pathlib import Path
 
 DEMOS_DIR = Path("demos")
 TRANSFORMERS_DIR = DEMOS_DIR / "transformers"
-OUTPUT = Path("demoplayground/index.html")
+OUTPUT_DIR = Path("demoplayground")
+OUTPUT = OUTPUT_DIR / "index.html"
+
+
+def get_project_version() -> str:
+    with open("pyproject.toml", "rb") as f:
+        data = tomllib.load(f)
+    return data["project"]["version"]
 
 
 def extract_demo(path: Path) -> dict:
@@ -84,7 +94,21 @@ def extract_demo(path: Path) -> dict:
     }
 
 
-def generate_html(demos: list[dict]) -> str:
+def build_wheel() -> str:
+    """Build a wheel and copy it into the playground directory. Returns the filename."""
+    subprocess.run(["uv", "build", "--wheel", "--quiet"], check=True)
+    dist = Path("dist")
+    wheels = sorted(dist.glob("funstruct-*.whl"))
+    if not wheels:
+        raise RuntimeError("No wheel found in dist/")
+    wheel = wheels[-1]
+    dest = OUTPUT_DIR / wheel.name
+    shutil.copy2(wheel, dest)
+    return wheel.name
+
+
+def generate_html(demos: list[dict], *, pkg_spec: str, banner: str) -> str:
+    pkg_config = '{"packages":["' + pkg_spec + '"]}'
     lines = [
         "<!DOCTYPE html>",
         '<html lang="en">',
@@ -112,8 +136,8 @@ def generate_html(demos: list[dict]) -> str:
         "",
         "<h1>funstruct playground</h1>",
         "<p>All demo scripts from the funstruct repo, runnable in the browser via Pyodide.</p>",
-        '<div class="todo">Requires <code>funstruct >= 2.0.0</code> on PyPI.</div>',
-        '<div id="status">⏳ Loading Python + funstruct...</div>',
+        f'<div class="todo">{banner}</div>',
+        '<div id="status">✅ Click ▶ on any block to run.</div>',
     ]
 
     for demo in demos:
@@ -130,21 +154,12 @@ def generate_html(demos: list[dict]) -> str:
                 + demo["path"]
                 + "</code></p>"
             )
-        lines.append(
-            f'<script type="py-editor" config=\'{{"packages":["funstruct"]}}\'>'
-        )
+        lines.append(f"<script type=\"py-editor\" config='{pkg_config}'>")
         lines.append(demo["code"])
         lines.append("</script>")
 
     lines.extend(
         [
-            "",
-            '<script type="py" config=\'{"packages":["funstruct"]}\'>',
-            "from pyscript import document",
-            'el = document.getElementById("status")',
-            'el.innerHTML = "✅ Ready! Click ▶ on any block to run."',
-            'el.style.color = "#93c763"',
-            "</script>",
             "",
             '<p style="margin-top:3rem; text-align:center; color:#404040; font-size:0.85rem;">',
             '    <a href="https://github.com/veyga/funstruct" style="color:#404040">github</a> ·',
@@ -160,10 +175,8 @@ def generate_html(demos: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def main():
+def collect_demos() -> list[dict]:
     demos = []
-
-    # Main demos (numbered)
     for path in sorted(DEMOS_DIR.glob("*.py")):
         if path.name == "__init__.py":
             continue
@@ -172,19 +185,35 @@ def main():
         except Exception as e:
             print(f"  Skipping {path}: {e}")
 
-    # Transformer demos
     if TRANSFORMERS_DIR.exists():
         for path in sorted(TRANSFORMERS_DIR.glob("*.py")):
             try:
                 demos.append(extract_demo(path))
             except Exception as e:
                 print(f"  Skipping {path}: {e}")
+    return demos
 
-    html = generate_html(demos)
-    OUTPUT.parent.mkdir(exist_ok=True)
+
+def main():
+    publish = "--publish" in sys.argv
+    demos = collect_demos()
+    OUTPUT_DIR.mkdir(exist_ok=True)
+
+    if publish:
+        version = get_project_version()
+        pkg_spec = f"funstruct=={version}"
+        banner = f"Using <code>funstruct=={version}</code> from PyPI"
+        print(f"Mode: publish (PyPI funstruct=={version})")
+    else:
+        port = 8042
+        wheel_name = build_wheel()
+        pkg_spec = f"http://localhost:{port}/{wheel_name}"
+        banner = f"Using bundled <code>{wheel_name}</code> (localhost:{port})"
+        print(f"Mode: local (bundled {wheel_name}, serve on port {port})")
+
+    html = generate_html(demos, pkg_spec=pkg_spec, banner=banner)
     OUTPUT.write_text(html)
     print(f"Generated {OUTPUT} with {len(demos)} demos")
-    print(f"Open with: open {OUTPUT}")
 
 
 if __name__ == "__main__":

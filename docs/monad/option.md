@@ -1,3 +1,0 @@
-# Option
-
-::: funstruct.monad.option

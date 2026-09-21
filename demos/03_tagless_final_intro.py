@@ -2,7 +2,8 @@
 
 Tagless final abstracts over the effect type via a Protocol (algebra).
 The program is written once against the protocol. Swap the interpreter
-to change the effect — AsyncResult in prod, plain Result in tests.
+to change the effect. Tagless final style is a primary place
+where the `summon` call is utilized.
 
 When tagless final is worth it:
     - Swapping infrastructure (DB, cache, HTTP) without touching logic
@@ -20,9 +21,11 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
+from typing import Protocol
 
-from funstruct.monad.result import AsyncResult, Err, Ok, Result, TryAsync
+from demos._util import header
+from funstruct.typeclasses import Monad, summon
+from funstruct.types.result import AsyncResult, Ok, Result, TryAsync
 
 
 @dataclass
@@ -33,7 +36,6 @@ class User:
 # ── Algebra (the interface) ──────────────────────────────────────────
 
 
-@runtime_checkable
 class UserRepo[F](Protocol):
     def get_user(self, name: str) -> F[User]: ...
     def get_age(self, user: User) -> F[int]: ...
@@ -41,10 +43,11 @@ class UserRepo[F](Protocol):
 
 
 # ── Program (generic in F) ───────────────────────────────────────────
+# Scala:  def getProfile[F[_]: Monad](repo: UserRepo[F], username: String): F[String]
 
 
-def get_profile[F](repo: UserRepo[F], F: type[F], username: str) -> F[str]:
-    @F.do
+def get_profile[F](repo: UserRepo[F], M: Monad[F], username: str):
+    @M.do
     def run():
         user = yield repo.get_user(username)
         age = yield repo.get_age(user)
@@ -88,20 +91,22 @@ class ResultUserRepo:
 
 
 def main():
-    print("=== Production (AsyncResult) ===")
+    header("Production (AsyncResult)")
     repo = AsyncResultUserRepo()
 
     async def run_async():
-        print(f"  alice: {await get_profile(repo, AsyncResult, 'alice')}")
-        print(f"  bob:   {await get_profile(repo, AsyncResult, 'bob')}")
-        print(f"  nobody: {await get_profile(repo, AsyncResult, 'nobody')}")
+        M = summon(Monad, AsyncResult)
+        print(f"  alice: {await get_profile(repo, M, 'alice')}")
+        print(f"  bob:   {await get_profile(repo, M, 'bob')}")
+        print(f"  nobody: {await get_profile(repo, M, 'nobody')}")
 
     asyncio.run(run_async())
 
-    print("\n=== Testing (Result, sync, no IO) ===")
+    header("Testing (Result, sync, no IO)")
     test_repo = ResultUserRepo()
-    print(f"  alice: {get_profile(test_repo, Result, 'alice')}")
-    print(f"  bob:   {get_profile(test_repo, Result, 'bob')}")
+    M = summon(Monad, Result)
+    print(f"  alice: {get_profile(test_repo, M, 'alice')}")
+    print(f"  bob:   {get_profile(test_repo, M, 'bob')}")
 
 
 if __name__ == "__main__":

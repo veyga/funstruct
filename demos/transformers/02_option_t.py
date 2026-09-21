@@ -8,14 +8,22 @@ The key operations:
     OptionT.lift_f(future)     — lift a Future[A] → OptionT[Future, A]
     OptionT.from_option(opt, F) — lift an Option[A] → OptionT[F, A]
     .run()                     — unwrap back to Future[Option[A]]
+
+Run: uv run python demos/transformers/02_option_t.py
 """
 
 import asyncio
+from dataclasses import dataclass
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.future import Future
+from demos._util import header
 from funstruct.experimental.monadtransformer.option_t import OptionT
-from funstruct.playground import User
+from funstruct.types.future import Future
+from funstruct.types.option import Option
+
+
+@dataclass
+class User:
+    name: str
 
 
 def get_user(name: str) -> Future[Option[User]]:
@@ -60,7 +68,7 @@ def get_profile_missing() -> OptionT[Future, str]:
 
 
 async def main():
-    print("=== OptionT: flat pipeline over Future[Option[A]] ===\n")
+    header("OptionT: flat pipeline over Future[Option[A]]")
 
     result = await get_profile().run()
     print(f"  get_profile()         = {result}")

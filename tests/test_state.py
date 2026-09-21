@@ -2,7 +2,7 @@
 
 from parametrization import Parametrization as P
 
-from funstruct.monad.state import State
+from funstruct.types.state import State
 from tests.laws import (
     assert_applicative_laws,
     assert_functor_laws,
@@ -87,7 +87,7 @@ class TestBind:
         assert pipeline.run([]) == ([1, 2, 3], 3)
 
     def test_bind_chains_state_with_clist(self):
-        from funstruct.collections.cons import CList, Cons, Nil
+        from funstruct.types.cons import CList, Cons, Nil
 
         push = lambda v: State(lambda s: (Cons(v, s), v))
         pipeline = push(1).bind(lambda _: push(2)).bind(lambda _: push(3))

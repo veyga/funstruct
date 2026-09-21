@@ -1,0 +1,3 @@
+# Future
+
+::: funstruct.types.future

@@ -1,6 +1,6 @@
 [project]
 name = "funstruct"
-version = "2.0.0a1"
+version = "2.0.0a2"
 description = "Fun & functional structures for Python"
 authors = [{name = "Andrew Stefanich", email = "andrewstefanich@gmail.com"}]
 license = {text = "MIT"}
@@ -8,6 +8,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["functional", "immutable", "fp", "data structures", "cons"]
 dependencies = []
+
+[project.scripts]
+funstruct-check = "funstruct.check:main"
 
 [project.urls]
 Homepage = "https://veyga.github.io/funstruct/"
@@ -34,6 +37,7 @@ dev = [
     "pre-commit>=4.6.2",
     "pytest-asyncio>=1.4.0",
     "typer>=0.27.1",
+    "mypy>=2.3.1",
 ]
 docs = [
     "mike>=2.2.0",
@@ -80,6 +84,7 @@ doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 
 [tool.ruff]
 line-length = 88
+target-version = "py312"
 extend-exclude = ["*.md"]
 
 [tool.ruff.format]
@@ -95,8 +100,27 @@ ignore = [
     "N802", # Function name should be lowercase — Try/TryAsync are constructor-like decorators
     "N803", # Argument name should be lowercase — we use G for Applicative instances (type constructor)
     "N805", # First argument of a method should be named `self` — we use fa/ff/fb for typeclass ops
+    "N806", # Variable in function should be lowercase — we use F/M/S for typeclass/monad instances
+    "N817", # CamelCase imported as acronym — we use `Parametrization as P` throughout tests
+    "N818", # Exception name should end with Error — test-local exceptions use domain names
+    "E402", # Module-level import not at top — intentional in demos, tests, and circular-import breaks
+    "UP046", # Use type parameter syntax — we support 3.10+ so Generic[] is required in library code
+    "UP047", # Use type parameter syntax for functions — same reason as UP046
 ]
 
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+# Subclasses narrow parameter types (e.g. Option.bind expects Option, not Any).
+# This is standard covariant narrowing in FP but violates Liskov in mypy's view.
+disable_error_code = ["override"]
+
+[[tool.mypy.overrides]]
+module = "funstruct.experimental.*"
+# Experimental code uses duck-typed `monad: type` params — mypy can't see the protocol.
+disable_error_code = ["override", "attr-defined"]
 
 [tool.docformatter]
 wrap-summaries = 80

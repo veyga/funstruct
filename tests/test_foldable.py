@@ -1,7 +1,7 @@
 """Tests for the Foldable typeclass."""
 
-from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.collections.tree import Tree, Leaf, Branch
+from funstruct.types.cons import CList, Cons, Nil
+from funstruct.types.tree import Branch, Leaf
 
 
 class TestCListFoldable:

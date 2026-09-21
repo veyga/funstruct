@@ -17,12 +17,20 @@ This is often simpler than transformers for real applications.
         return f"{nick}{age}"
 
 No lifting, no transformers, no .run(). Just bind.
+
+Run: uv run python demos/transformers/03_alternative.py
 """
 
 import asyncio
+from dataclasses import dataclass
 
-from funstruct.monad.result import AsyncResult, Ok, Err, TryAsync
-from funstruct.playground import User
+from demos._util import header
+from funstruct.types.result import AsyncResult, TryAsync
+
+
+@dataclass
+class User:
+    name: str
 
 
 @TryAsync
@@ -62,7 +70,7 @@ def get_profile_bind() -> AsyncResult[str]:
 
 
 async def main():
-    print("=== Alternative: one monad type everywhere ===\n")
+    header("Alternative: one monad type everywhere")
 
     result = await get_profile()
     print(f"  @do style:   {result}")

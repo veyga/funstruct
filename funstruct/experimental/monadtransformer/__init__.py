@@ -16,8 +16,8 @@ Types:
 
 Example — OptionT flattens ``Future[Option[...]]`` into a single pipeline::
 
-    from funstruct.monad.option import Option, Some, Nothing
-    from funstruct.monad.future import Future
+    from funstruct.types.option import Option, Some, Nothing
+    from funstruct.types.future import Future
     from funstruct.experimental.monadtransformer.option_t import OptionT
 
     # These return different nested shapes:

@@ -11,28 +11,24 @@ These tests verify:
     - Derived bounds (Monad registered → Functor resolved)
 """
 
-import pytest
-
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+
+import pytest
 
 from funstruct.typeclasses import (
     Alternative,
     Applicative,
     Bifunctor,
-    Foldable,
     Functor,
     Monad,
     MonadError,
     summon,
-    tc_of,
+    typeclass_of,
 )
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.either import Either, Right, Left
-from funstruct.monad.result import Result, Ok, Err
-from funstruct.collections.cons import CList
 from funstruct.typeclasses.utils.registry import register
-
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 # ── Custom typeclasses for testing ──────────────────────────────────
 
@@ -188,22 +184,22 @@ class TestMultipleBounds:
 
 
 class TestTcOfForBounds:
-    """tc_of resolves type constructors for auto-resolved bounds."""
+    """typeclass_of resolves type constructors for auto-resolved bounds."""
 
     def test_some_resolves_to_option(self):
-        assert tc_of(Some(42)) is Option
+        assert typeclass_of(Some(42)) is Option
 
     def test_auto_resolve_and_use(self):
         value = Some(10)
-        F = summon(Monad, tc_of(value))
+        F = summon(Monad, typeclass_of(value))
         assert F.map(value, lambda x: x * 2) == Some(20)
 
     def test_auto_resolve_fails_for_plain_python(self):
         with pytest.raises(TypeError, match="No _type_constructor"):
-            tc_of(42)
+            typeclass_of(42)
 
     def test_auto_resolve_fails_for_unregistered(self):
         value = Some(10)
-        F_tc = tc_of(value)
+        F_tc = typeclass_of(value)
         with pytest.raises(TypeError, match="No instance of MonadError for Option"):
             summon(MonadError, F_tc)

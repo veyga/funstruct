@@ -11,48 +11,43 @@ it was called and what it did, producing a complete trace at the end.
     result = pipeline("alice")
     result.value   # "ALICE@EXAMPLE.COM"
     result.output  # ["lookup_user(alice)", "get_email(User(alice))", "normalize(alice@...)"]
+
+Run: uv run python demos/10_writer_stacktrace.py
 """
 
-from funstruct.monad.writer import ListWriter
-from funstruct.typeclasses import Monoid
+from demos._util import header
+from funstruct.types.writer import ListWriter
 
 
-list_monoid = Monoid(typ=list, combine=lambda a, b: a + b, empty=[])
-
-
-class TraceWriter(ListWriter):
-    _monoid = list_monoid
-
-
-def lookup_user(name: str) -> TraceWriter:
+def lookup_user(name: str) -> ListWriter:
     """Simulate user lookup, logging the call."""
     users = {"alice": "Alice", "bob": "Bob"}
     user = users.get(name, "Unknown")
-    return TraceWriter(user, [f"lookup_user({name}) → {user}"])
+    return ListWriter(user, [f"lookup_user({name}) → {user}"])
 
 
-def get_email(user: str) -> TraceWriter:
+def get_email(user: str) -> ListWriter:
     """Simulate email lookup, logging the call."""
     email = f"{user.lower()}@example.com"
-    return TraceWriter(email, [f"get_email({user}) → {email}"])
+    return ListWriter(email, [f"get_email({user}) → {email}"])
 
 
-def normalize(email: str) -> TraceWriter:
+def normalize(email: str) -> ListWriter:
     """Normalize email, logging the transformation."""
     result = email.upper()
-    return TraceWriter(result, [f"normalize({email}) → {result}"])
+    return ListWriter(result, [f"normalize({email}) → {result}"])
 
 
-def validate(email: str) -> TraceWriter:
+def validate(email: str) -> ListWriter:
     """Validate email format, logging the check."""
     is_valid = "@" in email
-    return TraceWriter(
+    return ListWriter(
         email if is_valid else "INVALID",
         [f"validate({email}) → {'OK' if is_valid else 'INVALID'}"],
     )
 
 
-@TraceWriter.do
+@ListWriter.do
 def pipeline(name: str):
     """Full pipeline with accumulated trace."""
     user = yield lookup_user(name)
@@ -63,11 +58,11 @@ def pipeline(name: str):
 
 
 def main():
-    print("=== Writer monad: call trace accumulation ===\n")
+    header("Writer monad: call trace accumulation")
 
     result = pipeline("alice")
     print(f"  Value:  {result.value}")
-    print(f"  Trace:")
+    print("  Trace:")
     for entry in result.output:
         print(f"    → {entry}")
 
@@ -75,7 +70,7 @@ def main():
 
     result = pipeline("nobody")
     print(f"  Value:  {result.value}")
-    print(f"  Trace:")
+    print("  Trace:")
     for entry in result.output:
         print(f"    → {entry}")
 
@@ -83,7 +78,7 @@ def main():
     print("  No mutable state, no global logger, no context passing.")
 
     # You can also use bind chains
-    print("\n=== Bind chain (equivalent) ===\n")
+    header("Bind chain (equivalent)")
     result = lookup_user("bob").bind(get_email).bind(normalize).bind(validate)
     print(f"  Value:  {result.value}")
     print(f"  Trace:  {result.output}")

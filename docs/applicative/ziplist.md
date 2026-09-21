@@ -1,3 +1,0 @@
-# ZipList
-
-::: funstruct.applicative.ziplist

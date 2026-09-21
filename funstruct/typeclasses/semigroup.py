@@ -2,33 +2,33 @@
 
 Law: combine(combine(a, b), c) == combine(a, combine(b, c))
 
-Unlike a Protocol/ABC, this is a value — you can have multiple
-Semigroup instances for the same type (e.g. int under + vs int under *).
+Unlike Monad/Functor (one instance per type constructor), a type can have
+multiple Semigroup instances (e.g. int under + vs int under *). Create
+instances directly rather than using for_type= registration.
 
-When to use:
-    Any time you need to combine/merge two values of the same type
-    and the operation is associative (grouping doesn't matter).
+Examples:
 
-Business examples:
-    - Merging configs: combine(default_config, user_config)
-    - Error accumulation in Validated: combine error lists
-    - Merging frozendicts: right-biased key merge
-    - Combining log entries: concatenate CList of events
-    - Non-empty collections: concat where empty isn't meaningful
+    >>> from funstruct.typeclasses.semigroup import Semigroup
+    >>> class IntAdd(Semigroup):
+    ...     def combine(self, a, b): return a + b
+    >>> IntAdd().combine(1, 2)
+    3
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass
+from abc import abstractmethod
+
+from funstruct.typeclasses.typeclass import BaseTypeclass
 
 
-@dataclass(frozen=True)
-class Semigroup:
+class Semigroup(BaseTypeclass):
     """An associative binary operation over a type."""
 
-    typ: type
-    combine: Callable
+    @abstractmethod
+    def combine(self, a, b):
+        # a: A, b: A → A
+        ...
 
 
 __all__ = [

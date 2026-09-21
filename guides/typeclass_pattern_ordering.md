@@ -19,9 +19,10 @@ that can be compared.
 **Part 1: The typeclass (the interface)**
 
 ```python
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from funstruct.typeclasses.typeclass import BaseTypeclass
 
-class Ordering(ABC):
+class Ordering(BaseTypeclass):
     """Typeclass for types that can be compared."""
     @abstractmethod
     def compare(self, a, b) -> int:

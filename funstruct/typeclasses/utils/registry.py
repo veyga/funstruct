@@ -26,13 +26,13 @@ When to use each function:
                 return F.map(fa, lambda x: x * 2)
             double(summon(Monad, Option), Some(21))
 
-    tc_of(value) -> type
+    typeclass_of(value) -> type
         WHO: Advanced users writing fully generic functions
         WHEN: You receive any monadic value and need to resolve its
               type constructor without knowing the concrete type.
         Example:
             def double(fa):
-                F = summon(Monad, tc_of(fa))
+                F = summon(Monad, typeclass_of(fa))
                 return F.map(fa, lambda x: x * 2)
 
 When NOT to use these:
@@ -43,15 +43,17 @@ When NOT to use these:
 
 from __future__ import annotations
 
-_registry: dict[tuple[type, type], object] = {}
+from typing import Any
+
+_registry: dict[tuple[type, type], Any] = {}
 
 
-def register(typeclass: type, type_constructor: type, instance: object) -> None:
+def register(typeclass: type, type_constructor: type, instance: Any) -> None:
     """Register a typeclass instance for a type constructor."""
     _registry[(typeclass, type_constructor)] = instance
 
 
-def summon(typeclass: type, type_constructor: type) -> object:
+def summon(typeclass: type, type_constructor: type) -> Any:
     """Resolve a typeclass instance for a type constructor.
 
     Resolution:
@@ -74,8 +76,8 @@ def summon(typeclass: type, type_constructor: type) -> object:
     )
 
 
-def tc_of(value) -> type:
-    """Get the type constructor for a value. Haskell-style automatic resolution.
+def typeclass_of(value) -> type:
+    """Get the type constructor for a value.
 
     Every funstruct data type sets _type_constructor on its class:
         Some(42)  → Option
@@ -86,7 +88,7 @@ def tc_of(value) -> type:
     Use this in generic functions for automatic typeclass resolution:
 
         def double(fa):
-            F = summon(Monad, tc_of(fa))
+            F = summon(Monad, typeclass_of(fa))
             return F.map(fa, lambda x: x * 2)
 
         double(Some(21))  # resolves automatically → Some(42)
@@ -108,5 +110,5 @@ def _clear_registry():
 __all__ = [
     "register",
     "summon",
-    "tc_of",
+    "typeclass_of",
 ]

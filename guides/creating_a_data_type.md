@@ -1,7 +1,14 @@
-# Creating Your Own Data Type
+# Creating Your Own Higher-Kinded Type
 
 This guide walks through creating a complete funstruct-compatible
-data type from scratch: the ADT, typeclass instances, tests, and usage.
+higher-kinded type from scratch: the ADT, typeclass instances, tests,
+and usage.
+
+**This is for creating type constructors** like `Option[A]`, `Result[A]`,
+or `RemoteData[A]` — types that participate in the typeclass system
+(Monad, Eq, Representable, etc.). If you just need a plain data class
+like `User` or `Config`, use standard Python `@dataclass` — no funstruct
+machinery needed.
 
 ## The example: RemoteData
 
@@ -17,184 +24,227 @@ Four states, one type. This is useful because it distinguishes
 
 ## Step 1: Define the data type
 
+Data types extend `DataType` and use `@variant` (or `@final` + `@dataclass`)
+for sealed variants. Data types are **pure data** — no typeclass operations.
+All behavior comes from typeclass instances.
+
 ```python
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses import DataType
 
 A = TypeVar("A")
 
 
-class RemoteData(DataType, Generic[A]):
-    """RemoteData[A] = NotAsked | Loading | Failure(error) | Success(value).
-
-    Models the lifecycle of an async request.
-    """
-
-    @classmethod
-    def pure(cls, value: A) -> RemoteData[A]:
-        return Success(value)
+class RemoteData(DataType, ABC, Generic[A]):
+    """RemoteData[A] = NotAsked | Loading | Failure(error) | Success(value)."""
 
     @property
-    def is_success(self) -> bool:
-        return False
+    @abstractmethod
+    def is_success(self) -> bool: ...
 
 
+@final
 class NotAsked(RemoteData):
     _instance = None
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
-    def __repr__(self): return "NotAsked()"
-    def __eq__(self, other): return isinstance(other, NotAsked)
-    def __bool__(self): return False
 
 
+@final
 class Loading(RemoteData):
     _instance = None
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
-    def __repr__(self): return "Loading()"
-    def __eq__(self, other): return isinstance(other, Loading)
-    def __bool__(self): return False
 
 
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Failure(RemoteData[A]):
     error: Exception
-    def __eq__(self, other):
-        return isinstance(other, Failure) and self.error == other.error
-    def __repr__(self): return f"Failure({self.error!r})"
-    def __bool__(self): return False
+
+    @property
+    def is_success(self) -> bool: return False
 
 
-@dataclass(frozen=True, eq=False)
+@final
+@dataclass(frozen=True, eq=False, repr=False)
 class Success(RemoteData[A]):
     value: A
+
     @property
     def is_success(self) -> bool: return True
-    def __eq__(self, other):
-        return isinstance(other, Success) and self.value == other.value
-    def __repr__(self): return f"Success({self.value!r})"
-    def __bool__(self): return True
 ```
 
 Key points:
-- Extends `DataType` — gets TypeConstructor + DotNotation automatically
-- `Generic[A]` — parameterized over the success value type
-- Singleton variants (`NotAsked`, `Loading`) — like `Nothing`
-- Frozen dataclass variants (`Failure`, `Success`) — like `Err`/`Ok`
-- `pure` classmethod — creates `Success(value)`
+- Extends `DataType` + `ABC` — gets HKTMeta + DotNotation, can't instantiate base
+- `@final` on all variants — sealed, no subclassing (like Scala sealed traits)
+- `@dataclass(frozen=True, eq=False, repr=False)` — immutable, no auto `__eq__`/`__repr__`
+- NO typeclass operations on the type — no `bind`, `map`, `pure`, `__eq__`, `__repr__`
+- DataType delegates `__eq__`, `__repr__`, `__str__`, `__bool__` to typeclass instances
 
 ## Step 2: Create typeclass instances
 
+Each typeclass gets its own file under `instances/`:
+
+```text
+remote_data/
+    __init__.py
+    instances/
+        __init__.py          # imports all submodules
+        monad_error.py       # MonadError instance
+        eq.py                # Eq instance
+        representable.py     # Representable instance (__repr__)
+        truthable.py         # Truthable instance (__bool__)
+```
+
+### instances/monad_error.py
+
 ```python
-from funstruct.typeclasses.monad import Monad
 from funstruct.typeclasses.monad_error import MonadError
 
-
 class _RemoteDataMonadError(MonadError, for_type=RemoteData):
-    """MonadError instance — only implements primitives.
-
-    map, ap, product, then, map2 are all inherited from the
-    Monad → Applicative → Functor hierarchy.
-    """
-
     def pure(self, value):
         return Success(value)
 
-    def bind(self, fa: RemoteData, f):
+    def bind(self, fa, f):
         match fa:
-            case Success(value):
-                return f(value)
-            case _:
-                return fa  # NotAsked, Loading, Failure — short-circuit
+            case Success(value): return f(value)
+            case _: return fa
 
     def raise_error(self, error):
         return Failure(error)
 
-    def handle_error_with(self, fa: RemoteData, f):
+    def handle_error_with(self, fa, f):
         match fa:
-            case Failure(error):
-                return f(error)
-            case _:
-                return fa
+            case Failure(error): return f(error)
+            case _: return fa
 ```
 
-Key points:
-- Extends `MonadError` (which extends `Monad → Applicative → Functor`)
-- `for_type=RemoteData` — auto-registered, no manual `register()` call
-- Only implements `pure`, `bind`, `raise_error`, `handle_error_with`
-- `map`, `ap`, `product`, `then`, `map2` come for free from the hierarchy
+### instances/eq.py
+
+```python
+from funstruct.typeclasses.eq import Eq
+
+class _RemoteDataEq(Eq, for_type=RemoteData):
+    def eq(self, a, b) -> bool:
+        match a, b:
+            case NotAsked(), NotAsked(): return True
+            case Loading(), Loading(): return True
+            case Failure(e1), Failure(e2): return e1 == e2
+            case Success(v1), Success(v2): return v1 == v2
+            case _: return False
+
+    def hash(self, a) -> int:
+        match a:
+            case NotAsked(): return hash(("NotAsked",))
+            case Loading(): return hash(("Loading",))
+            case Failure(e): return hash(("Failure", e))
+            case Success(v): return hash(("Success", v))
+```
+
+### instances/representable.py
+
+```python
+from funstruct.typeclasses.representable import Representable
+
+class _RemoteDataRepresentable(Representable, for_type=RemoteData):
+    def represent(self, a) -> str:
+        match a:
+            case NotAsked(): return "NotAsked()"
+            case Loading(): return "Loading()"
+            case Failure(e): return f"Failure({e!r})"
+            case Success(v): return f"Success({v!r})"
+```
+
+### instances/truthable.py
+
+```python
+from funstruct.typeclasses.truthable import Truthable
+
+class _RemoteDataTruthable(Truthable, for_type=RemoteData):
+    def is_truthy(self, a) -> bool:
+        match a:
+            case Success(): return True
+            case _: return False
+```
+
+### instances/__init__.py
+
+```python
+import mylib.remote_data.instances.monad_error  # noqa: F401
+import mylib.remote_data.instances.eq  # noqa: F401
+import mylib.remote_data.instances.representable  # noqa: F401
+import mylib.remote_data.instances.truthable  # noqa: F401
+```
+
+At the bottom of the main `__init__.py`:
+```python
+import mylib.remote_data.instances  # triggers auto-registration
+```
 
 ## Step 3: What you get for free
 
-With just those two primitives (`pure` + `bind`), you get:
+With `pure` + `bind` implemented, the Monad hierarchy derives everything else:
 
 ```python
-# map — transform the success value
+# map — derived from bind + pure
 Success(10).map(lambda x: x * 2)           # Success(20)
 NotAsked().map(lambda x: x * 2)            # NotAsked()
-Loading().map(lambda x: x * 2)             # Loading()
-Failure(err).map(lambda x: x * 2)          # Failure(err)
 
-# bind — chain operations that might change state
-Success(10).bind(lambda x: Success(x + 1)) # Success(11)
-Success(10).bind(lambda x: Failure(err))   # Failure(err)
-NotAsked().bind(lambda x: Success(99))     # NotAsked()
-
-# >> operator (bind alias)
+# >> operator — bind alias (from DotNotation)
 Success(10) >> (lambda x: Success(x + 1))  # Success(11)
 
-# * operator (product)
+# * operator — product (from DotNotation)
 Success(1) * Success(2)                    # Success((1, 2))
 
-# ap — apply a function in context
-Success(lambda x: x + 1).ap(Success(10))   # Success(11)
+# ap, map2, then, do — all derived from bind + pure
 
-# handle_error_with — recover from Failure
-Failure(err).handle_error_with(lambda e: Success("default"))  # Success("default")
+# Class-level dispatch via HKTMeta:
+RemoteData.pure(42)                        # Success(42)
+RemoteData.raise_error(ValueError("x"))    # Failure(ValueError("x"))
+RemoteData.do(gen_fn)                      # do-notation
 
-# raise_error — create a Failure
-RemoteData.raise_error(ValueError("timeout"))  # Failure(ValueError("timeout"))
+# Python dunders via typeclass instances:
+Success(1) == Success(1)                   # True (Eq)
+repr(Success(42))                          # "Success(42)" (Representable)
+bool(NotAsked())                           # False (Truthable)
 ```
-
-All derived from `pure` + `bind` via the typeclass hierarchy.
 
 ## Step 4: Use with summon (tagless final)
 
 ```python
 from funstruct.typeclasses import Monad, MonadError, summon
 
-# Generic function — works with RemoteData, Result, Either, etc.
-def fetch_and_transform(F: Monad, fetch_fn, transform_fn):
-    return F.bind(fetch_fn(), lambda data: F.pure(transform_fn(data)))
+def fetch_and_transform(M: Monad, fetch_fn, transform_fn):
+    return M.bind(fetch_fn(), lambda data: M.pure(transform_fn(data)))
 
-# Use with RemoteData
-F = summon(Monad, RemoteData)
-result = fetch_and_transform(F, lambda: Success(42), lambda x: x * 2)
+# Works with RemoteData
+M = summon(Monad, RemoteData)
+result = fetch_and_transform(M, lambda: Success(42), lambda x: x * 2)
 # Success(84)
 
 # Same function with Result
-from funstruct.monad.result import Result, Ok
-G = summon(Monad, Result)
-result = fetch_and_transform(G, lambda: Ok(42), lambda x: x * 2)
+from funstruct.types.result import Result, Ok
+M = summon(Monad, Result)
+result = fetch_and_transform(M, lambda: Ok(42), lambda x: x * 2)
 # Ok(84)
 ```
 
 ## Step 5: Test it
 
 ```python
-import pytest
-from funstruct.typeclasses import Monad, MonadError, Functor, summon
+from funstruct.typeclasses import Monad, MonadError, summon
 
-class TestRemoteDataInstances:
+class TestRemoteData:
     def test_pure(self):
         assert RemoteData.pure(42) == Success(42)
 
@@ -204,29 +254,20 @@ class TestRemoteDataInstances:
     def test_map_not_asked(self):
         assert NotAsked().map(lambda x: x * 2) == NotAsked()
 
-    def test_map_loading(self):
-        assert Loading().map(lambda x: x * 2) == Loading()
-
-    def test_bind_success(self):
-        assert Success(10).bind(lambda x: Success(x + 1)) == Success(11)
-
     def test_bind_short_circuits(self):
         assert NotAsked().bind(lambda x: Success(99)) == NotAsked()
-        assert Loading().bind(lambda x: Success(99)) == Loading()
 
-    def test_raise_error(self):
-        F = summon(MonadError, RemoteData)
-        assert isinstance(F.raise_error(ValueError("x")), Failure)
+    def test_repr(self):
+        assert repr(Success(42)) == "Success(42)"
 
-    def test_handle_error_with(self):
-        err = Failure(ValueError("timeout"))
-        result = err.handle_error_with(lambda e: Success("cached"))
-        assert result == Success("cached")
+    def test_truthiness(self):
+        assert bool(Success(1)) is True
+        assert bool(NotAsked()) is False
 
-    # Dot syntax == summon equivalence
     def test_dot_equals_summon(self):
         f = lambda x: x + 1
-        assert Success(10).map(f) == summon(Monad, RemoteData).map(Success(10), f)
+        M = summon(Monad, RemoteData)
+        assert Success(10).map(f) == M.map(Success(10), f)
 
     # Monad laws
     def test_left_identity(self):
@@ -244,28 +285,18 @@ class TestRemoteDataInstances:
         assert m.bind(f).bind(g) == m.bind(lambda x: f(x).bind(g))
 ```
 
-## Step 6: File structure
-
-```text
-mylib/
-    remote_data/
-        __init__.py      # RemoteData, NotAsked, Loading, Failure, Success
-        instances.py     # _RemoteDataMonadError(MonadError, for_type=RemoteData)
-```
-
-At the bottom of `__init__.py`:
-```python
-import mylib.remote_data.instances  # triggers auto-registration
-```
-
 ## Checklist
 
-- [ ] Data type extends `DataType` + `Generic[A]`
-- [ ] Variants are frozen dataclasses (or singletons for empty cases)
-- [ ] `pure` classmethod on the base type
-- [ ] Instance class extends the appropriate typeclass with `for_type=`
-- [ ] Only implement primitives — let the hierarchy derive the rest
-- [ ] `import instances` at the bottom of `__init__.py`
-- [ ] Test monad laws (left identity, right identity, associativity)
-- [ ] Test dot syntax == summon equivalence
-- [ ] Test short-circuit behavior for each variant
+- [ ] Data type extends `DataType` + `ABC` + `Generic[A]`
+- [ ] `@final` on all variants — sealed
+- [ ] `@dataclass(frozen=True, eq=False, repr=False)` for data-carrying variants
+- [ ] Singleton pattern for empty variants (NotAsked, Loading)
+- [ ] NO typeclass ops on data types — no `bind`, `map`, `__eq__`, `__repr__`, `__bool__`
+- [ ] Instance per typeclass in `instances/` directory:
+    - `monad_error.py` — `pure`, `bind`, `raise_error`, `handle_error_with`
+    - `eq.py` — `eq` (pattern matching)
+    - `representable.py` — `represent` (pattern matching)
+    - `truthable.py` — `is_truthy` (pattern matching)
+- [ ] `instances/__init__.py` imports all submodules
+- [ ] `__init__.py` imports instances at the bottom
+- [ ] Test monad laws, dot-equals-summon equivalence, short-circuit behavior

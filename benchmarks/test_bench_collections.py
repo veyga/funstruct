@@ -4,8 +4,8 @@ Run with: just bench
 Compare against Python builtins to understand the cost of persistence.
 """
 
-from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.collections.frozendict import frozendict
+from funstruct.types.cons import CList, Cons, Nil
+from funstruct.types.frozendict import frozendict
 
 # ──────────────────────────────────────────────────────────────────────
 # CList

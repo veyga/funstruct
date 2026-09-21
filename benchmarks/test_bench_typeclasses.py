@@ -7,11 +7,17 @@ Measures the cost of:
     - Monad law operations (pure → bind → map)
 """
 
-from funstruct.monad.option import Option, Some, Nothing
-from funstruct.monad.result import Result, Ok, Err, AsyncResult
-from funstruct.monad.either import Either, Right, Left
-from funstruct.collections.cons import CList, Cons, Nil
-from funstruct.typeclasses import Alternative, Functor, Monad, MonadError, summon, tc_of
+from funstruct.typeclasses import (
+    Alternative,
+    Functor,
+    Monad,
+    MonadError,
+    summon,
+    typeclass_of,
+)
+from funstruct.types.either import Right
+from funstruct.types.option import Nothing, Option, Some
+from funstruct.types.result import Err, Ok, Result
 
 
 class TestDotNotationOverhead:
@@ -64,14 +70,14 @@ class TestSummonResolution:
     def test_summon_alternative_option(self, benchmark):
         benchmark(lambda: summon(Alternative, Option))
 
-    def test_tc_of_some(self, benchmark):
-        """tc_of resolves type constructor from a value."""
+    def test_typeclass_of_some(self, benchmark):
+        """typeclass_of resolves type constructor from a value."""
         v = Some(42)
-        benchmark(lambda: tc_of(v))
+        benchmark(lambda: typeclass_of(v))
 
-    def test_tc_of_ok(self, benchmark):
+    def test_typeclass_of_ok(self, benchmark):
         v = Ok(42)
-        benchmark(lambda: tc_of(v))
+        benchmark(lambda: typeclass_of(v))
 
 
 class TestSummonVsDotNotation:

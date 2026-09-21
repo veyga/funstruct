@@ -11,10 +11,12 @@ Use cases:
     - Interpreters (state = variable bindings)
     - ID generators (state = counter)
     - Game logic (state = game world)
+
+Run: uv run python demos/11_state_counter.py
 """
 
-from funstruct.monad.state import State
-
+from demos._util import header
+from funstruct.types.state import State
 
 # ── Example 1: Counter (state = int) ────────────────────────────────
 
@@ -83,7 +85,7 @@ def interpreter():
 
 
 def main():
-    print("=== State monad: pure stateful computation ===\n")
+    header("State monad: pure stateful computation")
 
     # Counter
     final_state, ids = allocate_three().run(100)
@@ -101,7 +103,7 @@ def main():
     print("  Each step is a pure function S → (S, A).")
 
     # Compose with bind
-    print("\n=== Bind chain ===\n")
+    header("Bind chain")
     result = next_id().bind(lambda a: next_id().map(lambda b: (a, b)))
     state, pair = result.run(0)
     print(f"  Two IDs: {pair}, counter = {state}")

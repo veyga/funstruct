@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+</head>
+<body>
+
+<h2>Test 1: Inline py (runs on load, no editor)</h2>
+<div id="out1"></div>
+<script type="py">
+from pyscript import document
+document.getElementById("out1").innerText = "inline py works!"
+</script>
+
+<h2>Test 2: py-editor (no packages)</h2>
+<script type="py-editor">
+print("hello from py-editor")
+print(1 + 1)
+</script>
+
+<h2>Test 3: py-editor with funstruct wheel</h2>
+<script type="py-editor" config='{"packages":["http://localhost:8042/funstruct-2.0.0a2-py3-none-any.whl"]}'>
+from funstruct.monad.result import Ok, Err
+print(Ok(42))
+print(Ok(10).map(lambda x: x + 1))
+</script>
+
+</body>
+</html>

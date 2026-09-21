@@ -14,7 +14,7 @@ walking — just ``sys._getframe()``, which is a single pointer lookup.
 ``Err`` and ``Left`` use this mixin automatically. Every error value
 knows where it was created::
 
-    from funstruct.monad.result import Err
+    from funstruct.types.result import Err
 
     def validate_auth(req):
         if not req.valid:
@@ -84,6 +84,8 @@ class CapturesCreationSiteMixin:
     Used by ``Err`` and ``Left`` — every error value automatically knows
     where it was created, with negligible overhead.
     """
+
+    _created_at: CreatedAt
 
     def __post_init__(self):
         object.__setattr__(self, "_created_at", capture_created_at())

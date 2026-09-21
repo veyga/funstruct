@@ -20,18 +20,20 @@ Build a data representation of the program, then interpret it:
 
 ```python
 # ADT representing expressions
+Expr = Lit | Add | Neg
+
 @dataclass(frozen=True)
 class Lit:
     value: int
 
 @dataclass(frozen=True)
 class Add:
-    left: object
-    right: object
+    left: Expr
+    right: Expr
 
 @dataclass(frozen=True)
 class Neg:
-    expr: object
+    expr: Expr
 
 # The program is DATA:
 program = Add(Lit(1), Neg(Lit(2)))
@@ -147,8 +149,8 @@ effect types:
 
 ```python
 from funstruct.typeclasses import Monad, MonadError, summon
-from funstruct.monad.option import Option, Some
-from funstruct.monad.result import Result, Ok
+from funstruct.types.option import Option, Some
+from funstruct.types.result import Result, Ok
 
 # The "algebra" is the typeclass (Monad, MonadError, etc.)
 # The "program" is generic in F:
@@ -185,17 +187,17 @@ Functional programming
 │
 └── Final / tagless-final FP
     └── abstract algebras + polymorphic implementations
-    └── funstruct provides: typeclasses + summon + DotNotation
+    └── funstruct provides: typeclasses + summon + dot syntax
 ```
 
 Both styles are fully functional. Tagless final is a particular way of
 structuring programs where the **effect type is abstract** — not an
 alternative to functional programming itself.
 
-## Playground demos
+## See also
 
-- `mt08.py` — tagless final intro: same program, different effects
-- `mt09.py` — swapping database backends (Postgres vs in-memory vs failing)
-- `mt10.py` — JSON encoder with typeclass composition and derivation
-- `mt11.py` — generic functions with trait bounds (`F: Monad`)
-- `mt13.py` — extending funstruct with your own types and typeclasses
+- `demos/03_tagless_final_intro.py` — same program, different effects
+- `demos/04_tagless_final_db.py` — swapping database backends
+- `demos/05_json_encoder.py` — JSON encoder with typeclass composition
+- `demos/06_generic_functions.py` — generic functions with trait bounds
+- `demos/08_custom_types.py` — extending funstruct with your own types

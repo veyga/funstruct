@@ -5,7 +5,7 @@ without manually rebuilding the path at every level.
 
 Examples:
     >>> from funstruct.experimental.optics import Lens, at
-    >>> from funstruct.collections.frozendict import frozendict
+    >>> from funstruct.types.frozendict import frozendict
     >>> users = frozendict({
     ...     "alice": {"profile": {"age": 30, "city": "NYC"}},
     ... })

@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 _S = TypeVar("_S")
 _A = TypeVar("_A")
@@ -29,10 +29,10 @@ _B = TypeVar("_B")
 
 
 @dataclass(frozen=True)
-class Lens:
+class Lens(Generic[_S, _A]):
     """A composable getter/setter pair.
 
-    >>> from funstruct.collections.frozendict import frozendict
+    >>> from funstruct.types.frozendict import frozendict
     >>> fd = frozendict({"a": frozendict({"b": 1})})
     >>> lens = at("a") >> at("b")
     >>> lens.get(fd)
@@ -43,8 +43,8 @@ class Lens:
     2
     """
 
-    _get: Callable
-    _set: Callable
+    _get: Callable[[_S], _A]
+    _set: Callable[[_S, _A], _S]
 
     def get(self, s):
         return self._get(s)
@@ -52,7 +52,7 @@ class Lens:
     def set(self, s, value):
         return self._set(s, value)
 
-    def modify(self, s, f: Callable):
+    def modify(self, s, f: Callable[[_A], _A]):
         return self.set(s, f(self.get(s)))
 
     def __rshift__(self, other: Lens) -> Lens:
@@ -71,14 +71,14 @@ def at(key) -> Lens:
 
     Works with frozendict (uses put) and plain dicts (uses spread).
 
-    >>> from funstruct.collections.frozendict import frozendict
+    >>> from funstruct.types.frozendict import frozendict
     >>> lens = at("x")
     >>> lens.get(frozendict({"x": 42}))
     42
     >>> lens.set(frozendict({"x": 42}), 99)["x"]
     99
     """
-    from funstruct.collections.frozendict import frozendict
+    from funstruct.types.frozendict import frozendict
 
     def _set(s, value):
         match s:

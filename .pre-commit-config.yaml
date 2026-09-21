@@ -28,9 +28,21 @@ repos:
         language: system
         pass_filenames: false
         files: ^funstruct/typeclasses/
-      - id: typecheck
-        name: typecheck
-        entry: bash -c "just check"
+      - id: check-summon
+        name: check summon resolution
+        entry: uv run python scripts/check_summon.py
+        language: system
+        pass_filenames: false
+        files: ^(funstruct/|tests/|demos/)
+      - id: ty
+        name: ty
+        entry: bash -c "just ty"
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: mypy
+        name: mypy
+        entry: bash -c "just mypy"
         language: system
         pass_filenames: false
         stages: [pre-push]
