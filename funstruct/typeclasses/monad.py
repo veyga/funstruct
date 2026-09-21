@@ -42,92 +42,43 @@ class Monad(Applicative):
 
     @final
     def do(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
-        """Do-notation — compiles yield statements to bind/map chains.
+        """Do-notation via generators. Desugars yield to bind/pure.
 
-        ``yield`` is a syntactic marker for monadic bind, NOT a generator.
-        At decoration time, the function's AST is parsed and each
-        ``x = yield expr`` is rewritten to ``expr.bind(lambda x: ...)``.
-        No generator runs at call time — the result is a plain function
-        of nested bind/map calls.
+        ``yield`` suspends the generator and extracts the value from
+        the monadic context. Works for monads where bind calls the
+        continuation exactly once (Option, Result, Either, State, etc.).
 
-        Falls back to generator replay when source is unavailable (REPL).
-
-        Works for ALL monads including CList (list monad).
+        For CList (list monad), use ``funstruct.experimental.do_ast``
+        which compiles yield to bind/map chains via AST transformation.
 
         Example::
 
             @Result.do
             def pipeline():
-                x = yield Ok(10)      # x = yield ... → bind
-                y = yield Ok(x + 1)   # same
-                return x + y           # final value → map
+                x = yield Ok(10)
+                y = yield Ok(x + 1)
+                return x + y
 
-            # Compiles to:
-            # Ok(10).bind(lambda x: Ok(x + 1).map(lambda y: x + y))
+            pipeline()  # Ok(21)
         """
-        try:
-            from funstruct.typeclasses.do_ast import do_ast
-
-            return do_ast(gen_fn)
-        except (OSError, TypeError, SyntaxError):
-            return self._do_generator(gen_fn)
-
-    def _do_generator(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
-        """Fallback: generator replay for when AST source is unavailable."""
-        monad = self
 
         def _thunk(*args, **kwargs):
-            def go(history):
-                gen = gen_fn(*args, **kwargs)
-                mv = next(gen)
-                for sv in history:
-                    mv = gen.send(sv)
-
-                def step(value):
-                    try:
-                        test = gen_fn(*args, **kwargs)
-                        next(test)
-                        for sv in history:
-                            test.send(sv)
-                        test.send(value)
-                        return go(history + [value])
-                    except StopIteration as e:
-                        return monad.pure(e.value)
-
-                return monad.bind(mv, step)
-
+            gen = gen_fn(*args, **kwargs)
             try:
-                return go([])
+                monadic_val = next(gen)
             except StopIteration as e:
-                return monad.pure(e.value)
+                return self.pure(e.value)
+
+            def step(value):
+                try:
+                    next_val = gen.send(value)
+                    return self.bind(next_val, step)
+                except StopIteration as e:
+                    return self.pure(e.value)
+
+            return self.bind(monadic_val, step)
 
         return _thunk
-
-    # def do_single(self, gen_fn: Callable[..., Any]) -> Callable[..., Any]:
-    #     """Fast do-notation for monads where bind calls the continuation exactly once.
-    #
-    #     ~3x faster than do() but INCORRECT for CList (list monad) where bind
-    #     calls the continuation multiple times. Use when performance matters
-    #     and you know the monad is deterministic (Option, Result, Either, State, etc.).
-    #     """
-    #
-    #     def _thunk(*args, **kwargs):
-    #         gen = gen_fn(*args, **kwargs)
-    #         try:
-    #             monadic_val = next(gen)
-    #         except StopIteration as e:
-    #             return self.pure(e.value)
-    #
-    #         def step(value):
-    #             try:
-    #                 next_val = gen.send(value)
-    #                 return self.bind(next_val, step)
-    #             except StopIteration as e:
-    #                 return self.pure(e.value)
-    #
-    #         return self.bind(monadic_val, step)
-    #
-    #     return _thunk
 
 
 __all__ = ["Monad"]

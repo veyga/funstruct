@@ -109,6 +109,7 @@ def failing_pipeline():
 
 from dataclasses import dataclass as dc
 
+from funstruct.experimental.do_ast import do_ast
 from funstruct.types.cons import CList
 
 
@@ -130,7 +131,7 @@ orders = CList.from_iterable([
 ])
 
 
-@CList.do
+@do_ast
 def user_orders():
     user = yield users
     order = yield orders

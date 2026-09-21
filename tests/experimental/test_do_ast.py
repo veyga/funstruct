@@ -1,6 +1,6 @@
 """Tests for AST-based do-notation — compiles yield to bind/map chains."""
 
-from funstruct.typeclasses.do_ast import do_ast
+from funstruct.experimental.do_ast import do_ast
 from funstruct.types.cons import CList
 from funstruct.types.option import Nothing, Some
 from funstruct.types.result import Err, Ok

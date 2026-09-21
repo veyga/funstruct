@@ -168,6 +168,38 @@ def pipeline():
 
 For hot loops, prefer bind chains. For readability (3+ steps), use do.
 
+## CList (list monad)
+
+`@do` uses Python generators internally. CList's `bind` calls the
+continuation multiple times (once per element), but generators are
+single-use — so `@CList.do` produces incorrect results.
+
+For list comprehension-style operations, use `map2` or explicit `bind` chains:
+
+```python
+from funstruct.typeclasses import Monad, summon
+from funstruct.types.cons import CList
+
+M = summon(Monad, CList)
+
+# Cartesian product: for { x <- xs; y <- ys } yield (x, y)
+M.map2(
+    CList.from_iterable([1, 2]),
+    CList.from_iterable(["a", "b"]),
+    lambda x, y: (x, y),
+)
+# → CList([(1, "a"), (1, "b"), (2, "a"), (2, "b")])
+
+# Dependent values: use bind chains
+xs = CList.from_iterable([1, 2, 3])
+xs.bind(lambda x: CList.from_iterable([x, x * 10]).map(lambda y: (x, y)))
+# → CList([(1, 1), (1, 10), (2, 2), (2, 20), (3, 3), (3, 30)])
+```
+
+An experimental AST-based `do` that works for CList is available at
+`funstruct.experimental.do_ast`. It compiles yield to bind/map at
+decoration time (no generators at runtime).
+
 ## See also
 
 - `demos/02_do_notation.py` — do-notation variants
