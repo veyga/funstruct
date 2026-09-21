@@ -14,14 +14,13 @@ Examples:
 from __future__ import annotations
 
 from abc import abstractmethod
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar, final
 
 from funstruct.typeclasses.mixins.data_type import DataType
 
 A = TypeVar("A")
-B = TypeVar("B")
 
 
 class CList(DataType, Generic[A]):
@@ -44,12 +43,6 @@ class CList(DataType, Generic[A]):
 
     @abstractmethod
     def append(self, other: CList) -> CList: ...
-
-    @abstractmethod
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B: ...
-
-    @abstractmethod
-    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B: ...
 
     @abstractmethod
     def drop(self, n: int) -> CList: ...
@@ -186,12 +179,6 @@ class CList(DataType, Generic[A]):
     def __rlshift__(self, other: A) -> CList:
         return self.prepend(other)
 
-    def __add__(self, other: CList) -> CList:
-        return self.append(other)
-
-    def __len__(self) -> int:
-        return self.fold_right(0, lambda _, acc: acc + 1)
-
     def to_list(self) -> list[A]:
         """>>> Cons(1, Cons(2, Cons(3, Nil()))).to_list()
         [1, 2, 3]
@@ -199,12 +186,6 @@ class CList(DataType, Generic[A]):
         []
         """
         return list(self)
-
-    def __iter__(self) -> Iterator[A]:
-        current = self
-        while isinstance(current, Cons):
-            yield current.head
-            current = current.tail
 
 
 
@@ -221,12 +202,6 @@ class Nil(CList):
 
     def append(self, other: CList) -> CList:
         return other
-
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        return acc
-
-    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
-        return acc
 
     def drop(self, n: int) -> CList:
         return self
@@ -257,22 +232,6 @@ class Cons(CList[A]):
 
     def append(self, other: CList) -> CList:
         return self.reversed().fold_left(other, lambda acc, h: Cons(h, acc))
-
-    def fold_right(self, acc: B, f: Callable[[A, B], B]) -> B:
-        return self.reversed().fold_left(acc, lambda a, b: f(b, a))
-
-    def fold_left(self, acc: B, f: Callable[[B, A], B]) -> B:
-        from funstruct.util.tailrec import tail_call, tco
-
-        @tco
-        def _go(current, result):
-            match current:
-                case Nil():
-                    return result
-                case Cons(h, t):
-                    return tail_call(_go)(t, f(result, h))
-
-        return _go(self, acc)
 
     def drop(self, n: int) -> CList:
         return self if n <= 0 else self.tail.drop(n - 1)

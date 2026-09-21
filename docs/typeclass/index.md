@@ -45,6 +45,33 @@ Instances only implement **primitives** (`pure` + `bind` for Monad).
 Derived operations (`map`, `ap`, `do`, `product`, `then`, `map2`) come
 from the typeclass hierarchy automatically.
 
+## Instance Grid
+
+Which types implement which typeclasses:
+
+| Type | Eq | Repr | Truth | Semi | Monoid | Func | App | Monad | MErr | Alt | Fold | Trav | Bifu | Str |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Option | ✓ | ✓ | ✓ | | | | | ✓ | | ✓ | | ✓ | | |
+| Either | ✓ | ✓ | | | | | | | ✓ | | | ✓ | ✓ | |
+| Result | ✓ | ✓ | | | | | | | ✓ | | | | ✓ | |
+| AsyncResult | | ✓ | | | | | | | ✓ | | | | ✓ | |
+| CList | ✓ | ✓ | ✓ | | ✓ | | | ✓ | | ✓ | | ✓ | | ✓ |
+| Tree | ✓ | ✓ | | | | ✓ | | | | | ✓ | ✓ | | |
+| frozendict | ✓ | ✓ | ✓ | ✓ | | ✓ | | | | | ✓ | | | |
+| Validated | ✓ | ✓ | ✓ | | | | ✓ | | | | | | ✓ | |
+| ZipList | ✓ | ✓ | | | | | ✓ | | | | ✓ | | | |
+| State | | ✓ | | | | | | ✓ | | | | | | |
+| Reader | | ✓ | | | | | | ✓ | | | | | | |
+| Writer | ✓ | ✓ | | | | | | ✓ | | | | | | |
+| Future | | ✓ | | | | | | ✓ | | | | | | |
+
+**Key:** Eq = equality + hash, Repr = `__repr__`, Truth = `__bool__`, Str = `__str__`,
+Func = Functor, App = Applicative, MErr = MonadError, Alt = Alternative,
+Fold = Foldable, Trav = Traversable, Bifu = Bifunctor
+
+Types without Eq (State, Reader, Future, AsyncResult) use identity comparison.
+Types without Truthable default to `True` (Python default).
+
 ## Typeclasses
 
 - [Semigroup](semigroup.md)

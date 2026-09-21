@@ -17,7 +17,7 @@ Examples:
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
 from typing import Generic, TypeVar
 
 from funstruct.typeclasses.mixins.data_type import DataType
@@ -31,17 +31,8 @@ class ZipList(DataType, Generic[_A]):
     def __init__(self, values: Iterable[_A]) -> None:
         self._values = list(values)
 
-    def __mul__(self, other: ZipList) -> ZipList:
-        return self.product(other)
-
     def to_list(self) -> list[_A]:
         return list(self._values)
-
-    def __iter__(self) -> Iterator[_A]:
-        return iter(self._values)
-
-    def __len__(self) -> int:
-        return len(self._values)
 
 
 

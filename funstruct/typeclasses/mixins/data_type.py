@@ -95,9 +95,9 @@ class DataType(TypeConstructor, DotNotation, metaclass=HKTMeta):
         - Auto _type_constructor detection (TypeConstructor)
         - Instance-level dispatch to typeclass instances (DotNotation)
         - Class-level dispatch to typeclass instances (HKTMeta)
-        - Python dunder dispatch to Eq/Representable/Stringable/Truthable
-        - >> operator (bind)
-        - * operator (product)
+        - Python dunder dispatch to typeclasses (Eq, Representable, etc.)
+        - >> operator (bind via DotNotation)
+        - * operator (product via DotNotation)
 
     Dunders delegate to typeclass instances when available,
     with sensible fallbacks when no instance is registered.
@@ -129,6 +129,29 @@ class DataType(TypeConstructor, DotNotation, metaclass=HKTMeta):
         from funstruct.typeclasses.truthable import Truthable
         result = _dispatch(self, Truthable, "is_truthy")
         return result if result is not _MISSING else True
+
+    def __add__(self, other):
+        from funstruct.typeclasses.semigroup import Semigroup
+        result = _dispatch(self, Semigroup, "combine", other)
+        return result if result is not _MISSING else NotImplemented
+
+    def __iter__(self):
+        from funstruct.typeclasses.foldable import Foldable
+        tc = type(self)._type_constructor or type(self)
+        for (_, t), instance in _registry.items():
+            if t is tc and isinstance(instance, Foldable):
+                result = []
+                instance.fold_left(self, None, lambda _, a: result.append(a))
+                return iter(result)
+        raise TypeError(f"'{type(self).__name__}' is not iterable (no Foldable instance)")
+
+    def __len__(self) -> int:
+        from funstruct.typeclasses.foldable import Foldable
+        tc = type(self)._type_constructor or type(self)
+        for (_, t), instance in _registry.items():
+            if t is tc and isinstance(instance, Foldable):
+                return instance.fold_left(self, 0, lambda acc, _: acc + 1)
+        raise TypeError(f"'{type(self).__name__}' has no len (no Foldable instance)")
 
 
 __all__ = ["DataType"]

@@ -13,10 +13,27 @@ _B = TypeVar("_B")
 
 class _CListTraversable(Traversable, for_type=CList):
     def fold_left(self, fa: CList[_A], acc: _B, f: Callable[[_B, _A], _B]) -> _B:
-        return fa.fold_left(acc, f)
+        from funstruct.util.tailrec import tail_call, tco
+
+        @tco
+        def _go(current, result):
+            match current:
+                case Nil():
+                    return result
+                case Cons(h, t):
+                    return tail_call(_go)(t, f(result, h))
+
+        return _go(fa, acc)
 
     def fold_right(self, fa: CList[_A], acc: _B, f: Callable[[_A, _B], _B]) -> _B:
-        return fa.fold_right(acc, f)
+        items = []
+        current = fa
+        while isinstance(current, Cons):
+            items.append(current.head)
+            current = current.tail
+        for item in reversed(items):
+            acc = f(item, acc)
+        return acc
 
     def traverse(
         self,
@@ -24,7 +41,8 @@ class _CListTraversable(Traversable, for_type=CList):
         f: Callable[[_A], Any],
         G: Applicative,
     ) -> Any:
-        return fa.fold_right(
+        return self.fold_right(
+            fa,
             G.pure(Nil()),
-            lambda a, acc: G.map2(f(a), acc, lambda b, bs: Cons(b, bs)),  # type: ignore[arg-type]  # HKT limitation
+            lambda a, acc: G.map2(f(a), acc, lambda b, bs: Cons(b, bs)),  # type: ignore[arg-type]
         )

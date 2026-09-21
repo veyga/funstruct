@@ -42,9 +42,6 @@ class Validated(DataType, ABC, Generic[_E, _A]):
         on_valid: Callable[[_A], _C],
     ) -> _C: ...
 
-    def __mul__(self, other: Validated) -> Validated:
-        return self.product(other)
-
     @staticmethod
     def valid(value: _A) -> Validated:
         return Valid(value)

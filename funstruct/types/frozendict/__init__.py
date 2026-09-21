@@ -318,9 +318,6 @@ class frozendict(DataType, Generic[K, V]):
             result = result.put(k, v)
         return result
 
-    def __add__(self, other: frozendict[K, V]) -> frozendict[K, V]:
-        return self.combine(other)
-
     def _map_internal(self, f: Callable[[V], V2]) -> frozendict[K, V2]:
         root = _EMPTY
         size = 0
