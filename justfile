@@ -30,9 +30,13 @@ docs-build:
 fmt-docs:
   uv run --group docs mdformat docs/ README.md
 
-# run pytest
-test *args:
-  uv run pytest {{args}}
+# run demo script
+demo file:
+  uv run python demos/{{file}}
+
+# debug demo script
+ddemo file:
+  PYDEVD_DISABLE_FILE_VALIDATION=1 uv run python -m debugpy --listen 0.0.0.0:5680 --wait-for-client demos/{{file}}
 
 # run pytest with coverage (pass 'html' to open browser report)
 cover *args:
